@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
+import { AppError, toAppError } from "@/lib/utils/error";
 
 export type RegistroState = {
   success: boolean;
@@ -14,6 +15,7 @@ export async function registrarAsistente(
   prevState: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
+  const previousMessage = prevState.message;
   // 1. Extraer datos del FormData
   const rawData = {
     nombre: formData.get("nombre"),
@@ -91,15 +93,11 @@ export async function registrarAsistente(
         };
       }
 
-      console.error("Supabase insert error:", error);
-      return {
-        success: false,
-        message:
-          "Error al procesar el registro. Intenta nuevamente o contáctanos.",
-        errors: {
-          _form: ["Error interno del servidor. Código: " + error.code],
-        },
-      };
+      throw new AppError(
+        "Error al procesar el registro. Intenta nuevamente o contáctanos.",
+        "DATABASE_ERROR",
+        error
+      );
     }
 
     return {
@@ -107,11 +105,14 @@ export async function registrarAsistente(
       message: `Registro completado. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.`,
       folio,
     };
-  } catch (err) {
-    console.error("Unexpected error:", err);
+  } catch (error) {
+    const appError = toAppError(
+      error,
+      previousMessage || "Error inesperado. Contacta a Contacto@LanzLogistics.com"
+    );
     return {
       success: false,
-      message: "Error inesperado. Contacta a Contacto@LanzLogistics.com",
+      message: appError.message,
       errors: {
         _form: ["Error de servidor. Por favor intenta más tarde."],
       },
