@@ -12,9 +12,10 @@ export type RegistroState = {
 };
 
 export async function registrarAsistente(
-  _prevState: RegistroState,
+  prevState: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
+  const previousMessage = prevState.message;
   // 1. Extraer datos del FormData
   const rawData = {
     nombre: formData.get("nombre"),
@@ -107,7 +108,7 @@ export async function registrarAsistente(
   } catch (error) {
     const appError = toAppError(
       error,
-      "Error inesperado. Contacta a Contacto@LanzLogistics.com"
+      previousMessage || "Error inesperado. Contacta a Contacto@LanzLogistics.com"
     );
     return {
       success: false,
