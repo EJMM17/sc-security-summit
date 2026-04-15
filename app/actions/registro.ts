@@ -12,10 +12,9 @@ export type RegistroState = {
 };
 
 export async function registrarAsistente(
-  prevState: RegistroState,
+  _prevState: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
-  void prevState;
   // 1. Extraer datos del FormData
   const rawData = {
     nombre: formData.get("nombre"),
