@@ -45,18 +45,23 @@ CREATE TRIGGER set_updated_at
 
 -- 4. Row Level Security
 ALTER TABLE public.registros ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.registros FORCE ROW LEVEL SECURITY;
 
--- Política: solo el service_role puede insertar/leer/actualizar
--- (Las inserciones vienen del Server Action con service_role key)
+-- Política estricta: solo service_role puede operar sobre registros.
+-- Esta política cubre SELECT/INSERT/UPDATE/DELETE.
+-- El rol service_role se usa en Server Actions del backend, nunca en el browser.
+DROP POLICY IF EXISTS "service_role_full_access" ON public.registros;
 CREATE POLICY "service_role_full_access" ON public.registros
   FOR ALL
   TO service_role
   USING (true)
   WITH CHECK (true);
 
--- Política: acceso público denegado (no se permite leer desde el browser)
--- Por diseño, los registros solo se leen desde el dashboard de Supabase
--- o via service_role en Server Actions/API Routes.
+-- Política para usuarios autenticados (authenticated): sin acceso directo.
+-- No se crean políticas para authenticated/anon, por lo que RLS bloquea
+-- lectura/escritura por defecto para clientes de navegador.
+-- FORCE ROW LEVEL SECURITY asegura que incluso el owner de la tabla
+-- respete las políticas RLS.
 
 -- 5. Constraint de unicidad de email por edición
 ALTER TABLE public.registros

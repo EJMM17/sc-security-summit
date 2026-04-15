@@ -22,6 +22,7 @@ Edita `.env.local` con tus credenciales de Supabase:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://TU_PROJECT_REF.supabase.co
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 NEXT_PUBLIC_SITE_URL=https://www.scsecuritysummit.com
 ```
@@ -60,8 +61,17 @@ components/
   RegistroForm.tsx        ← Form cliente con useFormState
 
 lib/
-  supabase.ts             ← Cliente admin (service_role)
+  supabase/
+    index.ts              ← Exports de clientes Supabase
+    client.ts             ← Cliente browser (Client Components)
+    server.ts             ← Clientes SSR para Server Components/Actions/Middleware
+    admin.ts              ← Cliente admin (service_role)
   schemas.ts              ← Zod schema + precios
+  utils/
+    error.ts              ← Utilidad genérica de errores
+
+types/
+  supabase.ts             ← Tipos base de la DB (Supabase)
 
 supabase-migration.sql    ← DDL para crear tabla registros
 .env.local.example        ← Template de variables de entorno
