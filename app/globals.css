@@ -1,55 +1,74 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Montserrat:wght@600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Montserrat:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,300&family=DM+Mono:wght@400;500&display=swap');
+
+/* ══════════════════════════════════════════════════════════════════
+   SISTEMA DE CONTRASTE — 3 niveles máximos por fondo
+   Estándar WCAG AA mínimo, objetivo WCAG AAA donde sea posible
+   ══════════════════════════════════════════════════════════════════
+
+   SOBRE FONDOS OSCUROS (navy-darker, navy, navy-mid):
+     --on-dark-primary:    rgba(255,255,255,0.95)  → títulos, datos clave
+     --on-dark-secondary:  rgba(255,255,255,0.70)  → cuerpo, descripciones
+     --on-dark-tertiary:   rgba(255,255,255,0.50)  → labels, metadata, notas
+     NUNCA usar opacidad < 0.50 para texto informativo
+
+   SOBRE FONDOS CLAROS (#fff, #f4f6fb):
+     --on-light-primary:   #080e1e                 → títulos
+     --on-light-secondary: #3a4566                 → cuerpo
+     --on-light-tertiary:  #6b7a9e                 → labels, notas
+   ══════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* Core palette */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
+  /* ── Backgrounds ── */
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f4f6fb;
+  --bg-tertiary:  #eaecf4;
 
-  /* Navy corporate */
-  --navy: #1e3a8a;
-  --navy-dark: #1e2d5a;
-  --navy-darker: #0f1e3d;
-  --navy-light: #2d4fa8;
+  /* ── Navy principal ── */
+  --navy:         #0d2554;
+  --navy-dark:    #091a3e;
+  --navy-darker:  #060f27;
+  --navy-mid:     #163070;
+  --navy-light:   #1e3d96;
 
-  /* Text */
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --text-on-navy: #ffffff;
+  /* ── Steel — único acento ── */
+  --steel:        #1e56c4;
+  --steel-light:  #3b72e8;
+  --steel-pale:   #8bb8fc;
+  --steel-muted:  rgba(30,86,196,0.09);
+  --steel-border: rgba(30,86,196,0.22);
 
-  /* Borders — gris humo 1px */
-  --border: #e5e7eb;
-  --border-strong: #d1d5db;
-  --border-smoke: #e5e7eb;
+  /* ── Texto sobre FONDOS CLAROS ── */
+  --text-primary:   #080e1e;
+  --text-secondary: #3a4566;
+  --text-tertiary:  #6b7a9e;   /* antes "muted" — mínimo WCAG AA sobre #fff */
 
-  /* Status */
-  --success: #16a34a;
-  --error: #dc2626;
+  /* ── Texto sobre FONDOS OSCUROS (valores fijos, no opacidades) ── */
+  --dark-text-1: rgba(255,255,255,0.95);  /* títulos, datos */
+  --dark-text-2: rgba(255,255,255,0.72);  /* cuerpo, descripciones */
+  --dark-text-3: rgba(255,255,255,0.52);  /* labels, metadata */
 
-  /* Typography */
-  --font-display: 'Montserrat', sans-serif;
-  --font-body: 'Inter', sans-serif;
-  /* Monoespaciada para cifras numéricas, precios, fechas, folios */
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+  /* ── Bordes ── */
+  --border:        #dde2ef;
+  --border-strong: #b8c2d8;
 
-  /* Spacing */
-  --section-py: 6rem;
-  --section-py-lg: 8rem;
+  /* ── Superficies en oscuro (cards, dividers) ── */
+  --dark-surface-1: rgba(255,255,255,0.08);  /* cards */
+  --dark-surface-2: rgba(255,255,255,0.05);  /* separadores */
+  --dark-border:    rgba(255,255,255,0.10);  /* bordes */
+
+  /* ── Tipografía ── */
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body:    'Montserrat', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Cascadia Code', monospace;
+
+  /* ── Spacing ── */
+  --section-py: 7rem;
+  --max-w:      1240px;
+  --gutter:     2.5rem;
 }
 
-/* Clase utilitaria: números/cifras en mono */
-.num {
-  font-family: var(--font-mono);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
-}
-
-/* Sin sombras globalmente — jerarquía por color de fondo */
-*, *::before, *::after {
-  box-sizing: border-box;
-  box-shadow: none !important;
-}
+/* ── Reset ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html {
   scroll-behavior: smooth;
@@ -58,33 +77,31 @@ html {
 }
 
 body {
-  margin: 0;
   font-family: var(--font-body);
   font-size: 1rem;
-  line-height: 1.6;
+  line-height: 1.65;
   color: var(--text-primary);
   background: var(--bg-primary);
 }
 
-/* Focus visible for a11y */
 :focus-visible {
-  outline: 2px solid var(--navy);
+  outline: 2px solid var(--steel);
   outline-offset: 3px;
   border-radius: 2px;
 }
 
-/* Skip nav for a11y */
 .skip-nav {
-  position: absolute;
-  top: -100%;
-  left: 1rem;
-  padding: 0.5rem 1rem;
-  background: var(--navy);
-  color: white;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border-radius: 0 0 4px 4px;
-  z-index: 9999;
-  transition: top 0.2s;
+  position: absolute; top: -100%; left: 1rem;
+  padding: 0.5rem 1rem; background: var(--navy);
+  color: white; font-size: 0.875rem; font-weight: 600;
+  border-radius: 0 0 4px 4px; z-index: 9999; transition: top 0.2s;
 }
 .skip-nav:focus { top: 0; }
+
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+::selection { background: rgba(30,86,196,0.15); }

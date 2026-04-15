@@ -1,0 +1,111 @@
+/*!*************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[14].oneOf[10].use[3]!./app/globals.css ***!
+  \*************************************************************************************************************************************************************************************************************************************************************/
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Montserrat:ital,opsz,wght@0,6..12,300;0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,300&family=DM+Mono:wght@400;500&display=swap');
+
+/* ══════════════════════════════════════════════════════════════════
+   SISTEMA DE CONTRASTE — 3 niveles máximos por fondo
+   Estándar WCAG AA mínimo, objetivo WCAG AAA donde sea posible
+   ══════════════════════════════════════════════════════════════════
+
+   SOBRE FONDOS OSCUROS (navy-darker, navy, navy-mid):
+     --on-dark-primary:    rgba(255,255,255,0.95)  → títulos, datos clave
+     --on-dark-secondary:  rgba(255,255,255,0.70)  → cuerpo, descripciones
+     --on-dark-tertiary:   rgba(255,255,255,0.50)  → labels, metadata, notas
+     NUNCA usar opacidad < 0.50 para texto informativo
+
+   SOBRE FONDOS CLAROS (#fff, #f4f6fb):
+     --on-light-primary:   #080e1e                 → títulos
+     --on-light-secondary: #3a4566                 → cuerpo
+     --on-light-tertiary:  #6b7a9e                 → labels, notas
+   ══════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Backgrounds ── */
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f4f6fb;
+  --bg-tertiary:  #eaecf4;
+
+  /* ── Navy principal ── */
+  --navy:         #0d2554;
+  --navy-dark:    #091a3e;
+  --navy-darker:  #060f27;
+  --navy-mid:     #163070;
+  --navy-light:   #1e3d96;
+
+  /* ── Steel — único acento ── */
+  --steel:        #1e56c4;
+  --steel-light:  #3b72e8;
+  --steel-pale:   #8bb8fc;
+  --steel-muted:  rgba(30,86,196,0.09);
+  --steel-border: rgba(30,86,196,0.22);
+
+  /* ── Texto sobre FONDOS CLAROS ── */
+  --text-primary:   #080e1e;
+  --text-secondary: #3a4566;
+  --text-tertiary:  #6b7a9e;   /* antes "muted" — mínimo WCAG AA sobre #fff */
+
+  /* ── Texto sobre FONDOS OSCUROS (valores fijos, no opacidades) ── */
+  --dark-text-1: rgba(255,255,255,0.95);  /* títulos, datos */
+  --dark-text-2: rgba(255,255,255,0.72);  /* cuerpo, descripciones */
+  --dark-text-3: rgba(255,255,255,0.52);  /* labels, metadata */
+
+  /* ── Bordes ── */
+  --border:        #dde2ef;
+  --border-strong: #b8c2d8;
+
+  /* ── Superficies en oscuro (cards, dividers) ── */
+  --dark-surface-1: rgba(255,255,255,0.08);  /* cards */
+  --dark-surface-2: rgba(255,255,255,0.05);  /* separadores */
+  --dark-border:    rgba(255,255,255,0.10);  /* bordes */
+
+  /* ── Tipografía ── */
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body:    'Montserrat', system-ui, sans-serif;
+  --font-mono:    'DM Mono', 'Cascadia Code', monospace;
+
+  /* ── Spacing ── */
+  --section-py: 7rem;
+  --max-w:      1240px;
+  --gutter:     2.5rem;
+}
+
+/* ── Reset ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  line-height: 1.65;
+  color: var(--text-primary);
+  background: var(--bg-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--steel);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+.skip-nav {
+  position: absolute; top: -100%; left: 1rem;
+  padding: 0.5rem 1rem; background: var(--navy);
+  color: white; font-size: 0.875rem; font-weight: 600;
+  border-radius: 0 0 4px 4px; z-index: 9999; transition: top 0.2s;
+}
+.skip-nav:focus { top: 0; }
+
+.num { font-family: var(--font-mono); font-feature-settings: "tnum"; font-variant-numeric: tabular-nums; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+::selection { background: rgba(30,86,196,0.15); }
+
