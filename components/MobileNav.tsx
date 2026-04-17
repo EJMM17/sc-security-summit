@@ -30,7 +30,7 @@ export default function MobileNav() {
         onClick={() => setOpen(!open)}
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
         aria-expanded={open}
-        className="relative z-50 w-10 h-10 flex items-center justify-center rounded-full border border-[var(--border-light)] hover:bg-[var(--blue-50)] transition-colors"
+        className="relative z-50 w-11 h-11 flex items-center justify-center rounded-full border border-[var(--border-light)] hover:bg-[var(--blue-50)] transition-colors touch-manipulation"
       >
         {open ? (
           <X className="w-5 h-5 text-[var(--navy)]" />
@@ -49,7 +49,7 @@ export default function MobileNav() {
 
       {/* Slide-down panel */}
       <div
-        className={`fixed top-[68px] left-4 right-4 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 ${
+        className={`fixed top-[68px] left-4 right-4 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"

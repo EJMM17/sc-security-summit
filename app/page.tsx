@@ -450,9 +450,9 @@ export default function Home() {
           {/* Content */}
           <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
             <ScrollReveal>
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8">
+              <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 sm:px-5 py-2.5 mb-8">
                 <Calendar className="w-4 h-4 text-cyan-300" />
-                <span className="text-sm text-white/90 font-medium">
+                <span className="text-xs sm:text-sm text-white/90 font-medium">
                   24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas
                 </span>
               </div>
@@ -485,11 +485,11 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={400}>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="#registro" className="btn-primary px-8 py-4 text-base">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
+                <a href="#registro" className="btn-primary px-8 py-4 text-base w-full sm:w-auto">
                   REGISTRARME AHORA <ArrowRight className="w-4 h-4" />
                 </a>
-                <a href="#patrocinadores" className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10">
+                <a href="#patrocinadores" className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
                   PATROCINAR EL EVENTO
                 </a>
               </div>
@@ -1036,7 +1036,7 @@ export default function Home() {
                 <ScrollReveal key={plan.id} delay={i * 100}>
                   <div
                     className={`relative p-8 rounded-2xl h-full flex flex-col transition-all duration-300 ${plan.featured
-                        ? "text-white border-2 border-blue-400 shadow-2xl scale-[1.03]"
+                        ? "text-white border-2 border-blue-400 shadow-2xl md:scale-[1.03]"
                         : "bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-blue-300"
                       }`}
                     style={plan.featured ? {
@@ -1127,7 +1127,10 @@ export default function Home() {
             {/* Comparison Table */}
             <ScrollReveal delay={300}>
               <div className="card-elevated mt-16 overflow-x-auto">
-                <table className="comparison-table w-full">
+                <p className="px-4 pt-4 text-[11px] sm:hidden text-slate-500">
+                  Desliza horizontalmente para comparar todos los beneficios.
+                </p>
+                <table className="comparison-table w-full min-w-[700px]">
                   <thead>
                     <tr>
                       <th className="text-left p-5 font-oswald text-xs tracking-wider text-slate-400 uppercase">Beneficio</th>
@@ -1236,7 +1239,7 @@ export default function Home() {
                 <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
                   <iframe
                     src="https://www.google.com/maps?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico&output=embed"
-                    className="w-full h-[350px]"
+                    className="w-full h-[280px] sm:h-[350px]"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
