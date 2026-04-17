@@ -313,7 +313,7 @@ const FAQ_ITEMS = [
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
-    answer: "El accceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+    answer: "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
   },
   {
     question: "¿Puedo obtener factura (CFDI)?",
@@ -1447,7 +1447,7 @@ export default function Home() {
                 <a href="/aviso-de-privacidad" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
                   Aviso de Privacidad
                 </a>
-                <a href="mailto:Contacto@LanzLogistics.com?subject=Términos%20y%20Condiciones" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                <a href="/terminos-y-condiciones" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
                   Términos y Condiciones
                 </a>
               </div>

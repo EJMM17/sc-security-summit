@@ -91,8 +91,10 @@ export default function RootLayout({
                 name: "Centro de Convenciones de Reynosa",
                 address: {
                   "@type": "PostalAddress",
+                  streetAddress: "Blvd. Morelos 190, Col. Longoria",
                   addressLocality: "Reynosa",
                   addressRegion: "Tamaulipas",
+                  postalCode: "88630",
                   addressCountry: "MX",
                 },
               },
