@@ -1,437 +1,358 @@
 "use client";
 
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState, useState, useEffect } from "react";
+import { Send, FileText, Loader2, CheckCircle2 } from "lucide-react";
 import { registrarAsistente, type RegistroState } from "@/app/actions/registro";
-import { CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
+/* ─── Shared input styles for Corporate Aesthetic ── */
+const inputClass =
+  "w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all";
+
+const labelClass =
+  "block text-sm font-semibold text-slate-700 mb-1.5";
+
+const errorClass =
+  "text-xs text-red-500 mt-1.5 flex items-center gap-1";
+
+/* ─── Initial state ────────────────────────────────────────────────────────── */
 const initialState: RegistroState = {
   success: false,
   message: "",
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      aria-busy={pending}
-      style={{
-        width: "100%",
-        padding: "14px 24px",
-        background: pending ? "#94a3b8" : "var(--navy)",
-        color: "#fff",
-        border: "none",
-        borderRadius: 6,
-        fontFamily: "var(--font-body)",
-        fontWeight: 600,
-        fontSize: "0.9375rem",
-        cursor: pending ? "not-allowed" : "pointer",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        gap: 8,
-        transition: "background 0.15s",
-      }}
-    >
-      {pending ? (
-        <>
-          <Loader2 size={18} style={{ animation: "spin 1s linear infinite" }} strokeWidth={1} />
-          Procesando registro...
-        </>
-      ) : (
-        "Confirmar Registro"
-      )}
-    </button>
-  );
-}
-
-function FieldError({ errors }: { errors?: string[] }) {
-  if (!errors?.length) return null;
-  return (
-    <p
-      role="alert"
-      style={{
-        color: "var(--error)",
-        fontSize: "0.8125rem",
-        marginTop: 4,
-        display: "flex",
-        alignItems: "center",
-        gap: 4,
-      }}
-    >
-      <AlertCircle size={13} strokeWidth={1} />
-      {errors[0]}
-    </p>
-  );
-}
-
-const ACCESOS = [
-  { value: "estudiante", label: "Estudiante", price: "$890 MXN", note: "(requiere credencial)" },
-  { value: "general",    label: "General",    price: "$5,800 MXN", note: "" },
-  { value: "vip",        label: "VIP",        price: "$7,200 MXN", note: "" },
-] as const;
-
+/* ─── Component ────────────────────────────────────────────────────────────── */
 export default function RegistroForm() {
-  const [state, formAction] = useFormState(registrarAsistente, initialState);
+  const [state, formAction, isPending] = useActionState(
+    registrarAsistente,
+    initialState
+  );
+  const [requiresCFDI, setRequiresCFDI] = useState(false);
 
+  /* ── Toasts Feedback ── */
+  useEffect(() => {
+    if (state.message) {
+      if (state.success) {
+        toast.success("¡Operación Exitosa!", {
+          description: state.message,
+        });
+      } else {
+        toast.error("Aviso", {
+          description: state.message,
+        });
+      }
+    }
+  }, [state]);
+
+  /* ── Success screen ── */
   if (state.success) {
     return (
-      <div
-        role="status"
-        aria-live="polite"
-        style={{
-          textAlign: "center",
-          padding: "3rem 2rem",
-          background: "#f0fdf4",
-          border: "1px solid #bbf7d0",
-          borderRadius: 8,
-        }}
-      >
-        <CheckCircle
-          size={48}
-          color="#16a34a"
-          strokeWidth={1}
-          style={{ marginBottom: "1rem" }}
-        />
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-6">
+          <CheckCircle2 className="w-8 h-8 text-green-500" />
+        </div>
         <h3
-          style={{
-            fontFamily: "var(--font-display)",
-            fontWeight: 700,
-            fontSize: "1.25rem",
-            color: "#0f172a",
-            marginBottom: "0.75rem",
-          }}
+          className="text-2xl font-bold mb-3 text-slate-900"
+          style={{ fontFamily: "var(--font-oswald)" }}
         >
-          Registro completado
+          ¡Registro Exitoso!
         </h3>
-        <p style={{ color: "#475569", fontSize: "0.9375rem", marginBottom: "1rem" }}>
-          {state.message}
-        </p>
         {state.folio && (
-          <div
-            style={{
-              display: "inline-block",
-              background: "#fff",
-              border: "1px solid #bbf7d0",
-              borderRadius: 4,
-              padding: "8px 20px",
-              fontFamily: "var(--font-mono)",
-              fontWeight: 500,
-              fontSize: "1rem",
-              color: "var(--navy)",
-              letterSpacing: "0.06em",
-            }}
-          >
-            {state.folio}
+          <div className="inline-flex flex-col items-center gap-1 px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl mb-6">
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              Tu Folio de Acceso
+            </span>
+            <span
+              className="text-2xl font-bold text-blue-600"
+              style={{ fontFamily: "var(--font-oswald)" }}
+            >
+              {state.folio}
+            </span>
           </div>
         )}
+        <p className="text-slate-600 text-sm leading-relaxed max-w-sm">
+          {state.message}
+        </p>
       </div>
     );
   }
 
   return (
-    <form action={formAction} noValidate>
-      {/* Form-level error */}
-      {state.errors?._form && (
-        <div
-          role="alert"
-          style={{
-            background: "#fef2f2",
-            border: "1px solid #fecaca",
-            borderRadius: 6,
-            padding: "12px 16px",
-            marginBottom: "1.5rem",
-            color: "var(--error)",
-            fontSize: "0.875rem",
-            display: "flex",
-            gap: 8,
-            alignItems: "flex-start",
-          }}
-        >
-          <AlertCircle size={16} style={{ flexShrink: 0, marginTop: 1 }} strokeWidth={1} />
-          {state.errors._form[0]}
-        </div>
-      )}
+    <form action={formAction} className="space-y-6">
 
-      <div style={{ display: "grid", gap: "1.25rem" }}>
-        {/* Nombre + Apellido */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label htmlFor="nombre" style={labelStyle}>
-              Nombre <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
-            </label>
-            <input
-              id="nombre"
-              name="nombre"
-              type="text"
-              required
-              autoComplete="given-name"
-              aria-required="true"
-              aria-describedby={state.errors?.nombre ? "nombre-error" : undefined}
-              aria-invalid={!!state.errors?.nombre}
-              placeholder="Juan"
-              style={inputStyle(!!state.errors?.nombre)}
-            />
-            <span id="nombre-error">
-              <FieldError errors={state.errors?.nombre} />
-            </span>
-          </div>
-          <div>
-            <label htmlFor="apellido" style={labelStyle}>
-              Apellido <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
-            </label>
-            <input
-              id="apellido"
-              name="apellido"
-              type="text"
-              required
-              autoComplete="family-name"
-              aria-required="true"
-              aria-describedby={state.errors?.apellido ? "apellido-error" : undefined}
-              aria-invalid={!!state.errors?.apellido}
-              placeholder="García Méndez"
-              style={inputStyle(!!state.errors?.apellido)}
-            />
-            <span id="apellido-error">
-              <FieldError errors={state.errors?.apellido} />
-            </span>
-          </div>
-        </div>
-
-        {/* Email */}
+      {/* Nombre + Apellido */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
-          <label htmlFor="email" style={labelStyle}>
-            Correo electrónico <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
+          <label htmlFor="reg-nombre" className={labelClass}>
+            Nombre(s)
           </label>
           <input
-            id="email"
-            name="email"
-            type="email"
+            id="reg-nombre"
+            name="nombre"
+            type="text"
             required
-            autoComplete="email"
-            aria-required="true"
-            aria-describedby={state.errors?.email ? "email-error" : undefined}
-            aria-invalid={!!state.errors?.email}
-            placeholder="juan@empresa.com"
-            style={inputStyle(!!state.errors?.email)}
+            placeholder="Ej. María"
+            className={inputClass}
           />
-          <span id="email-error">
-            <FieldError errors={state.errors?.email} />
-          </span>
+          {state.errors?.nombre && (
+            <p className={errorClass}>{state.errors.nombre[0]}</p>
+          )}
         </div>
-
-        {/* Teléfono + Empresa */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
-          <div>
-            <label htmlFor="telefono" style={labelStyle}>
-              Teléfono <span style={{ color: "var(--text-muted)", fontWeight: 400 }}>(opcional)</span>
-            </label>
-            <input
-              id="telefono"
-              name="telefono"
-              type="tel"
-              autoComplete="tel"
-              aria-describedby={state.errors?.telefono ? "telefono-error" : undefined}
-              aria-invalid={!!state.errors?.telefono}
-              placeholder="+52 81 1234 5678"
-              style={inputStyle(!!state.errors?.telefono)}
-            />
-            <span id="telefono-error">
-              <FieldError errors={state.errors?.telefono} />
-            </span>
-          </div>
-          <div>
-            <label htmlFor="empresa" style={labelStyle}>
-              Empresa <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
-            </label>
-            <input
-              id="empresa"
-              name="empresa"
-              type="text"
-              required
-              autoComplete="organization"
-              aria-required="true"
-              aria-describedby={state.errors?.empresa ? "empresa-error" : undefined}
-              aria-invalid={!!state.errors?.empresa}
-              placeholder="Nombre de tu empresa"
-              style={inputStyle(!!state.errors?.empresa)}
-            />
-            <span id="empresa-error">
-              <FieldError errors={state.errors?.empresa} />
-            </span>
-          </div>
-        </div>
-
-        {/* Cargo */}
         <div>
-          <label htmlFor="cargo" style={labelStyle}>
-            Cargo <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
+          <label htmlFor="reg-apellido" className={labelClass}>
+            Apellidos
           </label>
           <input
-            id="cargo"
+            id="reg-apellido"
+            name="apellido"
+            type="text"
+            required
+            placeholder="Ej. González López"
+            className={inputClass}
+          />
+          {state.errors?.apellido && (
+            <p className={errorClass}>{state.errors.apellido[0]}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Email */}
+      <div>
+        <label htmlFor="reg-email" className={labelClass}>
+          Correo Corporativo
+        </label>
+        <input
+          id="reg-email"
+          name="email"
+          type="email"
+          required
+          placeholder="nombre@empresa.com"
+          className={inputClass}
+        />
+        {state.errors?.email && (
+          <p className={errorClass}>{state.errors.email[0]}</p>
+        )}
+      </div>
+
+      {/* Empresa + Cargo */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label htmlFor="reg-empresa" className={labelClass}>
+            Empresa
+          </label>
+          <input
+            id="reg-empresa"
+            name="empresa"
+            type="text"
+            required
+            placeholder="Nombre de la empresa"
+            className={inputClass}
+          />
+          {state.errors?.empresa && (
+            <p className={errorClass}>{state.errors.empresa[0]}</p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="reg-cargo" className={labelClass}>
+            Cargo
+          </label>
+          <input
+            id="reg-cargo"
             name="cargo"
             type="text"
             required
-            aria-required="true"
-            aria-describedby={state.errors?.cargo ? "cargo-error" : undefined}
-            aria-invalid={!!state.errors?.cargo}
-            placeholder="Gerente de Operaciones"
-            style={inputStyle(!!state.errors?.cargo)}
+            placeholder="Ej. Director de Logística"
+            className={inputClass}
           />
-          <span id="cargo-error">
-            <FieldError errors={state.errors?.cargo} />
-          </span>
+          {state.errors?.cargo && (
+            <p className={errorClass}>{state.errors.cargo[0]}</p>
+          )}
         </div>
-
-        {/* Tipo de acceso */}
-        <div>
-          <fieldset style={{ border: "none", padding: 0, margin: 0 }}>
-            <legend style={{ ...labelStyle, display: "block", marginBottom: "0.75rem" }}>
-              Tipo de acceso <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
-            </legend>
-            <div style={{ display: "grid", gap: "0.625rem" }}>
-              {ACCESOS.map((a) => (
-                <label
-                  key={a.value}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 12,
-                    padding: "12px 16px",
-                    border: "1px solid var(--border)",
-                    borderRadius: 6,
-                    cursor: "pointer",
-                    fontFamily: "var(--font-body)",
-                    fontSize: "0.875rem",
-                    color: "var(--text-primary)",
-                    transition: "border-color 0.15s",
-                  }}
-                >
-                  <input
-                    type="radio"
-                    name="tipo_acceso"
-                    value={a.value}
-                    defaultChecked={a.value === "general"}
-                    aria-describedby={state.errors?.tipo_acceso ? "acceso-error" : undefined}
-                    style={{ accentColor: "var(--navy)", width: 16, height: 16 }}
-                  />
-                  <span style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
-                    <span>{a.label}</span>
-                    <span style={{ color: "var(--text-muted)", fontFamily: "var(--font-body)" }}>—</span>
-                    <span style={{ fontFamily: "var(--font-mono)", fontSize: "0.85rem", fontWeight: 500, color: "var(--navy)", letterSpacing: "-0.01em" }}>{a.price}</span>
-                    {a.note && <span style={{ color: "var(--text-muted)", fontSize: "0.8rem" }}>{a.note}</span>}
-                  </span>
-                </label>
-              ))}
-            </div>
-            <span id="acceso-error">
-              <FieldError errors={state.errors?.tipo_acceso} />
-            </span>
-          </fieldset>
-        </div>
-
-        {/* Credencial estudiantil */}
-        <div>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              cursor: "pointer",
-              fontSize: "0.875rem",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <input
-              type="checkbox"
-              name="credencial_estudiantil"
-              style={{ accentColor: "var(--navy)", marginTop: 2, width: 16, height: 16 }}
-            />
-            <span>
-              Confirmo que presentaré credencial estudiantil vigente en el evento{" "}
-              <span style={{ color: "var(--text-muted)" }}>(solo aplica para acceso estudiante)</span>
-            </span>
-          </label>
-          <FieldError errors={state.errors?.credencial_estudiantil} />
-        </div>
-
-        {/* Términos */}
-        <div>
-          <label
-            style={{
-              display: "flex",
-              alignItems: "flex-start",
-              gap: 10,
-              cursor: "pointer",
-              fontSize: "0.875rem",
-              color: "var(--text-secondary)",
-            }}
-          >
-            <input
-              type="checkbox"
-              name="acepta_terminos"
-              required
-              aria-required="true"
-              aria-describedby={state.errors?.acepta_terminos ? "terminos-error" : undefined}
-              aria-invalid={!!state.errors?.acepta_terminos}
-              style={{ accentColor: "var(--navy)", marginTop: 2, width: 16, height: 16 }}
-            />
-            <span>
-              Acepto los{" "}
-              <a
-                href="/terminos"
-                style={{ color: "var(--navy)", fontWeight: 500 }}
-                target="_blank"
-              >
-                términos y condiciones
-              </a>{" "}
-              y autorizo el tratamiento de mis datos personales conforme al aviso de privacidad.{" "}
-              <span aria-hidden="true" style={{ color: "var(--error)" }}>*</span>
-            </span>
-          </label>
-          <span id="terminos-error">
-            <FieldError errors={state.errors?.acepta_terminos} />
-          </span>
-        </div>
-
-        <SubmitButton />
-
-        <p style={{ fontSize: "0.75rem", color: "var(--text-muted)", textAlign: "center" }}>
-          El pago se coordina por separado vía transferencia o factura. Recibirás instrucciones en tu correo.
-        </p>
       </div>
 
-      <style>{`
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @media (max-width: 640px) {
-          form .grid-2col { grid-template-columns: 1fr !important; }
-        }
-      `}</style>
+      {/* Teléfono + Tipo de acceso */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div>
+          <label htmlFor="reg-telefono" className={labelClass}>
+            Teléfono Móvil
+          </label>
+          <input
+            id="reg-telefono"
+            name="telefono"
+            type="tel"
+            placeholder="+52 899 123 4567"
+            className={inputClass}
+          />
+          {state.errors?.telefono && (
+            <p className={errorClass}>{state.errors.telefono[0]}</p>
+          )}
+        </div>
+        <div>
+          <label htmlFor="reg-tipo" className={labelClass}>
+            Tipo de Acceso
+          </label>
+          <select
+            id="reg-tipo"
+            name="tipo_acceso"
+            defaultValue="general"
+            className={inputClass}
+          >
+            <option value="general">Acceso General — $5,800 MXN</option>
+            <option value="vip">Acceso VIP — $7,200 MXN</option>
+            <option value="estudiante">Acceso Estudiante — $1,200 MXN</option>
+          </select>
+          {state.errors?.tipo_acceso && (
+            <p className={errorClass}>{state.errors.tipo_acceso[0]}</p>
+          )}
+        </div>
+      </div>
+
+      {/* Credencial estudiantil */}
+      <div>
+        <label className="flex items-start gap-3 cursor-pointer p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <input
+            type="checkbox"
+            name="credencial_estudiantil"
+            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-blue-900 leading-snug">
+            Al seleccionar acceso Estudiante, entiendo que deberé presentar <strong>credencial estudiantil física y vigente</strong> el día del evento.
+          </span>
+        </label>
+        {state.errors?.credencial_estudiantil && (
+          <p className={errorClass}>
+            {state.errors.credencial_estudiantil[0]}
+          </p>
+        )}
+      </div>
+
+      <hr className="border-slate-200" />
+
+      {/* CFDI Toggle */}
+      <div>
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <span className="relative">
+            <input
+              type="checkbox"
+              name="requiere_cfdi"
+              value="true"
+              checked={requiresCFDI}
+              onChange={(e) => setRequiresCFDI(e.target.checked)}
+              className="sr-only peer"
+            />
+            <span className="block w-12 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
+            <span className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-6 transition-transform shadow-sm" />
+          </span>
+          <span className="flex items-center gap-2">
+            <FileText className="w-4 h-4 text-slate-400" />
+            <span className="text-sm font-semibold text-slate-700">
+              Requiero factura (CFDI)
+            </span>
+          </span>
+        </label>
+      </div>
+
+      {/* CFDI Fields */}
+      {requiresCFDI && (
+        <div
+          className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4"
+          aria-expanded="true"
+        >
+          <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">
+            Datos de Facturación
+          </p>
+          <div>
+            <label htmlFor="reg-rfc" className={labelClass}>
+              RFC
+            </label>
+            <input
+              id="reg-rfc"
+              name="rfc"
+              type="text"
+              required
+              placeholder="XAXX010101000"
+              className={inputClass}
+              maxLength={13}
+            />
+            {state.errors?.rfc && (
+              <p className={errorClass}>{state.errors.rfc[0]}</p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="reg-razon" className={labelClass}>
+              Razón Social
+            </label>
+            <input
+              id="reg-razon"
+              name="razon_social"
+              type="text"
+              required
+              placeholder="Ej. Mi Empresa S.A. de C.V."
+              className={inputClass}
+            />
+            {state.errors?.razon_social && (
+              <p className={errorClass}>{state.errors.razon_social[0]}</p>
+            )}
+          </div>
+          <div>
+            <label htmlFor="reg-cp" className={labelClass}>
+              Código Postal Fiscal
+            </label>
+            <input
+              id="reg-cp"
+              name="codigo_postal_fiscal"
+              type="text"
+              required
+              placeholder="Ej. 88500"
+              className={inputClass}
+              maxLength={5}
+            />
+            {state.errors?.codigo_postal_fiscal && (
+              <p className={errorClass}>
+                {state.errors.codigo_postal_fiscal[0]}
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Acepta términos */}
+      <div className="pt-2">
+        <label className="flex items-start gap-3 cursor-pointer">
+          <input
+            type="checkbox"
+            name="acepta_terminos"
+            required
+            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
+          />
+          <span className="text-sm text-slate-600 leading-snug">
+            Acepto los términos y condiciones del evento, y entiendo que mis datos
+            serán resguardados conforme al aviso de privacidad.
+          </span>
+        </label>
+        {state.errors?.acepta_terminos && (
+          <p className={errorClass}>{state.errors.acepta_terminos[0]}</p>
+        )}
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={isPending}
+        className="btn-primary w-full py-4 text-base mt-2"
+      >
+        {isPending ? (
+          <>
+            <Loader2 className="w-5 h-5 animate-spin" />
+            Procesando su registro...
+          </>
+        ) : (
+          <>
+            Completar Registro
+            <Send className="w-4 h-4 ml-1" />
+          </>
+        )}
+      </button>
     </form>
   );
 }
-
-const labelStyle: React.CSSProperties = {
-  display: "block",
-  fontFamily: "var(--font-body)",
-  fontWeight: 500,
-  fontSize: "0.8125rem",
-  color: "var(--text-primary)",
-  marginBottom: "6px",
-  letterSpacing: "0.01em",
-};
-
-const inputStyle = (hasError: boolean): React.CSSProperties => ({
-  width: "100%",
-  padding: "10px 14px",
-  border: `1px solid ${hasError ? "var(--error)" : "var(--border)"}`,
-  borderRadius: 6,
-  fontFamily: "var(--font-body)",
-  fontSize: "0.9375rem",
-  color: "var(--text-primary)",
-  background: "#fff",
-  outline: "none",
-  transition: "border-color 0.15s",
-  boxSizing: "border-box",
-});

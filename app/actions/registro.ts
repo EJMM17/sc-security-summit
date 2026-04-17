@@ -3,6 +3,8 @@
 import { createAdminClient } from "@/lib/supabase";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 export type RegistroState = {
   success: boolean;
   message: string;
@@ -10,11 +12,15 @@ export type RegistroState = {
   folio?: string;
 };
 
+// ─── Server Action ────────────────────────────────────────────────────────────
+
 export async function registrarAsistente(
   prevState: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
-  // 1. Extraer datos del FormData
+  // 1. Extract form data
+  const requiresCFDI = formData.get("requiere_cfdi") === "true";
+
   const rawData = {
     nombre: formData.get("nombre"),
     apellido: formData.get("apellido"),
@@ -25,23 +31,35 @@ export async function registrarAsistente(
     tipo_acceso: formData.get("tipo_acceso"),
     credencial_estudiantil: formData.get("credencial_estudiantil") === "on",
     acepta_terminos: formData.get("acepta_terminos") === "on",
+    // CFDI fields
+    requiere_cfdi: requiresCFDI,
+    rfc: requiresCFDI ? (formData.get("rfc") ?? "") : "",
+    razon_social: requiresCFDI ? (formData.get("razon_social") ?? "") : "",
+    codigo_postal_fiscal: requiresCFDI
+      ? (formData.get("codigo_postal_fiscal") ?? "")
+      : "",
   };
 
-  // 2. Validar con Zod (server-side)
+  // 2. Validate with Zod
   const parsed = RegistroSchema.safeParse(rawData);
 
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
+    const formErrors = parsed.error.flatten().formErrors;
+
     return {
       success: false,
       message: "Por favor corrige los errores en el formulario.",
-      errors: fieldErrors as RegistroState["errors"],
+      errors: {
+        ...(fieldErrors as RegistroState["errors"]),
+        ...(formErrors.length > 0 ? { _form: formErrors } : {}),
+      },
     };
   }
 
   const data = parsed.data;
 
-  // 3. Validación de negocio adicional
+  // 3. Business rule: estudiante must confirm credencial
   if (data.tipo_acceso === "estudiante" && !data.credencial_estudiantil) {
     return {
       success: false,
@@ -54,17 +72,17 @@ export async function registrarAsistente(
     };
   }
 
-  // 4. Generar folio único
+  // 4. Generate unique folio
   const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${Math.random()
     .toString(36)
     .substring(2, 6)
     .toUpperCase()}`;
 
-  // 5. Insertar en Supabase
+  // 5. Insert into Supabase
   try {
     const supabase = createAdminClient();
 
-    const { error } = await supabase.from("registros").insert({
+    const insertPayload: Record<string, unknown> = {
       folio,
       nombre: data.nombre,
       apellido: data.apellido,
@@ -76,11 +94,22 @@ export async function registrarAsistente(
       monto_mxn: PRECIOS[data.tipo_acceso],
       estado_pago: "pendiente",
       credencial_estudiantil: data.credencial_estudiantil ?? false,
+      requiere_cfdi: data.requiere_cfdi ?? false,
       created_at: new Date().toISOString(),
-    });
+    };
+
+    // Attach CFDI fields only if required
+    if (data.requiere_cfdi) {
+      insertPayload.rfc = data.rfc?.trim().toUpperCase() ?? null;
+      insertPayload.razon_social = data.razon_social?.trim() ?? null;
+      insertPayload.codigo_postal_fiscal =
+        data.codigo_postal_fiscal?.trim() ?? null;
+    }
+
+    const { error } = await supabase.from("registros").insert(insertPayload);
 
     if (error) {
-      // Detectar email duplicado (unique constraint en Supabase)
+      // Duplicate email (unique constraint)
       if (error.code === "23505") {
         return {
           success: false,
@@ -102,9 +131,13 @@ export async function registrarAsistente(
       };
     }
 
+    const cfdiNote = data.requiere_cfdi
+      ? " Se procesará tu factura CFDI con los datos proporcionados."
+      : "";
+
     return {
       success: true,
-      message: `Registro completado. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.`,
+      message: `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${cfdiNote}`,
       folio,
     };
   } catch (err) {
