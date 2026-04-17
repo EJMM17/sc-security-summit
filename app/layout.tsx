@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Analytics } from "@vercel/analytics/react";
 import WhatsAppButton from "@/components/WhatsAppButton";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.scsecuritysummit.com"),
   title: "1er Summit de Seguridad en la Cadena de Suministros 2026 | Reynosa",
   description:
     "24 y 25 de septiembre, Reynosa. Actualización normativa CTPAT/OEA, vinculación B2B y soluciones tecnológicas para la industria maquiladora del norte de México.",
@@ -73,6 +75,7 @@ export default function RootLayout({
         {children}
         <WhatsAppButton />
         <Toaster theme="light" position="bottom-right" richColors />
+        <Analytics />
 
         {/* ── Structured Data (JSON-LD) ── */}
         <script
