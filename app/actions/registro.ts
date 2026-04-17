@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
+import { sendConfirmationEmail } from "@/lib/email";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -182,6 +183,20 @@ export async function registrarAsistente(
           _form: ["Error interno del servidor. Contáctanos si el problema persiste."],
         },
       };
+    }
+
+    // Enviar email de confirmación (no-blocking: el registro ya está en DB)
+    const emailResult = await sendConfirmationEmail({
+      to: data.email,
+      nombre: data.nombre,
+      folio,
+      tipoAcceso: data.tipo_acceso,
+      monto: PRECIOS[data.tipo_acceso],
+      requiereCfdi: data.requiere_cfdi ?? false,
+    });
+
+    if (!emailResult.ok) {
+      console.warn("[registro] folio creado pero email falló", { folio, reason: emailResult.reason });
     }
 
     const cfdiNote = data.requiere_cfdi
