@@ -28,6 +28,29 @@ export default function RegistroForm() {
     initialState
   );
   const [requiresCFDI, setRequiresCFDI] = useState(false);
+  const [utms, setUtms] = useState({ source: "", medium: "", campaign: "" });
+
+  /* ── UTM capture from URL ── */
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    setUtms({
+      source: params.get("utm_source") ?? "",
+      medium: params.get("utm_medium") ?? "",
+      campaign: params.get("utm_campaign") ?? "",
+    });
+  }, []);
+
+  /* ── Cloudflare Turnstile script loader ── */
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js";
+    script.async = true;
+    script.defer = true;
+    document.body.appendChild(script);
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
 
   /* ── Toasts Feedback ── */
   useEffect(() => {
@@ -79,6 +102,11 @@ export default function RegistroForm() {
 
   return (
     <form action={formAction} className="space-y-6">
+
+      {/* UTM attribution — hidden, populated from URL params */}
+      <input type="hidden" name="utm_source" value={utms.source} />
+      <input type="hidden" name="utm_medium" value={utms.medium} />
+      <input type="hidden" name="utm_campaign" value={utms.campaign} />
 
       {/* Honeypot anti-spam: invisible para humanos, los bots lo llenan */}
       <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden" }}>
@@ -363,6 +391,14 @@ export default function RegistroForm() {
           <p className={errorClass}>{state.errors.acepta_terminos[0]}</p>
         )}
       </div>
+
+      {/* Cloudflare Turnstile — invisible, valida que no eres bot */}
+      <div
+        className="cf-turnstile"
+        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY}
+        data-theme="light"
+        data-size="flexible"
+      />
 
       {/* Submit */}
       <button

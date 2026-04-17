@@ -3,12 +3,13 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   experimental: {
     serverActions: {
-      // Allow both local dev and all production/preview Vercel domains
       allowedOrigins: [
         "localhost:3000",
         "scsecuritysummit.com",
         "www.scsecuritysummit.com",
-        "*.vercel.app",
+        "sc-security-summit.vercel.app",
+        "sc-security-summit-git-main-wemmanuel2-8516s-projects.vercel.app",
+        "sc-security-summit-wemmanuel2-8516s-projects.vercel.app",
       ],
     },
   },
@@ -32,12 +33,12 @@ const nextConfig: NextConfig = {
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+              "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob:",
-              "frame-src https://www.google.com https://maps.google.com",
-              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com",
+              "frame-src https://www.google.com https://maps.google.com https://challenges.cloudflare.com",
+              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com",
             ].join("; "),
           },
         ],
