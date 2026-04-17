@@ -59,9 +59,9 @@ const NAV_LINKS = [
 
 const HERO_STATS = [
   { number: 2, suffix: "", label: "Días de Capacitación" },
-  { number: 10, suffix: "+", label: "Workshops" },
-  { number: 300, suffix: "+", label: "Asistentes" },
-  { number: 20, suffix: "+", label: "Ponentes" },
+  { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
+  { number: 300, suffix: "", label: "Lugares Disponibles" },
+  { number: 4, suffix: "", label: "Sectores Industriales" },
 ];
 
 const PILARES = [
@@ -987,9 +987,9 @@ export default function Home() {
               <div className="md:w-2/5">
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { icon: Users, number: "300+", label: "ASISTENTES" },
+                    { icon: Users, number: "300", label: "LUGARES DISPONIBLES" },
                     { icon: Clock, number: "15+", label: "HORAS DE NETWORKING" },
-                    { icon: Handshake, number: "120+", label: "EMPRESAS" },
+                    { icon: Handshake, number: "2", label: "DÍAS DE EVENTO" },
                     { icon: Award, number: "4", label: "SECTORES" },
                   ].map((stat, i) => (
                     <ScrollReveal key={i} delay={i * 100}>

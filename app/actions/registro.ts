@@ -1,6 +1,6 @@
 "use server";
 
-import { createAdminClient } from "@/lib/supabase";
+import { createPublicClient } from "@/lib/supabase";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -18,6 +18,17 @@ export async function registrarAsistente(
   prevState: RegistroState,
   formData: FormData
 ): Promise<RegistroState> {
+  // 0. Honeypot anti-spam: si el campo "website" tiene contenido, es un bot
+  const honeypot = formData.get("website");
+  if (honeypot && String(honeypot).length > 0) {
+    // Respuesta falsa exitosa para no revelar la detección al bot
+    return {
+      success: true,
+      message: "Registro completado. Recibirás instrucciones en tu correo.",
+      folio: `SCSS2026-BOT-${Date.now().toString(36).toUpperCase()}`,
+    };
+  }
+
   // 1. Extract form data
   const requiresCFDI = formData.get("requiere_cfdi") === "true";
 
@@ -80,7 +91,7 @@ export async function registrarAsistente(
 
   // 5. Insert into Supabase
   try {
-    const supabase = createAdminClient();
+    const supabase = createPublicClient();
 
     const insertPayload: Record<string, unknown> = {
       folio,

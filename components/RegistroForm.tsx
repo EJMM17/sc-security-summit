@@ -80,6 +80,18 @@ export default function RegistroForm() {
   return (
     <form action={formAction} className="space-y-6">
 
+      {/* Honeypot anti-spam: invisible para humanos, los bots lo llenan */}
+      <div aria-hidden="true" style={{ position: "absolute", left: "-9999px", top: "auto", width: "1px", height: "1px", overflow: "hidden" }}>
+        <label htmlFor="reg-website">Website (no llenar)</label>
+        <input
+          id="reg-website"
+          name="website"
+          type="text"
+          tabIndex={-1}
+          autoComplete="off"
+        />
+      </div>
+
       {/* Nombre + Apellido */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>

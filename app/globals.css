@@ -725,6 +725,41 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   scroll-margin-top: 80px;
 }
 
+/* ═══ ACCESIBILIDAD — prefers-reduced-motion ═══
+   Desactiva todas las animaciones y transiciones para usuarios
+   que han configurado su SO para reducir movimiento (epilepsia,
+   mareo, preferencia personal). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Asegura que los reveal items sean visibles de inmediato */
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  /* Detiene los shapes flotantes del hero */
+  .float-shape,
+  .float-shape-reverse {
+    animation: none !important;
+  }
+
+  /* Detiene el pulse ring */
+  .pulse-dot::after {
+    animation: none !important;
+  }
+}
+
 /* ═══ IMAGE OVERLAY HERO ═══ */
 .hero-image-overlay {
   position: absolute;
