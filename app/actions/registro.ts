@@ -131,13 +131,14 @@ export async function registrarAsistente(
         };
       }
 
-      console.error("Supabase insert error:", error);
+      // Log estructurado para Vercel — no se expone al cliente
+      console.error("[registro] DB error", { code: error.code, hint: error.hint });
       return {
         success: false,
         message:
           "Error al procesar el registro. Intenta nuevamente o contáctanos.",
         errors: {
-          _form: ["Error interno del servidor. Código: " + error.code],
+          _form: ["Error interno del servidor. Contáctanos si el problema persiste."],
         },
       };
     }
@@ -152,7 +153,7 @@ export async function registrarAsistente(
       folio,
     };
   } catch (err) {
-    console.error("Unexpected error:", err);
+    console.error("[registro] Unexpected error", err instanceof Error ? err.message : "unknown");
     return {
       success: false,
       message: "Error inesperado. Contacta a Contacto@LanzLogistics.com",

@@ -338,8 +338,16 @@ export default function RegistroForm() {
             className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
           />
           <span className="text-sm text-slate-600 leading-snug">
-            Acepto los términos y condiciones del evento, y entiendo que mis datos
-            serán resguardados conforme al{" "}
+            Acepto los{" "}
+            <a
+              href="/terminos-y-condiciones"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Términos y Condiciones
+            </a>{" "}
+            del evento, y entiendo que mis datos serán resguardados conforme al{" "}
             <a
               href="/aviso-de-privacidad"
               target="_blank"

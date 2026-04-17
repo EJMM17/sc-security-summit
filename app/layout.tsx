@@ -55,6 +55,9 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
+  alternates: {
+    canonical: "https://www.scsecuritysummit.com",
+  },
 };
 
 export default function RootLayout({

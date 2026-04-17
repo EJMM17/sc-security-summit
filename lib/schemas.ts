@@ -52,9 +52,14 @@ export const RegistroSchema = z
 
     rfc: z
       .string()
-      .regex(
-        /^([A-ZÑ&]{3,4})\d{6}([A-Z\d]{3})$/,
-        "RFC inválido. Formato: XAXX010101000"
+      .transform((v) => v.toUpperCase().trim())
+      .pipe(
+        z
+          .string()
+          .regex(
+            /^([A-ZÑ&]{3,4})\d{6}([A-Z\d]{3})$/,
+            "RFC inválido. Formato: XAXX010101000"
+          )
       )
       .optional()
       .or(z.literal("")),

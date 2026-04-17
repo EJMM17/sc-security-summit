@@ -332,8 +332,8 @@ const FAQ_ITEMS = [
 /* ═══ WAVE SVG COMPONENT ═══ */
 function WaveSeparator({ color = "#EFF6FF", flip = false }: { color?: string; flip?: boolean }) {
   return (
-    <div className={`wave-separator ${flip ? "wave-separator-flip" : ""}`}>
-      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <div className={`wave-separator ${flip ? "wave-separator-flip" : ""}`} aria-hidden="true">
+      <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
         <path
           d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,40 1440,30 L1440,80 L0,80 Z"
           fill={color}
@@ -374,6 +374,14 @@ function AgendaBadge({ type }: { type: string }) {
 export default function Home() {
   return (
     <>
+      {/* ── SKIP TO CONTENT (accesibilidad) ── */}
+      <a
+        href="#registro"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
+      >
+        Ir al formulario de registro
+      </a>
+
       {/* ── HEADER ─────────────────────────── */}
       <HeaderScroll>
         <header className="fixed top-0 w-full z-50 transition-all duration-300">
@@ -1227,7 +1235,7 @@ export default function Home() {
                 {/* Map */}
                 <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3579.2!2d-98.2969!3d26.0815!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8664990f6c7ef8d3%3A0x5f8e2b3e9a1c4f2a!2sBlvd.%20Morelos%20190%2C%20Col.%20Longoria%2C%2088630%20Reynosa%2C%20Tamps.!5e0!3m2!1ses!2smx!4v1"
+                    src="https://www.google.com/maps?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico&output=embed"
                     className="w-full h-[350px]"
                     style={{ border: 0 }}
                     allowFullScreen
@@ -1250,7 +1258,7 @@ export default function Home() {
                         <p className="text-sm text-slate-500 mt-0.5">Blvd. Morelos 190, Col. Longoria</p>
                         <p className="text-sm text-slate-500">Reynosa, Tamaulipas, C.P. 88630</p>
                         <a
-                          href="https://maps.google.com/?q=Centro+de+Convenciones+Reynosa+Tamaulipas"
+                          href="https://maps.google.com/?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
