@@ -66,6 +66,9 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 h1, h2, h3, h4, h5, h6, .font-oswald {
@@ -179,6 +182,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   text-decoration: none;
   position: relative;
   overflow: hidden;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 .btn-primary::before {
   content: "";
@@ -218,6 +223,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 .btn-secondary:hover {
   background-color: var(--blue-600);
@@ -243,6 +250,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   cursor: pointer;
   text-decoration: none;
+  min-height: 44px;
+  touch-action: manipulation;
 }
 .btn-white:hover {
   transform: translateY(-2px);
@@ -364,6 +373,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 @media (min-width: 768px) {
   .countdown-separator { font-size: 3rem; }
+}
+
+@media (max-width: 640px) {
+  .countdown-unit { min-width: 3.2rem; }
+  .countdown-number { font-size: 2rem; }
+  .countdown-label { font-size: 0.56rem; letter-spacing: 0.1em; }
+  .countdown-separator { font-size: 1.5rem; margin-top: 0.35rem; }
 }
 
 /* ═══ SPEAKER CARDS ═══ */
@@ -823,4 +839,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   height: 4px;
   border-radius: 2px;
   background: linear-gradient(90deg, var(--blue-600), var(--cyan-400));
+}
+
+/* iOS/Android safe-area helpers */
+.safe-pad-bottom {
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+.safe-offset-bottom-left {
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
 }
