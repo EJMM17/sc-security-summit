@@ -34,9 +34,9 @@ export default function CountdownTimer() {
   ];
 
   return (
-    <div className="flex items-center gap-3 sm:gap-4">
+    <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:flex sm:items-center sm:gap-4">
       {units.map((u, i) => (
-        <div key={u.label} className="flex items-center gap-3 sm:gap-4">
+        <div key={u.label} className="flex items-center justify-center gap-2 sm:gap-4">
           <div className="countdown-unit">
             <div className="countdown-number" suppressHydrationWarning>
               {mounted ? String(u.value).padStart(2, "0") : "--"}
@@ -44,7 +44,7 @@ export default function CountdownTimer() {
             <div className="countdown-label">{u.label}</div>
           </div>
           {i < units.length - 1 && (
-            <span className="countdown-separator">:</span>
+            <span className="countdown-separator hidden sm:inline-flex">:</span>
           )}
         </div>
       ))}
