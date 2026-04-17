@@ -1,6 +1,9 @@
 "use server";
 
-import { createPublicClient } from "@/lib/supabase";
+import { headers } from "next/headers";
+import { createAdminClient } from "@/lib/supabase";
+import { checkRateLimit } from "@/lib/rate-limit";
+import { verifyTurnstile } from "@/lib/turnstile";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -29,7 +32,38 @@ export async function registrarAsistente(
     };
   }
 
-  // 1. Extract form data
+  // 1. Obtener IP, User-Agent y Referer desde los headers del request
+  const h = await headers();
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0].trim() ??
+    h.get("x-real-ip") ??
+    "unknown";
+  const userAgent = h.get("user-agent") ?? "unknown";
+  const referer = h.get("referer") ?? null;
+
+  // 2. Rate limit — 5 intentos por IP cada 15 minutos
+  // TODO: migrar a Vercel KV (@vercel/kv) para rate limiting distribuido multi-región
+  const rl = checkRateLimit(ip);
+  if (!rl.ok) {
+    return {
+      success: false,
+      message: "Has realizado demasiados intentos. Espera 15 minutos e intenta de nuevo.",
+      errors: { _form: ["Límite de intentos excedido."] },
+    };
+  }
+
+  // 3. Cloudflare Turnstile — verificar que no es bot
+  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
+  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+  if (!turnstileOk) {
+    return {
+      success: false,
+      message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
+      errors: { _form: ["Verificación de seguridad fallida."] },
+    };
+  }
+
+  // 4. Extract form data
   const requiresCFDI = formData.get("requiere_cfdi") === "true";
 
   const rawData = {
@@ -51,7 +85,7 @@ export async function registrarAsistente(
       : "",
   };
 
-  // 2. Validate with Zod
+  // 5. Validate with Zod
   const parsed = RegistroSchema.safeParse(rawData);
 
   if (!parsed.success) {
@@ -70,7 +104,7 @@ export async function registrarAsistente(
 
   const data = parsed.data;
 
-  // 3. Business rule: estudiante must confirm credencial
+  // 6. Business rule: estudiante must confirm credencial
   if (data.tipo_acceso === "estudiante" && !data.credencial_estudiantil) {
     return {
       success: false,
@@ -83,15 +117,15 @@ export async function registrarAsistente(
     };
   }
 
-  // 4. Generate unique folio
+  // 7. Generate unique folio
   const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${Math.random()
     .toString(36)
     .substring(2, 6)
     .toUpperCase()}`;
 
-  // 5. Insert into Supabase
+  // 8. Insert into Supabase via service_role (bypasses RLS, server-side only)
   try {
-    const supabase = createPublicClient();
+    const supabase = createAdminClient();
 
     const insertPayload: Record<string, unknown> = {
       folio,
@@ -107,6 +141,13 @@ export async function registrarAsistente(
       credencial_estudiantil: data.credencial_estudiantil ?? false,
       requiere_cfdi: data.requiere_cfdi ?? false,
       created_at: new Date().toISOString(),
+      // Auditoría y atribución
+      ip_registro: ip,
+      user_agent: userAgent,
+      referer,
+      utm_source: (formData.get("utm_source") as string | null) || null,
+      utm_medium: (formData.get("utm_medium") as string | null) || null,
+      utm_campaign: (formData.get("utm_campaign") as string | null) || null,
     };
 
     // Attach CFDI fields only if required
