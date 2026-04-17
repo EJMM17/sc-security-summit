@@ -385,15 +385,15 @@ export default function Home() {
       {/* ── HEADER ─────────────────────────── */}
       <HeaderScroll>
         <header className="fixed top-0 w-full z-50 transition-all duration-300">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[68px] flex items-center justify-between">
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[62px] sm:h-[68px] flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
-            <a href="#" className="flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow">
-                <Shield className="w-5 h-5 text-white" />
+            <a href="#" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow flex-shrink-0">
+                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
               </div>
-              <div>
-                <span className="font-oswald text-lg font-bold tracking-tight text-slate-900">SC SUMMIT</span>
-                <span className="block text-[10px] font-bold tracking-[0.2em] text-blue-600">REYNOSA 2026</span>
+              <div className="min-w-0">
+                <span className="font-oswald block truncate text-base sm:text-lg font-bold tracking-tight text-slate-900">SC SUMMIT</span>
+                <span className="hidden sm:block text-[10px] font-bold tracking-[0.18em] text-blue-600">REYNOSA 2026</span>
               </div>
             </a>
 
@@ -407,8 +407,8 @@ export default function Home() {
             </nav>
 
             {/* CTA + Mobile */}
-            <div className="flex items-center gap-3">
-              <a href="#registro" className="btn-primary hidden sm:inline-flex text-sm">
+            <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <a href="#registro" className="btn-primary hidden md:inline-flex text-sm">
                 REGISTRARME <ArrowRight className="w-4 h-4" />
               </a>
               <MobileNav />
@@ -417,11 +417,11 @@ export default function Home() {
         </header>
       </HeaderScroll>
 
-      <div className="pt-[68px]">
+      <div className="pt-[62px] sm:pt-[68px]">
         {/* ═══════════════════════════════════════════════════════════
             1. HERO — with background image
            ═══════════════════════════════════════════════════════════ */}
-        <section className="relative w-full min-h-[92vh] flex items-center justify-center overflow-hidden">
+        <section className="relative w-full min-h-[90vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
           {/* Background Image */}
           <Image
             src="/images/hero-bg.png"
@@ -448,9 +448,9 @@ export default function Home() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-4 pt-6 pb-10 sm:py-0 max-w-5xl mx-auto">
             <ScrollReveal>
-              <div className="inline-flex max-w-full flex-wrap items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-4 sm:px-5 py-2.5 mb-8">
+              <div className="inline-flex w-full sm:w-auto max-w-full flex-wrap items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl sm:rounded-full px-3 sm:px-5 py-2.5 mb-6 sm:mb-8">
                 <Calendar className="w-4 h-4 text-cyan-300" />
                 <span className="text-xs sm:text-sm text-white/90 font-medium">
                   24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas
@@ -459,7 +459,7 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
-              <h1 className="font-oswald text-4xl sm:text-5xl md:text-7xl font-bold text-white leading-[1.1] mb-6">
+              <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-7xl font-bold text-white leading-[1.08] mb-5 sm:mb-6">
                 SUMMIT DE SEGURIDAD EN LA{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                   CADENA DE SUMINISTROS
@@ -468,7 +468,7 @@ export default function Home() {
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <p className="text-lg md:text-xl text-blue-100/80 max-w-2xl mx-auto mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 max-w-2xl mx-auto mb-7 sm:mb-8 leading-relaxed">
                 El encuentro donde convergen la actualización estratégica, la vinculación empresarial y
                 las soluciones tecnológicas para fortalecer la industria del norte de México.
               </p>

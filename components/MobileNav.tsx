@@ -25,7 +25,7 @@ export default function MobileNav() {
   }, [open]);
 
   return (
-    <div className="lg:hidden">
+    <div className="md:hidden">
       <button
         onClick={() => setOpen(!open)}
         aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -49,7 +49,7 @@ export default function MobileNav() {
 
       {/* Slide-down panel */}
       <div
-        className={`fixed top-[68px] left-4 right-4 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
+        className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
@@ -74,6 +74,13 @@ export default function MobileNav() {
           >
             <span>Registrarme Ahora</span>
             <ArrowRight className="w-4 h-4" />
+          </a>
+          <a
+            href="#patrocinadores"
+            onClick={() => setOpen(false)}
+            className="mt-2 py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-all"
+          >
+            Patrocinar el evento
           </a>
         </nav>
       </div>

@@ -205,6 +205,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   position: relative;
   z-index: 1;
 }
+@media (max-width: 640px) {
+  .btn-primary {
+    padding: 0.8rem 1.25rem;
+    letter-spacing: 0.05em;
+    font-size: 0.8rem;
+  }
+}
 
 .btn-secondary {
   display: inline-flex;
@@ -381,6 +388,10 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .countdown-label { font-size: 0.56rem; letter-spacing: 0.1em; }
   .countdown-separator { font-size: 1.5rem; margin-top: 0.35rem; }
 }
+@media (max-width: 420px) {
+  .countdown-unit { min-width: 2.9rem; }
+  .countdown-number { font-size: 1.8rem; }
+}
 
 /* ═══ SPEAKER CARDS ═══ */
 .speaker-card {
@@ -531,6 +542,11 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   -webkit-backdrop-filter: blur(20px) saturate(1.8) !important;
   border-bottom-color: var(--border-light) !important;
   box-shadow: var(--shadow-sm) !important;
+}
+@media (max-width: 640px) {
+  .header-scrolled {
+    background: rgba(255,255,255,0.94) !important;
+  }
 }
 
 /* ═══ SOCIAL PROOF BAR ═══ */
