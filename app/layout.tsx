@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import "./globals.css";
 
 const siteUrl =
@@ -79,6 +80,7 @@ export default function RootLayout({
           Saltar al contenido principal
         </a>
         {children}
+        <SpeedInsights />
       </body>
     </html>
   );
