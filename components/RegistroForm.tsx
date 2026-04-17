@@ -3,6 +3,7 @@
 import { useActionState, useState, useEffect } from "react";
 import { Send, FileText, Loader2, CheckCircle2 } from "lucide-react";
 import { registrarAsistente, type RegistroState } from "@/app/actions/registro";
+import { ACCESO_OPTIONS } from "@/lib/constants";
 import { toast } from "sonner";
 
 /* ─── Shared input styles for Corporate Aesthetic ── */
@@ -52,18 +53,10 @@ export default function RegistroForm() {
     };
   }, []);
 
-  /* ── Toasts Feedback ── */
+  /* ── Toasts Feedback — solo errores (éxito se muestra en pantalla) ── */
   useEffect(() => {
-    if (state.message) {
-      if (state.success) {
-        toast.success("¡Operación Exitosa!", {
-          description: state.message,
-        });
-      } else {
-        toast.error("Aviso", {
-          description: state.message,
-        });
-      }
+    if (state.message && !state.success) {
+      toast.error("Aviso", { description: state.message });
     }
   }, [state]);
 
@@ -237,9 +230,11 @@ export default function RegistroForm() {
             defaultValue="general"
             className={inputClass}
           >
-            <option value="general">Acceso General — $5,800 MXN</option>
-            <option value="vip">Acceso VIP — $7,200 MXN</option>
-            <option value="estudiante">Acceso Estudiante — $1,200 MXN</option>
+            {ACCESO_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                Acceso {opt.label.charAt(0) + opt.label.slice(1).toLowerCase()} — {opt.price} MXN
+              </option>
+            ))}
           </select>
           {state.errors?.tipo_acceso && (
             <p className={errorClass}>{state.errors.tipo_acceso[0]}</p>

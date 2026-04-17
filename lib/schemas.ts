@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ACCESO_OPTIONS } from "./constants";
 
 // ─── Registro Schema ──────────────────────────────────────────────────────────
 
@@ -106,10 +107,11 @@ export const RegistroSchema = z
 
 export type RegistroInput = z.infer<typeof RegistroSchema>;
 
-// ─── Precios ──────────────────────────────────────────────────────────────────
+// ─── Precios — derived from ACCESO_OPTIONS (single source of truth) ──────────
 
-export const PRECIOS: Record<RegistroInput["tipo_acceso"], number> = {
-  estudiante: 1200,
-  general: 5800,
-  vip: 7200,
-};
+export const PRECIOS = Object.fromEntries(
+  ACCESO_OPTIONS.map((opt) => [
+    opt.value,
+    parseInt(opt.price.replace(/[^0-9]/g, ""), 10),
+  ])
+) as Record<RegistroInput["tipo_acceso"], number>;

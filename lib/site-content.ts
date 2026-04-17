@@ -137,11 +137,3 @@ export const HUB_FEATURES = [
   },
 ] as const;
 
-// ─── Social Proof ─────────────────────────────────────────────────────────────
-export const SOCIAL_PROOF = [
-  "Organizado por Lanz Logistics — 15 años en comercio exterior",
-  "Co-producido con Thynk Unlimited — Especialistas en eventos corporativos",
-  "Avalado por cámaras industriales de Tamaulipas y Texas",
-  "Más de 120 empresas registradas en preventa",
-  "Ponentes confirmados del CBP, SAT y sector privado",
-] as const;

@@ -85,16 +85,6 @@ export const FEATURE_CARDS = [
   },
 ] as const;
 
-// ─── SOCIAL PROOF ─────────────────────────────────────────────────────────────
-
-export const SOCIAL_PROOF = [
-  "Organizado por Lanz Logistics — 15 años en comercio exterior",
-  "Avalado por cámaras industriales de Tamaulipas y Texas",
-  "Más de 120 empresas registradas en preventa",
-  "Ponentes confirmados del CBP, SAT y sector privado",
-  "Sede certificada con capacidad para 400+ personas",
-] as const;
-
 // ─── PRECIOS ─────────────────────────────────────────────────────────────────
 
 export const ACCESO_OPTIONS = [
