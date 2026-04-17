@@ -327,7 +327,16 @@ export default function RegistroForm() {
           />
           <span className="text-sm text-slate-600 leading-snug">
             Acepto los términos y condiciones del evento, y entiendo que mis datos
-            serán resguardados conforme al aviso de privacidad.
+            serán resguardados conforme al{" "}
+            <a
+              href="/aviso-de-privacidad"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline font-medium"
+            >
+              Aviso de Privacidad
+            </a>{" "}
+            de Lanz Logistics.
           </span>
         </label>
         {state.errors?.acepta_terminos && (

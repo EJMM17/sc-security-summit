@@ -1079,6 +1079,43 @@ export default function Home() {
               ))}
             </div>
 
+            {/* Instrucciones de Pago */}
+            <ScrollReveal delay={200}>
+              <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-blue-50 border border-blue-200">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">¿Cómo funciona el proceso de pago?</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed mb-4">
+                      Al completar el formulario de registro recibirás un <strong>folio de confirmación</strong> en pantalla y por correo. Un representante de Lanz Logistics te contactará en un plazo de <strong>24–48 horas hábiles</strong> con las instrucciones de pago (transferencia bancaria, depósito o pago en línea). Tu lugar queda reservado una vez confirmado el pago.
+                    </p>
+                    <div className="grid sm:grid-cols-3 gap-3">
+                      {[
+                        { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio" },
+                        { step: "2", title: "Recibe instrucciones", desc: "Te contactamos en 24-48 hrs hábiles" },
+                        { step: "3", title: "Confirma tu lugar", desc: "Realiza el pago y recibes tu confirmación" },
+                      ].map((s) => (
+                        <div key={s.step} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-blue-100">
+                          <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">{s.step}</span>
+                          <div>
+                            <p className="text-sm font-bold text-slate-800">{s.title}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{s.desc}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs text-slate-400 mt-4">
+                      ¿Preguntas sobre el pago? Escríbenos a{" "}
+                      <a href="mailto:Contacto@LanzLogistics.com" className="text-blue-600 hover:underline font-medium">Contacto@LanzLogistics.com</a>
+                      {" "}o al <a href="tel:+19565158070" className="text-blue-600 hover:underline font-medium">+1 (956) 515-8070</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+
             {/* Comparison Table */}
             <ScrollReveal delay={300}>
               <div className="card-elevated mt-16 overflow-x-auto">
@@ -1190,13 +1227,13 @@ export default function Home() {
                 {/* Map */}
                 <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
                   <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3578.7!2d-98.295!3d26.08!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x866499e9f7b6e453%3A0x0!2sReynosa%2C%20Tamaulipas%2C%20Mexico!5e0!3m2!1sen!2s!4v1"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3579.2!2d-98.2969!3d26.0815!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8664990f6c7ef8d3%3A0x5f8e2b3e9a1c4f2a!2sBlvd.%20Morelos%20190%2C%20Col.%20Longoria%2C%2088630%20Reynosa%2C%20Tamps.!5e0!3m2!1ses!2smx!4v1"
                     className="w-full h-[350px]"
                     style={{ border: 0 }}
                     allowFullScreen
                     loading="lazy"
                     referrerPolicy="no-referrer-when-downgrade"
-                    title="Ubicación del Summit"
+                    title="Centro de Convenciones de Reynosa"
                   />
                 </div>
 
@@ -1209,7 +1246,17 @@ export default function Home() {
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-800 text-sm">Dirección</h4>
-                        <p className="text-sm text-slate-500 mt-1">Centro de Convenciones de Reynosa, Tamaulipas, México</p>
+                        <p className="text-sm text-slate-700 font-medium mt-1">Centro de Convenciones de Reynosa</p>
+                        <p className="text-sm text-slate-500 mt-0.5">Blvd. Morelos 190, Col. Longoria</p>
+                        <p className="text-sm text-slate-500">Reynosa, Tamaulipas, C.P. 88630</p>
+                        <a
+                          href="https://maps.google.com/?q=Centro+de+Convenciones+Reynosa+Tamaulipas"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
+                        >
+                          <ExternalLink className="w-3 h-3" /> Ver en Google Maps
+                        </a>
                       </div>
                     </div>
                   </div>
@@ -1397,10 +1444,10 @@ export default function Home() {
                 © 2026 SC Security Summit. Todos los derechos reservados.
               </p>
               <div className="flex items-center gap-6">
-                <a href="#" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                <a href="/aviso-de-privacidad" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
                   Aviso de Privacidad
                 </a>
-                <a href="#" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
+                <a href="mailto:Contacto@LanzLogistics.com?subject=Términos%20y%20Condiciones" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
                   Términos y Condiciones
                 </a>
               </div>
