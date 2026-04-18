@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import {
   Shield,
   MapPin,
@@ -47,15 +50,55 @@ import HeaderScroll from "@/components/HeaderScroll";
    DATA
    ═══════════════════════════════════════════════════════════════ */
 
-const NAV_LINKS = [
-  { href: "#enfoque", label: "Enfoque" },
-  { href: "#speakers", label: "Conferencistas" },
-  { href: "#agenda", label: "Agenda" },
-  { href: "#audiencia", label: "Audiencia" },
-  { href: "#accesos", label: "Accesos" },
-  { href: "#patrocinadores", label: "Patrocinadores" },
-  { href: "#ubicacion", label: "Ubicación" },
-];
+const NAV_LINKS = {
+  es: [
+    { href: "#enfoque", label: "Enfoque" },
+    { href: "#speakers", label: "Conferencistas" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audiencia" },
+    { href: "#accesos", label: "Accesos" },
+    { href: "#patrocinadores", label: "Patrocinadores" },
+    { href: "#ubicacion", label: "Ubicación" },
+  ],
+  en: [
+    { href: "#enfoque", label: "Focus" },
+    { href: "#speakers", label: "Speakers" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audience" },
+    { href: "#accesos", label: "Passes" },
+    { href: "#patrocinadores", label: "Sponsors" },
+    { href: "#ubicacion", label: "Location" },
+  ],
+} as const;
+
+const UI_TEXT = {
+  es: {
+    skipToForm: "Ir al formulario de registro",
+    registerBtn: "REGISTRARME",
+    dateLocation: "24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas",
+    heroAlt: "Summit de Seguridad en la Cadena de Suministros",
+    heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
+    heroTitleHighlight: "CADENA DE SUMINISTROS",
+    heroDescription:
+      "El encuentro donde convergen la actualización estratégica, la vinculación empresarial y las soluciones tecnológicas para fortalecer la industria del norte de México.",
+    countdownLabel: "Faltan",
+    registerNowBtn: "REGISTRARME AHORA",
+    sponsorBtn: "PATROCINAR EL EVENTO",
+  },
+  en: {
+    skipToForm: "Skip to registration form",
+    registerBtn: "REGISTER",
+    dateLocation: "September 24-25, 2026 · Reynosa, Tamaulipas",
+    heroAlt: "Supply Chain Security Summit",
+    heroTitlePrefix: "SECURITY SUMMIT FOR THE",
+    heroTitleHighlight: "SUPPLY CHAIN",
+    heroDescription:
+      "Where strategic updates, business networking, and technology solutions come together to strengthen northern Mexico's industrial ecosystem.",
+    countdownLabel: "Time left",
+    registerNowBtn: "REGISTER NOW",
+    sponsorBtn: "SPONSOR THE EVENT",
+  },
+} as const;
 
 const HERO_STATS = [
   { number: 2, suffix: "", label: "Días de Capacitación" },
@@ -372,6 +415,10 @@ function AgendaBadge({ type }: { type: string }) {
    PAGE COMPONENT
    ═══════════════════════════════════════════════════════════════ */
 export default function Home() {
+  const [language, setLanguage] = useState<"es" | "en">("es");
+  const navLinks = NAV_LINKS[language];
+  const text = UI_TEXT[language];
+
   return (
     <>
       {/* ── SKIP TO CONTENT (accesibilidad) ── */}
@@ -379,7 +426,7 @@ export default function Home() {
         href="#registro"
         className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold focus:shadow-lg"
       >
-        Ir al formulario de registro
+        {text.skipToForm}
       </a>
 
       {/* ── HEADER ─────────────────────────── */}
@@ -399,7 +446,7 @@ export default function Home() {
 
             {/* Nav Desktop */}
             <nav className="hidden lg:flex items-center gap-4">
-              {NAV_LINKS.map((l) => (
+              {navLinks.map((l) => (
                 <a key={l.href} href={l.href} className="nav-link">
                   {l.label}
                 </a>
@@ -408,10 +455,18 @@ export default function Home() {
 
             {/* CTA + Mobile */}
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => setLanguage((prev) => (prev === "es" ? "en" : "es"))}
+                className="inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+                aria-label={language === "es" ? "Cambiar a inglés" : "Switch to Spanish"}
+              >
+                {language === "es" ? "EN" : "ES"}
+              </button>
               <a href="#registro" className="btn-primary hidden md:inline-flex text-sm">
-                REGISTRARME <ArrowRight className="w-4 h-4" />
+                {text.registerBtn} <ArrowRight className="w-4 h-4" />
               </a>
-              <MobileNav />
+              <MobileNav language={language} />
             </div>
           </div>
         </header>
@@ -425,7 +480,7 @@ export default function Home() {
           {/* Background Image */}
           <Image
             src="/images/hero-bg.png"
-            alt="Summit de Seguridad en la Cadena de Suministros"
+            alt={text.heroAlt}
             fill
             className="object-cover"
             priority
@@ -453,24 +508,23 @@ export default function Home() {
               <div className="inline-flex w-full sm:w-auto max-w-full flex-wrap items-center justify-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl sm:rounded-full px-3 sm:px-5 py-2.5 mb-6 sm:mb-8">
                 <Calendar className="w-4 h-4 text-cyan-300" />
                 <span className="text-xs sm:text-sm text-white/90 font-medium">
-                  24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas
+                  {text.dateLocation}
                 </span>
               </div>
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
               <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-7xl font-bold text-white leading-[1.08] mb-5 sm:mb-6">
-                SUMMIT DE SEGURIDAD EN LA{" "}
+                {text.heroTitlePrefix}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-                  CADENA DE SUMINISTROS
+                  {text.heroTitleHighlight}
                 </span>
               </h1>
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
               <p className="text-base sm:text-lg md:text-xl text-blue-100/80 max-w-2xl mx-auto mb-7 sm:mb-8 leading-relaxed">
-                El encuentro donde convergen la actualización estratégica, la vinculación empresarial y
-                las soluciones tecnológicas para fortalecer la industria del norte de México.
+                {text.heroDescription}
               </p>
             </ScrollReveal>
 
@@ -478,7 +532,7 @@ export default function Home() {
               <div className="card-dark p-6 sm:p-8 mb-8 inline-flex flex-col items-center gap-4">
                 <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold tracking-widest uppercase">
                   <Clock className="w-3.5 h-3.5" />
-                  <span>Faltan</span>
+                  <span>{text.countdownLabel}</span>
                 </div>
                 <CountdownTimer />
               </div>
@@ -487,10 +541,10 @@ export default function Home() {
             <ScrollReveal delay={400}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 <a href="#registro" className="btn-primary px-8 py-4 text-base w-full sm:w-auto">
-                  REGISTRARME AHORA <ArrowRight className="w-4 h-4" />
+                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
                 </a>
                 <a href="#patrocinadores" className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
-                  PATROCINAR EL EVENTO
+                  {text.sponsorBtn}
                 </a>
               </div>
             </ScrollReveal>

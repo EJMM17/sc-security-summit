@@ -3,19 +3,37 @@
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 
-const links = [
-  { href: "#enfoque", label: "Enfoque" },
-  { href: "#speakers", label: "Conferencistas" },
-  { href: "#agenda", label: "Agenda" },
-  { href: "#audiencia", label: "Audiencia" },
-  { href: "#accesos", label: "Accesos" },
-  { href: "#patrocinadores", label: "Patrocinadores" },
-  { href: "#ubicacion", label: "Ubicación" },
-  { href: "#faq", label: "FAQ" },
-];
+type Language = "es" | "en";
 
-export default function MobileNav() {
+const linksByLanguage: Record<Language, { href: string; label: string }[]> = {
+  es: [
+    { href: "#enfoque", label: "Enfoque" },
+    { href: "#speakers", label: "Conferencistas" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audiencia" },
+    { href: "#accesos", label: "Accesos" },
+    { href: "#patrocinadores", label: "Patrocinadores" },
+    { href: "#ubicacion", label: "Ubicación" },
+    { href: "#faq", label: "FAQ" },
+  ],
+  en: [
+    { href: "#enfoque", label: "Focus" },
+    { href: "#speakers", label: "Speakers" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audience" },
+    { href: "#accesos", label: "Passes" },
+    { href: "#patrocinadores", label: "Sponsors" },
+    { href: "#ubicacion", label: "Location" },
+    { href: "#faq", label: "FAQ" },
+  ],
+};
+
+export default function MobileNav({ language = "es" }: { language?: Language }) {
   const [open, setOpen] = useState(false);
+  const links = linksByLanguage[language];
+  const menuAriaLabel = language === "en" ? (open ? "Close menu" : "Open menu") : (open ? "Cerrar menú" : "Abrir menú");
+  const registerLabel = language === "en" ? "Register now" : "Registrarme Ahora";
+  const sponsorLabel = language === "en" ? "Sponsor the event" : "Patrocinar el evento";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -28,7 +46,7 @@ export default function MobileNav() {
     <div className="md:hidden">
       <button
         onClick={() => setOpen(!open)}
-        aria-label={open ? "Cerrar menú" : "Abrir menú"}
+        aria-label={menuAriaLabel}
         aria-expanded={open}
         className="relative z-50 w-11 h-11 flex items-center justify-center rounded-full border border-[var(--border-light)] hover:bg-[var(--blue-50)] transition-colors touch-manipulation"
       >
@@ -72,7 +90,7 @@ export default function MobileNav() {
             onClick={() => setOpen(false)}
             className="btn-primary mt-1 text-sm"
           >
-            <span>Registrarme Ahora</span>
+            <span>{registerLabel}</span>
             <ArrowRight className="w-4 h-4" />
           </a>
           <a
@@ -80,7 +98,7 @@ export default function MobileNav() {
             onClick={() => setOpen(false)}
             className="mt-2 py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-all"
           >
-            Patrocinar el evento
+            {sponsorLabel}
           </a>
         </nav>
       </div>
