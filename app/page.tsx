@@ -71,9 +71,33 @@ const NAV_LINKS = {
   ],
 } as const;
 
+const FOOTER_LINKS = {
+  es: [
+    { href: "#enfoque", label: "Enfoque" },
+    { href: "#speakers", label: "Conferencistas" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audiencia" },
+    { href: "#accesos", label: "Accesos" },
+    { href: "#patrocinadores", label: "Patrocinadores" },
+    { href: "#ubicacion", label: "Ubicación" },
+    { href: "#faq", label: "FAQ" },
+  ],
+  en: [
+    { href: "#enfoque", label: "Focus" },
+    { href: "#speakers", label: "Speakers" },
+    { href: "#agenda", label: "Agenda" },
+    { href: "#audiencia", label: "Audience" },
+    { href: "#accesos", label: "Passes" },
+    { href: "#patrocinadores", label: "Sponsors" },
+    { href: "#ubicacion", label: "Location" },
+    { href: "#faq", label: "FAQ" },
+  ],
+} as const;
+
 const UI_TEXT = {
   es: {
     skipToForm: "Ir al formulario de registro",
+    switchLangLabel: "Cambiar a inglés",
     registerBtn: "REGISTRARME",
     dateLocation: "24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas",
     heroAlt: "Summit de Seguridad en la Cadena de Suministros",
@@ -84,9 +108,139 @@ const UI_TEXT = {
     countdownLabel: "Faltan",
     registerNowBtn: "REGISTRARME AHORA",
     sponsorBtn: "PATROCINAR EL EVENTO",
+    presentedBy: "Presentado por",
+    whyAttendLabel: "PORQUE SER PARTE DEL SUMMIT",
+    whyAttendTitle: "Lo Que Te Espera",
+    whyAttendDesc:
+      "Más que un congreso. Una experiencia de capacitación, networking e innovación diseñada para transformar tu operación.",
+    purposeLabel: "PROPÓSITO",
+    visionMissionTitle: "Visión y Misión",
+    missionLabel: "Misión",
+    missionP1:
+      "Reunir en un solo espacio a los sectores clave de la cadena de suministro para fortalecer las estrategias de seguridad, compartir mejores prácticas, difundir actualizaciones relevantes en certificaciones internacionales, y generar oportunidades de vinculación estratégica entre empresas, especialistas y proveedores de soluciones.",
+    missionP2:
+      "Nuestra misión es impulsar el desarrollo de cadenas de suministro más seguras, informadas y competitivas, mediante experiencias de alto valor como conferencias, paneles, talleres y networking especializado.",
+    visionLabel: "Visión",
+    visionP1:
+      "Ser el Summit líder en el norte de México en temas de seguridad en la cadena de suministro, comercio exterior, logística y cumplimiento normativo, reconocido por conectar a empresas, expertos y proveedores estratégicos en un ecosistema de aprendizaje, innovación y crecimiento colaborativo.",
+    visionP2:
+      "Aspiramos a consolidarnos como el evento de referencia para impulsar una cultura de prevención, cumplimiento y excelencia operativa que fortalezca el comercio seguro y eficiente a nivel regional y binacional.",
+    aboutText:
+      "El 1er Summit de Seguridad en la Cadena de Suministro es un espacio especializado creado para reunir a los principales actores de la industria maquiladora, transporte, aduanas, seguridad y compliance, con el propósito de fortalecer la seguridad, la eficiencia y la competitividad del comercio en la región. A través de conferencias, paneles, workshops y espacios de vinculación comercial como el Business Hub, buscamos impulsar alianzas estratégicas, promover soluciones de alto impacto y contribuir al desarrollo de una cadena de suministro más segura, resiliente y eficiente.",
+    pillarsLabel: "EJES TEMÁTICOS",
+    pillarsTitle: "Tres Pilares, Un Objetivo",
+    pillarsDesc:
+      "Cada eje del Summit fue diseñado para cubrir las necesidades reales de los profesionales de la cadena de suministros.",
+    speakersLabel: "CONFERENCISTAS CONFIRMADOS",
+    speakersTitle: "Especialistas de Primer Nivel",
+    speakersDesc:
+      "Líderes en estándares internacionales, comercio exterior, cumplimiento operativo e innovación estratégica.",
+    speakersMorePrefix: "Más conferencistas serán anunciados pronto.",
+    speakersMoreCTA: "Regístrate para recibirlos primero →",
+    valueLabel: "LO QUE OBTENDRÁS",
+    valueTitle: "Valor Real Para Tu Empresa",
+    audienceCardTitle: "Perfil de Asistentes",
+    audienceCardDesc:
+      "Personal de la industria maquiladora, transportistas, agencias aduanales, compliance y seguridad de cadena de suministro.",
+    audienceCardCTA: "Registrarme Ahora",
+    agendaLabel: "AGENDA DEL EVENTO",
+    agendaTitle: "Programa Preliminar",
+    agendaDesc:
+      "Dos días intensivos de capacitación, paneles de expertos, workshops prácticos y sesiones de networking dirigidas.",
+    day1: "Día 1",
+    day1Date: "Miércoles, 24 de septiembre",
+    day2: "Día 2",
+    day2Date: "Jueves, 25 de septiembre",
+    agendaFooter:
+      "* Programa sujeto a ajustes menores. La agenda final se publicará 30 días antes del evento.",
+    participantsLabel: "PARTICIPANTES",
+    participantsTitle: "¿A Quién Va Dirigido?",
+    participantsDesc:
+      "Para quienes mueven, protegen y fortalecen la cadena de suministro. Un punto de encuentro para líderes y especialistas en áreas clave.",
+    providersLabel: "PROVEEDORES",
+    providersTitle: "Ecosistema B2B",
+    providersDesc:
+      "Empresas especializadas en tecnología, seguridad y servicios para la industria y la cadena de suministro.",
+    networkingLabel: "OPORTUNIDAD COMERCIAL",
+    networkingTitle: "Sala de Networking & Business Hub",
+    networkingDesc:
+      "Un espacio físico dedicado al encuentro de negocios. Diseñado para conectar compradores, proveedores y decisores en reuniones de alto valor.",
+    networkingFeatures: [
+      "Mesas B2B por industria",
+      "Directorio de asistentes",
+      "Área de presentaciones",
+      "Acceso prioritario VIP",
+      "Coffee break en sesiones",
+      "Networking los 2 días",
+    ],
+    networkingCTA: "RESERVAR MI LUGAR",
+    networkingStats: [
+      { number: "300", label: "LUGARES DISPONIBLES" },
+      { number: "15+", label: "HORAS DE NETWORKING" },
+      { number: "2", label: "DÍAS DE EVENTO" },
+      { number: "4", label: "SECTORES" },
+    ],
+    pricingLabel: "TIPOS DE ACCESO",
+    pricingTitle: "Elige Tu Acceso",
+    pricingDesc:
+      "Dos días de capacitación especializada · 24 y 25 de septiembre de 2026 · Centro de Convenciones, Reynosa",
+    mostPopular: "Más Popular",
+    taxNote: "* Más I.V.A.",
+    getAccessBtn: "OBTENER ACCESO",
+    paymentTitle: "¿Cómo funciona el proceso de pago?",
+    paymentIntroHtml:
+      "Al completar el formulario de registro recibirás un <strong>folio de confirmación</strong> en pantalla y por correo. Un representante de Lanz Logistics te contactará en un plazo de <strong>24–48 horas hábiles</strong> con las instrucciones de pago (transferencia bancaria, depósito o pago en línea). Tu lugar queda reservado una vez confirmado el pago.",
+    paymentSteps: [
+      { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio" },
+      { step: "2", title: "Recibe instrucciones", desc: "Te contactamos en 24-48 hrs hábiles" },
+      { step: "3", title: "Confirma tu lugar", desc: "Realiza el pago y recibes tu confirmación" },
+    ],
+    paymentQuestionsPrefix: "¿Preguntas sobre el pago? Escríbenos a",
+    paymentOr: "o al",
+    comparisonMobile: "Desliza horizontalmente para comparar todos los beneficios.",
+    compBenefit: "Beneficio",
+    compGeneral: "General",
+    compVip: "VIP",
+    compStudent: "Estudiante",
+    sponsorsLabel: "OPORTUNIDADES DE PATROCINIO",
+    sponsorsTitle: "Posiciona Tu Marca",
+    sponsorsDesc:
+      "Marcas que buscan máxima visibilidad, posicionamiento y presencia comercial destacada en el evento. Conecta tu empresa con más de 300 profesionales de la cadena de suministros.",
+    sponsorRequestInfo: "Solicitar Info",
+    locationLabel: "SEDE DEL EVENTO",
+    locationTitle: "Centro de Convenciones de Reynosa",
+    addressLabel: "Dirección",
+    addressName: "Centro de Convenciones de Reynosa",
+    addressLine1: "Blvd. Morelos 190, Col. Longoria",
+    addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
+    viewOnMaps: "Ver en Google Maps",
+    datesLabel: "Fechas",
+    datesValue: "24 y 25 de septiembre, 2026",
+    datesHours: "8:00 AM — 5:30 PM",
+    contactLabel: "Contacto",
+    faqLabel: "PREGUNTAS FRECUENTES",
+    faqTitle: "¿Tienes Dudas?",
+    regLabel: "RESERVA TU LUGAR",
+    regTitle: "Formulario de Registro",
+    regDesc:
+      "Completa los siguientes datos para asegurar tu lugar. Los campos con * son obligatorios.",
+    finalCTATitlePart1: "Cupo Limitado. ¿Listo para",
+    finalCTATitlePart2: "Fortalecer Tu Cadena?",
+    finalCTADesc:
+      "El registro garantiza tu lugar en el evento de seguridad en cadena de suministros más relevante del norte de México. No te quedes fuera.",
+    contactOrg: "CONTACTAR ORGANIZADOR",
+    footerDesc:
+      "1er Summit de Seguridad en la Cadena de Suministros. 24 y 25 de septiembre, 2026. Centro de Convenciones de Reynosa, Tamaulipas, México.",
+    footerPresentedBy: "Presentado por",
+    footerEvent: "Evento",
+    footerContact: "Contacto",
+    footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
+    footerPrivacy: "Aviso de Privacidad",
+    footerTerms: "Términos y Condiciones",
   },
   en: {
     skipToForm: "Skip to registration form",
+    switchLangLabel: "Switch to Spanish",
     registerBtn: "REGISTER",
     dateLocation: "September 24-25, 2026 · Reynosa, Tamaulipas",
     heroAlt: "Supply Chain Security Summit",
@@ -97,253 +251,639 @@ const UI_TEXT = {
     countdownLabel: "Time left",
     registerNowBtn: "REGISTER NOW",
     sponsorBtn: "SPONSOR THE EVENT",
+    presentedBy: "Presented by",
+    whyAttendLabel: "WHY JOIN THE SUMMIT",
+    whyAttendTitle: "What Awaits You",
+    whyAttendDesc:
+      "More than a conference. A training, networking and innovation experience designed to transform your operation.",
+    purposeLabel: "PURPOSE",
+    visionMissionTitle: "Vision & Mission",
+    missionLabel: "Mission",
+    missionP1:
+      "Bring together the key players of the supply chain in a single space to strengthen security strategies, share best practices, broadcast updates on international certifications, and create strategic networking opportunities among companies, specialists and solution providers.",
+    missionP2:
+      "Our mission is to drive the development of safer, better-informed and more competitive supply chains through high-value experiences such as conferences, panels, workshops and specialized networking.",
+    visionLabel: "Vision",
+    visionP1:
+      "To be the leading Summit in northern Mexico for supply chain security, foreign trade, logistics and regulatory compliance, recognized for connecting companies, experts and strategic providers in an ecosystem of learning, innovation and collaborative growth.",
+    visionP2:
+      "We aspire to become the reference event that drives a culture of prevention, compliance and operational excellence, strengthening safe and efficient trade at the regional and binational level.",
+    aboutText:
+      "The 1st Supply Chain Security Summit is a specialized forum created to bring together leading players from the maquiladora industry, transport, customs, security and compliance sectors, with the goal of strengthening the security, efficiency and competitiveness of trade in the region. Through conferences, panels, workshops and business networking spaces such as the Business Hub, we aim to promote strategic alliances, showcase high-impact solutions and contribute to a safer, more resilient and more efficient supply chain.",
+    pillarsLabel: "STRATEGIC PILLARS",
+    pillarsTitle: "Three Pillars, One Goal",
+    pillarsDesc:
+      "Every pillar of the Summit was designed to meet the real needs of supply chain professionals.",
+    speakersLabel: "CONFIRMED SPEAKERS",
+    speakersTitle: "Top-Tier Specialists",
+    speakersDesc:
+      "Leaders in international standards, foreign trade, operational compliance and strategic innovation.",
+    speakersMorePrefix: "More speakers will be announced soon.",
+    speakersMoreCTA: "Register to hear about them first →",
+    valueLabel: "WHAT YOU WILL GAIN",
+    valueTitle: "Real Value For Your Company",
+    audienceCardTitle: "Attendee Profile",
+    audienceCardDesc:
+      "Professionals from the maquiladora industry, carriers, customs brokers, compliance and supply chain security.",
+    audienceCardCTA: "Register Now",
+    agendaLabel: "EVENT AGENDA",
+    agendaTitle: "Preliminary Program",
+    agendaDesc:
+      "Two intensive days of training, expert panels, hands-on workshops and curated networking sessions.",
+    day1: "Day 1",
+    day1Date: "Wednesday, September 24",
+    day2: "Day 2",
+    day2Date: "Thursday, September 25",
+    agendaFooter:
+      "* Program subject to minor adjustments. The final agenda will be published 30 days before the event.",
+    participantsLabel: "PARTICIPANTS",
+    participantsTitle: "Who Is It For?",
+    participantsDesc:
+      "For those who move, protect and strengthen the supply chain. A meeting point for leaders and specialists in key areas.",
+    providersLabel: "PROVIDERS",
+    providersTitle: "B2B Ecosystem",
+    providersDesc:
+      "Companies specialized in technology, security and services for industry and the supply chain.",
+    networkingLabel: "BUSINESS OPPORTUNITY",
+    networkingTitle: "Networking Lounge & Business Hub",
+    networkingDesc:
+      "A physical space dedicated to business meetings. Designed to connect buyers, providers and decision makers in high-value conversations.",
+    networkingFeatures: [
+      "B2B tables by industry",
+      "Attendee directory",
+      "Presentation area",
+      "VIP priority access",
+      "Coffee breaks during sessions",
+      "Networking both days",
+    ],
+    networkingCTA: "RESERVE MY SPOT",
+    networkingStats: [
+      { number: "300", label: "AVAILABLE SEATS" },
+      { number: "15+", label: "NETWORKING HOURS" },
+      { number: "2", label: "EVENT DAYS" },
+      { number: "4", label: "INDUSTRY SECTORS" },
+    ],
+    pricingLabel: "ACCESS TYPES",
+    pricingTitle: "Choose Your Pass",
+    pricingDesc:
+      "Two days of specialized training · September 24-25, 2026 · Reynosa Convention Center",
+    mostPopular: "Most Popular",
+    taxNote: "* Plus VAT",
+    getAccessBtn: "GET ACCESS",
+    paymentTitle: "How does the payment process work?",
+    paymentIntroHtml:
+      "After completing the registration form you will receive a <strong>confirmation code</strong> on screen and by email. A Lanz Logistics representative will contact you within <strong>24–48 business hours</strong> with payment instructions (bank transfer, deposit or online payment). Your spot is reserved once payment is confirmed.",
+    paymentSteps: [
+      { step: "1", title: "Register", desc: "Fill out the form and receive your code" },
+      { step: "2", title: "Get instructions", desc: "We contact you within 24-48 business hours" },
+      { step: "3", title: "Confirm your spot", desc: "Complete the payment and receive confirmation" },
+    ],
+    paymentQuestionsPrefix: "Questions about payment? Email us at",
+    paymentOr: "or call",
+    comparisonMobile: "Swipe horizontally to compare all benefits.",
+    compBenefit: "Benefit",
+    compGeneral: "General",
+    compVip: "VIP",
+    compStudent: "Student",
+    sponsorsLabel: "SPONSORSHIP OPPORTUNITIES",
+    sponsorsTitle: "Position Your Brand",
+    sponsorsDesc:
+      "Brands seeking maximum visibility, positioning and prominent commercial presence at the event. Connect your company with more than 300 supply chain professionals.",
+    sponsorRequestInfo: "Request Info",
+    locationLabel: "EVENT VENUE",
+    locationTitle: "Reynosa Convention Center",
+    addressLabel: "Address",
+    addressName: "Reynosa Convention Center",
+    addressLine1: "Blvd. Morelos 190, Col. Longoria",
+    addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
+    viewOnMaps: "View on Google Maps",
+    datesLabel: "Dates",
+    datesValue: "September 24-25, 2026",
+    datesHours: "8:00 AM — 5:30 PM",
+    contactLabel: "Contact",
+    faqLabel: "FREQUENTLY ASKED QUESTIONS",
+    faqTitle: "Have Questions?",
+    regLabel: "RESERVE YOUR SPOT",
+    regTitle: "Registration Form",
+    regDesc:
+      "Fill out the information below to secure your spot. Fields marked with * are required.",
+    finalCTATitlePart1: "Limited Seats. Ready to",
+    finalCTATitlePart2: "Strengthen Your Chain?",
+    finalCTADesc:
+      "Registering guarantees your spot at the most relevant supply chain security event in northern Mexico. Don't miss out.",
+    contactOrg: "CONTACT ORGANIZER",
+    footerDesc:
+      "1st Supply Chain Security Summit. September 24 and 25, 2026. Reynosa Convention Center, Tamaulipas, Mexico.",
+    footerPresentedBy: "Presented by",
+    footerEvent: "Event",
+    footerContact: "Contact",
+    footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
+    footerPrivacy: "Privacy Notice",
+    footerTerms: "Terms and Conditions",
   },
 } as const;
 
-const HERO_STATS = [
-  { number: 2, suffix: "", label: "Días de Capacitación" },
-  { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
-  { number: 300, suffix: "", label: "Lugares Disponibles" },
-  { number: 4, suffix: "", label: "Sectores Industriales" },
-];
+const HERO_STATS = {
+  es: [
+    { number: 2, suffix: "", label: "Días de Capacitación" },
+    { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
+    { number: 300, suffix: "", label: "Lugares Disponibles" },
+    { number: 4, suffix: "", label: "Sectores Industriales" },
+  ],
+  en: [
+    { number: 2, suffix: "", label: "Training Days" },
+    { number: 4, suffix: "+", label: "Confirmed Speakers" },
+    { number: 300, suffix: "", label: "Available Seats" },
+    { number: 4, suffix: "", label: "Industry Sectors" },
+  ],
+} as const;
 
-const PILARES = [
-  {
-    icon: ShieldCheck,
-    title: "Actualización Estratégica",
-    desc: "Accede a contenido de alto valor sobre certificaciones de seguridad, comercio exterior, gestión de riesgos y cumplimiento operativo con enfoque en estándares internacionales.",
-    bullets: [
-      "Tendencias y regulaciones vigentes",
-      "Mejores prácticas internacionales",
-      "Gestión de riesgos y controles",
-    ],
-    number: "01",
-  },
-  {
-    icon: Network,
-    title: "Soluciones e Innovación",
-    desc: "Descubre tecnologías, herramientas y servicios especializados para la seguridad de tu cadena: trazabilidad, monitoreo inteligente y ciberseguridad aplicada.",
-    bullets: [
-      "Tecnologías de seguridad avanzada",
-      "Monitoreo logístico en tiempo real",
-      "Ciberseguridad para supply chain",
-    ],
-    number: "02",
-  },
-  {
-    icon: Handshake,
-    title: "Business Hub B2B",
-    desc: "Conecta con empresas, especialistas y tomadores de decisión. Impulsa relaciones de negocio en el entorno aduanal y logístico del norte de México.",
-    bullets: [
-      "Networking dirigido por industria",
-      "Generación de leads calificados",
-      "Alianzas comerciales estratégicas",
-    ],
-    number: "03",
-  },
-];
+const PILARES = {
+  es: [
+    {
+      icon: ShieldCheck,
+      title: "Actualización Estratégica",
+      desc: "Accede a contenido de alto valor sobre certificaciones de seguridad, comercio exterior, gestión de riesgos y cumplimiento operativo con enfoque en estándares internacionales.",
+      bullets: [
+        "Tendencias y regulaciones vigentes",
+        "Mejores prácticas internacionales",
+        "Gestión de riesgos y controles",
+      ],
+      number: "01",
+    },
+    {
+      icon: Network,
+      title: "Soluciones e Innovación",
+      desc: "Descubre tecnologías, herramientas y servicios especializados para la seguridad de tu cadena: trazabilidad, monitoreo inteligente y ciberseguridad aplicada.",
+      bullets: [
+        "Tecnologías de seguridad avanzada",
+        "Monitoreo logístico en tiempo real",
+        "Ciberseguridad para supply chain",
+      ],
+      number: "02",
+    },
+    {
+      icon: Handshake,
+      title: "Business Hub B2B",
+      desc: "Conecta con empresas, especialistas y tomadores de decisión. Impulsa relaciones de negocio en el entorno aduanal y logístico del norte de México.",
+      bullets: [
+        "Networking dirigido por industria",
+        "Generación de leads calificados",
+        "Alianzas comerciales estratégicas",
+      ],
+      number: "03",
+    },
+  ],
+  en: [
+    {
+      icon: ShieldCheck,
+      title: "Strategic Update",
+      desc: "Access high-value content on security certifications, foreign trade, risk management and operational compliance with a focus on international standards.",
+      bullets: [
+        "Current trends and regulations",
+        "International best practices",
+        "Risk management and controls",
+      ],
+      number: "01",
+    },
+    {
+      icon: Network,
+      title: "Solutions & Innovation",
+      desc: "Discover technologies, tools and specialized services for the security of your chain: traceability, intelligent monitoring and applied cybersecurity.",
+      bullets: [
+        "Advanced security technologies",
+        "Real-time logistics monitoring",
+        "Cybersecurity for supply chain",
+      ],
+      number: "02",
+    },
+    {
+      icon: Handshake,
+      title: "Business Hub B2B",
+      desc: "Connect with companies, specialists and decision makers. Build business relationships in northern Mexico's customs and logistics ecosystem.",
+      bullets: [
+        "Industry-focused networking",
+        "Qualified lead generation",
+        "Strategic commercial alliances",
+      ],
+      number: "03",
+    },
+  ],
+} as const;
 
-const SPEAKERS = [
-  {
-    name: "Fidel Guerrero",
-    role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
-    org: "INDEX",
-    topic: "Aduanas & Comercio Exterior",
-    image: "/images/speaker-fidel.png",
-  },
-  {
-    name: "Isidoro Juárez",
-    role: "Mandatario Aduanal Certificado",
-    org: "Especialista en Comercio Exterior",
-    topic: "Aduanas & Compliance",
-    image: "/images/speaker-isidoro.png",
-  },
-  {
-    name: "Julio César Suárez",
-    role: "Líder en Trade Compliance e Innovación",
-    org: "Sector Automotriz e Industrial",
-    topic: "Trade Compliance",
-    image: "/images/speaker-julio.png",
-  },
-  {
-    name: "Eduardo Luna",
-    role: "Especialista en Innovación Estratégica",
-    org: "Certificación Internacional en Enseñanza",
-    topic: "Innovación & Aprendizaje",
-    image: "/images/speaker-eduardo.png",
-  },
-];
+const SPEAKERS = {
+  es: [
+    {
+      name: "Fidel Guerrero",
+      role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
+      org: "INDEX",
+      topic: "Aduanas & Comercio Exterior",
+      image: "/images/speaker-fidel.png",
+    },
+    {
+      name: "Isidoro Juárez",
+      role: "Mandatario Aduanal Certificado",
+      org: "Especialista en Comercio Exterior",
+      topic: "Aduanas & Compliance",
+      image: "/images/speaker-isidoro.png",
+    },
+    {
+      name: "Julio César Suárez",
+      role: "Líder en Trade Compliance e Innovación",
+      org: "Sector Automotriz e Industrial",
+      topic: "Trade Compliance",
+      image: "/images/speaker-julio.png",
+    },
+    {
+      name: "Eduardo Luna",
+      role: "Especialista en Innovación Estratégica",
+      org: "Certificación Internacional en Enseñanza",
+      topic: "Innovación & Aprendizaje",
+      image: "/images/speaker-eduardo.png",
+    },
+  ],
+  en: [
+    {
+      name: "Fidel Guerrero",
+      role: "Deputy Director, National Committee of Customs & Foreign Trade",
+      org: "INDEX",
+      topic: "Customs & Foreign Trade",
+      image: "/images/speaker-fidel.png",
+    },
+    {
+      name: "Isidoro Juárez",
+      role: "Certified Customs Broker",
+      org: "Foreign Trade Specialist",
+      topic: "Customs & Compliance",
+      image: "/images/speaker-isidoro.png",
+    },
+    {
+      name: "Julio César Suárez",
+      role: "Trade Compliance & Innovation Leader",
+      org: "Automotive & Industrial Sector",
+      topic: "Trade Compliance",
+      image: "/images/speaker-julio.png",
+    },
+    {
+      name: "Eduardo Luna",
+      role: "Strategic Innovation Specialist",
+      org: "International Teaching Certification",
+      topic: "Innovation & Learning",
+      image: "/images/speaker-eduardo.png",
+    },
+  ],
+} as const;
 
-const AGENDA_DIA1 = [
-  { time: "08:00 — 09:00", title: "Registro y Welcome Coffee", type: "break" },
-  { time: "09:00 — 09:30", title: "Ceremonia de Inauguración", type: "keynote" },
-  { time: "09:30 — 10:30", title: "Panorama Actual de la Seguridad en Supply Chain", type: "keynote" },
-  { time: "10:30 — 11:00", title: "Coffee Break & Networking", type: "break" },
-  { time: "11:00 — 12:30", title: "Panel: Certificaciones Internacionales de Seguridad — Retos y Beneficios", type: "panel" },
-  { time: "12:30 — 13:30", title: "Workshop: Gestión de Riesgos en Comercio Exterior", type: "workshop" },
-  { time: "13:30 — 15:00", title: "Comida & Business Hub B2B", type: "break" },
-  { time: "15:00 — 16:30", title: "Tecnologías de Trazabilidad y Monitoreo Logístico", type: "talk" },
-  { time: "16:30 — 17:30", title: "Sesión de Networking Dirigida", type: "networking" },
-];
+const AGENDA_DIA1 = {
+  es: [
+    { time: "08:00 — 09:00", title: "Registro y Welcome Coffee", type: "break" },
+    { time: "09:00 — 09:30", title: "Ceremonia de Inauguración", type: "keynote" },
+    { time: "09:30 — 10:30", title: "Panorama Actual de la Seguridad en Supply Chain", type: "keynote" },
+    { time: "10:30 — 11:00", title: "Coffee Break & Networking", type: "break" },
+    { time: "11:00 — 12:30", title: "Panel: Certificaciones Internacionales de Seguridad — Retos y Beneficios", type: "panel" },
+    { time: "12:30 — 13:30", title: "Workshop: Gestión de Riesgos en Comercio Exterior", type: "workshop" },
+    { time: "13:30 — 15:00", title: "Comida & Business Hub B2B", type: "break" },
+    { time: "15:00 — 16:30", title: "Tecnologías de Trazabilidad y Monitoreo Logístico", type: "talk" },
+    { time: "16:30 — 17:30", title: "Sesión de Networking Dirigida", type: "networking" },
+  ],
+  en: [
+    { time: "08:00 — 09:00", title: "Registration & Welcome Coffee", type: "break" },
+    { time: "09:00 — 09:30", title: "Opening Ceremony", type: "keynote" },
+    { time: "09:30 — 10:30", title: "Current State of Supply Chain Security", type: "keynote" },
+    { time: "10:30 — 11:00", title: "Coffee Break & Networking", type: "break" },
+    { time: "11:00 — 12:30", title: "Panel: International Security Certifications — Challenges & Benefits", type: "panel" },
+    { time: "12:30 — 13:30", title: "Workshop: Risk Management in Foreign Trade", type: "workshop" },
+    { time: "13:30 — 15:00", title: "Lunch & B2B Business Hub", type: "break" },
+    { time: "15:00 — 16:30", title: "Traceability & Logistics Monitoring Technologies", type: "talk" },
+    { time: "16:30 — 17:30", title: "Guided Networking Session", type: "networking" },
+  ],
+} as const;
 
-const AGENDA_DIA2 = [
-  { time: "08:30 — 09:00", title: "Welcome Coffee", type: "break" },
-  { time: "09:00 — 10:30", title: "Trade Compliance: Normativas y Cumplimiento", type: "keynote" },
-  { time: "10:30 — 11:00", title: "Coffee Break", type: "break" },
-  { time: "11:00 — 12:00", title: "Ciberseguridad Aplicada a la Cadena de Suministros", type: "talk" },
-  { time: "12:00 — 13:00", title: "Panel: Innovación y Aprendizaje Estratégico", type: "panel" },
-  { time: "13:00 — 14:30", title: "Comida & Rondas B2B", type: "break" },
-  { time: "14:30 — 16:00", title: "Workshops Simultáneos — Track A & B", type: "workshop" },
-  { time: "16:00 — 17:00", title: "Ceremonia de Clausura y Reconocimientos", type: "keynote" },
-];
+const AGENDA_DIA2 = {
+  es: [
+    { time: "08:30 — 09:00", title: "Welcome Coffee", type: "break" },
+    { time: "09:00 — 10:30", title: "Trade Compliance: Normativas y Cumplimiento", type: "keynote" },
+    { time: "10:30 — 11:00", title: "Coffee Break", type: "break" },
+    { time: "11:00 — 12:00", title: "Ciberseguridad Aplicada a la Cadena de Suministros", type: "talk" },
+    { time: "12:00 — 13:00", title: "Panel: Innovación y Aprendizaje Estratégico", type: "panel" },
+    { time: "13:00 — 14:30", title: "Comida & Rondas B2B", type: "break" },
+    { time: "14:30 — 16:00", title: "Workshops Simultáneos — Track A & B", type: "workshop" },
+    { time: "16:00 — 17:00", title: "Ceremonia de Clausura y Reconocimientos", type: "keynote" },
+  ],
+  en: [
+    { time: "08:30 — 09:00", title: "Welcome Coffee", type: "break" },
+    { time: "09:00 — 10:30", title: "Trade Compliance: Regulations & Compliance", type: "keynote" },
+    { time: "10:30 — 11:00", title: "Coffee Break", type: "break" },
+    { time: "11:00 — 12:00", title: "Cybersecurity Applied to the Supply Chain", type: "talk" },
+    { time: "12:00 — 13:00", title: "Panel: Innovation & Strategic Learning", type: "panel" },
+    { time: "13:00 — 14:30", title: "Lunch & B2B Rounds", type: "break" },
+    { time: "14:30 — 16:00", title: "Simultaneous Workshops — Track A & B", type: "workshop" },
+    { time: "16:00 — 17:00", title: "Closing Ceremony & Recognition", type: "keynote" },
+  ],
+} as const;
 
-const ASISTENTES = [
-  { title: "Operaciones & Supply Chain", desc: "Directores, gerentes y coordinaciones", icon: Building2 },
-  { title: "Logística & Transporte", desc: "Responsables de tráfico y distribución", icon: Truck },
-  { title: "Aduanas & Comercio Exterior", desc: "Import-export y cumplimiento operativo", icon: Globe },
-  { title: "Compliance & Seguridad", desc: "Seguridad patrimonial y control interno", icon: ShieldCheck },
-  { title: "Abastecimiento & Compras", desc: "Decisores de compra y proveedores", icon: ShoppingCart },
-  { title: "Sistemas & Tecnología", desc: "Monitoreo e innovación IT", icon: Monitor },
-];
+const ASISTENTES = {
+  es: [
+    { title: "Operaciones & Supply Chain", desc: "Directores, gerentes y coordinaciones", icon: Building2 },
+    { title: "Logística & Transporte", desc: "Responsables de tráfico y distribución", icon: Truck },
+    { title: "Aduanas & Comercio Exterior", desc: "Import-export y cumplimiento operativo", icon: Globe },
+    { title: "Compliance & Seguridad", desc: "Seguridad patrimonial y control interno", icon: ShieldCheck },
+    { title: "Abastecimiento & Compras", desc: "Decisores de compra y proveedores", icon: ShoppingCart },
+    { title: "Sistemas & Tecnología", desc: "Monitoreo e innovación IT", icon: Monitor },
+  ],
+  en: [
+    { title: "Operations & Supply Chain", desc: "Directors, managers and coordinators", icon: Building2 },
+    { title: "Logistics & Transportation", desc: "Traffic and distribution leads", icon: Truck },
+    { title: "Customs & Foreign Trade", desc: "Import-export and operational compliance", icon: Globe },
+    { title: "Compliance & Security", desc: "Asset protection and internal control", icon: ShieldCheck },
+    { title: "Sourcing & Procurement", desc: "Purchasing decision-makers and suppliers", icon: ShoppingCart },
+    { title: "Systems & Technology", desc: "Monitoring and IT innovation", icon: Monitor },
+  ],
+} as const;
 
-const PROVEEDORES = [
-  { title: "Transportistas", icon: Truck },
-  { title: "Agencias Aduanales", icon: Globe },
-  { title: "Videovigilancia CCTV", icon: Eye },
-  { title: "Telemetría GPS", icon: Satellite },
-  { title: "Control de Acceso", icon: ScanLine },
-  { title: "Consultoría", icon: BookOpen },
-];
+const PROVEEDORES = {
+  es: [
+    { title: "Transportistas", icon: Truck },
+    { title: "Agencias Aduanales", icon: Globe },
+    { title: "Videovigilancia CCTV", icon: Eye },
+    { title: "Telemetría GPS", icon: Satellite },
+    { title: "Control de Acceso", icon: ScanLine },
+    { title: "Consultoría", icon: BookOpen },
+  ],
+  en: [
+    { title: "Carriers", icon: Truck },
+    { title: "Customs Brokers", icon: Globe },
+    { title: "CCTV Surveillance", icon: Eye },
+    { title: "GPS Telemetry", icon: Satellite },
+    { title: "Access Control", icon: ScanLine },
+    { title: "Consulting", icon: BookOpen },
+  ],
+} as const;
 
-const PRICING = [
-  {
-    id: "estudiante",
-    label: "Acceso Estudiante",
-    price: "$1,200",
-    featured: false,
-    desc: "Perfil académico con credencial vigente",
-    features: ["Capacitación 2 días", "Acceso a paneles", "Constancia digital", "Kit básico"],
-  },
-  {
-    id: "general",
-    label: "Acceso General",
-    price: "$5,800",
-    featured: true,
-    desc: "Profesionales y operación",
-    features: ["Capacitación 2 días", "Acceso a paneles", "Business Hub B2B", "Kit estándar", "Constancia digital", "Coffee break"],
-  },
-  {
-    id: "vip",
-    label: "Acceso VIP",
-    price: "$7,200",
-    featured: false,
-    desc: "Ejecutivos y tomadores de decisión",
-    features: ["Todo lo de General", "Asientos prioritarios", "Constancia física", "Kit completo", "Plantillas descargables", "Acceso total B2B"],
-  },
-];
+const PRICING = {
+  es: [
+    {
+      id: "estudiante",
+      label: "Acceso Estudiante",
+      price: "$1,200",
+      featured: false,
+      desc: "Perfil académico con credencial vigente",
+      features: ["Capacitación 2 días", "Acceso a paneles", "Constancia digital", "Kit básico"],
+    },
+    {
+      id: "general",
+      label: "Acceso General",
+      price: "$5,800",
+      featured: true,
+      desc: "Profesionales y operación",
+      features: ["Capacitación 2 días", "Acceso a paneles", "Business Hub B2B", "Kit estándar", "Constancia digital", "Coffee break"],
+    },
+    {
+      id: "vip",
+      label: "Acceso VIP",
+      price: "$7,200",
+      featured: false,
+      desc: "Ejecutivos y tomadores de decisión",
+      features: ["Todo lo de General", "Asientos prioritarios", "Constancia física", "Kit completo", "Plantillas descargables", "Acceso total B2B"],
+    },
+  ],
+  en: [
+    {
+      id: "estudiante",
+      label: "Student Pass",
+      price: "$1,200",
+      featured: false,
+      desc: "Academic profile with valid ID",
+      features: ["2-day training", "Panel access", "Digital certificate", "Basic kit"],
+    },
+    {
+      id: "general",
+      label: "General Pass",
+      price: "$5,800",
+      featured: true,
+      desc: "Professionals and operations",
+      features: ["2-day training", "Panel access", "B2B Business Hub", "Standard kit", "Digital certificate", "Coffee break"],
+    },
+    {
+      id: "vip",
+      label: "VIP Pass",
+      price: "$7,200",
+      featured: false,
+      desc: "Executives and decision makers",
+      features: ["Everything in General", "Priority seating", "Printed certificate", "Full kit", "Downloadable templates", "Full B2B access"],
+    },
+  ],
+} as const;
 
-const COMPARISON_ROWS = [
-  { feature: "Acceso a capacitación (2 días)", vip: true, general: true, estudiante: true },
-  { feature: "Acceso a paneles", vip: true, general: true, estudiante: true },
-  { feature: "Nivel de Gafete", vip: "VIP Premium", general: "General", estudiante: "Básico" },
-  { feature: "Kit Operativo", vip: "Completo", general: "Estándar", estudiante: "Mínimo" },
-  { feature: "Constancia Oficial", vip: "Física", general: "Digital", estudiante: "Digital" },
-  { feature: "Business Hub B2B", vip: "Acceso Total", general: true, estudiante: false },
-  { feature: "Asientos Prioritarios", vip: true, general: false, estudiante: false },
-  { feature: "Plantillas Descargables", vip: true, general: false, estudiante: false },
-  { feature: "Coffee Break", vip: true, general: false, estudiante: false },
-];
+const COMPARISON_ROWS = {
+  es: [
+    { feature: "Acceso a capacitación (2 días)", vip: true, general: true, estudiante: true },
+    { feature: "Acceso a paneles", vip: true, general: true, estudiante: true },
+    { feature: "Nivel de Gafete", vip: "VIP Premium", general: "General", estudiante: "Básico" },
+    { feature: "Kit Operativo", vip: "Completo", general: "Estándar", estudiante: "Mínimo" },
+    { feature: "Constancia Oficial", vip: "Física", general: "Digital", estudiante: "Digital" },
+    { feature: "Business Hub B2B", vip: "Acceso Total", general: true, estudiante: false },
+    { feature: "Asientos Prioritarios", vip: true, general: false, estudiante: false },
+    { feature: "Plantillas Descargables", vip: true, general: false, estudiante: false },
+    { feature: "Coffee Break", vip: true, general: false, estudiante: false },
+  ],
+  en: [
+    { feature: "Training access (2 days)", vip: true, general: true, estudiante: true },
+    { feature: "Panel access", vip: true, general: true, estudiante: true },
+    { feature: "Badge Level", vip: "VIP Premium", general: "General", estudiante: "Basic" },
+    { feature: "Operational Kit", vip: "Complete", general: "Standard", estudiante: "Minimal" },
+    { feature: "Official Certificate", vip: "Printed", general: "Digital", estudiante: "Digital" },
+    { feature: "B2B Business Hub", vip: "Full Access", general: true, estudiante: false },
+    { feature: "Priority Seating", vip: true, general: false, estudiante: false },
+    { feature: "Downloadable Templates", vip: true, general: false, estudiante: false },
+    { feature: "Coffee Break", vip: true, general: false, estudiante: false },
+  ],
+} as const;
 
-const SPONSORS = [
-  {
-    tier: "Patrocinador Platino",
-    slots: "Disponibilidad limitada · 8 espacios",
-    stand: "Stand 5×6m",
-    benefits: [
-      "Stand Premium en ubicación privilegiada (5m × 6m)",
-      "Logo en material impreso y digital (flyers, banners, sitio web, redes sociales)",
-      "Mención destacada en inauguración y clausura del evento",
-      "Espacio de presentación comercial ante la audiencia (5 min)",
-      "5 accesos VIP a conferencias",
-      "Inclusión de material promocional en el kit de bienvenida",
-      "Publicación destacada en redes sociales y mailing",
-      "Acceso a actividades de vinculación con compradores y autoridades",
-      "Directorio de visitantes y contactos potenciales",
-      "Coffee break con servicio en el lugar",
-      "Reel publicitario en pantallas",
-    ],
-  },
-  {
-    tier: "Patrocinador Oro",
-    slots: "Disponibilidad limitada · 10 espacios",
-    stand: "Stand 4×4m",
-    benefits: [
-      "Stand en área central del evento (4m × 4m)",
-      "Logo en material impreso y digital",
-      "Mención durante la inauguración",
-      "3 accesos VIP a conferencias",
-      "Publicación en redes sociales y mailing",
-      "Oportunidad de distribuir material promocional",
-    ],
-  },
-  {
-    tier: "Patrocinador Plata",
-    slots: "Disponibilidad limitada · 14 espacios",
-    stand: "Stand 3×3m",
-    benefits: [
-      "Stand estándar en área de exhibición (3m × 3m)",
-      "Logo en material digital (sitio web, redes sociales)",
-      "2 accesos VIP a conferencias",
-      "Publicación en redes sociales",
-    ],
-  },
-  {
-    tier: "Proveedor Aliado Estratégico",
-    slots: "Categoría especial · 16 espacios",
-    stand: "Stand 3×3m",
-    benefits: [
-      "Stand 3×3m en zona de proveedores",
-      "1 acceso a conferencias incluido",
-      "Inclusión en directorio de soluciones",
-      'Badge "Proveedor Recomendado" en materiales del evento',
-      "Diseñado para proveedores especializados en certificaciones de seguridad",
-    ],
-  },
-];
+const SPONSORS = {
+  es: [
+    {
+      tier: "Patrocinador Platino",
+      slots: "Disponibilidad limitada · 8 espacios",
+      stand: "Stand 5×6m",
+      benefits: [
+        "Stand Premium en ubicación privilegiada (5m × 6m)",
+        "Logo en material impreso y digital (flyers, banners, sitio web, redes sociales)",
+        "Mención destacada en inauguración y clausura del evento",
+        "Espacio de presentación comercial ante la audiencia (5 min)",
+        "5 accesos VIP a conferencias",
+        "Inclusión de material promocional en el kit de bienvenida",
+        "Publicación destacada en redes sociales y mailing",
+        "Acceso a actividades de vinculación con compradores y autoridades",
+        "Directorio de visitantes y contactos potenciales",
+        "Coffee break con servicio en el lugar",
+        "Reel publicitario en pantallas",
+      ],
+    },
+    {
+      tier: "Patrocinador Oro",
+      slots: "Disponibilidad limitada · 10 espacios",
+      stand: "Stand 4×4m",
+      benefits: [
+        "Stand en área central del evento (4m × 4m)",
+        "Logo en material impreso y digital",
+        "Mención durante la inauguración",
+        "3 accesos VIP a conferencias",
+        "Publicación en redes sociales y mailing",
+        "Oportunidad de distribuir material promocional",
+      ],
+    },
+    {
+      tier: "Patrocinador Plata",
+      slots: "Disponibilidad limitada · 14 espacios",
+      stand: "Stand 3×3m",
+      benefits: [
+        "Stand estándar en área de exhibición (3m × 3m)",
+        "Logo en material digital (sitio web, redes sociales)",
+        "2 accesos VIP a conferencias",
+        "Publicación en redes sociales",
+      ],
+    },
+    {
+      tier: "Proveedor Aliado Estratégico",
+      slots: "Categoría especial · 16 espacios",
+      stand: "Stand 3×3m",
+      benefits: [
+        "Stand 3×3m en zona de proveedores",
+        "1 acceso a conferencias incluido",
+        "Inclusión en directorio de soluciones",
+        'Badge "Proveedor Recomendado" en materiales del evento',
+        "Diseñado para proveedores especializados en certificaciones de seguridad",
+      ],
+    },
+  ],
+  en: [
+    {
+      tier: "Platinum Sponsor",
+      slots: "Limited availability · 8 slots",
+      stand: "5×6m booth",
+      benefits: [
+        "Premium booth in privileged location (5m × 6m)",
+        "Logo on printed and digital material (flyers, banners, website, social media)",
+        "Featured mention at opening and closing ceremonies",
+        "Commercial presentation slot on stage (5 min)",
+        "5 VIP passes to conferences",
+        "Promotional material in the welcome kit",
+        "Featured posts on social media and mailing",
+        "Access to networking activities with buyers and authorities",
+        "Attendee and prospect directory",
+        "On-site coffee break service",
+        "Advertising reel on screens",
+      ],
+    },
+    {
+      tier: "Gold Sponsor",
+      slots: "Limited availability · 10 slots",
+      stand: "4×4m booth",
+      benefits: [
+        "Booth in the central area of the event (4m × 4m)",
+        "Logo on printed and digital material",
+        "Mention during the opening ceremony",
+        "3 VIP passes to conferences",
+        "Social media and mailing posts",
+        "Opportunity to distribute promotional material",
+      ],
+    },
+    {
+      tier: "Silver Sponsor",
+      slots: "Limited availability · 14 slots",
+      stand: "3×3m booth",
+      benefits: [
+        "Standard booth in the exhibition area (3m × 3m)",
+        "Logo on digital material (website, social media)",
+        "2 VIP passes to conferences",
+        "Social media posts",
+      ],
+    },
+    {
+      tier: "Strategic Allied Provider",
+      slots: "Special category · 16 slots",
+      stand: "3×3m booth",
+      benefits: [
+        "3×3m booth in the providers zone",
+        "1 conference pass included",
+        "Inclusion in the solutions directory",
+        '"Recommended Provider" badge on event materials',
+        "Designed for providers specializing in security certifications",
+      ],
+    },
+  ],
+} as const;
 
-const VALUE_HIGHLIGHTS = [
-  "Contenido especializado con aplicación directa en tu operación diaria",
-  "Networking estratégico con más de 300 profesionales de la industria",
-  "Acceso a soluciones tecnológicas de vanguardia en seguridad y logística",
-  "Vinculación directa con tomadores de decisión y compradores",
-  "Certificaciones y estándares internacionales con enfoque práctico",
-  "Workshops y paneles dirigidos por expertos con experiencia real",
-  "Business Hub B2B para generación de alianzas comerciales",
-  "Perspectiva binacional para impulsar el comercio seguro y eficiente",
-];
+const VALUE_HIGHLIGHTS = {
+  es: [
+    "Contenido especializado con aplicación directa en tu operación diaria",
+    "Networking estratégico con más de 300 profesionales de la industria",
+    "Acceso a soluciones tecnológicas de vanguardia en seguridad y logística",
+    "Vinculación directa con tomadores de decisión y compradores",
+    "Certificaciones y estándares internacionales con enfoque práctico",
+    "Workshops y paneles dirigidos por expertos con experiencia real",
+    "Business Hub B2B para generación de alianzas comerciales",
+    "Perspectiva binacional para impulsar el comercio seguro y eficiente",
+  ],
+  en: [
+    "Specialized content with direct application to your daily operation",
+    "Strategic networking with more than 300 industry professionals",
+    "Access to cutting-edge security and logistics technology solutions",
+    "Direct connection with decision makers and buyers",
+    "International certifications and standards with a practical focus",
+    "Workshops and panels led by experts with real-world experience",
+    "B2B Business Hub to drive commercial alliances",
+    "Binational perspective to boost safe and efficient trade",
+  ],
+} as const;
 
-const WHY_ATTEND = [
-  {
-    icon: BookOpen,
-    title: "Actualización Estratégica",
-    desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
-  },
-  {
-    icon: Mic2,
-    title: "Expertos del Sector",
-    desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia.",
-  },
-  {
-    icon: Target,
-    title: "Impacto Real",
-    desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
-  },
-  {
-    icon: Globe,
-    title: "Visión Binacional y Comercial",
-    desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
-  },
-];
+const WHY_ATTEND = {
+  es: [
+    {
+      icon: BookOpen,
+      title: "Actualización Estratégica",
+      desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
+    },
+    {
+      icon: Mic2,
+      title: "Expertos del Sector",
+      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia.",
+    },
+    {
+      icon: Target,
+      title: "Impacto Real",
+      desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
+    },
+    {
+      icon: Globe,
+      title: "Visión Binacional y Comercial",
+      desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
+    },
+  ],
+  en: [
+    {
+      icon: BookOpen,
+      title: "Strategic Update",
+      desc: "Current and specialized topics on security, logistics, foreign trade and compliance.",
+    },
+    {
+      icon: Mic2,
+      title: "Industry Experts",
+      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy.",
+    },
+    {
+      icon: Target,
+      title: "Real Impact",
+      desc: "Ideas, tools and contacts that translate into concrete improvements for your company.",
+    },
+    {
+      icon: Globe,
+      title: "Binational & Commercial Vision",
+      desc: "A binational perspective to drive trade, collaboration and growth.",
+    },
+  ],
+} as const;
 
 const FAQ_ITEMS = [
   {
@@ -512,7 +1052,7 @@ export default function Home() {
                 type="button"
                 onClick={() => setLanguage((prev) => (prev === "es" ? "en" : "es"))}
                 className="inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
-                aria-label={language === "es" ? "Cambiar a inglés" : "Switch to Spanish"}
+                aria-label={text.switchLangLabel}
               >
                 {language === "es" ? "EN" : "ES"}
               </button>
@@ -609,7 +1149,7 @@ export default function Home() {
            ═══════════════════════════════════════════════════════════ */}
         <section className="py-8 bg-white border-b border-slate-100">
           <div className="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-center gap-8 sm:gap-16">
-            {HERO_STATS.map((s, i) => (
+            {HERO_STATS[language].map((s, i) => (
               <div key={i} className="text-center">
                 <div className="flex items-baseline justify-center gap-1">
                   <AnimatedCounter target={s.number} className="number-accent text-3xl sm:text-4xl" />
@@ -621,7 +1161,7 @@ export default function Home() {
               </div>
             ))}
             <div className="hidden sm:block text-center border-l border-slate-200 pl-8">
-              <p className="text-xs text-slate-400 uppercase tracking-wider">Presentado por</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wider">{text.presentedBy}</p>
               <p className="font-bold text-slate-700 text-sm mt-1">Lanz Logistics <span className="text-blue-500">+</span> Thynk Unlimited</p>
             </div>
           </div>
@@ -636,19 +1176,18 @@ export default function Home() {
               <div className="text-center mb-16">
                 <div className="flex items-center justify-center gap-3 mb-4">
                   <div className="accent-line" />
-                  <span className="section-label">PORQUE SER PARTE DEL SUMMIT</span>
+                  <span className="section-label">{text.whyAttendLabel}</span>
                   <div className="accent-line" />
                 </div>
-                <h2 className="section-title">Lo Que Te Espera</h2>
+                <h2 className="section-title">{text.whyAttendTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4 text-lg">
-                  Más que un congreso. Una experiencia de capacitación, networking e innovación
-                  diseñada para transformar tu operación.
+                  {text.whyAttendDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             <div className="grid sm:grid-cols-2 gap-6">
-              {WHY_ATTEND.map((item, i) => (
+              {WHY_ATTEND[language].map((item, i) => (
                 <ScrollReveal key={i} delay={i * 100}>
                   <div className="group relative p-8 rounded-2xl border border-slate-100 bg-white hover:bg-blue-50/50 hover:border-blue-200 transition-all duration-500 hover:shadow-lg">
                     <div className="flex items-start gap-5">
@@ -685,10 +1224,10 @@ export default function Home() {
             <ScrollReveal>
               <div className="text-center mb-16">
                 <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
-                  <Compass className="w-3.5 h-3.5 text-cyan-300" /> PROPÓSITO
+                  <Compass className="w-3.5 h-3.5 text-cyan-300" /> {text.purposeLabel}
                 </span>
                 <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-tight">
-                  Visión y Misión
+                  {text.visionMissionTitle}
                 </h2>
               </div>
             </ScrollReveal>
@@ -701,15 +1240,11 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
                       <Crosshair className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">Misión</h3>
+                    <h3 className="font-oswald text-2xl font-bold text-white">{text.missionLabel}</h3>
                   </div>
                   <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>
-                      Reunir en un solo espacio a los sectores clave de la cadena de suministro para fortalecer las estrategias de seguridad, compartir mejores prácticas, difundir actualizaciones relevantes en certificaciones internacionales, y generar oportunidades de vinculación estratégica entre empresas, especialistas y proveedores de soluciones.
-                    </p>
-                    <p>
-                      Nuestra misión es impulsar el desarrollo de cadenas de suministro más seguras, informadas y competitivas, mediante experiencias de alto valor como conferencias, paneles, talleres y networking especializado.
-                    </p>
+                    <p>{text.missionP1}</p>
+                    <p>{text.missionP2}</p>
                   </div>
                 </div>
               </ScrollReveal>
@@ -721,15 +1256,11 @@ export default function Home() {
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
                       <Lightbulb className="w-6 h-6 text-white" />
                     </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">Visión</h3>
+                    <h3 className="font-oswald text-2xl font-bold text-white">{text.visionLabel}</h3>
                   </div>
                   <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>
-                      Ser el Summit líder en el norte de México en temas de seguridad en la cadena de suministro, comercio exterior, logística y cumplimiento normativo, reconocido por conectar a empresas, expertos y proveedores estratégicos en un ecosistema de aprendizaje, innovación y crecimiento colaborativo.
-                    </p>
-                    <p>
-                      Aspiramos a consolidarnos como el evento de referencia para impulsar una cultura de prevención, cumplimiento y excelencia operativa que fortalezca el comercio seguro y eficiente a nivel regional y binacional.
-                    </p>
+                    <p>{text.visionP1}</p>
+                    <p>{text.visionP2}</p>
                   </div>
                 </div>
               </ScrollReveal>
@@ -739,7 +1270,7 @@ export default function Home() {
             <ScrollReveal delay={300}>
               <div className="mt-12 p-8 sm:p-10 rounded-2xl bg-white/[0.04] border border-white/8 text-center max-w-4xl mx-auto">
                 <p className="text-blue-100/70 text-sm leading-relaxed">
-                  El 1er Summit de Seguridad en la Cadena de Suministro es un espacio especializado creado para reunir a los principales actores de la industria maquiladora, transporte, aduanas, seguridad y compliance, con el propósito de fortalecer la seguridad, la eficiencia y la competitividad del comercio en la región. A través de conferencias, paneles, workshops y espacios de vinculación comercial como el Business Hub, buscamos impulsar alianzas estratégicas, promover soluciones de alto impacto y contribuir al desarrollo de una cadena de suministro más segura, resiliente y eficiente.
+                  {text.aboutText}
                 </p>
               </div>
             </ScrollReveal>
@@ -756,17 +1287,16 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
-                <span className="section-label">EJES TEMÁTICOS</span>
-                <h2 className="section-title mt-3">Tres Pilares, Un Objetivo</h2>
+                <span className="section-label">{text.pillarsLabel}</span>
+                <h2 className="section-title mt-3">{text.pillarsTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  Cada eje del Summit fue diseñado para cubrir las necesidades reales
-                  de los profesionales de la cadena de suministros.
+                  {text.pillarsDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             <div className="grid md:grid-cols-3 gap-8">
-              {PILARES.map((p, i) => (
+              {PILARES[language].map((p, i) => (
                 <ScrollReveal key={i} delay={i * 150}>
                   <div className="card-elevated p-8 h-full group">
                     {/* Big number */}
@@ -802,18 +1332,17 @@ export default function Home() {
             <ScrollReveal>
               <div className="text-center mb-16">
                 <span className="section-label flex items-center justify-center gap-2">
-                  <Mic2 className="w-4 h-4" /> CONFERENCISTAS CONFIRMADOS
+                  <Mic2 className="w-4 h-4" /> {text.speakersLabel}
                 </span>
-                <h2 className="section-title mt-3">Especialistas de Primer Nivel</h2>
+                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  Líderes en estándares internacionales, comercio exterior, cumplimiento operativo e
-                  innovación estratégica.
+                  {text.speakersDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {SPEAKERS.map((s, i) => (
+              {SPEAKERS[language].map((s, i) => (
                 <ScrollReveal key={i} delay={i * 100}>
                   <div className="speaker-card group text-center">
                     {/* Photo */}
@@ -840,9 +1369,9 @@ export default function Home() {
 
             <ScrollReveal delay={500}>
               <p className="text-center text-sm text-slate-400 mt-12">
-                Más conferencistas serán anunciados pronto.{" "}
+                {text.speakersMorePrefix}{" "}
                 <a href="#registro" className="text-blue-600 font-semibold hover:underline">
-                  Regístrate para recibirlos primero →
+                  {text.speakersMoreCTA}
                 </a>
               </p>
             </ScrollReveal>
@@ -858,12 +1387,12 @@ export default function Home() {
               {/* Left: Bullet Points (3 cols) */}
               <div className="lg:col-span-3">
                 <ScrollReveal>
-                  <span className="section-label">LO QUE OBTENDRÁS</span>
-                  <h2 className="section-title mt-3 mb-8">Valor Real Para Tu Empresa</h2>
+                  <span className="section-label">{text.valueLabel}</span>
+                  <h2 className="section-title mt-3 mb-8">{text.valueTitle}</h2>
                 </ScrollReveal>
                 <ScrollReveal delay={100}>
                   <div className="space-y-3">
-                    {VALUE_HIGHLIGHTS.map((item, i) => (
+                    {VALUE_HIGHLIGHTS[language].map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
                         <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <span className="text-[15px] text-slate-700 font-medium leading-relaxed">{item}</span>
@@ -881,14 +1410,13 @@ export default function Home() {
                       <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md">
                         <Users className="w-5 h-5 text-white" />
                       </div>
-                      <h3 className="font-oswald text-xl font-bold text-slate-900">Perfil de Asistentes</h3>
+                      <h3 className="font-oswald text-xl font-bold text-slate-900">{text.audienceCardTitle}</h3>
                     </div>
                     <p className="text-[15px] text-slate-600 leading-relaxed mb-6">
-                      Personal de la industria maquiladora, transportistas, agencias aduanales,
-                      compliance y seguridad de cadena de suministro.
+                      {text.audienceCardDesc}
                     </p>
                     <div className="space-y-3">
-                      {ASISTENTES.slice(0, 4).map((a, i) => (
+                      {ASISTENTES[language].slice(0, 4).map((a, i) => (
                         <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
                           <a.icon className="w-4 h-4 text-blue-500 flex-shrink-0" />
                           <span className="font-medium">{a.title}</span>
@@ -896,7 +1424,7 @@ export default function Home() {
                       ))}
                     </div>
                     <a href="#registro" className="btn-primary w-full mt-8 py-3 text-sm justify-center">
-                      Registrarme Ahora <ArrowRight className="w-4 h-4" />
+                      {text.audienceCardCTA} <ArrowRight className="w-4 h-4" />
                     </a>
                   </div>
                 </ScrollReveal>
@@ -915,11 +1443,10 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
-                <span className="section-label">AGENDA DEL EVENTO</span>
-                <h2 className="section-title mt-3">Programa Preliminar</h2>
+                <span className="section-label">{text.agendaLabel}</span>
+                <h2 className="section-title mt-3">{text.agendaTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  Dos días intensivos de capacitación, paneles de expertos, workshops prácticos y
-                  sesiones de networking dirigidas.
+                  {text.agendaDesc}
                 </p>
               </div>
             </ScrollReveal>
@@ -933,12 +1460,12 @@ export default function Home() {
                       <Calendar className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-oswald text-xl font-bold text-slate-900">Día 1</h3>
-                      <p className="text-xs text-slate-400">Miércoles, 24 de septiembre</p>
+                      <h3 className="font-oswald text-xl font-bold text-slate-900">{text.day1}</h3>
+                      <p className="text-xs text-slate-400">{text.day1Date}</p>
                     </div>
                   </div>
                   <div>
-                    {AGENDA_DIA1.map((item, i) => (
+                    {AGENDA_DIA1[language].map((item, i) => (
                       <div key={i} className="timeline-item">
                         <div className="timeline-dot" />
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
@@ -960,12 +1487,12 @@ export default function Home() {
                       <Calendar className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-oswald text-xl font-bold text-slate-900">Día 2</h3>
-                      <p className="text-xs text-slate-400">Jueves, 25 de septiembre</p>
+                      <h3 className="font-oswald text-xl font-bold text-slate-900">{text.day2}</h3>
+                      <p className="text-xs text-slate-400">{text.day2Date}</p>
                     </div>
                   </div>
                   <div>
-                    {AGENDA_DIA2.map((item, i) => (
+                    {AGENDA_DIA2[language].map((item, i) => (
                       <div key={i} className="timeline-item">
                         <div className="timeline-dot" />
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
@@ -982,7 +1509,7 @@ export default function Home() {
 
             <ScrollReveal delay={300}>
               <p className="text-center text-xs text-slate-400 mt-8">
-                * Programa sujeto a ajustes menores. La agenda final se publicará 30 días antes del evento.
+                {text.agendaFooter}
               </p>
             </ScrollReveal>
           </div>
@@ -996,17 +1523,16 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
-                <span className="section-label">PARTICIPANTES</span>
-                <h2 className="section-title mt-3">¿A Quién Va Dirigido?</h2>
+                <span className="section-label">{text.participantsLabel}</span>
+                <h2 className="section-title mt-3">{text.participantsTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  Para quienes mueven, protegen y fortalecen la cadena de suministro. Un punto de
-                  encuentro para líderes y especialistas en áreas clave.
+                  {text.participantsDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
-              {ASISTENTES.map((a, i) => (
+              {ASISTENTES[language].map((a, i) => (
                 <ScrollReveal key={i} delay={i * 80}>
                   <div className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
                     <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
@@ -1026,14 +1552,14 @@ export default function Home() {
               <div className="card-elevated p-8 sm:p-10">
                 <div className="flex flex-col md:flex-row md:items-center gap-8">
                   <div className="md:w-2/5">
-                    <span className="section-label text-xs">PROVEEDORES</span>
-                    <h3 className="font-oswald text-2xl font-bold text-slate-900 mt-2">Ecosistema B2B</h3>
+                    <span className="section-label text-xs">{text.providersLabel}</span>
+                    <h3 className="font-oswald text-2xl font-bold text-slate-900 mt-2">{text.providersTitle}</h3>
                     <p className="text-slate-500 text-sm mt-3 leading-relaxed">
-                      Empresas especializadas en tecnología, seguridad y servicios para la industria y la cadena de suministro.
+                      {text.providersDesc}
                     </p>
                   </div>
                   <div className="md:w-3/5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {PROVEEDORES.map((prov, i) => (
+                    {PROVEEDORES[language].map((prov, i) => (
                       <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all text-sm font-medium text-slate-700">
                         <prov.icon className="w-4 h-4 text-blue-500" />
                         {prov.title}
@@ -1061,28 +1587,19 @@ export default function Home() {
               <div className="md:w-3/5">
                 <ScrollReveal>
                   <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
-                    OPORTUNIDAD COMERCIAL
+                    {text.networkingLabel}
                   </span>
                   <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-[1.15] mb-4">
-                    Sala de Networking & Business Hub
+                    {text.networkingTitle}
                   </h2>
                   <p className="text-blue-100/80 max-w-lg text-base leading-relaxed mb-6">
-                    Un espacio físico dedicado al encuentro de negocios. Diseñado
-                    para conectar compradores, proveedores y decisores en reuniones
-                    de alto valor.
+                    {text.networkingDesc}
                   </p>
                 </ScrollReveal>
 
                 <ScrollReveal delay={100}>
                   <div className="grid grid-cols-2 gap-3 mb-8">
-                    {[
-                      "Mesas B2B por industria",
-                      "Directorio de asistentes",
-                      "Área de presentaciones",
-                      "Acceso prioritario VIP",
-                      "Coffee break en sesiones",
-                      "Networking los 2 días",
-                    ].map((item, i) => (
+                    {text.networkingFeatures.map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm text-white/80">
                         <CheckCircle2 className="w-4 h-4 text-cyan-300 flex-shrink-0" />
                         {item}
@@ -1093,7 +1610,7 @@ export default function Home() {
 
                 <ScrollReveal delay={200}>
                   <a href="#registro" className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg">
-                    RESERVAR MI LUGAR <ArrowRight className="w-4 h-4" />
+                    {text.networkingCTA} <ArrowRight className="w-4 h-4" />
                   </a>
                 </ScrollReveal>
               </div>
@@ -1101,20 +1618,19 @@ export default function Home() {
               {/* Stats */}
               <div className="md:w-2/5">
                 <div className="grid grid-cols-2 gap-4">
-                  {[
-                    { icon: Users, number: "300", label: "LUGARES DISPONIBLES" },
-                    { icon: Clock, number: "15+", label: "HORAS DE NETWORKING" },
-                    { icon: Handshake, number: "2", label: "DÍAS DE EVENTO" },
-                    { icon: Award, number: "4", label: "SECTORES" },
-                  ].map((stat, i) => (
-                    <ScrollReveal key={i} delay={i * 100}>
-                      <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
-                        <stat.icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-                        <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
-                        <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
-                      </div>
-                    </ScrollReveal>
-                  ))}
+                  {text.networkingStats.map((stat, i) => {
+                    const icons = [Users, Clock, Handshake, Award];
+                    const Icon = icons[i];
+                    return (
+                      <ScrollReveal key={i} delay={i * 100}>
+                        <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
+                          <Icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
+                          <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
+                          <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
+                        </div>
+                      </ScrollReveal>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -1128,18 +1644,17 @@ export default function Home() {
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-6">
-                <span className="section-label">TIPOS DE ACCESO</span>
-                <h2 className="section-title mt-3">Elige Tu Acceso</h2>
+                <span className="section-label">{text.pricingLabel}</span>
+                <h2 className="section-title mt-3">{text.pricingTitle}</h2>
                 <p className="text-slate-500 max-w-xl mx-auto mt-4">
-                  Dos días de capacitación especializada · 24 y 25 de septiembre de 2026 · Centro de
-                  Convenciones, Reynosa
+                  {text.pricingDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             {/* Cards */}
             <div className="grid md:grid-cols-3 gap-6 mt-12">
-              {PRICING.map((plan, i) => (
+              {PRICING[language].map((plan, i) => (
                 <ScrollReveal key={plan.id} delay={i * 100}>
                   <div
                     className={`relative p-8 rounded-2xl h-full flex flex-col transition-all duration-300 ${plan.featured
@@ -1153,7 +1668,7 @@ export default function Home() {
                   >
                     {plan.featured && (
                       <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg" style={{ background: "linear-gradient(90deg, #22d3ee, #60a5fa)" }}>
-                        Más Popular
+                        {text.mostPopular}
                       </div>
                     )}
                     <h3 className={`font-oswald text-xl font-bold ${plan.featured ? "text-white" : "text-slate-900"}`}>
@@ -1167,7 +1682,7 @@ export default function Home() {
                         {plan.price}
                       </span>
                       <span className={`text-sm ml-1 ${plan.featured ? "text-blue-200" : "text-slate-400"}`}>MXN</span>
-                      <p className={`text-xs mt-1 ${plan.featured ? "text-blue-300" : "text-slate-400"}`}>* Más I.V.A.</p>
+                      <p className={`text-xs mt-1 ${plan.featured ? "text-blue-300" : "text-slate-400"}`}>{text.taxNote}</p>
                     </div>
 
                     {/* Features list */}
@@ -1187,7 +1702,7 @@ export default function Home() {
                           : "btn-primary"
                         }`}
                     >
-                      OBTENER ACCESO
+                      {text.getAccessBtn}
                     </a>
                   </div>
                 </ScrollReveal>
@@ -1202,16 +1717,10 @@ export default function Home() {
                     <CheckCircle2 className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">¿Cómo funciona el proceso de pago?</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed mb-4">
-                      Al completar el formulario de registro recibirás un <strong>folio de confirmación</strong> en pantalla y por correo. Un representante de Lanz Logistics te contactará en un plazo de <strong>24–48 horas hábiles</strong> con las instrucciones de pago (transferencia bancaria, depósito o pago en línea). Tu lugar queda reservado una vez confirmado el pago.
-                    </p>
+                    <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">{text.paymentTitle}</h3>
+                    <p className="text-sm text-slate-600 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: text.paymentIntroHtml }} />
                     <div className="grid sm:grid-cols-3 gap-3">
-                      {[
-                        { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio" },
-                        { step: "2", title: "Recibe instrucciones", desc: "Te contactamos en 24-48 hrs hábiles" },
-                        { step: "3", title: "Confirma tu lugar", desc: "Realiza el pago y recibes tu confirmación" },
-                      ].map((s) => (
+                      {text.paymentSteps.map((s) => (
                         <div key={s.step} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-blue-100">
                           <span className="w-7 h-7 rounded-full bg-blue-600 text-white text-xs font-bold flex items-center justify-center flex-shrink-0">{s.step}</span>
                           <div>
@@ -1222,9 +1731,9 @@ export default function Home() {
                       ))}
                     </div>
                     <p className="text-xs text-slate-400 mt-4">
-                      ¿Preguntas sobre el pago? Escríbenos a{" "}
+                      {text.paymentQuestionsPrefix}{" "}
                       <a href="mailto:Contacto@LanzLogistics.com" className="text-blue-600 hover:underline font-medium">Contacto@LanzLogistics.com</a>
-                      {" "}o al <a href="tel:+19565158070" className="text-blue-600 hover:underline font-medium">+1 (956) 515-8070</a>
+                      {" "}{text.paymentOr} <a href="tel:+19565158070" className="text-blue-600 hover:underline font-medium">+1 (956) 515-8070</a>
                     </p>
                   </div>
                 </div>
@@ -1235,19 +1744,19 @@ export default function Home() {
             <ScrollReveal delay={300}>
               <div className="card-elevated mt-16 overflow-x-auto">
                 <p className="px-4 pt-4 text-[11px] sm:hidden text-slate-500">
-                  Desliza horizontalmente para comparar todos los beneficios.
+                  {text.comparisonMobile}
                 </p>
                 <table className="comparison-table w-full min-w-[700px]">
                   <thead>
                     <tr>
-                      <th className="text-left p-5 font-oswald text-xs tracking-wider text-slate-400 uppercase">Beneficio</th>
-                      <th className="text-center p-5 font-oswald text-sm text-slate-600 uppercase">General</th>
-                      <th className="text-center p-5 font-oswald text-sm text-blue-600 uppercase font-bold">VIP</th>
-                      <th className="text-center p-5 font-oswald text-xs text-slate-400 uppercase">Estudiante</th>
+                      <th className="text-left p-5 font-oswald text-xs tracking-wider text-slate-400 uppercase">{text.compBenefit}</th>
+                      <th className="text-center p-5 font-oswald text-sm text-slate-600 uppercase">{text.compGeneral}</th>
+                      <th className="text-center p-5 font-oswald text-sm text-blue-600 uppercase font-bold">{text.compVip}</th>
+                      <th className="text-center p-5 font-oswald text-xs text-slate-400 uppercase">{text.compStudent}</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {COMPARISON_ROWS.map((row, i) => (
+                    {COMPARISON_ROWS[language].map((row, i) => (
                       <tr key={i} className="border-t border-slate-100 hover:bg-blue-50/30 transition-colors">
                         <td className="p-4 text-sm text-slate-700 font-medium">{row.feature}</td>
                         <td className="p-4 text-center">
@@ -1282,17 +1791,16 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
-                <span className="section-label">OPORTUNIDADES DE PATROCINIO</span>
-                <h2 className="section-title mt-3">Posiciona Tu Marca</h2>
+                <span className="section-label">{text.sponsorsLabel}</span>
+                <h2 className="section-title mt-3">{text.sponsorsTitle}</h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  Marcas que buscan máxima visibilidad, posicionamiento y presencia comercial
-                  destacada en el evento. Conecta tu empresa con más de 300 profesionales de la cadena de suministros.
+                  {text.sponsorsDesc}
                 </p>
               </div>
             </ScrollReveal>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {SPONSORS.map((s, i) => (
+              {SPONSORS[language].map((s, i) => (
                 <ScrollReveal key={i} delay={i * 100}>
                   <div className="card-elevated p-6 h-full flex flex-col rounded-2xl hover:shadow-xl hover:border-blue-200 transition-all duration-300">
                     <h3 className="font-oswald text-lg font-bold text-slate-900 mb-2">
@@ -1314,7 +1822,7 @@ export default function Home() {
                       href="mailto:Contacto@LanzLogistics.com?subject=Patrocinio%20Summit%202026"
                       className="inline-flex items-center justify-center gap-2 mt-6 w-full py-2.5 rounded-lg text-sm font-bold bg-blue-600 text-white hover:bg-blue-700 transition-all"
                     >
-                      Solicitar Info <ArrowRight className="w-4 h-4" />
+                      {text.sponsorRequestInfo} <ArrowRight className="w-4 h-4" />
                     </a>
                   </div>
                 </ScrollReveal>
@@ -1334,9 +1842,9 @@ export default function Home() {
             <ScrollReveal>
               <div className="text-center mb-12">
                 <span className="section-label flex items-center justify-center gap-2">
-                  <MapPin className="w-4 h-4" /> SEDE DEL EVENTO
+                  <MapPin className="w-4 h-4" /> {text.locationLabel}
                 </span>
-                <h2 className="section-title mt-3">Centro de Convenciones de Reynosa</h2>
+                <h2 className="section-title mt-3">{text.locationTitle}</h2>
               </div>
             </ScrollReveal>
 
@@ -1363,17 +1871,17 @@ export default function Home() {
                         <MapPin className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm">Dirección</h4>
-                        <p className="text-sm text-slate-700 font-medium mt-1">Centro de Convenciones de Reynosa</p>
-                        <p className="text-sm text-slate-500 mt-0.5">Blvd. Morelos 190, Col. Longoria</p>
-                        <p className="text-sm text-slate-500">Reynosa, Tamaulipas, C.P. 88630</p>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.addressLabel}</h4>
+                        <p className="text-sm text-slate-700 font-medium mt-1">{text.addressName}</p>
+                        <p className="text-sm text-slate-500 mt-0.5">{text.addressLine1}</p>
+                        <p className="text-sm text-slate-500">{text.addressLine2}</p>
                         <a
                           href="https://maps.google.com/?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico"
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
                         >
-                          <ExternalLink className="w-3 h-3" /> Ver en Google Maps
+                          <ExternalLink className="w-3 h-3" /> {text.viewOnMaps}
                         </a>
                       </div>
                     </div>
@@ -1384,9 +1892,9 @@ export default function Home() {
                         <Calendar className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm">Fechas</h4>
-                        <p className="text-sm text-slate-500 mt-1">24 y 25 de septiembre, 2026</p>
-                        <p className="text-xs text-slate-400 mt-1">8:00 AM — 5:30 PM</p>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.datesLabel}</h4>
+                        <p className="text-sm text-slate-500 mt-1">{text.datesValue}</p>
+                        <p className="text-xs text-slate-400 mt-1">{text.datesHours}</p>
                       </div>
                     </div>
                   </div>
@@ -1396,7 +1904,7 @@ export default function Home() {
                         <Phone className="w-5 h-5 text-blue-600" />
                       </div>
                       <div>
-                        <h4 className="font-bold text-slate-800 text-sm">Contacto</h4>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.contactLabel}</h4>
                         <p className="text-sm text-slate-500 mt-1">+1 (956) 515-8070</p>
                         <a href="mailto:Contacto@LanzLogistics.com" className="text-sm text-blue-600 hover:underline">Contacto@LanzLogistics.com</a>
                       </div>
@@ -1416,8 +1924,8 @@ export default function Home() {
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-12">
-                <span className="section-label">PREGUNTAS FRECUENTES</span>
-                <h2 className="section-title mt-3">¿Tienes Dudas?</h2>
+                <span className="section-label">{text.faqLabel}</span>
+                <h2 className="section-title mt-3">{text.faqTitle}</h2>
               </div>
             </ScrollReveal>
             <ScrollReveal delay={200}>
@@ -1434,11 +1942,10 @@ export default function Home() {
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-10">
-                <span className="section-label">RESERVA TU LUGAR</span>
-                <h2 className="section-title mt-3">Formulario de Registro</h2>
+                <span className="section-label">{text.regLabel}</span>
+                <h2 className="section-title mt-3">{text.regTitle}</h2>
                 <p className="text-slate-500 max-w-xl mx-auto mt-4">
-                  Completa los siguientes datos para asegurar tu lugar.
-                  Los campos con * son obligatorios.
+                  {text.regDesc}
                 </p>
               </div>
             </ScrollReveal>
@@ -1465,26 +1972,25 @@ export default function Home() {
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
             <ScrollReveal>
               <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
-                Cupo Limitado. ¿Listo para{" "}
+                {text.finalCTATitlePart1}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-                  Fortalecer Tu Cadena?
+                  {text.finalCTATitlePart2}
                 </span>
               </h2>
               <p className="text-blue-100/60 mt-4 max-w-xl mx-auto">
-                El registro garantiza tu lugar en el evento de seguridad en cadena de
-                suministros más relevante del norte de México. No te quedes fuera.
+                {text.finalCTADesc}
               </p>
             </ScrollReveal>
             <ScrollReveal delay={200}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
                 <a href="#registro" className="btn-primary px-8 py-4 text-base">
-                  REGISTRARME AHORA <ArrowRight className="w-4 h-4" />
+                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
                 </a>
                 <a
                   href="mailto:Contacto@LanzLogistics.com"
                   className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10"
                 >
-                  CONTACTAR ORGANIZADOR
+                  {text.contactOrg}
                 </a>
               </div>
             </ScrollReveal>
@@ -1509,29 +2015,18 @@ export default function Home() {
                   </div>
                 </div>
                 <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
-                  1er Summit de Seguridad en la Cadena de Suministros. 24
-                  y 25 de septiembre, 2026. Centro de Convenciones de
-                  Reynosa, Tamaulipas, México.
+                  {text.footerDesc}
                 </p>
                 <p className="text-xs text-slate-500 mt-4">
-                  Presentado por <span className="text-blue-400 font-semibold">Lanz Logistics</span> + <span className="text-blue-400 font-semibold">Thynk Unlimited</span>
+                  {text.footerPresentedBy} <span className="text-blue-400 font-semibold">Lanz Logistics</span> + <span className="text-blue-400 font-semibold">Thynk Unlimited</span>
                 </p>
               </div>
 
               {/* Links */}
               <div>
-                <h4 className="font-oswald text-sm font-bold text-white uppercase tracking-wider mb-4">Evento</h4>
+                <h4 className="font-oswald text-sm font-bold text-white uppercase tracking-wider mb-4">{text.footerEvent}</h4>
                 <nav className="flex flex-col gap-2.5">
-                  {[
-                    { href: "#enfoque", label: "Enfoque" },
-                    { href: "#speakers", label: "Conferencistas" },
-                    { href: "#agenda", label: "Agenda" },
-                    { href: "#audiencia", label: "Audiencia" },
-                    { href: "#accesos", label: "Accesos" },
-                    { href: "#patrocinadores", label: "Patrocinadores" },
-                    { href: "#ubicacion", label: "Ubicación" },
-                    { href: "#faq", label: "FAQ" },
-                  ].map((l) => (
+                  {FOOTER_LINKS[language].map((l) => (
                     <a key={l.href} href={l.href} className="text-sm text-slate-400 hover:text-blue-400 transition-colors">
                       {l.label}
                     </a>
@@ -1541,7 +2036,7 @@ export default function Home() {
 
               {/* Contact */}
               <div>
-                <h4 className="font-oswald text-sm font-bold text-white uppercase tracking-wider mb-4">Contacto</h4>
+                <h4 className="font-oswald text-sm font-bold text-white uppercase tracking-wider mb-4">{text.footerContact}</h4>
                 <div className="space-y-3">
                   <a href="mailto:Contacto@LanzLogistics.com" className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors">
                     <Mail className="w-4 h-4" /> Contacto@LanzLogistics.com
@@ -1559,14 +2054,14 @@ export default function Home() {
             {/* Bottom bar */}
             <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
               <p className="text-xs text-slate-500">
-                © 2026 SC Security Summit. Todos los derechos reservados.
+                {text.footerCopyright}
               </p>
               <div className="flex items-center gap-6">
                 <a href="/aviso-de-privacidad" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                  Aviso de Privacidad
+                  {text.footerPrivacy}
                 </a>
                 <a href="/terminos-y-condiciones" className="text-xs text-slate-500 hover:text-slate-300 transition-colors">
-                  Términos y Condiciones
+                  {text.footerTerms}
                 </a>
               </div>
             </div>
