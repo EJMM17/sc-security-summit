@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from "react";
 
+type Language = "es" | "en";
+
 const TARGET_DATE = new Date("2026-09-24T08:00:00-06:00").getTime();
 
 function getTimeLeft() {
@@ -15,7 +17,7 @@ function getTimeLeft() {
   };
 }
 
-export default function CountdownTimer() {
+export default function CountdownTimer({ language = "es" }: { language?: Language }) {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
@@ -26,12 +28,19 @@ export default function CountdownTimer() {
     return () => clearInterval(interval);
   }, []);
 
-  const units = [
-    { value: time.days, label: "Días" },
-    { value: time.hours, label: "Horas" },
-    { value: time.minutes, label: "Min" },
-    { value: time.seconds, label: "Seg" },
-  ];
+  const units = language === "es"
+    ? [
+        { value: time.days, label: "Días" },
+        { value: time.hours, label: "Horas" },
+        { value: time.minutes, label: "Min" },
+        { value: time.seconds, label: "Seg" },
+      ]
+    : [
+        { value: time.days, label: "Days" },
+        { value: time.hours, label: "Hours" },
+        { value: time.minutes, label: "Min" },
+        { value: time.seconds, label: "Sec" },
+      ];
 
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:flex sm:items-center sm:gap-4">

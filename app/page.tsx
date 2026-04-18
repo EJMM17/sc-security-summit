@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Shield,
   MapPin,
@@ -372,6 +372,33 @@ const FAQ_ITEMS = [
   },
 ];
 
+const FAQ_ITEMS_EN = [
+  {
+    question: "Where and when will the Summit take place?",
+    answer: "The Summit will be held on September 24 and 25, 2026, at the Reynosa Convention Center in Reynosa, Tamaulipas, Mexico. Activities begin at 8:00 AM and run through 5:30 PM each day.",
+  },
+  {
+    question: "Who is this event designed for?",
+    answer: "It is designed for supply chain professionals and executives: operations directors, logistics managers, foreign trade specialists, compliance leaders, and other key industry profiles.",
+  },
+  {
+    question: "What is included with each access type?",
+    answer: "Student access includes 2-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
+  },
+  {
+    question: "Can I request an invoice (CFDI)?",
+    answer: "Yes. During registration you can indicate that you need an invoice and submit your tax details. The CFDI will be issued within 72 hours after payment confirmation.",
+  },
+  {
+    question: "Does the student pass require an ID?",
+    answer: "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate or graduate students.",
+  },
+  {
+    question: "How can I become a sponsor?",
+    answer: "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Strategic Allied Provider) and the benefits for each tier.",
+  },
+];
+
 /* ═══ WAVE SVG COMPONENT ═══ */
 function WaveSeparator({ color = "#EFF6FF", flip = false }: { color?: string; flip?: boolean }) {
   return (
@@ -387,7 +414,7 @@ function WaveSeparator({ color = "#EFF6FF", flip = false }: { color?: string; fl
 }
 
 /* ═══ AGENDA TYPE BADGE ═══ */
-function AgendaBadge({ type }: { type: string }) {
+function AgendaBadge({ type, language }: { type: string; language: "es" | "en" }) {
   const styles: Record<string, string> = {
     keynote: "bg-blue-100 text-blue-700",
     panel: "bg-indigo-100 text-indigo-700",
@@ -396,14 +423,25 @@ function AgendaBadge({ type }: { type: string }) {
     networking: "bg-emerald-100 text-emerald-700",
     break: "bg-slate-100 text-slate-500",
   };
-  const labels: Record<string, string> = {
-    keynote: "Keynote",
-    panel: "Panel",
-    workshop: "Workshop",
-    talk: "Conferencia",
-    networking: "Networking",
-    break: "Break",
+  const labelsByLanguage: Record<"es" | "en", Record<string, string>> = {
+    es: {
+      keynote: "Conferencia Magistral",
+      panel: "Panel",
+      workshop: "Taller",
+      talk: "Conferencia",
+      networking: "Networking",
+      break: "Receso",
+    },
+    en: {
+      keynote: "Keynote",
+      panel: "Panel",
+      workshop: "Workshop",
+      talk: "Talk",
+      networking: "Networking",
+      break: "Break",
+    },
   };
+  const labels = labelsByLanguage[language];
   return (
     <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${styles[type] || styles.break}`}>
       {labels[type] || type}
@@ -416,6 +454,21 @@ function AgendaBadge({ type }: { type: string }) {
    ═══════════════════════════════════════════════════════════════ */
 export default function Home() {
   const [language, setLanguage] = useState<"es" | "en">("es");
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem("scss-language");
+    if (saved === "es" || saved === "en") {
+      setLanguage(saved);
+      return;
+    }
+    setLanguage(window.navigator.language.toLowerCase().startsWith("es") ? "es" : "en");
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+    window.localStorage.setItem("scss-language", language);
+  }, [language]);
+
   const navLinks = NAV_LINKS[language];
   const text = UI_TEXT[language];
 
@@ -534,7 +587,7 @@ export default function Home() {
                   <Clock className="w-3.5 h-3.5" />
                   <span>{text.countdownLabel}</span>
                 </div>
-                <CountdownTimer />
+                <CountdownTimer language={language} />
               </div>
             </ScrollReveal>
 
@@ -890,7 +943,7 @@ export default function Home() {
                         <div className="timeline-dot" />
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                           <span className="text-xs font-mono text-blue-600 font-semibold whitespace-nowrap">{item.time}</span>
-                          <AgendaBadge type={item.type} />
+                          <AgendaBadge type={item.type} language={language} />
                         </div>
                         <p className="text-sm text-slate-700 font-medium mt-1">{item.title}</p>
                       </div>
@@ -917,7 +970,7 @@ export default function Home() {
                         <div className="timeline-dot" />
                         <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3">
                           <span className="text-xs font-mono text-blue-600 font-semibold whitespace-nowrap">{item.time}</span>
-                          <AgendaBadge type={item.type} />
+                          <AgendaBadge type={item.type} language={language} />
                         </div>
                         <p className="text-sm text-slate-700 font-medium mt-1">{item.title}</p>
                       </div>
@@ -1368,7 +1421,7 @@ export default function Home() {
               </div>
             </ScrollReveal>
             <ScrollReveal delay={200}>
-              <FAQAccordion items={FAQ_ITEMS} />
+              <FAQAccordion items={language === "es" ? FAQ_ITEMS : FAQ_ITEMS_EN} />
             </ScrollReveal>
           </div>
         </section>
@@ -1391,7 +1444,7 @@ export default function Home() {
             </ScrollReveal>
             <ScrollReveal delay={200}>
               <div className="card-elevated p-6 sm:p-10">
-                <RegistroForm />
+                <RegistroForm language={language} />
               </div>
             </ScrollReveal>
           </div>
