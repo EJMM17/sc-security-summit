@@ -9,7 +9,6 @@ const linksByLanguage: Record<Language, { href: string; label: string }[]> = {
   es: [
     { href: "#enfoque", label: "Enfoque" },
     { href: "#speakers", label: "Conferencistas" },
-    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audiencia" },
     { href: "#accesos", label: "Accesos" },
     { href: "#patrocinadores", label: "Patrocinadores" },
@@ -19,7 +18,6 @@ const linksByLanguage: Record<Language, { href: string; label: string }[]> = {
   en: [
     { href: "#enfoque", label: "Focus" },
     { href: "#speakers", label: "Speakers" },
-    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audience" },
     { href: "#accesos", label: "Passes" },
     { href: "#patrocinadores", label: "Sponsors" },
