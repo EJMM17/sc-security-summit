@@ -178,7 +178,6 @@ const UI_TEXT = {
     pricingTitle: "Elige Tu Acceso",
     pricingDesc:
       "Dos días de capacitación especializada · 24 y 25 de septiembre de 2026 · Centro de Convenciones, Reynosa",
-    mostPopular: "Más Popular",
     taxNote: "* Más I.V.A.",
     getAccessBtn: "OBTENER ACCESO",
     paymentTitle: "¿Cómo funciona el proceso de pago?",
@@ -191,11 +190,6 @@ const UI_TEXT = {
     ],
     paymentQuestionsPrefix: "¿Preguntas sobre el pago? Escríbenos a",
     paymentOr: "o al",
-    comparisonMobile: "Desliza horizontalmente para comparar todos los beneficios.",
-    compBenefit: "Beneficio",
-    compGeneral: "General",
-    compVip: "VIP",
-    compStudent: "Estudiante",
     sponsorsLabel: "OPORTUNIDADES DE PATROCINIO",
     sponsorsTitle: "Posiciona Tu Marca",
     sponsorsDesc:
@@ -320,7 +314,6 @@ const UI_TEXT = {
     pricingTitle: "Choose Your Pass",
     pricingDesc:
       "Two days of specialized training · September 24-25, 2026 · Reynosa Convention Center",
-    mostPopular: "Most Popular",
     taxNote: "* Plus VAT",
     getAccessBtn: "GET ACCESS",
     paymentTitle: "How does the payment process work?",
@@ -333,11 +326,6 @@ const UI_TEXT = {
     ],
     paymentQuestionsPrefix: "Questions about payment? Email us at",
     paymentOr: "or call",
-    comparisonMobile: "Swipe horizontally to compare all benefits.",
-    compBenefit: "Benefit",
-    compGeneral: "General",
-    compVip: "VIP",
-    compStudent: "Student",
     sponsorsLabel: "SPONSORSHIP OPPORTUNITIES",
     sponsorsTitle: "Position Your Brand",
     sponsorsDesc:
@@ -574,80 +562,103 @@ const PROVEEDORES = {
 const PRICING = {
   es: [
     {
-      id: "estudiante",
-      label: "Acceso Estudiante",
-      price: "$1,200",
-      featured: false,
-      desc: "Perfil académico con credencial vigente",
-      features: ["Capacitación 2 días", "Acceso a paneles", "Constancia digital", "Kit básico"],
-    },
-    {
       id: "general",
       label: "Acceso General",
       price: "$5,800",
-      featured: true,
+      featured: false,
       desc: "Profesionales y operación",
-      features: ["Capacitación 2 días", "Acceso a paneles", "Business Hub B2B", "Kit estándar", "Constancia digital", "Coffee break"],
+      features: [
+        "Capacitación de 2 días",
+        "Acceso a paneles",
+        "Gafete nivel General",
+        "Kit operativo estándar",
+        "Constancia oficial digital",
+        "Business Hub B2B",
+        "Coffee break",
+      ],
     },
     {
       id: "vip",
       label: "Acceso VIP",
       price: "$7,200",
-      featured: false,
+      featured: true,
       desc: "Ejecutivos y tomadores de decisión",
-      features: ["Todo lo de General", "Asientos prioritarios", "Constancia física", "Kit completo", "Plantillas descargables", "Acceso total B2B"],
+      features: [
+        "Capacitación de 2 días",
+        "Acceso a paneles",
+        "Gafete VIP Premium",
+        "Kit operativo completo",
+        "Constancia oficial física",
+        "Acceso total al Business Hub B2B",
+        "Asientos prioritarios",
+        "Plantillas descargables",
+        "Coffee break",
+      ],
+    },
+    {
+      id: "estudiante",
+      label: "Acceso Estudiante",
+      price: "$1,200",
+      featured: false,
+      desc: "Perfil académico con credencial vigente",
+      features: [
+        "Capacitación de 2 días",
+        "Acceso a paneles",
+        "Gafete nivel Básico",
+        "Kit operativo mínimo",
+        "Constancia oficial digital",
+      ],
     },
   ],
   en: [
+    {
+      id: "general",
+      label: "General Pass",
+      price: "$5,800",
+      featured: false,
+      desc: "Professionals and operations",
+      features: [
+        "2-day training",
+        "Panel access",
+        "General badge level",
+        "Standard operational kit",
+        "Official digital certificate",
+        "B2B Business Hub",
+        "Coffee break",
+      ],
+    },
+    {
+      id: "vip",
+      label: "VIP Pass",
+      price: "$7,200",
+      featured: true,
+      desc: "Executives and decision makers",
+      features: [
+        "2-day training",
+        "Panel access",
+        "VIP Premium badge",
+        "Complete operational kit",
+        "Official printed certificate",
+        "Full B2B Business Hub access",
+        "Priority seating",
+        "Downloadable templates",
+        "Coffee break",
+      ],
+    },
     {
       id: "estudiante",
       label: "Student Pass",
       price: "$1,200",
       featured: false,
       desc: "Academic profile with valid ID",
-      features: ["2-day training", "Panel access", "Digital certificate", "Basic kit"],
+      features: [
+        "2-day training",
+        "Panel access",
+        "Basic badge level",
+        "Minimal operational kit",
+        "Official digital certificate",
+      ],
     },
-    {
-      id: "general",
-      label: "General Pass",
-      price: "$5,800",
-      featured: true,
-      desc: "Professionals and operations",
-      features: ["2-day training", "Panel access", "B2B Business Hub", "Standard kit", "Digital certificate", "Coffee break"],
-    },
-    {
-      id: "vip",
-      label: "VIP Pass",
-      price: "$7,200",
-      featured: false,
-      desc: "Executives and decision makers",
-      features: ["Everything in General", "Priority seating", "Printed certificate", "Full kit", "Downloadable templates", "Full B2B access"],
-    },
-  ],
-} as const;
-
-const COMPARISON_ROWS = {
-  es: [
-    { feature: "Acceso a capacitación (2 días)", vip: true, general: true, estudiante: true },
-    { feature: "Acceso a paneles", vip: true, general: true, estudiante: true },
-    { feature: "Nivel de Gafete", vip: "VIP Premium", general: "General", estudiante: "Básico" },
-    { feature: "Kit Operativo", vip: "Completo", general: "Estándar", estudiante: "Mínimo" },
-    { feature: "Constancia Oficial", vip: "Física", general: "Digital", estudiante: "Digital" },
-    { feature: "Business Hub B2B", vip: "Acceso Total", general: true, estudiante: false },
-    { feature: "Asientos Prioritarios", vip: true, general: false, estudiante: false },
-    { feature: "Plantillas Descargables", vip: true, general: false, estudiante: false },
-    { feature: "Coffee Break", vip: true, general: false, estudiante: false },
-  ],
-  en: [
-    { feature: "Training access (2 days)", vip: true, general: true, estudiante: true },
-    { feature: "Panel access", vip: true, general: true, estudiante: true },
-    { feature: "Badge Level", vip: "VIP Premium", general: "General", estudiante: "Basic" },
-    { feature: "Operational Kit", vip: "Complete", general: "Standard", estudiante: "Minimal" },
-    { feature: "Official Certificate", vip: "Printed", general: "Digital", estudiante: "Digital" },
-    { feature: "B2B Business Hub", vip: "Full Access", general: true, estudiante: false },
-    { feature: "Priority Seating", vip: true, general: false, estudiante: false },
-    { feature: "Downloadable Templates", vip: true, general: false, estudiante: false },
-    { feature: "Coffee Break", vip: true, general: false, estudiante: false },
   ],
 } as const;
 
@@ -1558,38 +1569,33 @@ export default function Home() {
                 <ScrollReveal key={plan.id} delay={i * 100}>
                   <div
                     className={`relative p-8 rounded-2xl h-full flex flex-col transition-all duration-300 ${plan.featured
-                        ? "text-white border-2 border-blue-400 shadow-2xl md:scale-[1.03]"
+                        ? "text-white border-2 border-amber-400/70 shadow-2xl md:scale-[1.03]"
                         : "bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-blue-300"
                       }`}
                     style={plan.featured ? {
-                      background: "linear-gradient(135deg, #1d4ed8 0%, #1e3a8a 50%, #172554 100%)",
-                      boxShadow: "0 25px 50px -12px rgba(37, 99, 235, 0.35)",
+                      background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #111827 100%)",
+                      boxShadow: "0 25px 50px -12px rgba(217, 119, 6, 0.4)",
                     } : undefined}
                   >
-                    {plan.featured && (
-                      <div className="absolute -top-3 left-1/2 -translate-x-1/2 text-white text-xs font-bold px-4 py-1.5 rounded-full uppercase tracking-wider shadow-lg" style={{ background: "linear-gradient(90deg, #22d3ee, #60a5fa)" }}>
-                        {text.mostPopular}
-                      </div>
-                    )}
-                    <h3 className={`font-oswald text-xl font-bold ${plan.featured ? "text-white" : "text-slate-900"}`}>
+                    <h3 className={`font-oswald text-xl font-bold ${plan.featured ? "text-amber-300" : "text-slate-900"}`}>
                       {plan.label}
                     </h3>
-                    <p className={`text-sm mt-1 ${plan.featured ? "text-blue-200" : "text-slate-400"}`}>
+                    <p className={`text-sm mt-1 ${plan.featured ? "text-amber-100/80" : "text-slate-400"}`}>
                       {plan.desc}
                     </p>
                     <div className="mt-6 mb-6">
                       <span className={`font-oswald text-4xl font-bold ${plan.featured ? "text-white" : "text-slate-900"}`}>
                         {plan.price}
                       </span>
-                      <span className={`text-sm ml-1 ${plan.featured ? "text-blue-200" : "text-slate-400"}`}>MXN</span>
-                      <p className={`text-xs mt-1 ${plan.featured ? "text-blue-300" : "text-slate-400"}`}>{text.taxNote}</p>
+                      <span className={`text-sm ml-1 ${plan.featured ? "text-amber-100/80" : "text-slate-400"}`}>MXN</span>
+                      <p className={`text-xs mt-1 ${plan.featured ? "text-amber-200/70" : "text-slate-400"}`}>{text.taxNote}</p>
                     </div>
 
                     {/* Features list */}
                     <ul className="space-y-3 mb-8 flex-1">
                       {plan.features.map((f, j) => (
-                        <li key={j} className={`flex items-center gap-2 text-sm ${plan.featured ? "text-blue-100" : "text-slate-600"}`}>
-                          <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.featured ? "text-cyan-300" : "text-blue-500"}`} />
+                        <li key={j} className={`flex items-center gap-2 text-sm ${plan.featured ? "text-amber-50/95" : "text-slate-600"}`}>
+                          <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.featured ? "text-amber-300" : "text-blue-500"}`} />
                           {f}
                         </li>
                       ))}
@@ -1598,7 +1604,7 @@ export default function Home() {
                     <a
                       href="#registro"
                       className={`w-full py-3.5 rounded-lg font-bold text-sm text-center block transition-all ${plan.featured
-                          ? "bg-white text-blue-800 hover:bg-blue-50 shadow-lg"
+                          ? "bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-lg"
                           : "btn-primary"
                         }`}
                     >
@@ -1640,46 +1646,6 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            {/* Comparison Table */}
-            <ScrollReveal delay={300}>
-              <div className="card-elevated mt-16 overflow-x-auto">
-                <p className="px-4 pt-4 text-[11px] sm:hidden text-slate-500">
-                  {text.comparisonMobile}
-                </p>
-                <table className="comparison-table w-full min-w-[700px]">
-                  <thead>
-                    <tr>
-                      <th className="text-left p-5 font-oswald text-xs tracking-wider text-slate-400 uppercase">{text.compBenefit}</th>
-                      <th className="text-center p-5 font-oswald text-sm text-slate-600 uppercase">{text.compGeneral}</th>
-                      <th className="text-center p-5 font-oswald text-sm text-blue-600 uppercase font-bold">{text.compVip}</th>
-                      <th className="text-center p-5 font-oswald text-xs text-slate-400 uppercase">{text.compStudent}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {COMPARISON_ROWS[language].map((row, i) => (
-                      <tr key={i} className="border-t border-slate-100 hover:bg-blue-50/30 transition-colors">
-                        <td className="p-4 text-sm text-slate-700 font-medium">{row.feature}</td>
-                        <td className="p-4 text-center">
-                          {typeof row.general === "boolean" ? (
-                            row.general ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mx-auto" /> : <span className="text-slate-300">—</span>
-                          ) : <span className="text-sm text-slate-600">{row.general}</span>}
-                        </td>
-                        <td className="p-4 text-center">
-                          {typeof row.vip === "boolean" ? (
-                            row.vip ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mx-auto" /> : <span className="text-slate-300">—</span>
-                          ) : <span className="text-sm font-semibold text-blue-600">{row.vip}</span>}
-                        </td>
-                        <td className="p-4 text-center">
-                          {typeof row.estudiante === "boolean" ? (
-                            row.estudiante ? <CheckCircle2 className="w-5 h-5 text-emerald-500 mx-auto" /> : <span className="text-slate-300">—</span>
-                          ) : <span className="text-sm text-slate-500">{row.estudiante}</span>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </ScrollReveal>
           </div>
         </section>
 
