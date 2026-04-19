@@ -633,33 +633,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   background: var(--blue-500);
 }
 
-/* ═══ TABLE STYLES ═══ */
-.comparison-table {
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-light);
-}
-.comparison-table th {
-  background-color: var(--bg-tinted);
-  padding: 1rem 1.5rem;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-.comparison-table td {
-  padding: 1rem 1.5rem;
-  font-size: 0.85rem;
-  border-top: 1px solid var(--border-lighter);
-}
-.comparison-table tbody tr {
-  transition: background-color 0.2s;
-}
-.comparison-table tbody tr:hover {
-  background-color: var(--blue-50);
-}
-
 /* ═══ FLOATING SHAPES (hero decoration) ═══ */
 @keyframes float {
   0%, 100% { transform: translateY(0px) rotate(0deg); }
