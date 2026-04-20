@@ -2,6 +2,30 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Shared observer at threshold 0.3 for all AnimatedCounter instances
+const counterObserverCallbacks = new WeakMap<Element, () => void>();
+let _counterObserver: IntersectionObserver | null = null;
+
+function getCounterObserver(): IntersectionObserver {
+  if (_counterObserver) return _counterObserver;
+  _counterObserver = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const cb = counterObserverCallbacks.get(entry.target);
+          if (cb) {
+            cb();
+            _counterObserver!.unobserve(entry.target);
+            counterObserverCallbacks.delete(entry.target);
+          }
+        }
+      }
+    },
+    { threshold: 0.3 }
+  );
+  return _counterObserver;
+}
+
 interface AnimatedCounterProps {
   target: number;
   suffix?: string;
@@ -27,20 +51,16 @@ export default function AnimatedCounter({
 
   useEffect(() => {
     const el = ref.current;
-    if (!el) return;
+    if (!el || hasStarted) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting && !hasStarted) {
-          setHasStarted(true);
-          observer.unobserve(el);
-        }
-      },
-      { threshold: 0.3 }
-    );
-
+    const observer = getCounterObserver();
+    counterObserverCallbacks.set(el, () => setHasStarted(true));
     observer.observe(el);
-    return () => observer.disconnect();
+
+    return () => {
+      observer.unobserve(el);
+      counterObserverCallbacks.delete(el);
+    };
   }, [hasStarted]);
 
   useEffect(() => {

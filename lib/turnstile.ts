@@ -1,8 +1,11 @@
 export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
   if (!secret) {
-    console.warn("[turnstile] TURNSTILE_SECRET_KEY no configurada, validación deshabilitada");
-    return true; // fallback: en dev sin keys, no bloquear
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[turnstile] TURNSTILE_SECRET_KEY is required in production");
+    }
+    console.warn("[turnstile] TURNSTILE_SECRET_KEY no configurada, validación deshabilitada en dev");
+    return true;
   }
 
   const body = new FormData();

@@ -465,28 +465,28 @@ const SPEAKERS = {
       role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
       org: "INDEX",
       topic: "Aduanas & Comercio Exterior",
-      image: "/images/speaker-fidel.png",
+      image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       org: "Especialista en Comercio Exterior",
       topic: "Aduanas & Compliance",
-      image: "/images/speaker-isidoro.png",
+      image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Líder en Trade Compliance e Innovación",
       org: "Sector Automotriz e Industrial",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.png",
+      image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
       role: "Especialista en Innovación Estratégica",
       org: "Certificación Internacional en Enseñanza",
       topic: "Innovación & Aprendizaje",
-      image: "/images/speaker-eduardo.png",
+      image: "/images/speaker-eduardo.webp",
     },
   ],
   en: [
@@ -495,28 +495,28 @@ const SPEAKERS = {
       role: "Deputy Director, National Committee of Customs & Foreign Trade",
       org: "INDEX",
       topic: "Customs & Foreign Trade",
-      image: "/images/speaker-fidel.png",
+      image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
       org: "Foreign Trade Specialist",
       topic: "Customs & Compliance",
-      image: "/images/speaker-isidoro.png",
+      image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Trade Compliance & Innovation Leader",
       org: "Automotive & Industrial Sector",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.png",
+      image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
       role: "Strategic Innovation Specialist",
       org: "International Teaching Certification",
       topic: "Innovation & Learning",
-      image: "/images/speaker-eduardo.png",
+      image: "/images/speaker-eduardo.webp",
     },
   ],
 } as const;
@@ -1624,6 +1624,8 @@ export default function Home() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">{text.paymentTitle}</h3>
+                    {/* dangerouslySetInnerHTML is intentional: content is authored in UI_TEXT (this file),
+                        not user-supplied. It only contains <strong> tags. Do NOT replace with user data. */}
                     <p className="text-sm text-slate-600 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: text.paymentIntroHtml }} />
                     <div className="grid sm:grid-cols-3 gap-3">
                       {text.paymentSteps.map((s) => (
