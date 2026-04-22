@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 
 type Language = "es" | "en";
 
@@ -17,6 +17,17 @@ function getTimeLeft() {
   };
 }
 
+/* Renders a single number with a slide-up animation each time value changes.
+   Using key forces React to remount the span, restarting the CSS animation. */
+function FlipNumber({ value, mounted }: { value: number; mounted: boolean }) {
+  const display = mounted ? String(value).padStart(2, "0") : "--";
+  return (
+    <span key={display} className="countdown-flip" suppressHydrationWarning>
+      {display}
+    </span>
+  );
+}
+
 export default function CountdownTimer({ language = "es" }: { language?: Language }) {
   const [mounted, setMounted] = useState(false);
   const [time, setTime] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
@@ -30,16 +41,16 @@ export default function CountdownTimer({ language = "es" }: { language?: Languag
 
   const units = language === "es"
     ? [
-        { value: time.days, label: "Días" },
-        { value: time.hours, label: "Horas" },
-        { value: time.minutes, label: "Min" },
-        { value: time.seconds, label: "Seg" },
+        { value: time.days,    label: "Días"  },
+        { value: time.hours,   label: "Horas" },
+        { value: time.minutes, label: "Min"   },
+        { value: time.seconds, label: "Seg"   },
       ]
     : [
-        { value: time.days, label: "Days" },
-        { value: time.hours, label: "Hours" },
-        { value: time.minutes, label: "Min" },
-        { value: time.seconds, label: "Sec" },
+        { value: time.days,    label: "Days"  },
+        { value: time.hours,   label: "Hours" },
+        { value: time.minutes, label: "Min"   },
+        { value: time.seconds, label: "Sec"   },
       ];
 
   return (
@@ -47,8 +58,8 @@ export default function CountdownTimer({ language = "es" }: { language?: Languag
       {units.map((u, i) => (
         <div key={u.label} className="flex items-center justify-center gap-2 sm:gap-4">
           <div className="countdown-unit">
-            <div className="countdown-number" suppressHydrationWarning>
-              {mounted ? String(u.value).padStart(2, "0") : "--"}
+            <div className="countdown-number" style={{ overflow: "hidden" }}>
+              <FlipNumber value={u.value} mounted={mounted} />
             </div>
             <div className="countdown-label">{u.label}</div>
           </div>

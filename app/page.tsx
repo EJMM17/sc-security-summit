@@ -50,6 +50,7 @@ import ScrollReveal from "@/components/ScrollReveal";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import FAQAccordion from "@/components/FAQAccordion";
 import HeaderScroll from "@/components/HeaderScroll";
+import ScrollProgress from "@/components/ScrollProgress";
 
 /* ═══════════════════════════════════════════════════════════════
    DATA
@@ -1003,6 +1004,9 @@ export default function Home() {
 
   return (
     <>
+      {/* ── SCROLL PROGRESS BAR ── */}
+      <ScrollProgress />
+
       {/* ── SKIP TO CONTENT (accesibilidad) ── */}
       <a
         href="#registro"

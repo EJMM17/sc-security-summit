@@ -1017,3 +1017,144 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   bottom: max(1rem, env(safe-area-inset-bottom));
   left: max(1rem, env(safe-area-inset-left));
 }
+
+/* ═══ COUNTDOWN FLIP ANIMATION ═══
+   Numbers slide up from below when they change. The key prop on
+   the element forces a re-mount each update, restarting the animation. */
+@keyframes countFlip {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.countdown-flip {
+  animation: countFlip 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: block;
+}
+
+/* ═══ SCALE-IN (success state entrance) ═══ */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ═══ CHECKMARK SVG DRAW ═══
+   stroke-dashoffset drives the "drawing" illusion. */
+@keyframes checkDraw {
+  from { stroke-dashoffset: 60; }
+  to   { stroke-dashoffset: 0;  }
+}
+.check-draw {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: checkDraw 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+/* Circle fade-in behind the checkmark */
+@keyframes circleFadeIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.check-circle-bg {
+  animation: circleFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ═══ CFDI PANEL — smooth height reveal via CSS grid ═══
+   grid-template-rows: 0fr → 1fr avoids JS height measurement
+   while still allowing natural content height. */
+.cfdi-panel {
+  display: grid;
+  transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity            0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cfdi-panel[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.cfdi-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.cfdi-panel-inner {
+  overflow: hidden;
+  /* Prevent inner padding from collapsing awkwardly */
+  min-height: 0;
+}
+
+/* ═══ PRICING FEATURED — shimmer scan ═══
+   A single diagonal highlight that sweeps across the card every 4s,
+   reinforcing premium status without being distracting. */
+@keyframes shimmerScan {
+  0%   { transform: translateX(-120%) skewX(-15deg); }
+  100% { transform: translateX(220%)  skewX(-15deg); }
+}
+.pricing-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 100%
+  );
+  animation: shimmerScan 4s ease-in-out 1.5s infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Keep pricing-featured children above the shimmer */
+.pricing-featured > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ ICON BOX — scale on card hover ═══ */
+.card-elevated:hover .icon-box {
+  transform: scale(1.08);
+}
+.icon-box {
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══ FEATURE PILL — interactive hover lift ═══ */
+.feature-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ═══ SECTION LABEL — animate the accent line on first reveal ═══
+   The ::before line grows from 0 → 2rem when the label becomes
+   visible inside a ScrollReveal container. */
+@keyframes labelLineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 2rem; opacity: 1; }
+}
+.reveal.visible .section-label::before,
+.reveal-left.visible .section-label::before,
+.reveal-scale.visible .section-label::before {
+  animation: labelLineGrow 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* ═══ NAV LINK active-section indicator ═══
+   Smooth underline width persists on the active link. */
+.nav-link.active::after {
+  width: 100%;
+}
+.nav-link.active {
+  color: var(--blue-600);
+}

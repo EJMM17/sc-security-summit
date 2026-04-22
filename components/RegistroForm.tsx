@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState, useEffect } from "react";
-import { Send, FileText, Loader2, CheckCircle2 } from "lucide-react";
+import { Send, FileText, Loader2 } from "lucide-react";
 import { registrarAsistente, type RegistroState } from "@/app/actions/registro";
 import { toast } from "sonner";
 
@@ -141,9 +141,21 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
 
   if (state.success) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-center">
-        <div className="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center mb-6">
-          <CheckCircle2 className="w-8 h-8 text-green-500" />
+      <div className="animate-scale-in flex flex-col items-center justify-center py-12 text-center">
+        {/* Animated SVG checkmark — circle fades in, path draws itself */}
+        <div className="check-circle-bg w-20 h-20 mb-6">
+          <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <circle cx="40" cy="40" r="38" fill="#F0FDF4" stroke="#22C55E" strokeWidth="2" />
+            <path
+              className="check-draw"
+              d="M22 41 L34 53 L58 29"
+              stroke="#22C55E"
+              strokeWidth="4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              fill="none"
+            />
+          </svg>
         </div>
         <h3
           className="text-2xl font-bold mb-3 text-slate-900"
@@ -276,26 +288,29 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
         </label>
       </div>
 
-      {requiresCFDI && (
-        <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4" aria-expanded="true">
-          <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
-          <div>
-            <label htmlFor="reg-rfc" className={labelClass}>{text.rfc}</label>
-            <input id="reg-rfc" name="rfc" type="text" required placeholder={text.rfcPlaceholder} className={inputClass} maxLength={13} />
-            {state.errors?.rfc && <p className={errorClass}>{state.errors.rfc[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="reg-razon" className={labelClass}>{text.legalName}</label>
-            <input id="reg-razon" name="razon_social" type="text" required placeholder={text.legalNamePlaceholder} className={inputClass} />
-            {state.errors?.razon_social && <p className={errorClass}>{state.errors.razon_social[0]}</p>}
-          </div>
-          <div>
-            <label htmlFor="reg-cp" className={labelClass}>{text.zip}</label>
-            <input id="reg-cp" name="codigo_postal_fiscal" type="text" required placeholder={text.zipPlaceholder} className={inputClass} maxLength={5} />
-            {state.errors?.codigo_postal_fiscal && <p className={errorClass}>{state.errors.codigo_postal_fiscal[0]}</p>}
+      {/* CFDI panel — CSS grid height animation (0fr → 1fr) avoids JS measurement */}
+      <div className="cfdi-panel" data-open={requiresCFDI ? "true" : "false"} aria-expanded={requiresCFDI}>
+        <div className="cfdi-panel-inner">
+          <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4">
+            <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
+            <div>
+              <label htmlFor="reg-rfc" className={labelClass}>{text.rfc}</label>
+              <input id="reg-rfc" name="rfc" type="text" placeholder={text.rfcPlaceholder} className={inputClass} maxLength={13} />
+              {state.errors?.rfc && <p className={errorClass}>{state.errors.rfc[0]}</p>}
+            </div>
+            <div>
+              <label htmlFor="reg-razon" className={labelClass}>{text.legalName}</label>
+              <input id="reg-razon" name="razon_social" type="text" placeholder={text.legalNamePlaceholder} className={inputClass} />
+              {state.errors?.razon_social && <p className={errorClass}>{state.errors.razon_social[0]}</p>}
+            </div>
+            <div>
+              <label htmlFor="reg-cp" className={labelClass}>{text.zip}</label>
+              <input id="reg-cp" name="codigo_postal_fiscal" type="text" placeholder={text.zipPlaceholder} className={inputClass} maxLength={5} />
+              {state.errors?.codigo_postal_fiscal && <p className={errorClass}>{state.errors.codigo_postal_fiscal[0]}</p>}
+            </div>
           </div>
         </div>
-      )}
+      </div>
 
       <div className="pt-2">
         <label className="flex items-start gap-3 cursor-pointer">
