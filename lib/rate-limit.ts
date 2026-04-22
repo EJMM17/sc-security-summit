@@ -1,46 +1,48 @@
-/**
- * Rate limiter in-memory simple para Server Actions.
- * Ventana: 5 registros por IP cada 15 minutos.
- *
- * TODO: migrar a Vercel KV (@vercel/kv) o Upstash Redis para rate limiting
- * distribuido real. En Vercel con múltiples regiones, cada lambda tiene su
- * propio estado en memoria — este limiter bloquea spam básico pero NO ataques
- * distribuidos desde múltiples IPs o regiones distintas.
- */
+import { Ratelimit } from "@upstash/ratelimit";
+import { kv } from "@vercel/kv";
 
-type Bucket = { count: number; resetAt: number };
-const buckets = new Map<string, Bucket>();
+// 5 registrations per IP per 15-minute sliding window, shared across all Vercel regions.
+// Uses Vercel KV (set up via Vercel dashboard → Storage → KV Database).
+// In dev without KV env vars, falls back to allow-all.
 
-const WINDOW_MS = 15 * 60 * 1000; // 15 min
-const MAX_REQUESTS = 5;
+let _limiter: Ratelimit | null = null;
 
-export function checkRateLimit(ip: string): {
+function getLimiter(): Ratelimit {
+  if (_limiter) return _limiter;
+
+  const url = process.env.KV_REST_API_URL;
+  const token = process.env.KV_REST_API_TOKEN;
+
+  if (!url || !token) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error("[rate-limit] KV_REST_API_URL and KV_REST_API_TOKEN are required in production");
+    }
+    // Dev fallback: always allow
+    return {
+      limit: async () => ({
+        success: true,
+        remaining: 4,
+        reset: Date.now() + 900_000,
+        limit: 5,
+        pending: Promise.resolve(),
+      }),
+    } as unknown as Ratelimit;
+  }
+
+  _limiter = new Ratelimit({
+    redis: kv,
+    limiter: Ratelimit.slidingWindow(5, "15 m"),
+    prefix: "scss2026:rl",
+    analytics: false,
+  });
+  return _limiter;
+}
+
+export async function checkRateLimit(ip: string): Promise<{
   ok: boolean;
   remaining: number;
   resetAt: number;
-} {
-  const now = Date.now();
-  const bucket = buckets.get(ip);
-
-  if (!bucket || bucket.resetAt < now) {
-    buckets.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return { ok: true, remaining: MAX_REQUESTS - 1, resetAt: now + WINDOW_MS };
-  }
-
-  if (bucket.count >= MAX_REQUESTS) {
-    return { ok: false, remaining: 0, resetAt: bucket.resetAt };
-  }
-
-  bucket.count++;
-  return { ok: true, remaining: MAX_REQUESTS - bucket.count, resetAt: bucket.resetAt };
-}
-
-// Limpieza periódica para evitar leak de memoria
-if (typeof setInterval !== "undefined") {
-  setInterval(() => {
-    const now = Date.now();
-    for (const [ip, bucket] of buckets.entries()) {
-      if (bucket.resetAt < now) buckets.delete(ip);
-    }
-  }, 60 * 1000);
+}> {
+  const { success, remaining, reset } = await getLimiter().limit(ip);
+  return { ok: success, remaining, resetAt: reset };
 }

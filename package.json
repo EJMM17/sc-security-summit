@@ -11,6 +11,8 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
     "@tailwindcss/postcss": "^4.0.0",
+    "@upstash/ratelimit": "^2.0.8",
+    "@vercel/kv": "^3.0.0",
     "@vercel/speed-insights": "^2.0.0",
     "lucide-react": "^0.441.0",
     "next": "^15.5.15",
@@ -24,6 +26,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "sharp": "^0.34.5",
     "typescript": "^5"
   }
 }

@@ -2,6 +2,34 @@
 
 import { useEffect, useRef, type ReactNode } from "react";
 
+// Shared observer instances keyed by threshold — avoids creating one per component.
+// Using WeakMap so entries are garbage-collected when elements are removed.
+const observerMap = new Map<number, IntersectionObserver>();
+const callbackMap = new WeakMap<Element, () => void>();
+
+function getObserver(threshold: number): IntersectionObserver {
+  if (observerMap.has(threshold)) return observerMap.get(threshold)!;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          const cb = callbackMap.get(entry.target);
+          if (cb) {
+            cb();
+            observer.unobserve(entry.target);
+            callbackMap.delete(entry.target);
+          }
+        }
+      }
+    },
+    { threshold, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  observerMap.set(threshold, observer);
+  return observer;
+}
+
 interface ScrollRevealProps {
   children: ReactNode;
   className?: string;
@@ -25,18 +53,14 @@ export default function ScrollReveal({
     const el = ref.current;
     if (!el) return;
 
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add("visible");
-          observer.unobserve(el);
-        }
-      },
-      { threshold, rootMargin: "0px 0px -40px 0px" }
-    );
-
+    const observer = getObserver(threshold);
+    callbackMap.set(el, () => el.classList.add("visible"));
     observer.observe(el);
-    return () => observer.disconnect();
+
+    return () => {
+      observer.unobserve(el);
+      callbackMap.delete(el);
+    };
   }, [threshold]);
 
   const dirClass =

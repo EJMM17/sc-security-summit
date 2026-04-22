@@ -1,6 +1,42 @@
 // ─── Site-wide content constants ─────────────────────────────────────────────
 // Single source of truth for all copy, names, and data.
 
+export const BASE_URL = "https://www.scsecuritysummit.com" as const;
+
+// FAQ items exported for FAQPage JSON-LD schema in layout.tsx
+export const FAQ_SCHEMA_ITEMS = [
+  {
+    question: "¿Dónde y cuándo se llevará a cabo el Summit?",
+    answer:
+      "El Summit se realizará los días 24 y 25 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 5:30 PM cada día.",
+  },
+  {
+    question: "¿A quién está dirigido este evento?",
+    answer:
+      "Está diseñado para profesionales y ejecutivos del sector de cadena de suministros: directores de operaciones, gerentes de logística, especialistas en comercio exterior, responsables de compliance, entre otros perfiles clave en la industria.",
+  },
+  {
+    question: "¿Qué incluye cada tipo de acceso?",
+    answer:
+      "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+  },
+  {
+    question: "¿Puedo obtener factura (CFDI)?",
+    answer:
+      "Sí. Al momento de tu registro puedes indicar que requieres factura y proporcionar tus datos fiscales. El CFDI se emitirá dentro de las 72 horas posteriores a la confirmación de tu pago.",
+  },
+  {
+    question: "¿El acceso estudiantil requiere credencial?",
+    answer:
+      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
+  },
+  {
+    question: "¿Cómo puedo convertirme en patrocinador?",
+    answer:
+      "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
+  },
+] as const;
+
 export const EVENT = {
   title: "1ER SUMMIT DE SEGURIDAD EN LA CADENA DE SUMINISTROS",
   year: "2026",
@@ -29,7 +65,7 @@ export const SPEAKERS = [
     role: "Director General",
     org: "INDEX — Industria Maquiladora",
     topic: "Panorama Industrial del Norte de México",
-    image: "/images/speaker-fidel-guerrero.jpg",
+    image: "/images/speaker-fidel.webp",
   },
   {
     id: 2,
@@ -37,7 +73,7 @@ export const SPEAKERS = [
     role: "Mandatario Aduanal Certificado",
     org: "Especialista en Comercio Exterior",
     topic: "Operaciones Aduanales y Cumplimiento",
-    image: "/images/speaker-isidoro-juarez.jpg",
+    image: "/images/speaker-isidoro.webp",
   },
   {
     id: 3,
@@ -45,7 +81,7 @@ export const SPEAKERS = [
     role: "Director de Trade Compliance",
     org: "Sector Maquilador Transfronterizo",
     topic: "Certificaciones Internacionales y Estándares Globales",
-    image: "/images/speaker-julio-suarez.jpg",
+    image: "/images/speaker-julio.webp",
   },
   {
     id: 4,
@@ -53,7 +89,7 @@ export const SPEAKERS = [
     role: "Director de Innovación",
     org: "Tecnología y Seguridad Logística",
     topic: "Innovación Tecnológica en Supply Chain",
-    image: "/images/speaker-eduardo-luna.jpg",
+    image: "/images/speaker-eduardo.webp",
   },
 ] as const;
 
