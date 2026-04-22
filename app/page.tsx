@@ -1204,7 +1204,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             VISIÓN & MISIÓN
            ═══════════════════════════════════════════════════════════ */}
-        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 sm:py-28 overflow-hidden">
+        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 rhythm-pause-md overflow-hidden">
           {/* Decorative Pattern */}
           <div className="absolute inset-0 opacity-[0.03]" style={{
             backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)`,
@@ -1228,7 +1228,7 @@ export default function Home() {
             <div className="grid md:grid-cols-2 gap-8">
               {/* MISIÓN */}
               <ScrollReveal>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full">
+                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full offset-up-sm">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
                       <Crosshair className="w-6 h-6 text-white" />
@@ -1243,8 +1243,8 @@ export default function Home() {
               </ScrollReveal>
 
               {/* VISIÓN */}
-              <ScrollReveal delay={200}>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full">
+              <ScrollReveal delay={140}>
+                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full offset-down-sm">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
                       <Lightbulb className="w-6 h-6 text-white" />
@@ -1320,7 +1320,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             5. CONFERENCISTAS — with real photos
            ═══════════════════════════════════════════════════════════ */}
-        <section id="speakers" className="py-20 sm:py-28 bg-white">
+        <section id="speakers" className="rhythm-pause-lg bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1374,7 +1374,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             6. VALOR DEL EVENTO — Bullet Points + Perfil de Asistentes
            ═══════════════════════════════════════════════════════════ */}
-        <section className="py-20 sm:py-28 bg-slate-50">
+        <section className="rhythm-pause-md bg-slate-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <div className="grid lg:grid-cols-5 gap-12 items-start">
               {/* Left: Bullet Points (3 cols) */}
@@ -1551,7 +1551,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             10. PRICING / ACCESOS
            ═══════════════════════════════════════════════════════════ */}
-        <section id="accesos" className="py-20 sm:py-28 bg-white">
+        <section id="accesos" className="rhythm-pause-lg bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-6">
@@ -1853,7 +1853,7 @@ export default function Home() {
             13. FAQ
            ═══════════════════════════════════════════════════════════ */}
         <WaveSeparator color="#F8FAFC" />
-        <section id="faq" className="py-20 sm:py-28 bg-slate-50">
+        <section id="faq" className="rhythm-pause-md bg-slate-50">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-12">

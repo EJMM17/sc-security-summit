@@ -69,6 +69,29 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  position: relative;
+}
+
+/* ═══ AMBIENT DEPTH LAYER ═══
+   Fixed radial wash that lives behind every section. Two off-centre
+   light sources at opposite corners give the page a subtle sense of
+   space without ever animating or drawing attention. Caps at ~7%
+   opacity. Pointer-events off, z-index negative so it never
+   interferes with content. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(900px 600px at 8% 12%, rgba(37, 99, 235, 0.055), transparent 60%),
+    radial-gradient(700px 500px at 92% 88%, rgba(6, 182, 212, 0.045), transparent 65%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::before {
+    transition: opacity 1200ms ease;
+  }
 }
 
 h1, h2, h3, h4, h5, h6, .font-oswald {
@@ -90,6 +113,57 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 @media (min-width: 1024px) {
   .section-pad { padding-top: 7rem; padding-bottom: 7rem; }
+}
+
+/* ═══ SECTION TITLE — typographic dominance ═══
+   Headings carry the layout. Size scales with viewport so the
+   character count and whitespace stay in proportion — never a
+   uniform "template" size. Tighter tracking and leading amplify
+   the sense of an intentional editorial voice. */
+.section-title {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+  max-width: 22ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+}
+/* Slightly lighter weight for secondary copy so headings dominate. */
+.section-title + p,
+.section-label + .section-title + p {
+  font-weight: 400;
+}
+
+/* Break the perfectly-centered feel on wide screens. */
+@media (min-width: 1024px) {
+  .section-title { letter-spacing: -0.022em; }
+}
+
+/* ═══ RHYTHM HELPERS — non-uniform vertical spacing ═══
+   The reference page feels un-templated because section padding
+   is never identical between neighbors. These helpers let a page
+   opt into a slightly tighter or slightly wider pause so the eye
+   is forced to "breathe" at different intervals. */
+.rhythm-pause-sm { padding-top: 3.25rem !important; padding-bottom: 3.25rem !important; }
+.rhythm-pause-md { padding-top: 5.5rem  !important; padding-bottom: 5.5rem  !important; }
+.rhythm-pause-lg { padding-top: 8.25rem !important; padding-bottom: 6.75rem !important; }
+@media (min-width: 1024px) {
+  .rhythm-pause-lg { padding-top: 10rem !important; padding-bottom: 7.5rem !important; }
+}
+
+/* ═══ CONTROLLED ASYMMETRY — 5–10px offsets ═══
+   Used sparingly on blocks that would otherwise land on a perfect
+   grid line. The offset is small enough to feel intentional, not
+   broken. */
+.offset-up-sm   { transform: translateY(-6px); }
+.offset-down-sm { transform: translateY(7px); }
+.offset-up-md   { transform: translateY(-10px); }
+@media (max-width: 768px) {
+  .offset-up-sm, .offset-down-sm, .offset-up-md { transform: none; }
 }
 
 /* ═══ SECTION BACKGROUNDS ═══ */
@@ -136,11 +210,14 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 320ms ease,
+              background-color 320ms ease;
 }
 .card-elevated:hover {
   box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   border-color: var(--blue-200);
 }
 
@@ -195,8 +272,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   border-radius: inherit;
 }
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.38);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  transition-duration: 120ms;
 }
 .btn-primary:hover::before {
   opacity: 1;
@@ -236,8 +318,39 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .btn-secondary:hover {
   background-color: var(--blue-600);
   color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37,99,235,0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.22);
+}
+
+/* ═══ BTN OUTLINE (dark backgrounds) ═══
+   Inline-replacement for the `.btn-outline` class used on the hero
+   and final-CTA bands. Gives those CTAs proper size, radius and
+   motion without colliding with `.btn-secondary`. */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 280ms ease,
+              border-color 280ms ease,
+              filter 280ms ease;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.btn-outline:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .btn-white {
@@ -273,22 +386,39 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   background-clip: text;
 }
 
-/* ═══ SCROLL REVEAL ANIMATIONS ═══ */
+/* ═══ SCROLL REVEAL — subtle, non-uniform motion ═══
+   The reference site moves almost imperceptibly: 12–18px of travel,
+   ~500ms, and — critically — different durations per element so
+   nothing animates in lock-step. A small rotation of three timings
+   (420ms / 560ms / 610ms) is applied via :nth-of-type so any group
+   of reveals automatically picks up the variation. */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(14px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
+/* Duration rotation — three values so adjacent elements never match. */
+.reveal:nth-of-type(3n+1) {
+  transition-duration: 420ms;
+}
+.reveal:nth-of-type(3n+2) {
+  transition-duration: 610ms;
+}
+.reveal:nth-of-type(3n) {
+  transition-duration: 560ms;
+}
+
 .reveal-left {
   opacity: 0;
-  transform: translateX(-60px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-18px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-left.visible {
   opacity: 1;
@@ -296,9 +426,9 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .reveal-right {
   opacity: 0;
-  transform: translateX(60px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(18px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-right.visible {
   opacity: 1;
@@ -306,22 +436,25 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(12px) scale(0.985);
+  transition: opacity 610ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 610ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-scale.visible {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0) scale(1);
 }
 
-/* Staggered children */
+/* Non-even stagger — the deltas between children shrink then grow,
+   so the cadence feels organic rather than metronomic. */
 .stagger-children > .reveal:nth-child(1) { transition-delay: 0ms; }
-.stagger-children > .reveal:nth-child(2) { transition-delay: 100ms; }
-.stagger-children > .reveal:nth-child(3) { transition-delay: 200ms; }
-.stagger-children > .reveal:nth-child(4) { transition-delay: 300ms; }
-.stagger-children > .reveal:nth-child(5) { transition-delay: 400ms; }
-.stagger-children > .reveal:nth-child(6) { transition-delay: 500ms; }
+.stagger-children > .reveal:nth-child(2) { transition-delay: 90ms; }
+.stagger-children > .reveal:nth-child(3) { transition-delay: 210ms; }
+.stagger-children > .reveal:nth-child(4) { transition-delay: 340ms; }
+.stagger-children > .reveal:nth-child(5) { transition-delay: 430ms; }
+.stagger-children > .reveal:nth-child(6) { transition-delay: 580ms; }
+.stagger-children > .reveal:nth-child(7) { transition-delay: 670ms; }
+.stagger-children > .reveal:nth-child(8) { transition-delay: 790ms; }
 
 /* ═══ HERO PARTICLES (decorative) ═══ */
 .hero-glow {
@@ -400,11 +533,12 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   overflow: hidden;
   background: #FFFFFF;
   border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 610ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .speaker-card:hover {
   box-shadow: var(--shadow-xl);
-  transform: translateY(-6px);
+  transform: translateY(-3px);
 }
 .speaker-card:hover .speaker-avatar {
   transform: scale(1.05);
@@ -482,17 +616,17 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .pricing-card:hover {
   box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
 }
 .pricing-featured {
   background: linear-gradient(165deg, #0F172A, #1E3A8A);
   color: #FFFFFF;
   border-color: transparent;
   box-shadow: var(--shadow-xl), var(--shadow-glow);
-  transform: scale(1.03);
+  transform: scale(1.02);
 }
 .pricing-featured:hover {
-  transform: scale(1.05) translateY(-4px);
+  transform: scale(1.02) translateY(-3px);
 }
 
 /* ═══ SPONSORS ═══ */
@@ -849,8 +983,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.10);
 }
 .sponsor-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 28px 60px -20px rgba(15, 23, 42, 0.22);
+  transform: translateY(-3px);
+  box-shadow: 0 24px 50px -18px rgba(15, 23, 42, 0.22);
 }
 .sponsor-card--featured {
   background:
