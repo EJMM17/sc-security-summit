@@ -170,10 +170,10 @@ const UI_TEXT = {
     ],
     networkingCTA: "RESERVAR MI LUGAR",
     networkingStats: [
-      { number: "300", label: "LUGARES DISPONIBLES" },
+      { number: "500+", label: "LUGARES DISPONIBLES" },
       { number: "15+", label: "HORAS DE NETWORKING" },
       { number: "2", label: "DÍAS DE EVENTO" },
-      { number: "4", label: "SECTORES" },
+      { number: "4", label: "SECTORES DE LA CADENA DE SUMINISTROS" },
     ],
     pricingLabel: "TIPOS DE ACCESO",
     pricingTitle: "Elige Tu Acceso",
@@ -1039,7 +1039,7 @@ export default function Home() {
             <a href="#" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
               <Image
                 src="/images/logo-symbol-blue.png"
-                alt="SC Security Summit"
+                alt="Security Chain Summit"
                 width={40}
                 height={40}
                 className="w-9 h-9 sm:w-10 sm:h-10 object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
