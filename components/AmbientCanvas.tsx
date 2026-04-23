@@ -61,9 +61,12 @@ const FRAG_SRC = `
     vec3 cyan  = vec3(0.133, 0.827, 0.933);
 
     vec3 col = mix(navy, blue, clamp(f * 1.2 + 0.5, 0.0, 1.0));
-    col = mix(col, cyan, clamp(length(q) * 0.28, 0.0, 0.14));
+    col = mix(col, cyan, clamp(length(q) * 0.35, 0.0, 0.22));
 
-    gl_FragColor = vec4(col, 0.055);
+    /* Alpha 0.18 — still well within WCAG AAA budget since section bgs
+       sit at 0.78-0.82 opacity on top of this canvas; effective tint on
+       section text is ~3-4%. */
+    gl_FragColor = vec4(col, 0.18);
   }
 `;
 

@@ -70,6 +70,9 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   position: relative;
+  /* Creates a stacking context so negative-z-index descendants (AmbientCanvas)
+     paint ABOVE the body's own background layer instead of behind it. */
+  isolation: isolate;
 }
 
 /* ═══ AMBIENT DEPTH LAYER ═══
@@ -166,12 +169,16 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .offset-up-sm, .offset-down-sm, .offset-up-md { transform: none; }
 }
 
-/* ═══ SECTION BACKGROUNDS ═══ */
+/* ═══ SECTION BACKGROUNDS ═══
+   Slight translucency on light sections lets the AmbientCanvas
+   fluid-mesh peek through as a subtle atmospheric tint. Dark/gradient
+   sections stay fully opaque — they already carry their own visual
+   treatment (hero image, CTA gradient). */
 .section-white {
-  background-color: var(--bg-primary);
+  background-color: rgba(255, 255, 255, 0.82);
 }
 .section-tinted {
-  background-color: var(--bg-tinted);
+  background-color: rgba(248, 250, 255, 0.78);
 }
 .section-dark {
   background: var(--bg-hero);
