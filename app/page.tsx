@@ -482,28 +482,24 @@ const SPEAKERS = {
     {
       name: "Fidel Guerrero",
       role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
-      org: "INDEX",
       topic: "Aduanas & Comercio Exterior",
       image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
-      org: "Especialista en Comercio Exterior",
       topic: "Aduanas & Compliance",
       image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Líder en Trade Compliance e Innovación",
-      org: "Sector Automotriz e Industrial",
       topic: "Trade Compliance",
       image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
-      role: "Especialista en Innovación Estratégica",
-      org: "Certificación Internacional en Enseñanza",
+      role: "Organización Operativa y Expansión Comercial",
       topic: "Innovación & Aprendizaje",
       image: "/images/speaker-eduardo.webp",
     },
@@ -512,28 +508,24 @@ const SPEAKERS = {
     {
       name: "Fidel Guerrero",
       role: "Deputy Director, National Committee of Customs & Foreign Trade",
-      org: "INDEX",
       topic: "Customs & Foreign Trade",
       image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
-      org: "Foreign Trade Specialist",
       topic: "Customs & Compliance",
       image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Trade Compliance & Innovation Leader",
-      org: "Automotive & Industrial Sector",
       topic: "Trade Compliance",
       image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
-      role: "Strategic Innovation Specialist",
-      org: "International Teaching Certification",
+      role: "Operational Organization & Commercial Expansion",
       topic: "Innovation & Learning",
       image: "/images/speaker-eduardo.webp",
     },
@@ -1365,27 +1357,33 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {SPEAKERS[language].map((s, i) => (
-                <ScrollReveal key={i} delay={i * 100}>
-                  <div className="speaker-card group text-center">
-                    {/* Photo */}
-                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/20 transition-shadow">
+                <ScrollReveal key={i} delay={i * 120} direction="scale">
+                  <div className="speaker-card group">
+                    {/* Photo — portrait ratio */}
+                    <div className="speaker-photo-wrap overflow-hidden">
                       <Image
                         src={s.image}
                         alt={s.name}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                        sizes="(max-width:640px) 80vw, (max-width:1024px) 45vw, 22vw"
+                        className="speaker-avatar object-cover object-top"
                       />
-                      {/* Topic badge */}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
-                        <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
-                      </div>
+                      {/* Topic badge — glassy pill top-left */}
+                      <span className="speaker-tag absolute top-3 left-3 z-10">{s.topic}</span>
+                      {/* Soft vignette at bottom */}
+                      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none" />
                     </div>
 
-                    <h3 className="font-oswald text-lg font-bold text-slate-900">{s.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
-                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
+                    {/* Info block */}
+                    <div className="p-5 pb-4">
+                      <h3 className="font-oswald text-base font-bold text-slate-900 leading-tight">{s.name}</h3>
+                      <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug">{s.role}</p>
+                    </div>
+
+                    {/* Accent line — slides in on hover */}
+                    <div className="speaker-accent-line" />
                   </div>
                 </ScrollReveal>
               ))}

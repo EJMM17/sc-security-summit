@@ -537,17 +537,20 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
               box-shadow 610ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .speaker-card:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-3px);
+  box-shadow: 0 22px 52px -12px rgba(37, 99, 235, 0.22),
+              0 4px 18px rgba(15, 23, 42, 0.07);
+  transform: translateY(-6px);
+}
+.speaker-photo-wrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
 }
 .speaker-card:hover .speaker-avatar {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 .speaker-avatar {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .speaker-tag {
   display: inline-flex;
@@ -555,10 +558,24 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   border-radius: var(--radius-full);
   font-size: 0.65rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background-color: var(--blue-50);
+  background-color: rgba(255, 255, 255, 0.88);
   color: var(--blue-700);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.10);
+}
+.speaker-accent-line {
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue-500) 0%, var(--cyan-400) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.speaker-card:hover .speaker-accent-line {
+  transform: scaleX(1);
 }
 
 /* ═══ FAQ ACCORDION ═══ */
