@@ -316,7 +316,7 @@ const UI_TEXT = {
     ],
     networkingCTA: "RESERVE MY SPOT",
     networkingStats: [
-      { number: "300", label: "AVAILABLE SEATS" },
+      { number: "500+", label: "AVAILABLE SEATS" },
       { number: "15+", label: "NETWORKING HOURS" },
       { number: "2", label: "EVENT DAYS" },
       { number: "4", label: "INDUSTRY SECTORS" },
@@ -393,14 +393,14 @@ const HERO_STATS = {
   es: [
     { number: 2, suffix: "", label: "Días de Capacitación" },
     { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
-    { number: 300, suffix: "", label: "Lugares Disponibles" },
-    { number: 500, suffix: "+", label: "sectores de la cadena de suministros" },
+    { number: 500, suffix: "+", label: "Lugares Disponibles" },
+    { number: 4, suffix: "+", label: "sectores de la cadena de suministros" },
   ],
   en: [
     { number: 2, suffix: "", label: "Training Days" },
     { number: 4, suffix: "+", label: "Confirmed Speakers" },
-    { number: 300, suffix: "", label: "Available Seats" },
-    { number: 500, suffix: "+", label: "supply chain sectors" },
+    { number: 500, suffix: "+", label: "Available Seats" },
+    { number: 4, suffix: "+", label: "supply chain sectors" },
   ],
 } as const;
 
