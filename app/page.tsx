@@ -16,7 +16,6 @@ import {
   Satellite,
   ScanLine,
   BookOpen,
-  CheckCircle2,
   Network,
   Handshake,
   ArrowRight,
@@ -975,17 +974,26 @@ const FAQ_ITEMS_EN = [
   },
 ];
 
-/* ═══ WAVE SVG COMPONENT ═══ */
+/* ═══ SECTION SEPARATOR ═══ */
 function WaveSeparator({ color = "#EFF6FF", flip = false }: { color?: string; flip?: boolean }) {
   return (
     <div className={`wave-separator ${flip ? "wave-separator-flip" : ""}`} aria-hidden="true">
       <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
         <path
-          d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,40 1440,30 L1440,80 L0,80 Z"
+          d="M0,64 C280,18 880,72 1440,38 L1440,80 L0,80 Z"
           fill={color}
         />
       </svg>
     </div>
+  );
+}
+
+/* ═══ PREMIUM CHECK ICON ═══ */
+function PremiumCheck({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 14 10" fill="none" className={className} aria-hidden="true">
+      <path d="M1.5 5L5 8.5L12.5 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
   );
 }
 
@@ -1092,10 +1100,20 @@ export default function Home() {
 
           {/* Floating decorative elements */}
           <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-            <div className="absolute top-[18%] left-[6%] w-20 h-20 border border-white/10 rounded-2xl float-shape" />
-            <div className="absolute top-[28%] right-[10%] w-16 h-16 border border-cyan-400/15 rounded-full float-shape-reverse" />
-            <div className="absolute bottom-[30%] left-[12%] w-12 h-12 border border-blue-400/10 rounded-lg float-shape" style={{ animationDelay: "2s" }} />
-            <div className="absolute bottom-[18%] right-[6%] w-24 h-24 border border-white/5 rounded-3xl float-shape-reverse" style={{ animationDelay: "1s" }} />
+            <svg className="absolute top-[18%] left-[6%] opacity-[0.14] float-shape" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+              <path d="M0,16 L0,0 L16,0 M36,0 L52,0 L52,16 M52,36 L52,52 L36,52 M16,52 L0,52 L0,36" stroke="white" strokeWidth="1.5" strokeLinecap="square"/>
+            </svg>
+            <svg className="absolute top-[28%] right-[10%] opacity-[0.11] float-shape-reverse" width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
+              <line x1="20" y1="0" x2="20" y2="40" stroke="#22D3EE" strokeWidth="0.75"/>
+              <line x1="0" y1="20" x2="40" y2="20" stroke="#22D3EE" strokeWidth="0.75"/>
+              <circle cx="20" cy="20" r="7" stroke="#22D3EE" strokeWidth="0.75" fill="none"/>
+            </svg>
+            <svg className="absolute bottom-[30%] left-[12%] opacity-[0.09] float-shape" style={{ animationDelay: "2s" }} width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
+              <path d="M15,1 L29,15 L15,29 L1,15 Z" stroke="white" strokeWidth="1"/>
+            </svg>
+            <svg className="absolute bottom-[18%] right-[6%] opacity-[0.07] float-shape-reverse" style={{ animationDelay: "1s" }} width="60" height="60" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+              <path d="M0,18 L0,0 L18,0 M42,0 L60,0 L60,18 M60,42 L60,60 L42,60 M18,60 L0,60 L0,42" stroke="white" strokeWidth="1" strokeLinecap="square"/>
+            </svg>
             {/* Grid subtle pattern */}
             <div className="absolute inset-0 opacity-[0.03]" style={{
               backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -1198,8 +1216,8 @@ export default function Home() {
                 <ScrollReveal key={i} delay={i * 100}>
                   <div className="group relative p-8 rounded-2xl border border-slate-100 bg-white hover:bg-blue-50/50 hover:border-blue-200 transition-all duration-500 hover:shadow-lg">
                     <div className="flex items-start gap-5">
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-shadow">
-                        <item.icon className="w-6 h-6 text-white" />
+                      <div className="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center flex-shrink-0 ring-1 ring-slate-700 group-hover:ring-blue-500/50 transition-all shadow-lg">
+                        <item.icon className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
                       </div>
                       <div>
                         <h3 className="font-oswald text-xl font-bold text-slate-900 mb-2">
@@ -1239,15 +1257,15 @@ export default function Home() {
                   <div className="card-elevated p-8 h-full group">
                     {/* Big number */}
                     <span className="number-accent text-6xl font-oswald font-bold opacity-20 group-hover:opacity-40 transition-opacity">{p.number}</span>
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
-                      <p.icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-11 h-11 rounded-lg border border-slate-200 flex items-center justify-center mb-5 group-hover:border-blue-300 transition-colors">
+                      <p.icon className="w-5 h-5 text-slate-700" strokeWidth={1.5} />
                     </div>
                     <h3 className="font-oswald text-xl font-bold text-slate-900 mb-3">{p.title}</h3>
                     <p className="text-slate-500 text-sm leading-relaxed mb-5">{p.desc}</p>
                     <ul className="space-y-2">
                       {p.bullets.map((b, j) => (
                         <li key={j} className="flex items-start gap-2 text-sm text-slate-600">
-                          <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <PremiumCheck className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                           {b}
                         </li>
                       ))}
@@ -1301,7 +1319,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {text.networkingFeatures.map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm text-white/80">
-                        <CheckCircle2 className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                        <PremiumCheck className="w-4 h-4 text-cyan-300 flex-shrink-0" />
                         {item}
                       </div>
                     ))}
@@ -1324,7 +1342,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3">
                     {PROVEEDORES[language].map((prov, i) => (
                       <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-white/10 border border-white/10 text-sm font-medium text-white/80 hover:bg-white/15 transition-colors">
-                        <prov.icon className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                        <prov.icon className="w-4 h-4 text-cyan-300 flex-shrink-0" strokeWidth={1.5} />
                         {prov.title}
                       </div>
                     ))}
@@ -1511,7 +1529,7 @@ export default function Home() {
                   <div className="space-y-3">
                     {VALUE_HIGHLIGHTS[language].map((item, i) => (
                       <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
-                        <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <PremiumCheck className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
                         <span className="text-[15px] text-slate-700 font-medium leading-relaxed">{item}</span>
                       </div>
                     ))}
@@ -1524,8 +1542,8 @@ export default function Home() {
                 <ScrollReveal delay={200}>
                   <div className="sticky top-24 p-8 rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-lg">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md">
-                        <Users className="w-5 h-5 text-white" />
+                      <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center ring-1 ring-slate-700 shadow-md">
+                        <Users className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
                       </div>
                       <h3 className="font-oswald text-xl font-bold text-slate-900">{text.audienceCardTitle}</h3>
                     </div>
@@ -1535,7 +1553,7 @@ export default function Home() {
                     <div className="space-y-3">
                       {ASISTENTES[language].slice(0, 4).map((a, i) => (
                         <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                          <a.icon className="w-4 h-4 text-blue-500 flex-shrink-0" />
+                          <a.icon className="w-4 h-4 text-slate-400 flex-shrink-0" strokeWidth={1.5} />
                           <span className="font-medium">{a.title}</span>
                         </div>
                       ))}
@@ -1570,8 +1588,8 @@ export default function Home() {
               {ASISTENTES[language].map((a, i) => (
                 <ScrollReveal key={i} delay={i * 80}>
                   <div className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
-                      <a.icon className="w-5 h-5 text-blue-600" />
+                    <div className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-blue-300 transition-colors">
+                      <a.icon className="w-5 h-5 text-slate-600" strokeWidth={1.5} />
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800 text-sm">{a.title}</h4>
@@ -1632,7 +1650,7 @@ export default function Home() {
                     <ul className="space-y-3 mb-8 flex-1">
                       {plan.features.map((f, j) => (
                         <li key={j} className={`flex items-center gap-2 text-sm ${plan.featured ? "text-amber-50/95" : "text-slate-600"}`}>
-                          <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.featured ? "text-amber-300" : "text-blue-500"}`} />
+                          <PremiumCheck className={`w-4 h-4 flex-shrink-0 ${plan.featured ? "text-amber-300" : "text-blue-500"}`} />
                           {f}
                         </li>
                       ))}
@@ -1656,8 +1674,8 @@ export default function Home() {
             <ScrollReveal delay={200}>
               <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-blue-50 border border-blue-200">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-xl border-2 border-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <PremiumCheck className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">{text.paymentTitle}</h3>
@@ -1740,7 +1758,7 @@ export default function Home() {
                             className={`relative w-12 h-12 rounded-xl ${meta.iconBg} ${meta.iconFg} flex items-center justify-center shadow-lg flex-shrink-0`}
                             aria-hidden="true"
                           >
-                            <TierIcon className="w-6 h-6" strokeWidth={2.2} />
+                            <TierIcon className="w-6 h-6" strokeWidth={1.5} />
                           </div>
                           <div className="min-w-0">
                             <div className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full ${meta.chipBg} ${meta.chipFg}`}>
@@ -1782,7 +1800,7 @@ export default function Home() {
                         <ul className="space-y-2 flex-1">
                           {s.benefits.map((b, j) => (
                             <li key={j} className="flex items-start gap-2 text-[13px] leading-snug text-slate-600">
-                              <CheckCircle2 className={`w-4 h-4 ${meta.accent} flex-shrink-0 mt-0.5`} />
+                              <PremiumCheck className={`w-4 h-4 ${meta.accent} flex-shrink-0 mt-0.5`} />
                               <span>{b}</span>
                             </li>
                           ))}
@@ -1900,8 +1918,8 @@ export default function Home() {
                 <div className="md:col-span-2 space-y-6">
                   <div className="card-elevated p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-800 text-sm">{text.addressLabel}</h4>
@@ -1921,8 +1939,8 @@ export default function Home() {
                   </div>
                   <div className="card-elevated p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-800 text-sm">{text.datesLabel}</h4>
@@ -1933,8 +1951,8 @@ export default function Home() {
                   </div>
                   <div className="card-elevated p-6">
                     <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <Phone className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                       </div>
                       <div>
                         <h4 className="font-bold text-slate-800 text-sm">{text.contactLabel}</h4>
