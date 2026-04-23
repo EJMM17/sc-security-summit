@@ -1830,11 +1830,7 @@ export default function Home() {
                       <div className="relative p-6 pb-5 flex flex-col flex-1">
                         {/* Tier header */}
                         <div className="mb-5">
-                          <div className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] px-2.5 py-0.5 rounded-full ${meta.chipBg} ${meta.chipFg}`}>
-                            <span>{text.sponsorTierLabel}</span>
-                            <span className="font-mono">{levelLabel}</span>
-                          </div>
-                          <h3 className="font-oswald text-xl font-bold text-slate-900 mt-2 leading-tight tracking-tight">
+                          <h3 className="font-oswald text-xl font-bold text-slate-900 leading-tight tracking-tight">
                             {s.tier}
                           </h3>
                         </div>
