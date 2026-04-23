@@ -1086,7 +1086,7 @@ export default function Home() {
         <section className="relative w-full min-h-[92vh] sm:min-h-[94vh] flex items-center justify-center overflow-hidden">
           {/* Background Image */}
           <Image
-            src="/images/corporate_hero_bg.png"
+            src="/images/hero-bg.jpg"
             alt={text.heroAlt}
             fill
             className="object-cover object-center"
