@@ -170,10 +170,6 @@ export default async function RootLayout({
     "@type": "Person",
     name: s.name,
     jobTitle: s.role,
-    worksFor: {
-      "@type": "Organization",
-      name: s.org,
-    },
     description: s.topic,
     image: `${BASE_URL}${s.image}`,
   }));
