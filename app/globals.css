@@ -639,20 +639,20 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .pricing-card-v2--featured {
   background:
-    radial-gradient(1200px 500px at 50% -10%, rgba(245, 158, 11, 0.18), transparent 55%),
-    linear-gradient(165deg, #0B1220 0%, #0F172A 45%, #1E1B4B 100%);
-  border: 1px solid rgba(245, 158, 11, 0.28);
+    radial-gradient(900px 400px at 50% -15%, rgba(34, 211, 238, 0.12), transparent 55%),
+    linear-gradient(165deg, #0B1220 0%, #0F172A 50%, #1E3A8A 100%);
+  border: 1px solid rgba(37, 99, 235, 0.30);
   box-shadow:
-    0 30px 60px -20px rgba(15, 23, 42, 0.55),
-    0 0 0 1px rgba(245, 158, 11, 0.15) inset,
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+    0 28px 56px -18px rgba(15, 23, 42, 0.55),
+    0 0 0 1px rgba(37, 99, 235, 0.12) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 .pricing-card-v2--featured:hover {
   transform: translateY(-0.75rem);
   box-shadow:
-    0 40px 80px -20px rgba(15, 23, 42, 0.65),
-    0 0 0 1px rgba(245, 158, 11, 0.28) inset,
-    0 1px 0 rgba(255, 255, 255, 0.10) inset;
+    0 36px 72px -20px rgba(15, 23, 42, 0.62),
+    0 0 0 1px rgba(37, 99, 235, 0.22) inset,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
 @media (min-width: 768px) {
   .pricing-card-v2--featured {

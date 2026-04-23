@@ -19,7 +19,7 @@ import {
   Network,
   Handshake,
   ArrowRight,
-  Star,
+
   Users,
   Clock,
   Award,
@@ -39,7 +39,6 @@ import {
   Crown,
   Trophy,
   Medal,
-  Sparkles,
   Gem,
   GraduationCap,
   Ruler,
@@ -686,21 +685,21 @@ type PricingThemeEntry = {
 const PRICING_THEME: Record<"general" | "vip" | "estudiante", PricingThemeEntry> = {
   general: {
     icon: Users,
-    stripe: "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400",
-    iconBox: "bg-amber-400/15 text-amber-300 ring-1 ring-amber-400/40",
-    accent: "text-amber-300",
+    stripe: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
+    iconBox: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+    accent: "text-slate-600",
   },
   vip: {
     icon: Crown,
-    stripe: "bg-gradient-to-r from-blue-600 via-cyan-400 to-blue-600",
-    iconBox: "bg-blue-50 text-blue-600 ring-1 ring-blue-100",
-    accent: "text-blue-600",
+    stripe: "bg-gradient-to-r from-blue-800 via-cyan-400 to-blue-800",
+    iconBox: "bg-white/10 text-white ring-1 ring-white/20",
+    accent: "text-cyan-300",
   },
   estudiante: {
     icon: GraduationCap,
-    stripe: "bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400",
-    iconBox: "bg-slate-100 text-slate-700 ring-1 ring-slate-200",
-    accent: "text-slate-700",
+    stripe: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
+    iconBox: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
+    accent: "text-slate-600",
   },
 };
 
@@ -1651,76 +1650,67 @@ export default function Home() {
             </ScrollReveal>
 
             {/* Cards */}
-            <div className="grid md:grid-cols-3 gap-6 lg:gap-7 mt-14 md:items-stretch">
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-7 mt-12 md:items-stretch">
               {PRICING[language].map((plan, i) => {
+                const isVip = plan.id === "vip";
                 const theme = PRICING_THEME[plan.id as keyof typeof PRICING_THEME];
                 const TierIcon = theme.icon;
                 return (
                   <ScrollReveal key={plan.id} delay={i * 100}>
                     <div
-                      className={`pricing-card-v2 relative group rounded-3xl h-full flex flex-col overflow-hidden transition-all duration-500 ${plan.featured
+                      className={`pricing-card-v2 relative group rounded-3xl h-full flex flex-col overflow-hidden transition-all duration-500 ${isVip
                         ? "pricing-card-v2--featured text-white md:-translate-y-2"
-                        : "bg-white border border-slate-200/80 shadow-[0_4px_20px_-8px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_48px_-18px_rgba(15,23,42,0.18)] hover:-translate-y-1 hover:border-blue-200"
+                        : "bg-white border border-slate-200/80 shadow-[0_4px_20px_-8px_rgba(15,23,42,0.08)] hover:shadow-[0_20px_44px_-16px_rgba(15,23,42,0.16)] hover:-translate-y-1 hover:border-slate-300"
                         }`}
                     >
                       {/* Top tier stripe */}
                       <div className={`absolute inset-x-0 top-0 h-1 ${theme.stripe}`} aria-hidden="true" />
 
-                      {/* MÁS POPULAR badge */}
-                      {plan.featured && (
-                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 z-20">
-                          <div className="flex items-center gap-1.5 bg-gradient-to-r from-amber-400 to-amber-300 text-slate-900 text-[10px] font-black uppercase tracking-[0.22em] px-4 py-1.5 rounded-full shadow-[0_10px_25px_-8px_rgba(245,158,11,0.7)] ring-1 ring-amber-200/50">
-                            <Sparkles className="w-3 h-3" strokeWidth={2.5} />
-                            <span>{text.mostPopular}</span>
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Decorative dot pattern on featured */}
-                      {plan.featured && (
+                      {/* Subtle dot texture on VIP card */}
+                      {isVip && (
                         <div
-                          className="absolute inset-0 opacity-[0.05] pointer-events-none"
+                          className="absolute inset-0 opacity-[0.04] pointer-events-none"
                           style={{
                             backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 1px)",
-                            backgroundSize: "22px 22px",
+                            backgroundSize: "24px 24px",
                           }}
                           aria-hidden="true"
                         />
                       )}
 
-                      <div className="relative p-7 sm:p-8 pt-10 sm:pt-11 flex flex-col flex-1">
+                      <div className="relative p-7 sm:p-8 pt-9 sm:pt-9 flex flex-col flex-1">
                         {/* Tier header: icon + label */}
                         <div className="flex items-center gap-3 mb-6">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ${theme.iconBox}`}>
-                            <TierIcon className="w-6 h-6" strokeWidth={1.8} />
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.iconBox}`}>
+                            <TierIcon className="w-5 h-5" strokeWidth={1.8} />
                           </div>
                           <div className="min-w-0">
-                            <h3 className={`font-oswald text-xl font-bold leading-none tracking-tight ${plan.featured ? "text-white" : "text-slate-900"}`}>
+                            <h3 className={`font-oswald text-xl font-bold leading-none tracking-tight ${isVip ? "text-white" : "text-slate-900"}`}>
                               {plan.label}
                             </h3>
-                            <p className={`text-xs mt-1.5 leading-relaxed ${plan.featured ? "text-slate-300/90" : "text-slate-500"}`}>
+                            <p className={`text-xs mt-1.5 leading-relaxed ${isVip ? "text-slate-300/90" : "text-slate-500"}`}>
                               {plan.desc}
                             </p>
                           </div>
                         </div>
 
                         {/* Price block with divider */}
-                        <div className={`pb-6 mb-6 border-b ${plan.featured ? "border-white/10" : "border-slate-100"}`}>
+                        <div className={`pb-6 mb-6 border-b ${isVip ? "border-white/10" : "border-slate-100"}`}>
                           <div className="flex items-baseline gap-2">
-                            <span className={`font-oswald text-5xl font-bold tracking-tight leading-none ${plan.featured ? "text-white" : "text-slate-900"}`}>
+                            <span className={`font-oswald text-5xl font-bold tracking-tight leading-none ${isVip ? "text-white" : "text-slate-900"}`}>
                               {plan.price}
                             </span>
-                            <span className={`text-xs font-bold uppercase tracking-[0.18em] ${plan.featured ? "text-amber-300" : "text-slate-400"}`}>MXN</span>
+                            <span className={`text-xs font-bold uppercase tracking-[0.18em] ${isVip ? "text-cyan-300" : "text-slate-400"}`}>MXN</span>
                           </div>
-                          <p className={`text-[11px] mt-2 ${plan.featured ? "text-slate-400" : "text-slate-400"}`}>{text.taxNote}</p>
+                          <p className="text-[11px] mt-2 text-slate-400">{text.taxNote}</p>
                         </div>
 
                         {/* Features list */}
                         <ul className="space-y-2.5 mb-8 flex-1">
                           {plan.features.map((f, j) => (
-                            <li key={j} className={`flex items-start gap-2.5 text-[13.5px] leading-snug ${plan.featured ? "text-slate-100" : "text-slate-600"}`}>
-                              <span className={`w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${plan.featured ? "bg-amber-400/20 ring-1 ring-amber-300/30" : "bg-blue-50 ring-1 ring-blue-100"}`}>
-                                <PremiumCheck className={`w-2.5 h-2.5 ${plan.featured ? "text-amber-300" : "text-blue-600"}`} />
+                            <li key={j} className={`flex items-start gap-2.5 text-[13.5px] leading-snug ${isVip ? "text-slate-100" : "text-slate-600"}`}>
+                              <span className={`w-[18px] h-[18px] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${isVip ? "bg-blue-400/20 ring-1 ring-cyan-300/25" : "bg-slate-100 ring-1 ring-slate-200"}`}>
+                                <PremiumCheck className={`w-2.5 h-2.5 ${isVip ? "text-cyan-300" : "text-slate-500"}`} />
                               </span>
                               <span>{f}</span>
                             </li>
@@ -1729,8 +1719,8 @@ export default function Home() {
 
                         <a
                           href="#registro"
-                          className={`relative w-full py-3.5 rounded-xl font-bold text-sm text-center inline-flex items-center justify-center gap-2 uppercase tracking-[0.12em] transition-all duration-300 ${plan.featured
-                            ? "bg-gradient-to-r from-amber-400 to-amber-300 text-slate-900 hover:from-amber-300 hover:to-amber-200 shadow-[0_10px_28px_-8px_rgba(245,158,11,0.65)] hover:shadow-[0_14px_32px_-8px_rgba(245,158,11,0.85)] hover:-translate-y-0.5"
+                          className={`w-full py-3.5 rounded-xl font-bold text-sm text-center inline-flex items-center justify-center gap-2 uppercase tracking-[0.12em] transition-all duration-300 ${isVip
+                            ? "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_8px_24px_-8px_rgba(37,99,235,0.6)] hover:shadow-[0_12px_28px_-8px_rgba(37,99,235,0.75)] hover:-translate-y-0.5"
                             : "btn-primary"
                             }`}
                         >
@@ -1802,16 +1792,15 @@ export default function Home() {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
               {SPONSORS[language].map((s, i) => {
                 const meta = SPONSOR_TIER_META[i];
-                const TierIcon = meta.icon;
                 const levelLabel = String(meta.level).padStart(2, "0");
                 const benefitsCount = s.benefits.length;
                 const ctaClass = meta.featured
-                  ? "bg-slate-900 text-white hover:bg-slate-800 shadow-[0_10px_28px_-8px_rgba(15,23,42,0.5)]"
+                  ? "bg-slate-900 text-white hover:bg-slate-800 shadow-[0_8px_22px_-8px_rgba(15,23,42,0.45)]"
                   : meta.highlighted
-                    ? "bg-gradient-to-r from-amber-500 to-amber-400 text-white hover:from-amber-400 hover:to-amber-300 shadow-[0_10px_28px_-8px_rgba(245,158,11,0.6)]"
+                    ? "bg-amber-500 text-white hover:bg-amber-400 shadow-[0_8px_22px_-8px_rgba(245,158,11,0.5)]"
                     : i === 2
-                      ? "bg-slate-800 text-white hover:bg-slate-700 shadow-[0_10px_24px_-10px_rgba(15,23,42,0.45)]"
-                      : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 shadow-[0_10px_28px_-8px_rgba(37,99,235,0.55)]";
+                      ? "bg-slate-700 text-white hover:bg-slate-600 shadow-[0_8px_20px_-8px_rgba(15,23,42,0.38)]"
+                      : "bg-blue-600 text-white hover:bg-blue-500 shadow-[0_8px_22px_-8px_rgba(37,99,235,0.5)]";
                 return (
                   <ScrollReveal key={i} delay={i * 100}>
                     <div
@@ -1823,50 +1812,24 @@ export default function Home() {
 
                       {/* Subtle inner shine */}
                       <div
-                        className="absolute inset-x-0 top-0 h-36 pointer-events-none opacity-60"
+                        className="absolute inset-x-0 top-0 h-32 pointer-events-none opacity-50"
                         style={{
-                          background: "linear-gradient(180deg, rgba(255,255,255,0.65) 0%, rgba(255,255,255,0) 100%)",
+                          background: "linear-gradient(180deg, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0) 100%)",
                         }}
                         aria-hidden="true"
                       />
 
                       {/* Oversized tier numeral watermark */}
                       <span
-                        className="absolute -right-2 -bottom-3 font-oswald font-black text-[120px] leading-none text-slate-900/[0.035] select-none pointer-events-none group-hover:text-slate-900/[0.06] transition-colors duration-500"
+                        className="absolute -right-2 -bottom-3 font-oswald font-black text-[120px] leading-none text-slate-900/[0.03] select-none pointer-events-none group-hover:text-slate-900/[0.055] transition-colors duration-500"
                         aria-hidden="true"
                       >
                         {levelLabel}
                       </span>
 
-                      {/* Badges */}
-                      {meta.featured && (
-                        <div className="absolute top-5 right-5 z-10 flex items-center gap-1 bg-slate-900 text-slate-50 text-[9px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full shadow-[0_6px_16px_-4px_rgba(15,23,42,0.5)]">
-                          <Sparkles className="w-3 h-3" />
-                          <span>{text.sponsorExclusiveBadge}</span>
-                        </div>
-                      )}
-                      {meta.highlighted && (
-                        <div className="absolute top-5 right-5 z-10 flex items-center gap-1 bg-gradient-to-r from-amber-500 to-amber-400 text-white text-[9px] font-bold uppercase tracking-[0.18em] px-2.5 py-1 rounded-full shadow-[0_6px_16px_-4px_rgba(245,158,11,0.5)]">
-                          <Star className="w-3 h-3 fill-white" />
-                          <span>{text.sponsorRecommendedBadge}</span>
-                        </div>
-                      )}
-
                       <div className="relative p-6 pb-5 flex flex-col flex-1">
-                        {/* Icon + tier header */}
+                        {/* Tier header */}
                         <div className="mb-5">
-                          <div className="relative inline-flex mb-4">
-                            <div
-                              className={`absolute inset-0 rounded-2xl ${meta.iconBg} opacity-25 blur-lg scale-110`}
-                              aria-hidden="true"
-                            />
-                            <div
-                              className={`relative w-14 h-14 rounded-2xl ${meta.iconBg} ${meta.iconFg} flex items-center justify-center shadow-lg flex-shrink-0 ring-1 ring-white/40`}
-                              aria-hidden="true"
-                            >
-                              <TierIcon className="w-7 h-7" strokeWidth={1.5} />
-                            </div>
-                          </div>
                           <div className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] px-2.5 py-0.5 rounded-full ${meta.chipBg} ${meta.chipFg}`}>
                             <span>{text.sponsorTierLabel}</span>
                             <span className="font-mono">{levelLabel}</span>
