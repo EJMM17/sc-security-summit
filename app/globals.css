@@ -531,14 +531,21 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #FFFFFF;
-  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 8px 32px -4px rgba(15, 23, 42, 0.08),
+              0 1px 0 rgba(255, 255, 255, 0.5) inset;
   transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1),
-              box-shadow 610ms cubic-bezier(0.22, 1, 0.36, 1);
+              box-shadow 610ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 320ms ease;
 }
 .speaker-card:hover {
   box-shadow: 0 22px 52px -12px rgba(37, 99, 235, 0.22),
-              0 4px 18px rgba(15, 23, 42, 0.07);
+              0 4px 18px rgba(15, 23, 42, 0.07),
+              0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  border-color: rgba(255, 255, 255, 0.85);
   transform: translateY(-6px);
 }
 .speaker-photo-wrap {
@@ -627,13 +634,18 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   position: relative;
   border-radius: var(--radius-xl);
   padding: 2.5rem 2rem;
-  background: #FFFFFF;
-  border: 1px solid var(--border-light);
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px) saturate(1.4);
+  -webkit-backdrop-filter: blur(24px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.58);
+  box-shadow: 0 8px 32px -4px rgba(15, 23, 42, 0.08);
   transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .pricing-card:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-3px);
+  box-shadow: 0 16px 48px -8px rgba(15, 23, 42, 0.14),
+              0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  border-color: rgba(37, 99, 235, 0.28);
+  transform: translateY(-4px);
 }
 .pricing-featured {
   background: linear-gradient(165deg, #0F172A, #1E3A8A);
@@ -1364,4 +1376,25 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   justify-content: center;
   text-align: center;
   padding: 2rem;
+}
+
+/* ═══ FORM INPUTS — Fase 4: Premium focus enhancement ═══
+   Layers on top of Tailwind's focus:ring-2 focus:ring-blue-500/20.
+   Widens the glow ring and transitions bg to pure white for clarity. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus,
+select:focus,
+textarea:focus {
+  background-color: #FFFFFF !important;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.14),
+    0 2px 8px rgba(37, 99, 235, 0.07) !important;
+  transition: border-color 0.25s ease,
+              box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.22s ease;
+}
+
+/* Pricing card hover — border luminance lift for dark featured card */
+.pricing-featured:hover {
+  box-shadow: var(--shadow-xl), 0 0 40px rgba(37, 99, 235, 0.2);
+  border-color: rgba(99, 149, 255, 0.25);
 }
