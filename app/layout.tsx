@@ -6,6 +6,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SPEAKERS, FAQ_SCHEMA_ITEMS, BASE_URL } from "@/lib/site-content";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -202,6 +203,7 @@ export default async function RootLayout({
         {children}
         <WhatsAppButton />
         <Toaster theme="light" position="bottom-right" richColors />
+        <SpeedInsights />
         {/* Turnstile loaded here so the browser has it ready before the form hydrates */}
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
