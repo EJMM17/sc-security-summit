@@ -1111,20 +1111,6 @@ export default function Home() {
 
           {/* Content */}
           <div className="relative z-10 text-center px-5 sm:px-6 py-10 sm:py-16 max-w-5xl mx-auto flex flex-col items-center">
-            {/* Logo */}
-            <ScrollReveal delay={50}>
-              <div className="flex justify-center mb-8 sm:mb-10">
-                <Image
-                  src="/images/logo-full-white.png"
-                  alt="Supply Chain Security Summit"
-                  width={420}
-                  height={120}
-                  className="w-[200px] sm:w-[280px] md:w-[380px] h-auto object-contain drop-shadow-[0_4px_24px_rgba(6,182,212,0.3)]"
-                  priority
-                />
-              </div>
-            </ScrollReveal>
-
             {/* Title */}
             <ScrollReveal delay={100}>
               <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-[4.2rem] lg:text-7xl font-bold text-white leading-[1.06] mb-6 sm:mb-7 tracking-tight">
