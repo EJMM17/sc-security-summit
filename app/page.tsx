@@ -1244,6 +1244,7 @@ export default function Home() {
                     src="/images/gallery-hall.jpg"
                     alt={text.galleryTag1}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 100vw, 62vw"
                   />
@@ -1264,6 +1265,7 @@ export default function Home() {
                     src="/images/gallery-registro.jpg"
                     alt={text.galleryTag2}
                     fill
+                    unoptimized
                     className="object-cover object-top"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 26vw"
                   />
@@ -1282,6 +1284,7 @@ export default function Home() {
                     src="/images/gallery-keynote.jpg"
                     alt={text.galleryTag3}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 36vw"
                   />
@@ -1299,6 +1302,7 @@ export default function Home() {
                     src="/images/gallery-hub.jpg"
                     alt={text.galleryTag4}
                     fill
+                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 30vw"
                   />
@@ -1606,6 +1610,7 @@ export default function Home() {
               src="/images/gallery-hub.jpg"
               alt=""
               fill
+              unoptimized
               className="object-cover opacity-[0.18]"
               aria-hidden="true"
             />
@@ -1782,6 +1787,7 @@ export default function Home() {
             src="/images/gallery-stands.jpg"
             alt={text.galleryStripAlt}
             fill
+            unoptimized
             className="object-cover object-center"
             sizes="100vw"
           />
