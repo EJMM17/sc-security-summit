@@ -40,7 +40,6 @@ import {
   Trophy,
   Medal,
   Gem,
-  GraduationCap,
   Ruler,
   LayoutGrid,
 } from "lucide-react";
@@ -676,31 +675,10 @@ const PRICING = {
   ],
 } as const;
 
-type PricingThemeEntry = {
-  icon: typeof Crown;
-  stripe: string;
-  iconBox: string;
-  accent: string;
-};
-const PRICING_THEME: Record<"general" | "vip" | "estudiante", PricingThemeEntry> = {
-  general: {
-    icon: Users,
-    stripe: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
-    iconBox: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
-    accent: "text-slate-600",
-  },
-  vip: {
-    icon: Crown,
-    stripe: "bg-gradient-to-r from-blue-800 via-cyan-400 to-blue-800",
-    iconBox: "bg-white/10 text-white ring-1 ring-white/20",
-    accent: "text-cyan-300",
-  },
-  estudiante: {
-    icon: GraduationCap,
-    stripe: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
-    iconBox: "bg-slate-100 text-slate-600 ring-1 ring-slate-200",
-    accent: "text-slate-600",
-  },
+const PRICING_STRIPE: Record<"general" | "vip" | "estudiante", string> = {
+  general: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
+  vip: "bg-gradient-to-r from-blue-800 via-cyan-400 to-blue-800",
+  estudiante: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
 };
 
 type SponsorTierMeta = {
@@ -1653,8 +1631,7 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6 lg:gap-7 mt-12 md:items-stretch">
               {PRICING[language].map((plan, i) => {
                 const isVip = plan.id === "vip";
-                const theme = PRICING_THEME[plan.id as keyof typeof PRICING_THEME];
-                const TierIcon = theme.icon;
+                const stripe = PRICING_STRIPE[plan.id as keyof typeof PRICING_STRIPE];
                 return (
                   <ScrollReveal key={plan.id} delay={i * 100}>
                     <div
@@ -1664,7 +1641,7 @@ export default function Home() {
                         }`}
                     >
                       {/* Top tier stripe */}
-                      <div className={`absolute inset-x-0 top-0 h-1 ${theme.stripe}`} aria-hidden="true" />
+                      <div className={`absolute inset-x-0 top-0 h-1 ${stripe}`} aria-hidden="true" />
 
                       {/* Subtle dot texture on VIP card */}
                       {isVip && (
@@ -1679,19 +1656,14 @@ export default function Home() {
                       )}
 
                       <div className="relative p-7 sm:p-8 pt-9 sm:pt-9 flex flex-col flex-1">
-                        {/* Tier header: icon + label */}
-                        <div className="flex items-center gap-3 mb-6">
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${theme.iconBox}`}>
-                            <TierIcon className="w-5 h-5" strokeWidth={1.8} />
-                          </div>
-                          <div className="min-w-0">
-                            <h3 className={`font-oswald text-xl font-bold leading-none tracking-tight ${isVip ? "text-white" : "text-slate-900"}`}>
-                              {plan.label}
-                            </h3>
-                            <p className={`text-xs mt-1.5 leading-relaxed ${isVip ? "text-slate-300/90" : "text-slate-500"}`}>
-                              {plan.desc}
-                            </p>
-                          </div>
+                        {/* Tier header */}
+                        <div className="mb-6">
+                          <h3 className={`font-oswald text-xl font-bold leading-tight tracking-tight ${isVip ? "text-white" : "text-slate-900"}`}>
+                            {plan.label}
+                          </h3>
+                          <p className={`text-xs mt-1.5 leading-relaxed ${isVip ? "text-slate-300/90" : "text-slate-500"}`}>
+                            {plan.desc}
+                          </p>
                         </div>
 
                         {/* Price block with divider */}
