@@ -1315,23 +1315,21 @@ export default function Home() {
                 </ScrollReveal>
               </div>
 
-              {/* Stats */}
+              {/* Proveedores integrado */}
               <div className="md:w-2/5">
-                <div className="grid grid-cols-2 gap-4">
-                  {text.networkingStats.map((stat, i) => {
-                    const icons = [Users, Clock, Handshake, Award];
-                    const Icon = icons[i];
-                    return (
-                      <ScrollReveal key={i} delay={i * 100}>
-                        <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
-                          <Icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-                          <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
-                          <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
-                        </div>
-                      </ScrollReveal>
-                    );
-                  })}
-                </div>
+                <ScrollReveal delay={150}>
+                  <span className="inline-block text-[10px] text-white/60 tracking-widest font-semibold uppercase mb-2">{text.providersLabel}</span>
+                  <h3 className="font-oswald text-xl font-bold text-white mb-3">{text.providersTitle}</h3>
+                  <p className="text-blue-100/70 text-sm leading-relaxed mb-5">{text.providersDesc}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {PROVEEDORES[language].map((prov, i) => (
+                      <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-white/10 border border-white/10 text-sm font-medium text-white/80 hover:bg-white/15 transition-colors">
+                        <prov.icon className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                        {prov.title}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollReveal>
               </div>
             </div>
           </div>
@@ -1568,7 +1566,7 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {ASISTENTES[language].map((a, i) => (
                 <ScrollReveal key={i} delay={i * 80}>
                   <div className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
@@ -1584,28 +1582,6 @@ export default function Home() {
               ))}
             </div>
 
-            {/* Proveedores */}
-            <ScrollReveal>
-              <div className="card-elevated p-8 sm:p-10">
-                <div className="flex flex-col md:flex-row md:items-center gap-8">
-                  <div className="md:w-2/5">
-                    <span className="section-label text-xs">{text.providersLabel}</span>
-                    <h3 className="font-oswald text-2xl font-bold text-slate-900 mt-2">{text.providersTitle}</h3>
-                    <p className="text-slate-500 text-sm mt-3 leading-relaxed">
-                      {text.providersDesc}
-                    </p>
-                  </div>
-                  <div className="md:w-3/5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {PROVEEDORES[language].map((prov, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all text-sm font-medium text-slate-700">
-                        <prov.icon className="w-4 h-4 text-blue-500" />
-                        {prov.title}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
           </div>
         </section>
 
