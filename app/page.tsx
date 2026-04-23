@@ -79,6 +79,7 @@ const FOOTER_LINKS = {
   es: [
     { href: "#enfoque", label: "Enfoque" },
     { href: "#speakers", label: "Conferencistas" },
+    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audiencia" },
     { href: "#accesos", label: "Accesos" },
     { href: "#patrocinadores", label: "Patrocinadores" },
@@ -88,6 +89,7 @@ const FOOTER_LINKS = {
   en: [
     { href: "#enfoque", label: "Focus" },
     { href: "#speakers", label: "Speakers" },
+    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audience" },
     { href: "#accesos", label: "Passes" },
     { href: "#patrocinadores", label: "Sponsors" },
@@ -106,15 +108,15 @@ const UI_TEXT = {
     heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
     heroTitleHighlight: "CADENA DE SUMINISTROS",
     heroDescription:
-      "El encuentro donde convergen la actualización estratégica, la vinculación empresarial y las soluciones tecnológicas para fortalecer la industria del norte de México.",
+      "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
     countdownLabel: "Faltan",
     registerNowBtn: "REGISTRARME AHORA",
     sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
-    whyAttendLabel: "PORQUE SER PARTE DEL SUMMIT",
-    whyAttendTitle: "Lo Que Te Espera",
+    whyAttendLabel: "POR QUÉ SER PARTE DEL SUMMIT",
+    whyAttendTitle: "Por Qué Ser Parte del Summit",
     whyAttendDesc:
-      "Más que un congreso. Una experiencia de capacitación, networking e innovación diseñada para transformar tu operación.",
+      "Lidera la integridad de la cadena de suministro. Implementa las mejores prácticas en seguridad para minimizar riesgos y garantizar la eficiencia operativa de tus rutas internacionales.",
     purposeLabel: "PROPÓSITO",
     visionMissionTitle: "Visión y Misión",
     missionLabel: "Misión",
@@ -232,13 +234,13 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos y Condiciones",
-    galleryLabel: "GALERÍA DE EDICIONES PREVIAS",
-    galleryTitle: "Así Se Vive el Summit",
-    galleryDesc: "Networking especializado, conferencias magistrales y vinculación empresarial — esto es lo que te espera.",
+    galleryLabel: "ASÍ SERÁ EL SUMMIT",
+    galleryTitle: "Así Será el Summit",
+    galleryDesc: "Cuatro áreas de actividad diseñadas para maximizar tu experiencia y el valor que llevas a tu empresa.",
     galleryTag1: "Expo Comercial",
     galleryTag2: "Registro & Bienvenida",
     galleryTag3: "Conferencia Magistral",
-    galleryTag4: "Business Hub",
+    galleryTag4: "Business Hub B2B",
     galleryStripAlt: "Sala de exposición — SC Security Summit",
   },
   en: {
@@ -376,13 +378,13 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms and Conditions",
-    galleryLabel: "PAST EDITIONS GALLERY",
-    galleryTitle: "Experience the Summit",
-    galleryDesc: "Specialized networking, keynote sessions and business connections — this is what awaits you.",
+    galleryLabel: "WHAT AWAITS THE SUMMIT",
+    galleryTitle: "What to Expect",
+    galleryDesc: "Four activity areas designed to maximize your experience and the value you take back to your company.",
     galleryTag1: "Commercial Expo",
     galleryTag2: "Registration & Welcome",
     galleryTag3: "Keynote Session",
-    galleryTag4: "Business Hub",
+    galleryTag4: "Business Hub B2B",
     galleryStripAlt: "Exhibition hall — SC Security Summit",
   },
 } as const;
@@ -392,13 +394,13 @@ const HERO_STATS = {
     { number: 2, suffix: "", label: "Días de Capacitación" },
     { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
     { number: 300, suffix: "", label: "Lugares Disponibles" },
-    { number: 4, suffix: "", label: "Sectores Industriales" },
+    { number: 500, suffix: "+", label: "sectores de la cadena de suministros" },
   ],
   en: [
     { number: 2, suffix: "", label: "Training Days" },
     { number: 4, suffix: "+", label: "Confirmed Speakers" },
     { number: 300, suffix: "", label: "Available Seats" },
-    { number: 4, suffix: "", label: "Industry Sectors" },
+    { number: 500, suffix: "+", label: "supply chain sectors" },
   ],
 } as const;
 
@@ -406,7 +408,7 @@ const PILARES = {
   es: [
     {
       icon: ShieldCheck,
-      title: "Actualización Estratégica",
+      title: "Cumplimiento y actualización",
       desc: "Accede a contenido de alto valor sobre certificaciones de seguridad, comercio exterior, gestión de riesgos y cumplimiento operativo con enfoque en estándares internacionales.",
       bullets: [
         "Tendencias y regulaciones vigentes",
@@ -582,7 +584,7 @@ const PRICING = {
       id: "general",
       label: "Acceso General",
       price: "$5,800",
-      featured: false,
+      featured: true,
       desc: "Profesionales y operación",
       features: [
         "Capacitación de 2 días",
@@ -598,7 +600,7 @@ const PRICING = {
       id: "vip",
       label: "Acceso VIP",
       price: "$7,200",
-      featured: true,
+      featured: false,
       desc: "Ejecutivos y tomadores de decisión",
       features: [
         "Capacitación de 2 días",
@@ -632,7 +634,7 @@ const PRICING = {
       id: "general",
       label: "General Pass",
       price: "$5,800",
-      featured: false,
+      featured: true,
       desc: "Professionals and operations",
       features: [
         "2-day training",
@@ -648,7 +650,7 @@ const PRICING = {
       id: "vip",
       label: "VIP Pass",
       price: "$7,200",
-      featured: true,
+      featured: false,
       desc: "Executives and decision makers",
       features: [
         "2-day training",
@@ -885,44 +887,44 @@ const WHY_ATTEND = {
     {
       icon: BookOpen,
       title: "Actualización Estratégica",
-      desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
+      desc: "Domina los estándares para anticipar riesgos antes de que interrumpan tu operación",
     },
     {
       icon: Mic2,
       title: "Expertos del Sector",
-      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia.",
+      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia",
     },
     {
       icon: Target,
       title: "Impacto Real",
-      desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
+      desc: "Convierte el cumplimiento en una ventaja competitiva que abra nuevos canales de venta B2B",
     },
     {
       icon: Globe,
       title: "Visión Binacional y Comercial",
-      desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
+      desc: "Networking con tomadores de decisiones que están definiendo el futuro de la seguridad logística y mejoras para tu empresa",
     },
   ],
   en: [
     {
       icon: BookOpen,
       title: "Strategic Update",
-      desc: "Current and specialized topics on security, logistics, foreign trade and compliance.",
+      desc: "Master the standards to anticipate risks before they disrupt your operation",
     },
     {
       icon: Mic2,
       title: "Industry Experts",
-      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy.",
+      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy",
     },
     {
       icon: Target,
       title: "Real Impact",
-      desc: "Ideas, tools and contacts that translate into concrete improvements for your company.",
+      desc: "Turn compliance into a competitive advantage that opens new B2B sales channels",
     },
     {
       icon: Globe,
       title: "Binational & Commercial Vision",
-      desc: "A binational perspective to drive trade, collaboration and growth.",
+      desc: "Networking with decision-makers who are shaping the future of logistics security and improvements for your company",
     },
   ],
 } as const;
@@ -937,6 +939,10 @@ const FAQ_ITEMS = [
     answer: "Está diseñado para profesionales y ejecutivos del sector de cadena de suministros: directores de operaciones, gerentes de logística, especialistas en comercio exterior, responsables de compliance, entre otros perfiles clave en la industria.",
   },
   {
+    question: "¿Cómo puedo convertirme en patrocinador?",
+    answer: "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
+  },
+  {
     question: "¿Qué incluye cada tipo de acceso?",
     answer: "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
   },
@@ -947,10 +953,6 @@ const FAQ_ITEMS = [
   {
     question: "¿El acceso estudiantil requiere credencial?",
     answer: "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
-  },
-  {
-    question: "¿Cómo puedo convertirme en patrocinador?",
-    answer: "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
   },
 ];
 
@@ -964,6 +966,10 @@ const FAQ_ITEMS_EN = [
     answer: "It is designed for supply chain professionals and executives: operations directors, logistics managers, foreign trade specialists, compliance leaders, and other key industry profiles.",
   },
   {
+    question: "How can I become a sponsor?",
+    answer: "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Strategic Allied Provider) and the benefits for each tier.",
+  },
+  {
     question: "What is included with each access type?",
     answer: "Student access includes 2-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
   },
@@ -974,10 +980,6 @@ const FAQ_ITEMS_EN = [
   {
     question: "Does the student pass require an ID?",
     answer: "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate or graduate students.",
-  },
-  {
-    question: "How can I become a sponsor?",
-    answer: "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Strategic Allied Provider) and the benefits for each tier.",
   },
 ];
 
@@ -1128,6 +1130,26 @@ export default function Home() {
               </p>
             </ScrollReveal>
 
+            {/* Stats — moved up into hero */}
+            <ScrollReveal delay={260}>
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-8 sm:mb-10">
+                {HERO_STATS[language].map((s, i) => (
+                  <div
+                    key={i}
+                    className={`text-center px-5 py-3 rounded-xl ${i === 3 ? "bg-blue-700 shadow-lg shadow-blue-900/40" : ""}`}
+                  >
+                    <div className="flex items-baseline justify-center gap-1">
+                      <AnimatedCounter target={s.number} className="font-oswald text-3xl sm:text-4xl font-bold text-white" />
+                      {s.suffix && <span className="font-oswald text-2xl font-bold text-white">{s.suffix}</span>}
+                    </div>
+                    <p className="text-xs text-white/70 uppercase tracking-wider font-medium mt-1">
+                      {s.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+
             {/* Date & Location — minimal inline strip */}
             <ScrollReveal delay={280}>
               <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-6 sm:mb-8">
@@ -1154,42 +1176,11 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            {/* CTAs */}
-            <ScrollReveal delay={400}>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                <a href="#registro" className="btn-primary px-8 py-4 text-base w-full sm:w-auto">
-                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
-                </a>
-                <a href="#patrocinadores" className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
-                  {text.sponsorBtn}
-                </a>
-              </div>
-            </ScrollReveal>
+            {/* CTAs — removed per PDF mockup (CTAs exist in other sections) */}
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            2. SOCIAL PROOF BAR
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="py-8 bg-white border-b border-slate-100">
-          <div className="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-center gap-8 sm:gap-16">
-            {HERO_STATS[language].map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="flex items-baseline justify-center gap-1">
-                  <AnimatedCounter target={s.number} className="number-accent text-3xl sm:text-4xl" />
-                  {s.suffix && <span className="number-accent text-2xl">{s.suffix}</span>}
-                </div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-            <div className="hidden sm:block text-center border-l border-slate-200 pl-8">
-              <p className="text-xs text-slate-400 uppercase tracking-wider">{text.presentedBy}</p>
-              <p className="font-bold text-slate-700 text-sm mt-1">Lanz Logistics <span className="text-blue-500">+</span> Thynk Unlimited</p>
-            </div>
-          </div>
-        </section>
+        {/* ═══ SOCIAL PROOF BAR — stats moved into hero ═══ */}
 
         {/* ═══════════════════════════════════════════════════════════
             3. ¿POR QUÉ ASISTIR? — Zig-Zag Layout
@@ -1232,8 +1223,187 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ═══ VISIÓN & MISIÓN — removed from flow per PDF mockup ═══ */}
+
         {/* ═══════════════════════════════════════════════════════════
-            GALERÍA — Bento Editorial Grid
+            EJES TEMÁTICOS — Numbered Cards
+           ═══════════════════════════════════════════════════════════ */}
+        <span id="agenda" aria-hidden="true" />
+        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-16">
+                <span className="section-label">{text.pillarsLabel}</span>
+                <h2 className="section-title mt-3">{text.pillarsTitle}</h2>
+                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
+                  {text.pillarsDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid md:grid-cols-3 gap-8">
+              {PILARES[language].map((p, i) => (
+                <ScrollReveal key={i} delay={i * 150}>
+                  <div className="card-elevated p-8 h-full group">
+                    {/* Big number */}
+                    <span className="number-accent text-6xl font-oswald font-bold opacity-20 group-hover:opacity-40 transition-opacity">{p.number}</span>
+                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
+                      <p.icon className="w-6 h-6 text-blue-600" />
+                    </div>
+                    <h3 className="font-oswald text-xl font-bold text-slate-900 mb-3">{p.title}</h3>
+                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{p.desc}</p>
+                    <ul className="space-y-2">
+                      {p.bullets.map((b, j) => (
+                        <li key={j} className="flex items-start gap-2 text-sm text-slate-600">
+                          <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                          {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            NETWORKING HUB — Business Hub B2B
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden">
+          {/* Background Photo — Business Hub atmosphere */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/gallery-hub.jpg"
+              alt=""
+              fill
+              unoptimized
+              className="object-cover opacity-[0.18]"
+              aria-hidden="true"
+            />
+          </div>
+          {/* Gradient overlay to blend photo into brand color */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-blue-900/96 via-blue-900/80 to-blue-900/60" />
+          {/* Decorative grid */}
+          <div className="absolute inset-0 z-[2] opacity-[0.04]" style={{
+            backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
+            backgroundSize: "40px 40px"
+          }} />
+
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="flex flex-col md:flex-row items-center gap-12">
+              <div className="md:w-3/5">
+                <ScrollReveal>
+                  <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
+                    {text.networkingLabel}
+                  </span>
+                  <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-[1.15] mb-4">
+                    {text.networkingTitle}
+                  </h2>
+                  <p className="text-blue-100/80 max-w-lg text-base leading-relaxed mb-6">
+                    {text.networkingDesc}
+                  </p>
+                </ScrollReveal>
+
+                <ScrollReveal delay={100}>
+                  <div className="grid grid-cols-2 gap-3 mb-8">
+                    {text.networkingFeatures.map((item, i) => (
+                      <div key={i} className="flex items-center gap-2 text-sm text-white/80">
+                        <CheckCircle2 className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                        {item}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollReveal>
+
+                <ScrollReveal delay={200}>
+                  <a href="#registro" className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg">
+                    {text.networkingCTA} <ArrowRight className="w-4 h-4" />
+                  </a>
+                </ScrollReveal>
+              </div>
+
+              {/* Stats */}
+              <div className="md:w-2/5">
+                <div className="grid grid-cols-2 gap-4">
+                  {text.networkingStats.map((stat, i) => {
+                    const icons = [Users, Clock, Handshake, Award];
+                    const Icon = icons[i];
+                    return (
+                      <ScrollReveal key={i} delay={i * 100}>
+                        <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
+                          <Icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
+                          <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
+                          <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
+                        </div>
+                      </ScrollReveal>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Wave → */}
+        <WaveSeparator color="#FFFFFF" flip />
+
+        {/* ═══════════════════════════════════════════════════════════
+            CONFERENCISTAS — with real photos
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="speakers" className="rhythm-pause-lg bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-16">
+                <span className="section-label flex items-center justify-center gap-2">
+                  <Mic2 className="w-4 h-4" /> {text.speakersLabel}
+                </span>
+                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
+                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
+                  {text.speakersDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {SPEAKERS[language].map((s, i) => (
+                <ScrollReveal key={i} delay={i * 100}>
+                  <div className="speaker-card group text-center">
+                    {/* Photo */}
+                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/20 transition-shadow">
+                      <Image
+                        src={s.image}
+                        alt={s.name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                      {/* Topic badge */}
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
+                        <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-oswald text-lg font-bold text-slate-900">{s.name}</h3>
+                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
+                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+
+            <ScrollReveal delay={500}>
+              <p className="text-center text-sm text-slate-400 mt-12">
+                {text.speakersMorePrefix}{" "}
+                <a href="#registro" className="text-blue-600 font-semibold hover:underline">
+                  {text.speakersMoreCTA}
+                </a>
+              </p>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            GALERÍA — Preview del Evento
            ═══════════════════════════════════════════════════════════ */}
         <section className="py-16 sm:py-24 bg-slate-50 overflow-hidden">
           <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -1330,177 +1500,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            VISIÓN & MISIÓN
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 rhythm-pause-md overflow-hidden">
-          {/* Decorative Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)`,
-            backgroundSize: "28px 28px"
-          }} />
-          <div className="absolute top-10 right-10 w-40 h-40 border border-white/5 rounded-full float-shape" />
-          <div className="absolute bottom-10 left-10 w-28 h-28 border border-cyan-400/8 rounded-2xl float-shape-reverse" />
-
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
-                  <Compass className="w-3.5 h-3.5 text-cyan-300" /> {text.purposeLabel}
-                </span>
-                <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-tight">
-                  {text.visionMissionTitle}
-                </h2>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* MISIÓN */}
-              <ScrollReveal>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full offset-up-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                      <Crosshair className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">{text.missionLabel}</h3>
-                  </div>
-                  <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>{text.missionP1}</p>
-                    <p>{text.missionP2}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* VISIÓN */}
-              <ScrollReveal delay={140}>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full offset-down-sm">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                      <Lightbulb className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">{text.visionLabel}</h3>
-                  </div>
-                  <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>{text.visionP1}</p>
-                    <p>{text.visionP2}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* Acerca del evento (About) */}
-            <ScrollReveal delay={300}>
-              <div className="mt-12 p-8 sm:p-10 rounded-2xl bg-white/[0.04] border border-white/8 text-center max-w-4xl mx-auto">
-                <p className="text-blue-100/70 text-sm leading-relaxed">
-                  {text.aboutText}
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* Wave → */}
-        <WaveSeparator color="#F8FAFC" />
-
-        {/* ═══════════════════════════════════════════════════════════
-            4. 3 EJES TEMÁTICOS — Numbered Cards
-           ═══════════════════════════════════════════════════════════ */}
-        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="section-label">{text.pillarsLabel}</span>
-                <h2 className="section-title mt-3">{text.pillarsTitle}</h2>
-                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  {text.pillarsDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid md:grid-cols-3 gap-8">
-              {PILARES[language].map((p, i) => (
-                <ScrollReveal key={i} delay={i * 150}>
-                  <div className="card-elevated p-8 h-full group">
-                    {/* Big number */}
-                    <span className="number-accent text-6xl font-oswald font-bold opacity-20 group-hover:opacity-40 transition-opacity">{p.number}</span>
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
-                      <p.icon className="w-6 h-6 text-blue-600" />
-                    </div>
-                    <h3 className="font-oswald text-xl font-bold text-slate-900 mb-3">{p.title}</h3>
-                    <p className="text-slate-500 text-sm leading-relaxed mb-5">{p.desc}</p>
-                    <ul className="space-y-2">
-                      {p.bullets.map((b, j) => (
-                        <li key={j} className="flex items-start gap-2 text-sm text-slate-600">
-                          <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                          {b}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Wave → */}
-        <WaveSeparator color="#FFFFFF" flip />
-
-        {/* ═══════════════════════════════════════════════════════════
-            5. CONFERENCISTAS — with real photos
-           ═══════════════════════════════════════════════════════════ */}
-        <section id="speakers" className="rhythm-pause-lg bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="section-label flex items-center justify-center gap-2">
-                  <Mic2 className="w-4 h-4" /> {text.speakersLabel}
-                </span>
-                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
-                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  {text.speakersDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {SPEAKERS[language].map((s, i) => (
-                <ScrollReveal key={i} delay={i * 100}>
-                  <div className="speaker-card group text-center">
-                    {/* Photo */}
-                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/20 transition-shadow">
-                      <Image
-                        src={s.image}
-                        alt={s.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                      {/* Topic badge */}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
-                        <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
-                      </div>
-                    </div>
-
-                    <h3 className="font-oswald text-lg font-bold text-slate-900">{s.name}</h3>
-                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
-                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-
-            <ScrollReveal delay={500}>
-              <p className="text-center text-sm text-slate-400 mt-12">
-                {text.speakersMorePrefix}{" "}
-                <a href="#registro" className="text-blue-600 font-semibold hover:underline">
-                  {text.speakersMoreCTA}
-                </a>
-              </p>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            6. VALOR DEL EVENTO — Bullet Points + Perfil de Asistentes
+            VALOR DEL EVENTO — Bullet Points + Perfil de Asistentes
            ═══════════════════════════════════════════════════════════ */}
         <section className="rhythm-pause-md bg-slate-50">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -1555,7 +1555,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            7. AUDIENCIA + PROVEEDORES
+            AUDIENCIA + PROVEEDORES
            ═══════════════════════════════════════════════════════════ */}
         <WaveSeparator color="#F8FAFC" />
         <section id="audiencia" className="py-20 sm:py-28 bg-slate-50">
@@ -1612,85 +1612,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            9. NETWORKING HUB — Blue Banner
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden">
-          {/* Background Photo — Business Hub atmosphere */}
-          <div className="absolute inset-0 z-0">
-            <Image
-              src="/images/gallery-hub.jpg"
-              alt=""
-              fill
-              unoptimized
-              className="object-cover opacity-[0.18]"
-              aria-hidden="true"
-            />
-          </div>
-          {/* Gradient overlay to blend photo into brand color */}
-          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-blue-900/96 via-blue-900/80 to-blue-900/60" />
-          {/* Decorative grid */}
-          <div className="absolute inset-0 z-[2] opacity-[0.04]" style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
-            backgroundSize: "40px 40px"
-          }} />
-
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <div className="flex flex-col md:flex-row items-center gap-12">
-              <div className="md:w-3/5">
-                <ScrollReveal>
-                  <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
-                    {text.networkingLabel}
-                  </span>
-                  <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-[1.15] mb-4">
-                    {text.networkingTitle}
-                  </h2>
-                  <p className="text-blue-100/80 max-w-lg text-base leading-relaxed mb-6">
-                    {text.networkingDesc}
-                  </p>
-                </ScrollReveal>
-
-                <ScrollReveal delay={100}>
-                  <div className="grid grid-cols-2 gap-3 mb-8">
-                    {text.networkingFeatures.map((item, i) => (
-                      <div key={i} className="flex items-center gap-2 text-sm text-white/80">
-                        <CheckCircle2 className="w-4 h-4 text-cyan-300 flex-shrink-0" />
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                </ScrollReveal>
-
-                <ScrollReveal delay={200}>
-                  <a href="#registro" className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-50 transition-colors shadow-lg">
-                    {text.networkingCTA} <ArrowRight className="w-4 h-4" />
-                  </a>
-                </ScrollReveal>
-              </div>
-
-              {/* Stats */}
-              <div className="md:w-2/5">
-                <div className="grid grid-cols-2 gap-4">
-                  {text.networkingStats.map((stat, i) => {
-                    const icons = [Users, Clock, Handshake, Award];
-                    const Icon = icons[i];
-                    return (
-                      <ScrollReveal key={i} delay={i * 100}>
-                        <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
-                          <Icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-                          <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
-                          <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
-                        </div>
-                      </ScrollReveal>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            10. PRICING / ACCESOS
+            TIPOS DE ACCESO
            ═══════════════════════════════════════════════════════════ */}
         <section id="accesos" className="rhythm-pause-lg bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -1792,39 +1714,7 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ═══ CINEMATIC STRIP — Expo Comercial ═══ */}
-        <div className="photo-strip">
-          <Image
-            src="/images/gallery-stands.jpg"
-            alt={text.galleryStripAlt}
-            fill
-            unoptimized
-            className="object-cover object-center"
-            sizes="100vw"
-          />
-          <div
-            className="photo-strip-overlay"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(15,23,42,0.82) 0%, rgba(15,23,42,0.45) 50%, rgba(15,23,42,0.72) 100%)",
-            }}
-          />
-          <div className="photo-strip-content">
-            <ScrollReveal>
-              <p className="text-[11px] font-bold tracking-[0.25em] uppercase text-cyan-300/90 mb-3">
-                SC Security Summit 2026
-              </p>
-              <h3 className="font-oswald text-3xl sm:text-5xl font-bold text-white leading-tight drop-shadow-xl">
-                {language === "es" ? "300+ Empresas. 1 Espacio." : "300+ Companies. 1 Space."}
-              </h3>
-              <p className="text-blue-100/70 text-sm sm:text-base mt-3 max-w-md">
-                {language === "es"
-                  ? "El ecosistema B2B más completo del norte de México."
-                  : "The most complete B2B ecosystem in northern Mexico."}
-              </p>
-            </ScrollReveal>
-          </div>
-        </div>
+        {/* ═══ CINEMATIC STRIP — removed from flow per PDF mockup ═══ */}
 
         {/* ═══════════════════════════════════════════════════════════
             11. PATROCINADORES
@@ -1941,9 +1831,71 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            12. UBICACIÓN
+            CTA Banner — Cupo Limitado
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 overflow-hidden">
+          {/* Decorative */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
+            backgroundSize: "30px 30px"
+          }} />
+          <div className="absolute top-10 left-10 w-32 h-32 border border-white/5 rounded-full float-shape" />
+          <div className="absolute bottom-10 right-10 w-24 h-24 border border-cyan-400/10 rounded-2xl float-shape-reverse" />
+
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
+            <ScrollReveal>
+              <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
+                {text.finalCTATitlePart1}{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
+                  {text.finalCTATitlePart2}
+                </span>
+              </h2>
+              <p className="text-blue-100/60 mt-4 max-w-xl mx-auto">
+                {text.finalCTADesc}
+              </p>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
+                <a href="#registro" className="btn-primary px-8 py-4 text-base">
+                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
+                </a>
+                <a
+                  href="mailto:Contacto@LanzLogistics.com"
+                  className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10"
+                >
+                  {text.contactOrg}
+                </a>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            FORMULARIO DE REGISTRO
            ═══════════════════════════════════════════════════════════ */}
         <WaveSeparator color="#FFFFFF" flip />
+        <section id="registro" className="py-20 sm:py-28 bg-white">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-10">
+                <span className="section-label">{text.regLabel}</span>
+                <h2 className="section-title mt-3">{text.regTitle}</h2>
+                <p className="text-slate-500 max-w-xl mx-auto mt-4">
+                  {text.regDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className="card-elevated p-6 sm:p-10">
+                <RegistroForm language={language} />
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            UBICACIÓN
+           ═══════════════════════════════════════════════════════════ */}
         <section id="ubicacion" className="py-20 sm:py-28 bg-white">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
@@ -2024,7 +1976,7 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            13. FAQ
+            FAQ
            ═══════════════════════════════════════════════════════════ */}
         <WaveSeparator color="#F8FAFC" />
         <section id="faq" className="rhythm-pause-md bg-slate-50">
@@ -2037,69 +1989,6 @@ export default function Home() {
             </ScrollReveal>
             <ScrollReveal delay={200}>
               <FAQAccordion items={language === "es" ? FAQ_ITEMS : FAQ_ITEMS_EN} />
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            14. REGISTRO
-           ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#FFFFFF" flip />
-        <section id="registro" className="py-20 sm:py-28 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-10">
-                <span className="section-label">{text.regLabel}</span>
-                <h2 className="section-title mt-3">{text.regTitle}</h2>
-                <p className="text-slate-500 max-w-xl mx-auto mt-4">
-                  {text.regDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal delay={200}>
-              <div className="card-elevated p-6 sm:p-10">
-                <RegistroForm language={language} />
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            15. FINAL CTA Banner
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 overflow-hidden">
-          {/* Decorative */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
-            backgroundSize: "30px 30px"
-          }} />
-          <div className="absolute top-10 left-10 w-32 h-32 border border-white/5 rounded-full float-shape" />
-          <div className="absolute bottom-10 right-10 w-24 h-24 border border-cyan-400/10 rounded-2xl float-shape-reverse" />
-
-          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
-            <ScrollReveal>
-              <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
-                {text.finalCTATitlePart1}{" "}
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
-                  {text.finalCTATitlePart2}
-                </span>
-              </h2>
-              <p className="text-blue-100/60 mt-4 max-w-xl mx-auto">
-                {text.finalCTADesc}
-              </p>
-            </ScrollReveal>
-            <ScrollReveal delay={200}>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-                <a href="#registro" className="btn-primary px-8 py-4 text-base">
-                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
-                </a>
-                <a
-                  href="mailto:Contacto@LanzLogistics.com"
-                  className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10"
-                >
-                  {text.contactOrg}
-                </a>
-              </div>
             </ScrollReveal>
           </div>
         </section>
