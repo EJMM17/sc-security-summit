@@ -232,6 +232,14 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos y Condiciones",
+    galleryLabel: "GALERÍA DE EDICIONES PREVIAS",
+    galleryTitle: "Así Se Vive el Summit",
+    galleryDesc: "Networking especializado, conferencias magistrales y vinculación empresarial — esto es lo que te espera.",
+    galleryTag1: "Expo Comercial",
+    galleryTag2: "Registro & Bienvenida",
+    galleryTag3: "Conferencia Magistral",
+    galleryTag4: "Business Hub",
+    galleryStripAlt: "Sala de exposición — SC Security Summit",
   },
   en: {
     skipToForm: "Skip to registration form",
@@ -368,6 +376,14 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms and Conditions",
+    galleryLabel: "PAST EDITIONS GALLERY",
+    galleryTitle: "Experience the Summit",
+    galleryDesc: "Specialized networking, keynote sessions and business connections — this is what awaits you.",
+    galleryTag1: "Commercial Expo",
+    galleryTag2: "Registration & Welcome",
+    galleryTag3: "Keynote Session",
+    galleryTag4: "Business Hub",
+    galleryStripAlt: "Exhibition hall — SC Security Summit",
   },
 } as const;
 
@@ -1206,6 +1222,99 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
+            GALERÍA — Bento Editorial Grid
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-24 bg-slate-50 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-10 sm:mb-14">
+                <span className="section-label">{text.galleryLabel}</span>
+                <h2 className="section-title mt-3">{text.galleryTitle}</h2>
+                <p className="text-slate-500 max-w-xl mx-auto mt-4 text-base leading-relaxed">
+                  {text.galleryDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={120}>
+              <div className="gallery-bento">
+                {/* Photo 1 — Exhibition Hall (feature, spans 2 cols on desktop) */}
+                <div className="gallery-photo gallery-p1">
+                  <Image
+                    src="/images/gallery-hall.jpg"
+                    alt={text.galleryTag1}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 100vw, 62vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Building2 className="w-3 h-3" /> {text.galleryTag1}
+                    </span>
+                    <p className="text-white font-oswald text-xl font-bold leading-tight mt-1 drop-shadow-sm">
+                      SC Security Summit 2026
+                    </p>
+                  </div>
+                </div>
+
+                {/* Photo 2 — Registration (tall portrait, spans 2 rows on desktop) */}
+                <div className="gallery-photo gallery-p2">
+                  <Image
+                    src="/images/gallery-registro.jpg"
+                    alt={text.galleryTag2}
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 26vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Users className="w-3 h-3" /> {text.galleryTag2}
+                    </span>
+                    <p className="text-white/85 text-xs mt-1">Reynosa, Tamaulipas</p>
+                  </div>
+                </div>
+
+                {/* Photo 3 — Keynote */}
+                <div className="gallery-photo gallery-p3">
+                  <Image
+                    src="/images/gallery-keynote.jpg"
+                    alt={text.galleryTag3}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 36vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Mic2 className="w-3 h-3" /> {text.galleryTag3}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Photo 4 — Business Hub */}
+                <div className="gallery-photo gallery-p4">
+                  <Image
+                    src="/images/gallery-hub.jpg"
+                    alt={text.galleryTag4}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 30vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Network className="w-3 h-3" /> {text.galleryTag4}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
             VISIÓN & MISIÓN
            ═══════════════════════════════════════════════════════════ */}
         <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 rhythm-pause-md overflow-hidden">
@@ -1490,9 +1599,21 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             9. NETWORKING HUB — Blue Banner
            ═══════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 py-20 sm:py-28 relative overflow-hidden">
+        <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden">
+          {/* Background Photo — Business Hub atmosphere */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/gallery-hub.jpg"
+              alt=""
+              fill
+              className="object-cover opacity-[0.18]"
+              aria-hidden="true"
+            />
+          </div>
+          {/* Gradient overlay to blend photo into brand color */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-blue-900/96 via-blue-900/80 to-blue-900/60" />
           {/* Decorative grid */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
+          <div className="absolute inset-0 z-[2] opacity-[0.04]" style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
             backgroundSize: "40px 40px"
           }} />
@@ -1654,6 +1775,39 @@ export default function Home() {
 
           </div>
         </section>
+
+        {/* ═══ CINEMATIC STRIP — Expo Comercial ═══ */}
+        <div className="photo-strip">
+          <Image
+            src="/images/gallery-stands.jpg"
+            alt={text.galleryStripAlt}
+            fill
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+          <div
+            className="photo-strip-overlay"
+            style={{
+              background:
+                "linear-gradient(to right, rgba(15,23,42,0.82) 0%, rgba(15,23,42,0.45) 50%, rgba(15,23,42,0.72) 100%)",
+            }}
+          />
+          <div className="photo-strip-content">
+            <ScrollReveal>
+              <p className="text-[11px] font-bold tracking-[0.25em] uppercase text-cyan-300/90 mb-3">
+                SC Security Summit 2026
+              </p>
+              <h3 className="font-oswald text-3xl sm:text-5xl font-bold text-white leading-tight drop-shadow-xl">
+                {language === "es" ? "300+ Empresas. 1 Espacio." : "300+ Companies. 1 Space."}
+              </h3>
+              <p className="text-blue-100/70 text-sm sm:text-base mt-3 max-w-md">
+                {language === "es"
+                  ? "El ecosistema B2B más completo del norte de México."
+                  : "The most complete B2B ecosystem in northern Mexico."}
+              </p>
+            </ScrollReveal>
+          </div>
+        </div>
 
         {/* ═══════════════════════════════════════════════════════════
             11. PATROCINADORES
