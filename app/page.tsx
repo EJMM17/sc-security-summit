@@ -1083,25 +1083,25 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             1. HERO — with background image
            ═══════════════════════════════════════════════════════════ */}
-        <section className="relative w-full min-h-[90vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
+        <section className="relative w-full min-h-[92vh] sm:min-h-[94vh] flex items-center justify-center overflow-hidden">
           {/* Background Image */}
           <Image
-            src="/images/hero-bg.png"
+            src="/images/corporate_hero_bg.png"
             alt={text.heroAlt}
             fill
-            className="object-cover"
+            className="object-cover object-center"
             priority
-            quality={85}
+            quality={90}
           />
           {/* Gradient Overlay */}
           <div className="hero-image-overlay" />
 
           {/* Floating decorative elements */}
           <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-            <div className="absolute top-[20%] left-[8%] w-20 h-20 border border-white/10 rounded-2xl float-shape" />
-            <div className="absolute top-[30%] right-[12%] w-16 h-16 border border-cyan-400/15 rounded-full float-shape-reverse" />
-            <div className="absolute bottom-[25%] left-[15%] w-12 h-12 border border-blue-400/10 rounded-lg float-shape" style={{ animationDelay: "2s" }} />
-            <div className="absolute bottom-[20%] right-[8%] w-24 h-24 border border-white/5 rounded-3xl float-shape-reverse" style={{ animationDelay: "1s" }} />
+            <div className="absolute top-[18%] left-[6%] w-20 h-20 border border-white/10 rounded-2xl float-shape" />
+            <div className="absolute top-[28%] right-[10%] w-16 h-16 border border-cyan-400/15 rounded-full float-shape-reverse" />
+            <div className="absolute bottom-[30%] left-[12%] w-12 h-12 border border-blue-400/10 rounded-lg float-shape" style={{ animationDelay: "2s" }} />
+            <div className="absolute bottom-[18%] right-[6%] w-24 h-24 border border-white/5 rounded-3xl float-shape-reverse" style={{ animationDelay: "1s" }} />
             {/* Grid subtle pattern */}
             <div className="absolute inset-0 opacity-[0.03]" style={{
               backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
@@ -1110,21 +1110,24 @@ export default function Home() {
           </div>
 
           {/* Content */}
-          <div className="relative z-10 text-center px-4 pt-6 pb-10 sm:py-0 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-5 sm:px-6 py-10 sm:py-16 max-w-5xl mx-auto flex flex-col items-center">
+            {/* Logo */}
             <ScrollReveal delay={50}>
-              <div className="flex justify-center mb-6 sm:mb-8">
+              <div className="flex justify-center mb-8 sm:mb-10">
                 <Image
-                  src="/images/logo-full-blue.png"
+                  src="/images/logo-full-white.png"
                   alt="Supply Chain Security Summit"
                   width={420}
                   height={120}
-                  className="w-[220px] sm:w-[320px] md:w-[420px] h-auto object-contain hero-logo-glow logo-on-dark"
+                  className="w-[200px] sm:w-[280px] md:w-[380px] h-auto object-contain drop-shadow-[0_4px_24px_rgba(6,182,212,0.3)]"
                   priority
                 />
               </div>
             </ScrollReveal>
+
+            {/* Title */}
             <ScrollReveal delay={100}>
-              <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-7xl font-bold text-white leading-[1.08] mb-5 sm:mb-6">
+              <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-[4.2rem] lg:text-7xl font-bold text-white leading-[1.06] mb-6 sm:mb-7 tracking-tight">
                 {text.heroTitlePrefix}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                   {text.heroTitleHighlight}
@@ -1132,35 +1135,40 @@ export default function Home() {
               </h1>
             </ScrollReveal>
 
+            {/* Description */}
             <ScrollReveal delay={200}>
-              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 max-w-2xl mx-auto mb-7 sm:mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/85 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
                 {text.heroDescription}
               </p>
             </ScrollReveal>
 
-            <ScrollReveal delay={300}>
-              <div className="card-dark p-6 sm:p-8 mb-8 inline-flex flex-col items-center gap-4">
-                <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold tracking-widest uppercase">
-                  <Clock className="w-3.5 h-3.5" />
-                  <span>{text.countdownLabel}</span>
+            {/* Date & Location — minimal inline strip */}
+            <ScrollReveal delay={280}>
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 text-cyan-300/90">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm sm:text-base font-semibold text-white tracking-wide">{text.eventDayValue}</span>
                 </div>
-                <CountdownTimer language={language} />
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-                <div className="flex flex-col items-center gap-1 text-center">
-                  <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold tracking-[0.22em] uppercase text-cyan-300/90">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{text.eventDayLabel}</span>
-                  </div>
-                  <p className="font-oswald text-base sm:text-lg font-bold text-white tracking-wide">
-                    {text.eventDayValue}
-                  </p>
-                  <p className="text-[11px] sm:text-xs text-blue-100/70">
-                    {text.eventDayVenue}
-                  </p>
+                <span className="hidden sm:inline text-white/25">|</span>
+                <div className="flex items-center gap-2 text-cyan-300/90">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm sm:text-base font-medium text-white/80">{text.eventDayVenue}</span>
                 </div>
               </div>
             </ScrollReveal>
 
+            {/* Countdown */}
+            <ScrollReveal delay={320}>
+              <div className="mb-8 sm:mb-10">
+                <div className="flex items-center justify-center gap-2 text-cyan-300/80 text-xs font-bold tracking-widest uppercase mb-3">
+                  <Clock className="w-3.5 h-3.5" />
+                  <span>{text.countdownLabel}</span>
+                </div>
+                <CountdownTimer language={language} />
+              </div>
+            </ScrollReveal>
+
+            {/* CTAs */}
             <ScrollReveal delay={400}>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
                 <a href="#registro" className="btn-primary px-8 py-4 text-base w-full sm:w-auto">
