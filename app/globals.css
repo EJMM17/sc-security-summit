@@ -899,6 +899,42 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   }
 }
 
+/* ═══ HERO LOGO GLOW ═══
+   Soft pulsing ambient glow behind the main brand logo in the hero.
+   Subtle enough to be premium, not distracting.
+   Combined with brightness(0) invert(1) to make colored logos white. */
+@keyframes heroLogoGlow {
+  0%, 100% {
+    filter: brightness(0) invert(1)
+            drop-shadow(0 4px 24px rgba(6, 182, 212, 0.25))
+            drop-shadow(0 0 40px rgba(37, 99, 235, 0.15));
+  }
+  50% {
+    filter: brightness(0) invert(1)
+            drop-shadow(0 4px 32px rgba(6, 182, 212, 0.40))
+            drop-shadow(0 0 60px rgba(37, 99, 235, 0.25));
+  }
+}
+.hero-logo-glow {
+  animation: heroLogoGlow 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo-glow {
+    animation: none !important;
+    filter: brightness(0) invert(1) drop-shadow(0 4px 24px rgba(6, 182, 212, 0.30));
+  }
+}
+
+/* ═══ LOGO ON DARK BACKGROUNDS ═══
+   Transforms colored logos to appear white on dark sections.
+   The white background of non-transparent PNGs blends seamlessly
+   because brightness(0) + invert(1) makes white → white (invisible
+   against the dark bg visual padding is handled by object-contain). */
+.logo-on-dark {
+  filter: brightness(0) invert(1);
+  mix-blend-mode: screen;
+}
+
 /* ═══ IMAGE OVERLAY HERO ═══ */
 .hero-image-overlay {
   position: absolute;

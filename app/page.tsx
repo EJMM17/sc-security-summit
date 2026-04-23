@@ -1037,9 +1037,14 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[62px] sm:h-[68px] flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
             <a href="#" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow flex-shrink-0">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
+              <Image
+                src="/images/logo-symbol-blue.png"
+                alt="SC Security Summit"
+                width={40}
+                height={40}
+                className="w-9 h-9 sm:w-10 sm:h-10 object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                priority
+              />
               <div className="min-w-0">
                 <span className="font-oswald block truncate text-base sm:text-lg font-bold tracking-tight text-slate-900">SC SUMMIT</span>
                 <span className="hidden sm:block text-[10px] font-bold tracking-[0.18em] text-blue-600">REYNOSA 2026</span>
@@ -1106,6 +1111,18 @@ export default function Home() {
 
           {/* Content */}
           <div className="relative z-10 text-center px-4 pt-6 pb-10 sm:py-0 max-w-5xl mx-auto">
+            <ScrollReveal delay={50}>
+              <div className="flex justify-center mb-6 sm:mb-8">
+                <Image
+                  src="/images/logo-full-blue.png"
+                  alt="Supply Chain Security Summit"
+                  width={420}
+                  height={120}
+                  className="w-[220px] sm:w-[320px] md:w-[420px] h-auto object-contain hero-logo-glow logo-on-dark"
+                  priority
+                />
+              </div>
+            </ScrollReveal>
             <ScrollReveal delay={100}>
               <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-7xl font-bold text-white leading-[1.08] mb-5 sm:mb-6">
                 {text.heroTitlePrefix}{" "}
@@ -1699,8 +1716,8 @@ export default function Home() {
                 <ScrollReveal key={plan.id} delay={i * 100}>
                   <div
                     className={`relative p-8 rounded-2xl h-full flex flex-col transition-all duration-300 ${plan.featured
-                        ? "text-white border-2 border-amber-400/70 shadow-2xl md:scale-[1.03]"
-                        : "bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-blue-300"
+                      ? "text-white border-2 border-amber-400/70 shadow-2xl md:scale-[1.03]"
+                      : "bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-blue-300"
                       }`}
                     style={plan.featured ? {
                       background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #111827 100%)",
@@ -1734,8 +1751,8 @@ export default function Home() {
                     <a
                       href="#registro"
                       className={`w-full py-3.5 rounded-lg font-bold text-sm text-center block transition-all ${plan.featured
-                          ? "bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-lg"
-                          : "btn-primary"
+                        ? "bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-lg"
+                        : "btn-primary"
                         }`}
                     >
                       {text.getAccessBtn}
@@ -1841,9 +1858,8 @@ export default function Home() {
                 return (
                   <ScrollReveal key={i} delay={i * 100}>
                     <div
-                      className={`sponsor-card relative h-full flex flex-col rounded-2xl bg-white border border-slate-200/70 overflow-hidden transition-all duration-500 ${meta.ring} ${
-                        meta.featured ? "sponsor-card--featured" : ""
-                      }`}
+                      className={`sponsor-card relative h-full flex flex-col rounded-2xl bg-white border border-slate-200/70 overflow-hidden transition-all duration-500 ${meta.ring} ${meta.featured ? "sponsor-card--featured" : ""
+                        }`}
                     >
                       <div className={`h-1.5 w-full ${meta.stripe}`} aria-hidden="true" />
 
@@ -2103,9 +2119,13 @@ export default function Home() {
               {/* Brand */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
+                  <Image
+                    src="/images/logo-symbol-blue.png"
+                    alt="SC Security Summit"
+                    width={44}
+                    height={44}
+                    className="w-10 h-10 sm:w-11 sm:h-11 object-contain logo-on-dark"
+                  />
                   <div>
                     <span className="font-oswald text-lg font-bold text-white">SC SUMMIT</span>
                     <span className="block text-[10px] font-bold tracking-[0.2em] text-blue-400">REYNOSA 2026</span>
