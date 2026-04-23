@@ -7,6 +7,7 @@ import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SPEAKERS, FAQ_SCHEMA_ITEMS, BASE_URL } from "@/lib/site-content";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import AmbientCanvas from "@/components/AmbientCanvas";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -198,6 +199,7 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
+        <AmbientCanvas />
         {children}
         <WhatsAppButton />
         <Toaster theme="light" position="bottom-right" richColors />
