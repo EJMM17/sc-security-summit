@@ -1,21 +1,21 @@
 import { Ratelimit } from "@upstash/ratelimit";
-import { kv } from "@vercel/kv";
+import { Redis } from "@upstash/redis";
 
 // 5 registrations per IP per 15-minute sliding window, shared across all Vercel regions.
-// Uses Vercel KV (set up via Vercel dashboard → Storage → KV Database).
-// In dev without KV env vars, falls back to allow-all.
+// Uses Upstash Redis (set up via Vercel Integrations → Upstash Redis).
+// In dev without Redis env vars, falls back to allow-all.
 
 let _limiter: Ratelimit | null = null;
 
 function getLimiter(): Ratelimit {
   if (_limiter) return _limiter;
 
-  const url = process.env.KV_REST_API_URL;
-  const token = process.env.KV_REST_API_TOKEN;
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
 
   if (!url || !token) {
     if (process.env.NODE_ENV === "production") {
-      throw new Error("[rate-limit] KV_REST_API_URL and KV_REST_API_TOKEN are required in production");
+      throw new Error("[rate-limit] UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN are required in production");
     }
     // Dev fallback: always allow
     return {
@@ -30,7 +30,7 @@ function getLimiter(): Ratelimit {
   }
 
   _limiter = new Ratelimit({
-    redis: kv,
+    redis: new Redis({ url, token }),
     limiter: Ratelimit.slidingWindow(5, "15 m"),
     prefix: "scss2026:rl",
     analytics: false,
