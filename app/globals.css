@@ -623,6 +623,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
               border-color 320ms ease;
 }
 .speaker-card:hover {
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), var(--shadow-xl);
+  transform: translateY(-8px);
   box-shadow: 0 22px 52px -12px rgba(37, 99, 235, 0.30),
               0 4px 18px rgba(15, 23, 42, 0.07),
               0 0 0 1.5px rgba(37, 99, 235, 0.20),
@@ -713,6 +715,123 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 #speakers .reveal-scale.visible {
   transform: translateY(0) scale(1);
+}
+
+/* ═══ SPEAKER MOTION ENHANCEMENTS ═══ */
+
+/* Shimmer sweep across photo on group hover */
+@keyframes shimmerSweep {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(230%) skewX(-15deg); }
+}
+.speaker-shimmer {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 20%,
+    rgba(255, 255, 255, 0.26) 50%,
+    transparent 80%
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  pointer-events: none;
+  z-index: 5;
+}
+.group:hover .speaker-shimmer {
+  animation: shimmerSweep 0.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Pulsing glow ring on photo container */
+@keyframes photoRingPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.28), 0 8px 24px rgba(59, 130, 246, 0.07); }
+  50%       { box-shadow: 0 0 0 9px rgba(59, 130, 246, 0),  0 8px 24px rgba(59, 130, 246, 0.18); }
+}
+.speaker-photo-pulse {
+  animation: photoRingPulse 3.5s ease-in-out infinite;
+}
+
+/* Topic badge text glow on hover */
+.speaker-topic-glow {
+  display: inline-block;
+  transition: text-shadow 0.4s;
+}
+.group:hover .speaker-topic-glow {
+  text-shadow: 0 0 10px rgba(34, 211, 238, 0.9), 0 0 24px rgba(34, 211, 238, 0.5);
+}
+
+/* Speaker name animated underline */
+.speaker-name-anim {
+  position: relative;
+  display: inline-block;
+}
+.speaker-name-anim::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--blue-500), var(--cyan-400));
+  border-radius: 1px;
+  transition: width 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.group:hover .speaker-name-anim::after {
+  width: 75%;
+}
+
+/* Speaker numbered badge — reveals on hover */
+.speaker-index {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue-600), var(--cyan-400));
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.55);
+  transform: scale(0.7) rotate(-10deg);
+  opacity: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s;
+}
+.group:hover .speaker-index {
+  transform: scale(1) rotate(0deg);
+  opacity: 1;
+}
+
+/* Section background animated orbs */
+@keyframes orbDrift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  40%       { transform: translate(40px, -28px) scale(1.06); }
+  70%       { transform: translate(-28px, 38px) scale(0.94); }
+}
+.speaker-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  pointer-events: none;
+  animation: orbDrift 16s ease-in-out infinite;
+}
+.speaker-orb-1 {
+  width: 500px; height: 500px;
+  background: var(--blue-100);
+  opacity: 0.55;
+  top: -140px; left: -100px;
+}
+.speaker-orb-2 {
+  width: 380px; height: 380px;
+  background: #CFFAFE;
+  opacity: 0.45;
+  bottom: -90px; right: -70px;
+  animation-delay: -6s;
+  animation-direction: reverse;
 }
 
 /* ═══ FAQ ACCORDION ═══ */

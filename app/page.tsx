@@ -502,6 +502,10 @@ const SPEAKERS = {
     },
     {
       name: "Eduardo Luna",
+      role: "Especialista en Innovación Estratégica",
+      org: "Certificación Internacional en Enseñanza",
+      topic: "Organización & Expansión",
+      image: "/images/speaker-eduardo.png",
       role: "Organización Operativa y Expansión Comercial",
       topic: "Organización & Expansión",
       image: "/images/speaker-eduardo.webp",
@@ -528,6 +532,10 @@ const SPEAKERS = {
     },
     {
       name: "Eduardo Luna",
+      role: "Strategic Innovation Specialist",
+      org: "International Teaching Certification",
+      topic: "Organization & Expansion",
+      image: "/images/speaker-eduardo.png",
       role: "Operational Organization & Commercial Expansion",
       topic: "Organization & Expansion",
       image: "/images/speaker-eduardo.webp",
@@ -1349,6 +1357,12 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             CONFERENCISTAS — with real photos
            ═══════════════════════════════════════════════════════════ */}
+        <section id="speakers" className="relative overflow-hidden py-20 sm:py-28 bg-white">
+          {/* Animated background orbs */}
+          <div className="speaker-orb speaker-orb-1" aria-hidden="true" />
+          <div className="speaker-orb speaker-orb-2" aria-hidden="true" />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
         <section id="speakers" className="rhythm-pause-lg bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
@@ -1365,6 +1379,17 @@ export default function Home() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {SPEAKERS[language].map((s, i) => (
+                <ScrollReveal
+                  key={i}
+                  delay={i * 120}
+                  direction={(["left", "scale", "scale", "right"] as const)[i]}
+                >
+                  <div className="speaker-card group text-center">
+                    {/* Photo */}
+                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/30 transition-shadow speaker-photo-pulse">
+                      {/* Numbered badge — reveals on hover */}
+                      <span className="speaker-index">{String(i + 1).padStart(2, "0")}</span>
+
                 <ScrollReveal key={i} delay={i * 120} direction="scale">
                   <div className="speaker-card group">
                     {/* Photo — portrait ratio */}
@@ -1376,6 +1401,21 @@ export default function Home() {
                         sizes="(max-width:640px) 80vw, (max-width:1024px) 45vw, 22vw"
                         className="speaker-avatar object-cover object-top"
                       />
+
+                      {/* Shimmer sweep on hover */}
+                      <div className="speaker-shimmer" aria-hidden="true" />
+
+                      {/* Topic badge */}
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
+                        <span className="speaker-topic-glow text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-oswald text-lg font-bold text-slate-900">
+                      <span className="speaker-name-anim">{s.name}</span>
+                    </h3>
+                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
+                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
                       {/* Topic badge — glassy pill top-left */}
                       <span className="speaker-tag absolute top-3 left-3 z-10">{s.topic}</span>
                       {/* Soft vignette at bottom */}
