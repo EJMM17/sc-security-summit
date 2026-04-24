@@ -1,6 +1,20 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useCallback } from "react";
+
+/* ═══════════════════════════════════════════════════════════════
+   AMBIENT CANVAS — Enhanced WebGL Background Layer
+   ═══════════════════════════════════════════════════════════════
+   Domain-warped FBM fluid mesh in the navy/blue/cyan palette.
+   Sits behind everything as a fixed layer at ~5.5% opacity so
+   it tints without competing with content.
+
+   Upgraded with:
+   • Mouse reactivity (subtle warp toward cursor)
+   • 5-octave FBM for richer detail
+   • Higher render scale (0.45) for more definition
+   • Smoother colour transitions
+   ─────────────────────────────────────────────────────────────── */
 
 const VERT_SRC = `
   attribute vec2 a_pos;
@@ -9,13 +23,11 @@ const VERT_SRC = `
   }
 `;
 
-/* Domain-warped FBM fluid mesh — navy/blue/cyan brand palette.
-   Alpha stays at 0.055 so on white sections the tint is ~5.5%,
-   giving depth without compromising WCAG contrast on text layers. */
 const FRAG_SRC = `
   precision mediump float;
   uniform float u_time;
   uniform vec2  u_res;
+  uniform vec2  u_mouse;
 
   vec2 hash2(vec2 p) {
     p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
@@ -38,9 +50,10 @@ const FRAG_SRC = `
   float fbm(vec2 p) {
     float v = 0.0;
     float a = 0.5;
-    for (int i = 0; i < 4; i++) {
+    mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
+    for (int i = 0; i < 5; i++) {
       v += a * gnoise(p);
-      p  = p * 2.1 + vec2(1.7, 9.2);
+      p  = rot * p * 2.1 + vec2(1.7, 9.2);
       a *= 0.5;
     }
     return v;
@@ -48,13 +61,16 @@ const FRAG_SRC = `
 
   void main() {
     vec2 uv = gl_FragCoord.xy / u_res;
-    float t  = u_time * 0.0002;
+    float t  = u_time * 0.00015;
+
+    /* Subtle mouse warp */
+    vec2 toMouse = (u_mouse - uv) * 0.08;
 
     vec2 q = vec2(
-      fbm(uv * 1.6 + vec2(t * 0.7, t * 0.5)),
-      fbm(uv * 1.6 + vec2(t * 0.4, t * 0.8) + vec2(5.2, 1.3))
+      fbm(uv * 1.8 + vec2(t * 0.7, t * 0.5) + toMouse),
+      fbm(uv * 1.8 + vec2(t * 0.4, t * 0.8) + vec2(5.2, 1.3) + toMouse * 0.6)
     );
-    float f = fbm(uv * 1.3 + 2.5 * q + vec2(t * 0.35, t * 0.55));
+    float f = fbm(uv * 1.5 + 2.8 * q + vec2(t * 0.35, t * 0.55));
 
     vec3 navy = vec3(0.059, 0.090, 0.165);
     vec3 blue  = vec3(0.118, 0.227, 0.541);
@@ -62,6 +78,10 @@ const FRAG_SRC = `
 
     vec3 col = mix(navy, blue, clamp(f * 1.2 + 0.5, 0.0, 1.0));
     col = mix(col, cyan, clamp(length(q) * 0.28, 0.0, 0.14));
+
+    /* Gentle glow near mouse */
+    float md = length(uv - u_mouse);
+    col += cyan * 0.04 * smoothstep(0.45, 0.0, md);
 
     gl_FragColor = vec4(col, 0.055);
   }
@@ -76,6 +96,12 @@ function compileShader(gl: WebGLRenderingContext, type: number, src: string) {
 
 export default function AmbientCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: 0.5, y: 0.5 });
+
+  const onMove = useCallback((e: MouseEvent) => {
+    mouse.current.x = e.clientX / window.innerWidth;
+    mouse.current.y = 1 - e.clientY / window.innerHeight;
+  }, []);
 
   useEffect(() => {
     /* Respect user motion preference — body::before static radials serve as fallback */
@@ -113,17 +139,18 @@ export default function AmbientCanvas() {
     gl.enableVertexAttribArray(aPos);
     gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
 
-    const uTime = gl.getUniformLocation(prog, "u_time");
-    const uRes  = gl.getUniformLocation(prog, "u_res");
+    const uTime  = gl.getUniformLocation(prog, "u_time");
+    const uRes   = gl.getUniformLocation(prog, "u_res");
+    const uMouse = gl.getUniformLocation(prog, "u_mouse");
 
     gl.enable(gl.BLEND);
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
-    /* Render at 38% of logical resolution — imperceptible for smooth noise, major GPU saving */
+    /* Render at 45% of logical resolution — sharper than before, still performant */
     function resize() {
       const dpr   = Math.min(window.devicePixelRatio || 1, 1.5);
-      const scale = 0.38;
+      const scale = 0.45;
       canvas!.width  = Math.round(window.innerWidth  * dpr * scale);
       canvas!.height = Math.round(window.innerHeight * dpr * scale);
       gl!.viewport(0, 0, canvas!.width, canvas!.height);
@@ -133,13 +160,20 @@ export default function AmbientCanvas() {
     const ro = new ResizeObserver(resize);
     ro.observe(document.documentElement);
 
+    window.addEventListener("mousemove", onMove, { passive: true });
+
     let raf = 0;
     const startTime = performance.now();
+    const sm = { x: 0.5, y: 0.5 };
 
     function draw() {
+      sm.x += (mouse.current.x - sm.x) * 0.03;
+      sm.y += (mouse.current.y - sm.y) * 0.03;
+
       gl!.clear(gl!.COLOR_BUFFER_BIT);
       gl!.uniform1f(uTime, performance.now() - startTime);
       gl!.uniform2f(uRes, canvas!.width, canvas!.height);
+      gl!.uniform2f(uMouse, sm.x, sm.y);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
       raf = requestAnimationFrame(draw);
     }
@@ -156,10 +190,11 @@ export default function AmbientCanvas() {
       cancelAnimationFrame(raf);
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVisChange);
+      window.removeEventListener("mousemove", onMove);
       gl.deleteProgram(prog);
       gl.deleteBuffer(buf);
     };
-  }, []);
+  }, [onMove]);
 
   return (
     <canvas
