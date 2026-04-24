@@ -3,17 +3,20 @@
 import { useEffect, useRef, useCallback } from "react";
 
 /* ═══════════════════════════════════════════════════════════════
-   AMBIENT CANVAS — Enhanced WebGL Background Layer
+   AMBIENT CANVAS — Premium WebGL Background Layer
    ═══════════════════════════════════════════════════════════════
-   Domain-warped FBM fluid mesh in the navy/blue/cyan palette.
-   Sits behind everything as a fixed layer at ~5.5% opacity so
-   it tints without competing with content.
+   Awwwards-level fluid mesh in a lighter blue/cyan/indigo palette.
+   Sits behind everything as a fixed layer at ~14% opacity —
+   visible as a living watercolor wash that connects the page
+   visually to the hero's gradient mesh.
 
-   Upgraded with:
-   • Mouse reactivity (subtle warp toward cursor)
-   • 5-octave FBM for richer detail
-   • Higher render scale (0.45) for more definition
-   • Smoother colour transitions
+   Features:
+   • Lighter aurora palette (blue-300 / cyan-200 / indigo-200)
+   • 14% opacity — clearly visible behind white sections
+   • Mouse-reactive warp (tracks cursor position)
+   • 5-octave FBM for organic fluid detail
+   • Throttled to 30fps for GPU efficiency
+   • Smooth breathing animation
    ─────────────────────────────────────────────────────────────── */
 
 const VERT_SRC = `
@@ -53,37 +56,45 @@ const FRAG_SRC = `
     mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
     for (int i = 0; i < 5; i++) {
       v += a * gnoise(p);
-      p  = rot * p * 2.1 + vec2(1.7, 9.2);
-      a *= 0.5;
+      p  = rot * p * 2.0 + vec2(1.7, 9.2);
+      a *= 0.48;
     }
     return v;
   }
 
   void main() {
     vec2 uv = gl_FragCoord.xy / u_res;
-    float t  = u_time * 0.00015;
+    float t  = u_time * 0.00010;   /* Slower drift for premium feel */
 
-    /* Subtle mouse warp */
-    vec2 toMouse = (u_mouse - uv) * 0.08;
+    /* Mouse warp — more pronounced */
+    vec2 toMouse = (u_mouse - uv) * 0.15;
 
+    /* Domain-warped FBM — larger patterns for atmospheric feel */
     vec2 q = vec2(
-      fbm(uv * 1.8 + vec2(t * 0.7, t * 0.5) + toMouse),
-      fbm(uv * 1.8 + vec2(t * 0.4, t * 0.8) + vec2(5.2, 1.3) + toMouse * 0.6)
+      fbm(uv * 1.2 + vec2(t * 0.5, t * 0.4) + toMouse),
+      fbm(uv * 1.2 + vec2(t * 0.3, t * 0.6) + vec2(5.2, 1.3) + toMouse * 0.7)
     );
-    float f = fbm(uv * 1.5 + 2.8 * q + vec2(t * 0.35, t * 0.55));
+    float f = fbm(uv * 1.0 + 2.5 * q + vec2(t * 0.25, t * 0.4));
 
-    vec3 navy = vec3(0.059, 0.090, 0.165);
-    vec3 blue  = vec3(0.118, 0.227, 0.541);
-    vec3 cyan  = vec3(0.133, 0.827, 0.933);
+    /* Lighter aurora palette — visible on white backgrounds */
+    vec3 blue3   = vec3(0.576, 0.773, 0.992);   /* ~blue-300 */
+    vec3 cyan2   = vec3(0.647, 0.929, 0.961);   /* ~cyan-200 */
+    vec3 indigo2 = vec3(0.780, 0.796, 0.973);   /* ~indigo-200 */
+    vec3 blue5   = vec3(0.231, 0.510, 0.965);   /* ~blue-500 accent */
 
-    vec3 col = mix(navy, blue, clamp(f * 1.2 + 0.5, 0.0, 1.0));
-    col = mix(col, cyan, clamp(length(q) * 0.28, 0.0, 0.14));
+    /* Layer colours — soft transitions */
+    vec3 col = mix(blue3, indigo2, smoothstep(-0.3, 0.4, f));
+    col = mix(col, cyan2, smoothstep(0.1, 0.7, f) * 0.6);
+    col = mix(col, blue5, smoothstep(0.4, 1.0, length(q)) * 0.15);
 
-    /* Gentle glow near mouse */
+    /* Breathing pulse — subtle global intensity shift */
+    float breath = 0.92 + 0.08 * sin(u_time * 0.0008);
+
+    /* Soft glow near mouse */
     float md = length(uv - u_mouse);
-    col += cyan * 0.04 * smoothstep(0.45, 0.0, md);
+    col += cyan2 * 0.08 * smoothstep(0.5, 0.0, md);
 
-    gl_FragColor = vec4(col, 0.055);
+    gl_FragColor = vec4(col * breath, 0.14);
   }
 `;
 
@@ -147,10 +158,10 @@ export default function AmbientCanvas() {
     gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     gl.clearColor(0, 0, 0, 0);
 
-    /* Render at 45% of logical resolution — sharper than before, still performant */
+    /* Render at 40% of logical resolution — smooth gradients, performant */
     function resize() {
       const dpr   = Math.min(window.devicePixelRatio || 1, 1.5);
-      const scale = 0.45;
+      const scale = 0.40;
       canvas!.width  = Math.round(window.innerWidth  * dpr * scale);
       canvas!.height = Math.round(window.innerHeight * dpr * scale);
       gl!.viewport(0, 0, canvas!.width, canvas!.height);
@@ -165,26 +176,33 @@ export default function AmbientCanvas() {
     let raf = 0;
     const startTime = performance.now();
     const sm = { x: 0.5, y: 0.5 };
+    let lastFrame = 0;
+    const FRAME_INTERVAL = 1000 / 30; /* 30fps throttle */
 
-    function draw() {
-      sm.x += (mouse.current.x - sm.x) * 0.03;
-      sm.y += (mouse.current.y - sm.y) * 0.03;
+    function draw(now: number) {
+      raf = requestAnimationFrame(draw);
+
+      /* Throttle to ~30fps */
+      if (now - lastFrame < FRAME_INTERVAL) return;
+      lastFrame = now;
+
+      sm.x += (mouse.current.x - sm.x) * 0.04;
+      sm.y += (mouse.current.y - sm.y) * 0.04;
 
       gl!.clear(gl!.COLOR_BUFFER_BIT);
       gl!.uniform1f(uTime, performance.now() - startTime);
       gl!.uniform2f(uRes, canvas!.width, canvas!.height);
       gl!.uniform2f(uMouse, sm.x, sm.y);
       gl!.drawArrays(gl!.TRIANGLE_STRIP, 0, 4);
-      raf = requestAnimationFrame(draw);
     }
 
     const onVisChange = () => {
       if (document.hidden) cancelAnimationFrame(raf);
-      else draw();
+      else draw(performance.now());
     };
     document.addEventListener("visibilitychange", onVisChange);
 
-    draw();
+    draw(performance.now());
 
     return () => {
       cancelAnimationFrame(raf);

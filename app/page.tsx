@@ -46,6 +46,7 @@ import FAQAccordion from "@/components/FAQAccordion";
 import HeaderScroll from "@/components/HeaderScroll";
 import ScrollProgress from "@/components/ScrollProgress";
 import MouseGlow from "@/components/MouseGlow";
+import MarqueeStrip from "@/components/MarqueeStrip";
 
 const HeroGradientMesh = dynamic(() => import("@/components/HeroGradientMesh"), {
   ssr: false,
@@ -1056,7 +1057,7 @@ export default function Home() {
         </header>
       </HeaderScroll>
 
-      <div className="pt-[62px] sm:pt-[68px]">
+      <div className="pt-[62px] sm:pt-[68px] page-enter">
         {/* ═══════════════════════════════════════════════════════════
             1. HERO — with background image
            ═══════════════════════════════════════════════════════════ */}
@@ -1067,30 +1068,18 @@ export default function Home() {
           {/* Floating grid — masked to centre for depth */}
           <div className="floating-grid" aria-hidden="true" />
 
-          {/* Geometric floating decorations — parallelogram motifs */}
+          {/* Geometric floating decorations — refined for B2B formality (3 elements) */}
           <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-            {/* Top-left corner bracket */}
-            <svg className="absolute top-[15%] left-[5%] opacity-[0.12] float-shape" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+            {/* Corner bracket — top-left */}
+            <svg className="absolute top-[15%] left-[5%] opacity-[0.10] float-shape" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
               <path d="M0,16 L0,0 L16,0 M36,0 L52,0 L52,16 M52,36 L52,52 L36,52 M16,52 L0,52 L0,36" stroke="white" strokeWidth="1.5" strokeLinecap="square"/>
             </svg>
             {/* Parallelogram accent — Stripe-inspired */}
-            <div className="absolute top-[22%] right-[8%] w-20 h-8 border border-cyan-400/15 opacity-[0.35] float-shape-reverse" style={{ transform: "skewX(-12deg)" }} />
-            {/* Cross-hair dot */}
-            <svg className="absolute top-[28%] right-[12%] opacity-[0.10] float-shape-reverse" width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true">
-              <line x1="20" y1="0" x2="20" y2="40" stroke="#22D3EE" strokeWidth="0.75"/>
-              <line x1="0" y1="20" x2="40" y2="20" stroke="#22D3EE" strokeWidth="0.75"/>
-              <circle cx="20" cy="20" r="7" stroke="#22D3EE" strokeWidth="0.75" fill="none"/>
-            </svg>
-            {/* Diamond */}
-            <svg className="absolute bottom-[30%] left-[12%] opacity-[0.09] float-shape" style={{ animationDelay: "2s" }} width="30" height="30" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-              <path d="M15,1 L29,15 L15,29 L1,15 Z" stroke="white" strokeWidth="1"/>
-            </svg>
-            {/* Bottom-right bracket */}
-            <svg className="absolute bottom-[18%] right-[6%] opacity-[0.07] float-shape-reverse" style={{ animationDelay: "1s" }} width="60" height="60" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+            <div className="absolute top-[22%] right-[8%] w-20 h-8 border border-cyan-400/10 opacity-[0.25] float-shape-reverse" style={{ transform: "skewX(-12deg)" }} />
+            {/* Corner bracket — bottom-right */}
+            <svg className="absolute bottom-[18%] right-[6%] opacity-[0.06] float-shape-reverse" style={{ animationDelay: "1s" }} width="60" height="60" viewBox="0 0 60 60" fill="none" aria-hidden="true">
               <path d="M0,18 L0,0 L18,0 M42,0 L60,0 L60,18 M60,42 L60,60 L42,60 M18,60 L0,60 L0,42" stroke="white" strokeWidth="1" strokeLinecap="square"/>
             </svg>
-            {/* Parallelogram accent — bottom left */}
-            <div className="absolute bottom-[25%] left-[8%] w-16 h-6 border border-blue-400/10 opacity-[0.25] float-shape" style={{ transform: "skewX(15deg)", animationDelay: "3s" }} />
           </div>
 
           {/* Content */}
@@ -1162,12 +1151,38 @@ export default function Home() {
           </div>
         </section>
 
-        {/* ═══ SOCIAL PROOF BAR — stats moved into hero ═══ */}
+        {/* ═══ MARQUEE STRIP — Awwwards-level social proof ticker ═══ */}
+        <MarqueeStrip
+          items={
+            language === "es"
+              ? [
+                  "300+ Profesionales",
+                  "24–25 Sep 2026",
+                  "Reynosa, Tamaulipas",
+                  "CTPAT · OEA · C-TPAT",
+                  "Networking B2B",
+                  "Business Hub",
+                  "20+ Speakers",
+                  "Seguridad Logística",
+                ]
+              : [
+                  "300+ Professionals",
+                  "Sep 24–25, 2026",
+                  "Reynosa, Tamaulipas",
+                  "CTPAT · OEA · C-TPAT",
+                  "B2B Networking",
+                  "Business Hub",
+                  "20+ Speakers",
+                  "Supply Chain Security",
+                ]
+          }
+          speed={40}
+        />
 
         {/* ═══════════════════════════════════════════════════════════
             3. ¿POR QUÉ ASISTIR? — Zig-Zag Layout
            ═══════════════════════════════════════════════════════════ */}
-        <section className="py-20 sm:py-28 bg-white">
+        <section className="py-20 sm:py-28 bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1213,7 +1228,7 @@ export default function Home() {
             EJES TEMÁTICOS — Numbered Cards
            ═══════════════════════════════════════════════════════════ */}
         <span id="agenda" aria-hidden="true" />
-        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50">
+        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50 section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1225,6 +1240,7 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
+            <MouseGlow color="rgba(37, 99, 235, 0.06)" radius={400}>
             <div className="grid md:grid-cols-3 gap-8">
               {PILARES[language].map((p, i) => (
                 <ScrollReveal key={i} delay={i * 150}>
@@ -1248,6 +1264,7 @@ export default function Home() {
                 </ScrollReveal>
               ))}
             </div>
+            </MouseGlow>
           </div>
         </section>
 
@@ -1255,6 +1272,8 @@ export default function Home() {
             NETWORKING HUB — Business Hub B2B
            ═══════════════════════════════════════════════════════════ */}
         <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden noise-texture">
+          {/* Floating grid overlay */}
+          <div className="floating-grid" aria-hidden="true" />
           {/* Background Photo — Business Hub atmosphere */}
           <div className="absolute inset-0 z-0">
             <Image
@@ -1327,13 +1346,10 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Wave → */}
-        <WaveSeparator color="#FFFFFF" flip />
-
         {/* ═══════════════════════════════════════════════════════════
             CONFERENCISTAS — with real photos
            ═══════════════════════════════════════════════════════════ */}
-        <section id="speakers" className="rhythm-pause-lg bg-white">
+        <section id="speakers" className="rhythm-pause-lg bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1545,8 +1561,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             AUDIENCIA + PROVEEDORES
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="audiencia" className="py-20 sm:py-28 bg-slate-50">
+        <section id="audiencia" className="py-20 sm:py-28 bg-slate-50 section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1558,6 +1573,7 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
+            <MouseGlow color="rgba(37, 99, 235, 0.06)" radius={400}>
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {ASISTENTES[language].map((a, i) => (
                 <ScrollReveal key={i} delay={i * 80}>
@@ -1573,14 +1589,14 @@ export default function Home() {
                 </ScrollReveal>
               ))}
             </div>
-
+            </MouseGlow>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
             TIPOS DE ACCESO
            ═══════════════════════════════════════════════════════════ */}
-        <section id="accesos" className="rhythm-pause-lg bg-white">
+        <section id="accesos" className="rhythm-pause-lg bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-6">
@@ -1714,8 +1730,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             11. PATROCINADORES
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="patrocinadores" className="sponsors-section py-20 sm:py-28 relative overflow-hidden">
+        <section id="patrocinadores" className="sponsors-section py-20 sm:py-28 relative overflow-hidden section-ambient">
           <div className="sponsors-bg-glow" aria-hidden="true" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
@@ -1849,8 +1864,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             FORMULARIO DE REGISTRO
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#FFFFFF" flip />
-        <section id="registro" className="py-20 sm:py-28 bg-white">
+        <section id="registro" className="py-20 sm:py-28 bg-white section-ambient">
           <div className="max-w-4xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-10">
@@ -1954,8 +1968,7 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             FAQ
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="faq" className="rhythm-pause-md bg-slate-50">
+        <section id="faq" className="rhythm-pause-md bg-slate-50 section-ambient">
           <div className="max-w-3xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-12">
@@ -1972,8 +1985,10 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             16. FOOTER
            ═══════════════════════════════════════════════════════════ */}
-        <footer className="bg-slate-900 pt-16 pb-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <footer className="footer-premium pt-16 pb-8">
+          <div className="noise-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
+          <div className="floating-grid" aria-hidden="true" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
             <div className="grid md:grid-cols-4 gap-10 mb-12">
               {/* Brand */}
               <div className="md:col-span-2">
