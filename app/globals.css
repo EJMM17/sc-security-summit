@@ -69,6 +69,41 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  position: relative;
+}
+
+/* Prevent iOS auto-zoom on input focus (requires font-size >= 16px) */
+@media (max-width: 640px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="number"],
+  input[type="search"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* ═══ AMBIENT DEPTH LAYER ═══
+   Static radial wash that complements the live WebGL AmbientCanvas.
+   Provides subtle colour anchors at two corners. Pointer-events off,
+   z-index negative so it never interferes with content. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    radial-gradient(1000px 700px at 5% 8%, rgba(37, 99, 235, 0.06), transparent 55%),
+    radial-gradient(800px 600px at 95% 92%, rgba(6, 182, 212, 0.05), transparent 60%),
+    radial-gradient(600px 400px at 50% 50%, rgba(99, 102, 241, 0.025), transparent 70%);
+}
+@media (prefers-reduced-motion: no-preference) {
+  body::before {
+    transition: opacity 1200ms ease;
+  }
 }
 
 h1, h2, h3, h4, h5, h6, .font-oswald {
@@ -82,14 +117,68 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 
 /* ═══ SECTION SPACING ═══ */
 .section-pad {
-  padding-top: 4rem;
-  padding-bottom: 4rem;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+@media (min-width: 480px) {
+  .section-pad { padding-top: 4rem; padding-bottom: 4rem; }
 }
 @media (min-width: 768px) {
   .section-pad { padding-top: 6rem; padding-bottom: 6rem; }
 }
 @media (min-width: 1024px) {
   .section-pad { padding-top: 7rem; padding-bottom: 7rem; }
+}
+
+/* ═══ SECTION TITLE — typographic dominance ═══
+   Headings carry the layout. Size scales with viewport so the
+   character count and whitespace stay in proportion — never a
+   uniform "template" size. Tighter tracking and leading amplify
+   the sense of an intentional editorial voice. */
+.section-title {
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: clamp(1.85rem, 4.2vw, 3.1rem);
+  line-height: 1.02;
+  letter-spacing: -0.018em;
+  max-width: 22ch;
+  margin-left: auto;
+  margin-right: auto;
+  text-wrap: balance;
+}
+/* Slightly lighter weight for secondary copy so headings dominate. */
+.section-title + p,
+.section-label + .section-title + p {
+  font-weight: 400;
+}
+
+/* Break the perfectly-centered feel on wide screens. */
+@media (min-width: 1024px) {
+  .section-title { letter-spacing: -0.022em; }
+}
+
+/* ═══ RHYTHM HELPERS — non-uniform vertical spacing ═══
+   The reference page feels un-templated because section padding
+   is never identical between neighbors. These helpers let a page
+   opt into a slightly tighter or slightly wider pause so the eye
+   is forced to "breathe" at different intervals. */
+.rhythm-pause-sm { padding-top: 3.25rem !important; padding-bottom: 3.25rem !important; }
+.rhythm-pause-md { padding-top: 5.5rem  !important; padding-bottom: 5.5rem  !important; }
+.rhythm-pause-lg { padding-top: 8.25rem !important; padding-bottom: 6.75rem !important; }
+@media (min-width: 1024px) {
+  .rhythm-pause-lg { padding-top: 10rem !important; padding-bottom: 7.5rem !important; }
+}
+
+/* ═══ CONTROLLED ASYMMETRY — 5–10px offsets ═══
+   Used sparingly on blocks that would otherwise land on a perfect
+   grid line. The offset is small enough to feel intentional, not
+   broken. */
+.offset-up-sm   { transform: translateY(-6px); }
+.offset-down-sm { transform: translateY(7px); }
+.offset-up-md   { transform: translateY(-10px); }
+@media (max-width: 768px) {
+  .offset-up-sm, .offset-down-sm, .offset-up-md { transform: none; }
 }
 
 /* ═══ SECTION BACKGROUNDS ═══ */
@@ -108,12 +197,68 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   color: var(--text-on-dark);
 }
 
+/* ═══ SECTION AMBIENT GLOW ═══
+   Subtle radial gradient anchors on white/tinted sections so they
+   don't feel flat. Connects the light sections to the WebGL canvas
+   running behind them. Award-winning sites never have fully flat
+   white sections — there's always a hint of depth. */
+.section-ambient {
+  position: relative;
+}
+.section-ambient::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(800px 350px at 15% 0%, rgba(37, 99, 235, 0.04), transparent 60%),
+    radial-gradient(600px 300px at 85% 100%, rgba(6, 182, 212, 0.035), transparent 55%);
+}
+.section-ambient > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ SECTION GRADIENT TRANSITION ═══
+   Replaces wave separators with clean gradient fade between sections.
+   More premium than SVG waves. Used between sections of different
+   background colours. */
+.section-fade-top {
+  position: relative;
+}
+.section-fade-top::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, var(--fade-from, #FFFFFF), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+.section-fade-bottom {
+  position: relative;
+}
+.section-fade-bottom::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to top, var(--fade-to, #F8FAFF), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
 /* ═══ SECTION LABEL (subtle overline) ═══ */
 .section-label {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.15em;
@@ -136,11 +281,14 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 320ms ease,
+              background-color 320ms ease;
 }
 .card-elevated:hover {
   box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+  transform: translateY(-3px);
   border-color: var(--blue-200);
 }
 
@@ -195,8 +343,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   border-radius: inherit;
 }
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37,99,235,0.4);
+  transform: translateY(-1px);
+  filter: brightness(1.04);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.38);
+}
+.btn-primary:active {
+  transform: translateY(0);
+  transition-duration: 120ms;
 }
 .btn-primary:hover::before {
   opacity: 1;
@@ -209,7 +362,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .btn-primary {
     padding: 0.8rem 1.25rem;
     letter-spacing: 0.05em;
-    font-size: 0.8rem;
+    font-size: 0.875rem;
   }
 }
 
@@ -236,8 +389,39 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .btn-secondary:hover {
   background-color: var(--blue-600);
   color: #FFFFFF;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(37,99,235,0.25);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37,99,235,0.22);
+}
+
+/* ═══ BTN OUTLINE (dark backgrounds) ═══
+   Inline-replacement for the `.btn-outline` class used on the hero
+   and final-CTA bands. Gives those CTAs proper size, radius and
+   motion without colliding with `.btn-secondary`. */
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.875rem 2rem;
+  border-radius: var(--radius-full);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  border: 1.5px solid currentColor;
+  background: transparent;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 280ms ease,
+              border-color 280ms ease,
+              filter 280ms ease;
+  cursor: pointer;
+  text-decoration: none;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+.btn-outline:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
 }
 
 .btn-white {
@@ -273,22 +457,39 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   background-clip: text;
 }
 
-/* ═══ SCROLL REVEAL ANIMATIONS ═══ */
+/* ═══ SCROLL REVEAL — subtle, non-uniform motion ═══
+   The reference site moves almost imperceptibly: 12–18px of travel,
+   ~500ms, and — critically — different durations per element so
+   nothing animates in lock-step. A small rotation of three timings
+   (420ms / 560ms / 610ms) is applied via :nth-of-type so any group
+   of reveals automatically picks up the variation. */
 .reveal {
   opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(14px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
 }
 .reveal.visible {
   opacity: 1;
   transform: translateY(0);
 }
+/* Duration rotation — three values so adjacent elements never match. */
+.reveal:nth-of-type(3n+1) {
+  transition-duration: 420ms;
+}
+.reveal:nth-of-type(3n+2) {
+  transition-duration: 610ms;
+}
+.reveal:nth-of-type(3n) {
+  transition-duration: 560ms;
+}
+
 .reveal-left {
   opacity: 0;
-  transform: translateX(-60px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(-18px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-left.visible {
   opacity: 1;
@@ -296,9 +497,9 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .reveal-right {
   opacity: 0;
-  transform: translateX(60px);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateX(18px);
+  transition: opacity 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 560ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-right.visible {
   opacity: 1;
@@ -306,22 +507,25 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .reveal-scale {
   opacity: 0;
-  transform: scale(0.9);
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
-              transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  transform: translateY(12px) scale(0.985);
+  transition: opacity 610ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 610ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .reveal-scale.visible {
   opacity: 1;
-  transform: scale(1);
+  transform: translateY(0) scale(1);
 }
 
-/* Staggered children */
+/* Non-even stagger — the deltas between children shrink then grow,
+   so the cadence feels organic rather than metronomic. */
 .stagger-children > .reveal:nth-child(1) { transition-delay: 0ms; }
-.stagger-children > .reveal:nth-child(2) { transition-delay: 100ms; }
-.stagger-children > .reveal:nth-child(3) { transition-delay: 200ms; }
-.stagger-children > .reveal:nth-child(4) { transition-delay: 300ms; }
-.stagger-children > .reveal:nth-child(5) { transition-delay: 400ms; }
-.stagger-children > .reveal:nth-child(6) { transition-delay: 500ms; }
+.stagger-children > .reveal:nth-child(2) { transition-delay: 90ms; }
+.stagger-children > .reveal:nth-child(3) { transition-delay: 210ms; }
+.stagger-children > .reveal:nth-child(4) { transition-delay: 340ms; }
+.stagger-children > .reveal:nth-child(5) { transition-delay: 430ms; }
+.stagger-children > .reveal:nth-child(6) { transition-delay: 580ms; }
+.stagger-children > .reveal:nth-child(7) { transition-delay: 670ms; }
+.stagger-children > .reveal:nth-child(8) { transition-delay: 790ms; }
 
 /* ═══ HERO PARTICLES (decorative) ═══ */
 .hero-glow {
@@ -340,6 +544,10 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   width: 500px; height: 500px;
   background: var(--blue-500);
   bottom: -150px; left: -100px;
+}
+@media (max-width: 640px) {
+  .hero-glow-1 { width: 320px; height: 320px; right: -80px; top: -120px; }
+  .hero-glow-2 { width: 280px; height: 280px; left: -80px; bottom: -100px; }
 }
 
 /* ═══ COUNTDOWN UNIT ═══ */
@@ -392,39 +600,121 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .countdown-unit { min-width: 2.9rem; }
   .countdown-number { font-size: 1.8rem; }
 }
+@media (max-width: 360px) {
+  .countdown-unit { min-width: 2.5rem; }
+  .countdown-number { font-size: 1.55rem; }
+  .countdown-label { font-size: 0.5rem; letter-spacing: 0.06em; }
+  .countdown-separator { font-size: 1.2rem; }
+}
 
 /* ═══ SPEAKER CARDS ═══ */
 .speaker-card {
   position: relative;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: #FFFFFF;
-  border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  background: rgba(255, 255, 255, 0.76);
+  backdrop-filter: blur(24px) saturate(1.5);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  border: 1px solid rgba(255, 255, 255, 0.62);
+  box-shadow: 0 8px 32px -4px rgba(15, 23, 42, 0.08),
+              0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  transition: transform 560ms cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 610ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 320ms ease;
 }
 .speaker-card:hover {
   box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), var(--shadow-xl);
   transform: translateY(-8px);
+  box-shadow: 0 22px 52px -12px rgba(37, 99, 235, 0.30),
+              0 4px 18px rgba(15, 23, 42, 0.07),
+              0 0 0 1.5px rgba(37, 99, 235, 0.20),
+              0 1px 0 rgba(255, 255, 255, 0.7) inset;
+  border-color: rgba(37, 99, 235, 0.22);
+  transform: translateY(-8px);
+}
+.speaker-photo-wrap {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  width: 100%;
+  overflow: hidden;
+}
+.speaker-photo-wrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -110%;
+  width: 55%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 10%,
+    rgba(255, 255, 255, 0.24) 50%,
+    transparent 90%
+  );
+  transform: skewX(-10deg);
+  transition: left 750ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 5;
+  pointer-events: none;
+}
+.speaker-card:hover .speaker-photo-wrap::after {
+  left: 155%;
 }
 .speaker-card:hover .speaker-avatar {
-  transform: scale(1.05);
+  transform: scale(1.06);
 }
 .speaker-avatar {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .speaker-tag {
   display: inline-flex;
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  background-color: var(--blue-50);
+  background-color: rgba(255, 255, 255, 0.88);
   color: var(--blue-700);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(37, 99, 235, 0.14);
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.10);
+  transition: background-color 320ms ease, color 320ms ease,
+              box-shadow 350ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1),
+              border-color 320ms ease;
+}
+.speaker-card:hover .speaker-tag {
+  background-color: rgba(37, 99, 235, 0.92);
+  color: #fff;
+  border-color: rgba(37, 99, 235, 0.5);
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.42);
+  transform: translateY(-1px) scale(1.05);
+}
+.speaker-accent-line {
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue-500) 0%, var(--cyan-400) 100%);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1),
+              height 350ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.speaker-card:hover .speaker-accent-line {
+  transform: scaleX(1);
+  height: 4px;
+}
+.speaker-info {
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.speaker-card:hover .speaker-info {
+  transform: translateY(-3px);
+}
+/* More dramatic reveal entrance for speaker cards */
+#speakers .reveal-scale {
+  transform: translateY(28px) scale(0.91);
+  transition-duration: 720ms;
+}
+#speakers .reveal-scale.visible {
+  transform: translateY(0) scale(1);
 }
 
 /* ═══ SPEAKER MOTION ENHANCEMENTS ═══ */
@@ -589,27 +879,56 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 
 /* ═══ PRICING ═══ */
-.pricing-card {
-  position: relative;
-  border-radius: var(--radius-xl);
-  padding: 2.5rem 2rem;
-  background: #FFFFFF;
-  border: 1px solid var(--border-light);
-  transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+.pricing-card-v2 {
+  transition:
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease;
+  will-change: transform;
 }
-.pricing-card:hover {
-  box-shadow: var(--shadow-xl);
-  transform: translateY(-4px);
+.pricing-card-v2--featured {
+  background:
+    radial-gradient(1200px 500px at 50% -10%, rgba(245, 158, 11, 0.18), transparent 55%),
+    linear-gradient(165deg, #0B1220 0%, #0F172A 45%, #1E1B4B 100%);
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  box-shadow:
+    0 30px 60px -20px rgba(15, 23, 42, 0.55),
+    0 0 0 1px rgba(245, 158, 11, 0.15) inset,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset;
 }
-.pricing-featured {
-  background: linear-gradient(165deg, #0F172A, #1E3A8A);
-  color: #FFFFFF;
-  border-color: transparent;
-  box-shadow: var(--shadow-xl), var(--shadow-glow);
-  transform: scale(1.03);
+.pricing-card-v2--featured:hover {
+  transform: translateY(-0.75rem);
+  box-shadow:
+    0 40px 80px -20px rgba(15, 23, 42, 0.65),
+    0 0 0 1px rgba(245, 158, 11, 0.28) inset,
+    0 1px 0 rgba(255, 255, 255, 0.10) inset;
 }
-.pricing-featured:hover {
-  transform: scale(1.05) translateY(-4px);
+
+/* ═══ VIP CARD — Stripe Sessions-inspired premium treatment ═══ */
+.pricing-card-v2--vip {
+  background:
+    radial-gradient(900px 400px at 50% -5%, rgba(6, 182, 212, 0.14), transparent 55%),
+    radial-gradient(600px 300px at 80% 100%, rgba(37, 99, 235, 0.10), transparent 60%),
+    linear-gradient(165deg, #0B1220 0%, #0F172A 40%, #172554 100%);
+  border: 1px solid rgba(6, 182, 212, 0.18);
+  box-shadow:
+    0 30px 60px -20px rgba(15, 23, 42, 0.60),
+    0 0 0 1px rgba(6, 182, 212, 0.08) inset,
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 80px -20px rgba(6, 182, 212, 0.12);
+}
+.pricing-card-v2--vip:hover {
+  transform: translateY(-0.85rem) scale(1.03);
+  box-shadow:
+    0 40px 80px -20px rgba(15, 23, 42, 0.70),
+    0 0 0 1px rgba(6, 182, 212, 0.22) inset,
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 100px -16px rgba(6, 182, 212, 0.20);
+}
+@media (min-width: 768px) {
+  .pricing-card-v2--featured {
+    transform: translateY(-0.5rem);
+  }
 }
 
 /* ═══ SPONSORS ═══ */
@@ -679,12 +998,15 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   line-height: 1;
 }
 .proof-label {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-muted);
   margin-top: 0.5rem;
+}
+@media (min-width: 640px) {
+  .proof-label { font-size: 0.75rem; }
 }
 
 /* ═══ FEATURE ICON BOX ═══ */
@@ -882,6 +1204,42 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   }
 }
 
+/* ═══ HERO LOGO GLOW ═══
+   Soft pulsing ambient glow behind the main brand logo in the hero.
+   Subtle enough to be premium, not distracting.
+   Combined with brightness(0) invert(1) to make colored logos white. */
+@keyframes heroLogoGlow {
+  0%, 100% {
+    filter: brightness(0) invert(1)
+            drop-shadow(0 4px 24px rgba(6, 182, 212, 0.25))
+            drop-shadow(0 0 40px rgba(37, 99, 235, 0.15));
+  }
+  50% {
+    filter: brightness(0) invert(1)
+            drop-shadow(0 4px 32px rgba(6, 182, 212, 0.40))
+            drop-shadow(0 0 60px rgba(37, 99, 235, 0.25));
+  }
+}
+.hero-logo-glow {
+  animation: heroLogoGlow 4s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-logo-glow {
+    animation: none !important;
+    filter: brightness(0) invert(1) drop-shadow(0 4px 24px rgba(6, 182, 212, 0.30));
+  }
+}
+
+/* ═══ LOGO ON DARK BACKGROUNDS ═══
+   Transforms colored logos to appear white on dark sections.
+   The white background of non-transparent PNGs blends seamlessly
+   because brightness(0) + invert(1) makes white → white (invisible
+   against the dark bg visual padding is handled by object-contain). */
+.logo-on-dark {
+  filter: brightness(0) invert(1);
+  mix-blend-mode: screen;
+}
+
 /* ═══ IMAGE OVERLAY HERO ═══ */
 .hero-image-overlay {
   position: absolute;
@@ -963,24 +1321,32 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
     radial-gradient(600px 200px at 80% 100%, rgba(37, 99, 235, 0.10), transparent 70%);
 }
 .sponsor-card {
-  box-shadow: 0 6px 20px -8px rgba(15, 23, 42, 0.10);
+  box-shadow: 0 8px 24px -10px rgba(15, 23, 42, 0.12);
+  transition:
+    transform 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.3s ease;
 }
 .sponsor-card:hover {
   transform: translateY(-6px);
-  box-shadow: 0 28px 60px -20px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 30px 60px -20px rgba(15, 23, 42, 0.28);
 }
 .sponsor-card--featured {
   background:
-    linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
-  border-color: rgba(15, 23, 42, 0.25);
-  box-shadow: 0 16px 50px -18px rgba(15, 23, 42, 0.30);
+    linear-gradient(180deg, #FFFFFF 0%, #F4F6FB 100%);
+  border-color: rgba(15, 23, 42, 0.18);
+  box-shadow:
+    0 20px 55px -20px rgba(15, 23, 42, 0.32),
+    0 0 0 1px rgba(15, 23, 42, 0.04) inset;
 }
 .sponsor-card--featured::after {
   content: "";
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(140deg, rgba(148, 163, 184, 0.10) 0%, transparent 45%);
+  background:
+    linear-gradient(140deg, rgba(148, 163, 184, 0.14) 0%, transparent 45%),
+    radial-gradient(600px 200px at 100% 0%, rgba(148, 163, 184, 0.10), transparent 70%);
   pointer-events: none;
 }
 .sponsor-cta {
@@ -999,4 +1365,748 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .safe-offset-bottom-left {
   bottom: max(1rem, env(safe-area-inset-bottom));
   left: max(1rem, env(safe-area-inset-left));
+}
+
+/* ═══ COUNTDOWN FLIP ANIMATION ═══
+   Numbers slide up from below when they change. The key prop on
+   the element forces a re-mount each update, restarting the animation. */
+@keyframes countFlip {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.countdown-flip {
+  animation: countFlip 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  display: block;
+}
+
+/* ═══ SCALE-IN (success state entrance) ═══ */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.88) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ═══ CHECKMARK SVG DRAW ═══
+   stroke-dashoffset drives the "drawing" illusion. */
+@keyframes checkDraw {
+  from { stroke-dashoffset: 60; }
+  to   { stroke-dashoffset: 0;  }
+}
+.check-draw {
+  stroke-dasharray: 60;
+  stroke-dashoffset: 60;
+  animation: checkDraw 0.55s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+}
+
+/* Circle fade-in behind the checkmark */
+@keyframes circleFadeIn {
+  from { opacity: 0; transform: scale(0.7); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.check-circle-bg {
+  animation: circleFadeIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+/* ═══ CFDI PANEL — smooth height reveal via CSS grid ═══
+   grid-template-rows: 0fr → 1fr avoids JS height measurement
+   while still allowing natural content height. */
+.cfdi-panel {
+  display: grid;
+  transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity            0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.cfdi-panel[data-open="false"] {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.cfdi-panel[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+.cfdi-panel-inner {
+  overflow: hidden;
+  /* Prevent inner padding from collapsing awkwardly */
+  min-height: 0;
+}
+
+/* ═══ PRICING FEATURED — shimmer scan ═══
+   A single diagonal highlight that sweeps across the card every 4s,
+   reinforcing premium status without being distracting. */
+@keyframes shimmerScan {
+  0%   { transform: translateX(-120%) skewX(-15deg); }
+  100% { transform: translateX(220%)  skewX(-15deg); }
+}
+.pricing-featured::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.07) 50%,
+    transparent 100%
+  );
+  animation: shimmerScan 4s ease-in-out 1.5s infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+/* Keep pricing-featured children above the shimmer */
+.pricing-featured > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* ═══ ICON BOX — scale on card hover ═══ */
+.card-elevated:hover .icon-box {
+  transform: scale(1.08);
+}
+.icon-box {
+  transition: all 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ═══ FEATURE PILL — interactive hover lift ═══ */
+.feature-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ═══ SECTION LABEL — animate the accent line on first reveal ═══
+   The ::before line grows from 0 → 2rem when the label becomes
+   visible inside a ScrollReveal container. */
+@keyframes labelLineGrow {
+  from { width: 0; opacity: 0; }
+  to   { width: 2rem; opacity: 1; }
+}
+.reveal.visible .section-label::before,
+.reveal-left.visible .section-label::before,
+.reveal-scale.visible .section-label::before {
+  animation: labelLineGrow 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+/* ═══ NAV LINK active-section indicator ═══
+   Smooth underline width persists on the active link. */
+.nav-link.active::after {
+  width: 100%;
+}
+.nav-link.active {
+  color: var(--blue-600);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PHOTO GALLERY — Bento Editorial Grid
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Mobile first: single column */
+.gallery-bento {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+/* Small tablet: 2-column equal grid */
+@media (min-width: 480px) {
+  .gallery-bento {
+    grid-template-columns: 1fr 1fr;
+    grid-auto-rows: 200px;
+  }
+  .gallery-p1 {
+    grid-column: 1 / 3;
+  }
+}
+
+/* Tablet: taller rows */
+@media (min-width: 640px) {
+  .gallery-bento {
+    grid-auto-rows: 220px;
+  }
+}
+
+/* Mid-size: 3-column intermediate */
+@media (min-width: 768px) {
+  .gallery-bento {
+    grid-template-columns: 1.4fr 1fr 0.9fr;
+    grid-template-rows: 260px 200px;
+    grid-auto-rows: unset;
+    gap: 10px;
+  }
+  .gallery-p1 { grid-column: 1 / 3; grid-row: 1; }
+  .gallery-p2 { grid-column: 3;     grid-row: 1 / 3; }
+  .gallery-p3 { grid-column: 1;     grid-row: 2; }
+  .gallery-p4 { grid-column: 2;     grid-row: 2; }
+}
+
+/* Desktop: Full 3-column bento layout */
+@media (min-width: 1024px) {
+  .gallery-bento {
+    grid-template-columns: 1.55fr 1fr 0.88fr;
+    grid-template-rows: 310px 245px;
+    gap: 10px;
+  }
+  .gallery-p1 { grid-column: 1 / 3; grid-row: 1; }
+  .gallery-p2 { grid-column: 3;     grid-row: 1 / 3; }
+  .gallery-p3 { grid-column: 1;     grid-row: 2; }
+  .gallery-p4 { grid-column: 2;     grid-row: 2; }
+}
+
+.gallery-photo {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  background: var(--navy-light);
+  aspect-ratio: 16/10;
+}
+
+@media (min-width: 480px) {
+  .gallery-photo { aspect-ratio: unset; }
+}
+
+/* The Next.js Image inside fills the container */
+.gallery-photo img {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              filter 500ms ease;
+  will-change: transform;
+}
+.gallery-photo:hover img {
+  transform: scale(1.06);
+  filter: brightness(0.78);
+}
+
+/* Gradient vignette — always visible, deepens on hover */
+.gallery-photo-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    rgba(15,23,42,0.88) 0%,
+    rgba(15,23,42,0.18) 48%,
+    transparent 72%
+  );
+  opacity: 0.6;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+}
+.gallery-photo:hover .gallery-photo-overlay { opacity: 1; }
+
+/* Label area — slides up from bottom on hover */
+.gallery-photo-label {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  padding: 16px 20px 20px;
+  transform: translateY(4px);
+  opacity: 0.85;
+  transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 350ms ease;
+  pointer-events: none;
+}
+.gallery-photo:hover .gallery-photo-label {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Category pill badge */
+.gallery-photo-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.22rem 0.7rem;
+  border-radius: var(--radius-full);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(37, 99, 235, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: rgba(255,255,255,0.95);
+  margin-bottom: 0.4rem;
+}
+
+/* Touch/no-hover devices — labels always fully visible */
+@media (hover: none) {
+  .gallery-photo-label { transform: translateY(0); opacity: 1; }
+  .gallery-photo-overlay { opacity: 0.75; }
+}
+
+/* ═══ CINEMATIC PHOTO STRIP ═══
+   Full-width image break between sections */
+.photo-strip {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  overflow: hidden;
+}
+@media (min-width: 768px) {
+  .photo-strip { height: 340px; }
+}
+.photo-strip img {
+  transition: transform 8000ms ease;
+}
+.photo-strip:hover img {
+  transform: scale(1.03);
+}
+.photo-strip-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+.photo-strip-content {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+/* ═══ FORM INPUTS — Fase 4: Premium focus enhancement ═══
+   Layers on top of Tailwind's focus:ring-2 focus:ring-blue-500/20.
+   Widens the glow ring and transitions bg to pure white for clarity. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):focus,
+select:focus,
+textarea:focus {
+  background-color: #FFFFFF !important;
+  box-shadow:
+    0 0 0 3px rgba(37, 99, 235, 0.14),
+    0 2px 8px rgba(37, 99, 235, 0.07) !important;
+  transition: border-color 0.25s ease,
+              box-shadow 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+              background-color 0.22s ease;
+}
+
+/* Pricing card hover — border luminance lift for dark featured card */
+.pricing-featured:hover {
+  box-shadow: var(--shadow-xl), 0 0 40px rgba(37, 99, 235, 0.2);
+  border-color: rgba(99, 149, 255, 0.25);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   STRIPE SESSIONS–INSPIRED ENHANCEMENTS
+   Professional WebGL/UX polish — brand palette preserved
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ NOISE TEXTURE OVERLAY ═══
+   Ultra-subtle SVG noise over dark sections to add grain/texture
+   depth like premium print. Applied via the .noise-texture class. */
+.noise-texture::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.028;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
+/* ═══ GEOMETRIC SECTION DIVIDER ═══
+   Clean angled divider inspired by Stripe's parallelogram motifs.
+   More premium than wave separators for transitions between sections. */
+.geo-divider {
+  position: relative;
+  width: 100%;
+  height: 80px;
+  overflow: hidden;
+}
+.geo-divider::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: -5%;
+  width: 110%;
+  height: 100%;
+  background: inherit;
+  transform: skewY(-1.8deg);
+  transform-origin: bottom left;
+}
+.geo-divider--flip::before {
+  transform: skewY(1.8deg);
+  transform-origin: bottom right;
+}
+
+/* ═══ CARD BORDER GRADIENT HOVER ═══
+   On hover, cards gain a shimmering gradient border that travels
+   around the perimeter. Uses conic-gradient + mask for the effect. */
+.card-glow-border {
+  position: relative;
+  overflow: hidden;
+}
+.card-glow-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--glow-angle, 0deg),
+    transparent 30%,
+    var(--blue-400) 50%,
+    var(--cyan-400) 55%,
+    transparent 70%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box,
+               linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
+}
+.card-glow-border:hover::before {
+  opacity: 1;
+  animation: borderSpin 3s linear infinite;
+}
+@keyframes borderSpin {
+  to { --glow-angle: 360deg; }
+}
+@property --glow-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ═══ BLUR-IN REVEAL ═══
+   Content fades in while un-blurring — more cinematic than a
+   simple opacity fade. Used for hero text and section titles. */
+.reveal-blur {
+  opacity: 0;
+  filter: blur(8px);
+  transform: translateY(20px);
+  transition: opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              filter 700ms cubic-bezier(0.22, 1, 0.36, 1),
+              transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, filter, transform;
+}
+.reveal-blur.visible {
+  opacity: 1;
+  filter: blur(0);
+  transform: translateY(0);
+}
+
+/* ═══ TEXT REVEAL — Clip-path wipe ═══
+   Text slides up behind a clip-path mask for a dramatic reveal.
+   Used on hero headings. */
+.text-reveal {
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.text-reveal.visible {
+  clip-path: inset(0 0 0 0);
+}
+
+/* ═══ GEOMETRIC ACCENT STRIPE ═══
+   A thin diagonal accent stripe on cards — like Stripe Sessions'
+   parallelogram motif. Applied via .geo-accent-stripe on a card. */
+.geo-accent-stripe {
+  position: relative;
+  overflow: hidden;
+}
+.geo-accent-stripe::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 100px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--blue-500), var(--cyan-400));
+  transform: skewX(-30deg);
+  transform-origin: right top;
+  opacity: 0;
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.geo-accent-stripe:hover::after {
+  opacity: 1;
+  transform: skewX(-30deg) translateX(0);
+}
+
+/* ═══ SECTION GRID DOT PATTERN ═══
+   Radial dot grid for section backgrounds — more refined than a
+   line grid. Used on CTA and dark sections. */
+.dot-pattern {
+  background-image: radial-gradient(circle, rgba(255,255,255,0.08) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ═══ HERO MESH FALLBACK ═══
+   Static gradient fallback when WebGL isn't available or when
+   prefers-reduced-motion is set. Matches the WebGL mesh palette. */
+.hero-mesh-fallback {
+  background: linear-gradient(
+    160deg,
+    #0F172A 0%,
+    #1E3A8A 35%,
+    #2563EB 65%,
+    #0F172A 100%
+  );
+}
+
+/* ═══ FLOATING GRID LINES ═══
+   Thin animated grid lines that pulse slowly — decorative motif
+   for dark hero/CTA sections. */
+.floating-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 50%, black 30%, transparent 70%);
+}
+
+/* ═══ STAGGERED REVEAL DELAYS — Extended ═══
+   More slots for larger grids. */
+.stagger-children > .reveal:nth-child(9)  { transition-delay: 870ms; }
+.stagger-children > .reveal:nth-child(10) { transition-delay: 960ms; }
+.stagger-children > .reveal:nth-child(11) { transition-delay: 1040ms; }
+.stagger-children > .reveal:nth-child(12) { transition-delay: 1120ms; }
+
+/* ═══ PARALLAX DEPTH OFFSET ═══
+   Utility that shifts an element on scroll via CSS scroll-driven
+   animations (progressive enhancement). Falls back to static. */
+@supports (animation-timeline: scroll()) {
+  .parallax-subtle {
+    animation: parallaxShift linear both;
+    animation-timeline: scroll();
+    animation-range: entry 0% exit 100%;
+  }
+  @keyframes parallaxShift {
+    from { transform: translateY(30px); }
+    to   { transform: translateY(-30px); }
+  }
+}
+
+/* ═══ ENHANCED CARD HOVER — Shadow spread + border shift ═══ */
+.card-elevated:hover {
+  box-shadow:
+    0 20px 48px -12px rgba(15, 23, 42, 0.12),
+    0 4px 12px rgba(37, 99, 235, 0.06);
+}
+
+/* ═══ prefers-reduced-motion guard for new animations ═══ */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-blur,
+  .text-reveal {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+  .card-glow-border::before {
+    animation: none !important;
+  }
+  .parallax-subtle {
+    animation: none !important;
+    transform: none !important;
+  }
+  .marquee-track {
+    animation-play-state: paused !important;
+  }
+  .page-enter,
+  .page-enter > * {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   AWWWARDS-LEVEL UX PATTERNS
+   Marquee strips, page entrance, footer premium, magnetic buttons
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ═══ MARQUEE STRIP — Infinite Horizontal Ticker ═══
+   Commonly seen on Stripe Sessions, Linear, Vercel, and virtually
+   every Awwwards-winning B2B site. Used for social proof, stats,
+   or sponsor logos as a visual break between sections. */
+.marquee-strip {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 1.25rem 0;
+  background: linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 50%, #F8FAFF 100%);
+  border-top: 1px solid var(--border-lighter);
+  border-bottom: 1px solid var(--border-lighter);
+}
+.marquee-strip--dark {
+  background: linear-gradient(180deg, rgba(15,23,42,0.95) 0%, rgba(15,23,42,0.98) 100%);
+  border-color: rgba(255,255,255,0.06);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marqueeScroll 35s linear infinite;
+  will-change: transform;
+}
+.marquee-strip:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.marquee-text {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+.marquee-strip--dark .marquee-text {
+  color: rgba(255,255,255,0.5);
+}
+.marquee-sep {
+  display: inline-block;
+  margin: 0 2rem;
+  font-size: 0.7rem;
+  color: var(--blue-300);
+}
+.marquee-strip--dark .marquee-sep {
+  color: rgba(6,182,212,0.3);
+}
+@keyframes marqueeScroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-25%); }
+}
+
+/* ═══ PAGE ENTRANCE ANIMATION ═══
+   Cinematic page-enter: content fades in and lifts slightly on
+   first load. Triggers once via the .page-enter class on the
+   main content wrapper. */
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.page-enter {
+  animation: pageEnter 600ms cubic-bezier(0.22, 1, 0.36, 1) 50ms both;
+}
+
+/* ═══ FOOTER PREMIUM — Hero-level treatment ═══
+   Award-winning sites close with the same intensity they open.
+   The footer gets noise texture, floating grid, and ambient glow
+   to bookend the hero. */
+.footer-premium {
+  position: relative;
+  background:
+    radial-gradient(1000px 400px at 20% 0%, rgba(37, 99, 235, 0.12), transparent 60%),
+    radial-gradient(800px 300px at 80% 100%, rgba(6, 182, 212, 0.08), transparent 55%),
+    linear-gradient(180deg, #0B1220 0%, #0F172A 40%, #111827 100%);
+  overflow: hidden;
+}
+.footer-premium .floating-grid {
+  opacity: 0.5;
+  mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black 20%, transparent 65%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 50% at 50% 30%, black 20%, transparent 65%);
+}
+
+/* ═══ MAGNETIC BUTTON ENHANCEMENT ═══
+   On hover, buttons gain a soft ambient glow behind them,
+   similar to Stripe's CTA buttons. Applies to .btn-primary. */
+.btn-primary {
+  position: relative;
+}
+.btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: linear-gradient(135deg, var(--blue-500), var(--cyan-500));
+  opacity: 0;
+  filter: blur(16px);
+  z-index: -1;
+  transition: opacity 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+.btn-primary:hover::after {
+  opacity: 0.35;
+}
+
+/* ═══ STATS BAR — Award-winning stats strip ═══
+   Minimal horizontal stat bar with oversized numbers and
+   muted labels. Clean dividers between items. */
+.stats-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  flex-wrap: wrap;
+}
+.stats-bar-item {
+  text-align: center;
+  padding: 1rem 2.5rem;
+  position: relative;
+}
+.stats-bar-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 25%;
+  height: 50%;
+  width: 1px;
+  background: var(--border-light);
+}
+.stats-bar-number {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 2.8rem;
+  font-weight: 700;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--blue-600), var(--cyan-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.stats-bar-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-top: 0.35rem;
+}
+@media (max-width: 767px) {
+  .stats-bar { gap: 0; flex-wrap: wrap; }
+  .stats-bar-item { padding: 0.75rem 1.25rem; }
+  .stats-bar-number { font-size: 2rem; }
+  .stats-bar-item:not(:last-child)::after { display: none; }
+}
+@media (max-width: 480px) {
+  .stats-bar-item { padding: 0.65rem 1rem; width: 50%; }
+  .stats-bar-number { font-size: 1.8rem; }
 }

@@ -65,7 +65,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
 
       {/* Slide-down panel */}
       <div
-        className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
+        className={`fixed top-[62px] sm:top-[68px] left-3 right-3 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-76px)] sm:max-h-[calc(100dvh-82px)] overflow-y-auto safe-pad-bottom ${
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"

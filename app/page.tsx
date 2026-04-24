@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import {
   Shield,
   MapPin,
@@ -16,11 +17,9 @@ import {
   Satellite,
   ScanLine,
   BookOpen,
-  CheckCircle2,
   Network,
   Handshake,
   ArrowRight,
-  Star,
   Users,
   Clock,
   Award,
@@ -37,11 +36,6 @@ import {
   Lightbulb,
   Compass,
   Crosshair,
-  Crown,
-  Trophy,
-  Medal,
-  Sparkles,
-  Gem,
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
 import RegistroForm from "@/components/RegistroForm";
@@ -50,6 +44,14 @@ import ScrollReveal from "@/components/ScrollReveal";
 import AnimatedCounter from "@/components/AnimatedCounter";
 import FAQAccordion from "@/components/FAQAccordion";
 import HeaderScroll from "@/components/HeaderScroll";
+import ScrollProgress from "@/components/ScrollProgress";
+import MouseGlow from "@/components/MouseGlow";
+import MarqueeStrip from "@/components/MarqueeStrip";
+
+const HeroGradientMesh = dynamic(() => import("@/components/HeroGradientMesh"), {
+  ssr: false,
+  loading: () => <div className="absolute inset-0 hero-mesh-fallback" />,
+});
 
 /* ═══════════════════════════════════════════════════════════════
    DATA
@@ -78,6 +80,7 @@ const FOOTER_LINKS = {
   es: [
     { href: "#enfoque", label: "Enfoque" },
     { href: "#speakers", label: "Conferencistas" },
+    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audiencia" },
     { href: "#accesos", label: "Accesos" },
     { href: "#patrocinadores", label: "Patrocinadores" },
@@ -87,6 +90,7 @@ const FOOTER_LINKS = {
   en: [
     { href: "#enfoque", label: "Focus" },
     { href: "#speakers", label: "Speakers" },
+    { href: "#agenda", label: "Agenda" },
     { href: "#audiencia", label: "Audience" },
     { href: "#accesos", label: "Passes" },
     { href: "#patrocinadores", label: "Sponsors" },
@@ -105,15 +109,15 @@ const UI_TEXT = {
     heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
     heroTitleHighlight: "CADENA DE SUMINISTROS",
     heroDescription:
-      "El encuentro donde convergen la actualización estratégica, la vinculación empresarial y las soluciones tecnológicas para fortalecer la industria del norte de México.",
+      "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
     countdownLabel: "Faltan",
     registerNowBtn: "REGISTRARME AHORA",
     sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
-    whyAttendLabel: "PORQUE SER PARTE DEL SUMMIT",
-    whyAttendTitle: "Lo Que Te Espera",
+    whyAttendLabel: "POR QUÉ SER PARTE DEL SUMMIT",
+    whyAttendTitle: "Por Qué Ser Parte del Summit",
     whyAttendDesc:
-      "Más que un congreso. Una experiencia de capacitación, networking e innovación diseñada para transformar tu operación.",
+      "Lidera la integridad de la cadena de suministro. Implementa las mejores prácticas en seguridad para minimizar riesgos y garantizar la eficiencia operativa de tus rutas internacionales.",
     purposeLabel: "PROPÓSITO",
     visionMissionTitle: "Visión y Misión",
     missionLabel: "Misión",
@@ -169,10 +173,10 @@ const UI_TEXT = {
     ],
     networkingCTA: "RESERVAR MI LUGAR",
     networkingStats: [
-      { number: "300", label: "LUGARES DISPONIBLES" },
+      { number: "500+", label: "LUGARES DISPONIBLES" },
       { number: "15+", label: "HORAS DE NETWORKING" },
       { number: "2", label: "DÍAS DE EVENTO" },
-      { number: "4", label: "SECTORES" },
+      { number: "4", label: "SECTORES DE LA CADENA DE SUMINISTROS" },
     ],
     pricingLabel: "TIPOS DE ACCESO",
     pricingTitle: "Elige Tu Acceso",
@@ -180,6 +184,7 @@ const UI_TEXT = {
       "Dos días de capacitación especializada · 24 y 25 de septiembre de 2026 · Centro de Convenciones, Reynosa",
     taxNote: "* Más I.V.A.",
     getAccessBtn: "OBTENER ACCESO",
+    mostPopular: "MÁS POPULAR",
     paymentTitle: "¿Cómo funciona el proceso de pago?",
     paymentIntroHtml:
       "Al completar el formulario de registro recibirás un <strong>folio de confirmación</strong> en pantalla y por correo. Un representante de Lanz Logistics te contactará en un plazo de <strong>24–48 horas hábiles</strong> con las instrucciones de pago (transferencia bancaria, depósito o pago en línea). Tu lugar queda reservado una vez confirmado el pago.",
@@ -231,6 +236,14 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos y Condiciones",
+    galleryLabel: "ASÍ SERÁ EL SUMMIT",
+    galleryTitle: "Así Será el Summit",
+    galleryDesc: "Cuatro áreas de actividad diseñadas para maximizar tu experiencia y el valor que llevas a tu empresa.",
+    galleryTag1: "Expo Comercial",
+    galleryTag2: "Registro & Bienvenida",
+    galleryTag3: "Conferencia Magistral",
+    galleryTag4: "Business Hub B2B",
+    galleryStripAlt: "Sala de exposición — SC Security Summit",
   },
   en: {
     skipToForm: "Skip to registration form",
@@ -305,7 +318,7 @@ const UI_TEXT = {
     ],
     networkingCTA: "RESERVE MY SPOT",
     networkingStats: [
-      { number: "300", label: "AVAILABLE SEATS" },
+      { number: "500+", label: "AVAILABLE SEATS" },
       { number: "15+", label: "NETWORKING HOURS" },
       { number: "2", label: "EVENT DAYS" },
       { number: "4", label: "INDUSTRY SECTORS" },
@@ -316,6 +329,7 @@ const UI_TEXT = {
       "Two days of specialized training · September 24-25, 2026 · Reynosa Convention Center",
     taxNote: "* Plus VAT",
     getAccessBtn: "GET ACCESS",
+    mostPopular: "MOST POPULAR",
     paymentTitle: "How does the payment process work?",
     paymentIntroHtml:
       "After completing the registration form you will receive a <strong>confirmation code</strong> on screen and by email. A Lanz Logistics representative will contact you within <strong>24–48 business hours</strong> with payment instructions (bank transfer, deposit or online payment). Your spot is reserved once payment is confirmed.",
@@ -367,6 +381,14 @@ const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms and Conditions",
+    galleryLabel: "WHAT AWAITS THE SUMMIT",
+    galleryTitle: "What to Expect",
+    galleryDesc: "Four activity areas designed to maximize your experience and the value you take back to your company.",
+    galleryTag1: "Commercial Expo",
+    galleryTag2: "Registration & Welcome",
+    galleryTag3: "Keynote Session",
+    galleryTag4: "Business Hub B2B",
+    galleryStripAlt: "Exhibition hall — SC Security Summit",
   },
 } as const;
 
@@ -374,14 +396,14 @@ const HERO_STATS = {
   es: [
     { number: 2, suffix: "", label: "Días de Capacitación" },
     { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
-    { number: 300, suffix: "", label: "Lugares Disponibles" },
-    { number: 4, suffix: "", label: "Sectores Industriales" },
+    { number: 500, suffix: "+", label: "Lugares Disponibles" },
+    { number: 4, suffix: "+", label: "sectores de la cadena de suministros" },
   ],
   en: [
     { number: 2, suffix: "", label: "Training Days" },
     { number: 4, suffix: "+", label: "Confirmed Speakers" },
-    { number: 300, suffix: "", label: "Available Seats" },
-    { number: 4, suffix: "", label: "Industry Sectors" },
+    { number: 500, suffix: "+", label: "Available Seats" },
+    { number: 4, suffix: "+", label: "supply chain sectors" },
   ],
 } as const;
 
@@ -389,7 +411,7 @@ const PILARES = {
   es: [
     {
       icon: ShieldCheck,
-      title: "Actualización Estratégica",
+      title: "Cumplimiento y actualización",
       desc: "Accede a contenido de alto valor sobre certificaciones de seguridad, comercio exterior, gestión de riesgos y cumplimiento operativo con enfoque en estándares internacionales.",
       bullets: [
         "Tendencias y regulaciones vigentes",
@@ -463,23 +485,20 @@ const SPEAKERS = {
     {
       name: "Fidel Guerrero",
       role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
-      org: "INDEX",
       topic: "Aduanas & Comercio Exterior",
-      image: "/images/speaker-fidel.png",
+      image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
-      org: "Especialista en Comercio Exterior",
       topic: "Aduanas & Compliance",
-      image: "/images/speaker-isidoro.png",
+      image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Líder en Trade Compliance e Innovación",
-      org: "Sector Automotriz e Industrial",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.png",
+      image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
@@ -487,29 +506,29 @@ const SPEAKERS = {
       org: "Certificación Internacional en Enseñanza",
       topic: "Organización & Expansión",
       image: "/images/speaker-eduardo.png",
+      role: "Organización Operativa y Expansión Comercial",
+      topic: "Organización & Expansión",
+      image: "/images/speaker-eduardo.webp",
     },
   ],
   en: [
     {
       name: "Fidel Guerrero",
       role: "Deputy Director, National Committee of Customs & Foreign Trade",
-      org: "INDEX",
       topic: "Customs & Foreign Trade",
-      image: "/images/speaker-fidel.png",
+      image: "/images/speaker-fidel.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
-      org: "Foreign Trade Specialist",
       topic: "Customs & Compliance",
-      image: "/images/speaker-isidoro.png",
+      image: "/images/speaker-isidoro.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Trade Compliance & Innovation Leader",
-      org: "Automotive & Industrial Sector",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.png",
+      image: "/images/speaker-julio.webp",
     },
     {
       name: "Eduardo Luna",
@@ -517,6 +536,9 @@ const SPEAKERS = {
       org: "International Teaching Certification",
       topic: "Organization & Expansion",
       image: "/images/speaker-eduardo.png",
+      role: "Operational Organization & Commercial Expansion",
+      topic: "Organization & Expansion",
+      image: "/images/speaker-eduardo.webp",
     },
   ],
 } as const;
@@ -581,7 +603,7 @@ const PRICING = {
       id: "vip",
       label: "Acceso VIP",
       price: "$7,200",
-      featured: true,
+      featured: false,
       desc: "Ejecutivos y tomadores de decisión",
       features: [
         "Capacitación de 2 días",
@@ -631,7 +653,7 @@ const PRICING = {
       id: "vip",
       label: "VIP Pass",
       price: "$7,200",
-      featured: true,
+      featured: false,
       desc: "Executives and decision makers",
       features: [
         "2-day training",
@@ -662,16 +684,12 @@ const PRICING = {
   ],
 } as const;
 
+
+
 type SponsorTierMeta = {
-  level: number;
-  icon: typeof Crown;
   slotsTotal: number;
   stand: string;
   stripe: string;
-  iconBg: string;
-  iconFg: string;
-  chipBg: string;
-  chipFg: string;
   accent: string;
   ring: string;
   featured: boolean;
@@ -680,60 +698,36 @@ type SponsorTierMeta = {
 
 const SPONSOR_TIER_META: readonly SponsorTierMeta[] = [
   {
-    level: 1,
-    icon: Crown,
     slotsTotal: 8,
     stand: "5 × 6 m",
     stripe: "bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400",
-    iconBg: "bg-slate-900",
-    iconFg: "text-slate-100",
-    chipBg: "bg-slate-900",
-    chipFg: "text-slate-50",
     accent: "text-slate-900",
     ring: "hover:ring-2 hover:ring-slate-300",
     featured: true,
     highlighted: false,
   },
   {
-    level: 2,
-    icon: Trophy,
     slotsTotal: 10,
     stand: "4 × 4 m",
     stripe: "bg-gradient-to-r from-amber-300 via-yellow-400 to-amber-300",
-    iconBg: "bg-amber-500",
-    iconFg: "text-white",
-    chipBg: "bg-amber-50",
-    chipFg: "text-amber-700",
     accent: "text-amber-600",
     ring: "hover:ring-2 hover:ring-amber-300",
     featured: false,
     highlighted: true,
   },
   {
-    level: 3,
-    icon: Medal,
     slotsTotal: 14,
     stand: "3 × 3 m",
     stripe: "bg-gradient-to-r from-slate-300 via-slate-400 to-slate-300",
-    iconBg: "bg-slate-500",
-    iconFg: "text-white",
-    chipBg: "bg-slate-100",
-    chipFg: "text-slate-600",
     accent: "text-slate-600",
     ring: "hover:ring-2 hover:ring-slate-200",
     featured: false,
     highlighted: false,
   },
   {
-    level: 4,
-    icon: Gem,
     slotsTotal: 16,
     stand: "3 × 3 m",
     stripe: "bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400",
-    iconBg: "bg-blue-600",
-    iconFg: "text-white",
-    chipBg: "bg-blue-50",
-    chipFg: "text-blue-700",
     accent: "text-blue-600",
     ring: "hover:ring-2 hover:ring-blue-200",
     featured: false,
@@ -868,44 +862,44 @@ const WHY_ATTEND = {
     {
       icon: BookOpen,
       title: "Actualización Estratégica",
-      desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
+      desc: "Domina los estándares para anticipar riesgos antes de que interrumpan tu operación",
     },
     {
       icon: Mic2,
       title: "Expertos del Sector",
-      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia.",
+      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia",
     },
     {
       icon: Target,
       title: "Impacto Real",
-      desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
+      desc: "Convierte el cumplimiento en una ventaja competitiva que abra nuevos canales de venta B2B",
     },
     {
       icon: Globe,
       title: "Visión Binacional y Comercial",
-      desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
+      desc: "Networking con tomadores de decisiones que están definiendo el futuro de la seguridad logística y mejoras para tu empresa",
     },
   ],
   en: [
     {
       icon: BookOpen,
       title: "Strategic Update",
-      desc: "Current and specialized topics on security, logistics, foreign trade and compliance.",
+      desc: "Master the standards to anticipate risks before they disrupt your operation",
     },
     {
       icon: Mic2,
       title: "Industry Experts",
-      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy.",
+      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy",
     },
     {
       icon: Target,
       title: "Real Impact",
-      desc: "Ideas, tools and contacts that translate into concrete improvements for your company.",
+      desc: "Turn compliance into a competitive advantage that opens new B2B sales channels",
     },
     {
       icon: Globe,
       title: "Binational & Commercial Vision",
-      desc: "A binational perspective to drive trade, collaboration and growth.",
+      desc: "Networking with decision-makers who are shaping the future of logistics security and improvements for your company",
     },
   ],
 } as const;
@@ -920,6 +914,10 @@ const FAQ_ITEMS = [
     answer: "Está diseñado para profesionales y ejecutivos del sector de cadena de suministros: directores de operaciones, gerentes de logística, especialistas en comercio exterior, responsables de compliance, entre otros perfiles clave en la industria.",
   },
   {
+    question: "¿Cómo puedo convertirme en patrocinador?",
+    answer: "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
+  },
+  {
     question: "¿Qué incluye cada tipo de acceso?",
     answer: "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
   },
@@ -930,10 +928,6 @@ const FAQ_ITEMS = [
   {
     question: "¿El acceso estudiantil requiere credencial?",
     answer: "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
-  },
-  {
-    question: "¿Cómo puedo convertirme en patrocinador?",
-    answer: "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
   },
 ];
 
@@ -947,6 +941,10 @@ const FAQ_ITEMS_EN = [
     answer: "It is designed for supply chain professionals and executives: operations directors, logistics managers, foreign trade specialists, compliance leaders, and other key industry profiles.",
   },
   {
+    question: "How can I become a sponsor?",
+    answer: "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Strategic Allied Provider) and the benefits for each tier.",
+  },
+  {
     question: "What is included with each access type?",
     answer: "Student access includes 2-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
   },
@@ -958,23 +956,28 @@ const FAQ_ITEMS_EN = [
     question: "Does the student pass require an ID?",
     answer: "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate or graduate students.",
   },
-  {
-    question: "How can I become a sponsor?",
-    answer: "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Strategic Allied Provider) and the benefits for each tier.",
-  },
 ];
 
-/* ═══ WAVE SVG COMPONENT ═══ */
+/* ═══ SECTION SEPARATOR ═══ */
 function WaveSeparator({ color = "#EFF6FF", flip = false }: { color?: string; flip?: boolean }) {
   return (
     <div className={`wave-separator ${flip ? "wave-separator-flip" : ""}`} aria-hidden="true">
       <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" role="presentation">
         <path
-          d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,40 1440,30 L1440,80 L0,80 Z"
+          d="M0,64 C280,18 880,72 1440,38 L1440,80 L0,80 Z"
           fill={color}
         />
       </svg>
     </div>
+  );
+}
+
+/* ═══ PREMIUM CHECK ICON ═══ */
+function PremiumCheck({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 14 10" fill="none" className={className} aria-hidden="true">
+      <path d="M1.5 5L5 8.5L12.5 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
   );
 }
 
@@ -1003,6 +1006,9 @@ export default function Home() {
 
   return (
     <>
+      {/* ── SCROLL PROGRESS BAR ── */}
+      <ScrollProgress />
+
       {/* ── SKIP TO CONTENT (accesibilidad) ── */}
       <a
         href="#registro"
@@ -1017,9 +1023,14 @@ export default function Home() {
           <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[62px] sm:h-[68px] flex items-center justify-between gap-2 sm:gap-4">
             {/* Logo */}
             <a href="#" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
-              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/40 transition-shadow flex-shrink-0">
-                <Shield className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
-              </div>
+              <Image
+                src="/images/logo-symbol-blue.png"
+                alt="Security Chain Summit"
+                width={40}
+                height={40}
+                className="w-9 h-9 sm:w-10 sm:h-10 object-contain flex-shrink-0 drop-shadow-sm group-hover:scale-105 transition-transform duration-300"
+                priority
+              />
               <div className="min-w-0">
                 <span className="font-oswald block truncate text-base sm:text-lg font-bold tracking-tight text-slate-900">SC SUMMIT</span>
                 <span className="hidden sm:block text-[10px] font-bold tracking-[0.18em] text-blue-600">REYNOSA 2026</span>
@@ -1040,7 +1051,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setLanguage((prev) => (prev === "es" ? "en" : "es"))}
-                className="inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+                className="inline-flex items-center justify-center w-11 h-11 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors touch-manipulation"
                 aria-label={text.switchLangLabel}
               >
                 {language === "es" ? "EN" : "ES"}
@@ -1054,40 +1065,36 @@ export default function Home() {
         </header>
       </HeaderScroll>
 
-      <div className="pt-[62px] sm:pt-[68px]">
+      <div className="pt-[62px] sm:pt-[68px] page-enter">
         {/* ═══════════════════════════════════════════════════════════
             1. HERO — with background image
            ═══════════════════════════════════════════════════════════ */}
-        <section className="relative w-full min-h-[90vh] sm:min-h-[92vh] flex items-center justify-center overflow-hidden">
-          {/* Background Image */}
-          <Image
-            src="/images/hero-bg.png"
-            alt={text.heroAlt}
-            fill
-            className="object-cover"
-            priority
-            quality={85}
-          />
-          {/* Gradient Overlay */}
-          <div className="hero-image-overlay" />
+        <section className="relative w-full min-h-[92vh] sm:min-h-[94vh] flex items-center justify-center overflow-hidden noise-texture">
+          {/* WebGL Gradient Mesh Background */}
+          <HeroGradientMesh />
 
-          {/* Floating decorative elements */}
+          {/* Floating grid — masked to centre for depth */}
+          <div className="floating-grid" aria-hidden="true" />
+
+          {/* Geometric floating decorations — refined for B2B formality (3 elements) */}
           <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">
-            <div className="absolute top-[20%] left-[8%] w-20 h-20 border border-white/10 rounded-2xl float-shape" />
-            <div className="absolute top-[30%] right-[12%] w-16 h-16 border border-cyan-400/15 rounded-full float-shape-reverse" />
-            <div className="absolute bottom-[25%] left-[15%] w-12 h-12 border border-blue-400/10 rounded-lg float-shape" style={{ animationDelay: "2s" }} />
-            <div className="absolute bottom-[20%] right-[8%] w-24 h-24 border border-white/5 rounded-3xl float-shape-reverse" style={{ animationDelay: "1s" }} />
-            {/* Grid subtle pattern */}
-            <div className="absolute inset-0 opacity-[0.03]" style={{
-              backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-              backgroundSize: "60px 60px"
-            }} />
+            {/* Corner bracket — top-left */}
+            <svg className="absolute top-[15%] left-[5%] opacity-[0.10] float-shape" width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden="true">
+              <path d="M0,16 L0,0 L16,0 M36,0 L52,0 L52,16 M52,36 L52,52 L36,52 M16,52 L0,52 L0,36" stroke="white" strokeWidth="1.5" strokeLinecap="square"/>
+            </svg>
+            {/* Parallelogram accent — Stripe-inspired */}
+            <div className="absolute top-[22%] right-[8%] w-20 h-8 border border-cyan-400/10 opacity-[0.25] float-shape-reverse" style={{ transform: "skewX(-12deg)" }} />
+            {/* Corner bracket — bottom-right */}
+            <svg className="absolute bottom-[18%] right-[6%] opacity-[0.06] float-shape-reverse" style={{ animationDelay: "1s" }} width="60" height="60" viewBox="0 0 60 60" fill="none" aria-hidden="true">
+              <path d="M0,18 L0,0 L18,0 M42,0 L60,0 L60,18 M60,42 L60,60 L42,60 M18,60 L0,60 L0,42" stroke="white" strokeWidth="1" strokeLinecap="square"/>
+            </svg>
           </div>
 
           {/* Content */}
-          <div className="relative z-10 text-center px-4 pt-6 pb-10 sm:py-0 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-5 sm:px-6 py-10 sm:py-16 max-w-5xl mx-auto flex flex-col items-center">
+            {/* Title */}
             <ScrollReveal delay={100}>
-              <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-7xl font-bold text-white leading-[1.08] mb-5 sm:mb-6">
+              <h1 className="font-oswald text-[2rem] sm:text-[2.8rem] md:text-[4.2rem] lg:text-7xl font-bold text-white leading-[1.06] mb-6 sm:mb-7 tracking-tight">
                 {text.heroTitlePrefix}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                   {text.heroTitleHighlight}
@@ -1095,75 +1102,95 @@ export default function Home() {
               </h1>
             </ScrollReveal>
 
+            {/* Description */}
             <ScrollReveal delay={200}>
-              <p className="text-base sm:text-lg md:text-xl text-blue-100/80 max-w-2xl mx-auto mb-7 sm:mb-8 leading-relaxed">
+              <p className="text-base sm:text-lg md:text-xl text-blue-100/85 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed">
                 {text.heroDescription}
               </p>
             </ScrollReveal>
 
-            <ScrollReveal delay={300}>
-              <div className="card-dark p-6 sm:p-8 mb-8 inline-flex flex-col items-center gap-4">
-                <div className="flex items-center gap-2 text-cyan-300 text-xs font-bold tracking-widest uppercase">
+            {/* Stats — moved up into hero */}
+            <ScrollReveal delay={260}>
+              <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-10 mb-8 sm:mb-10">
+                {HERO_STATS[language].map((s, i) => (
+                  <div
+                    key={i}
+                    className={`text-center px-5 py-3 rounded-xl ${i === 3 ? "bg-blue-700 shadow-lg shadow-blue-900/40" : ""}`}
+                  >
+                    <div className="flex items-baseline justify-center gap-1">
+                      <AnimatedCounter target={s.number} className="font-oswald text-3xl sm:text-4xl font-bold text-white" />
+                      {s.suffix && <span className="font-oswald text-2xl font-bold text-white">{s.suffix}</span>}
+                    </div>
+                    <p className="text-xs text-white/70 uppercase tracking-wider font-medium mt-1">
+                      {s.label}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </ScrollReveal>
+
+            {/* Date & Location — minimal inline strip */}
+            <ScrollReveal delay={280}>
+              <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mb-6 sm:mb-8">
+                <div className="flex items-center gap-2 text-cyan-300/90">
+                  <Calendar className="w-4 h-4" />
+                  <span className="text-sm sm:text-base font-semibold text-white tracking-wide">{text.eventDayValue}</span>
+                </div>
+                <span className="hidden sm:inline text-white/25">|</span>
+                <div className="flex items-center gap-2 text-cyan-300/90">
+                  <MapPin className="w-4 h-4" />
+                  <span className="text-sm sm:text-base font-medium text-white/80">{text.eventDayVenue}</span>
+                </div>
+              </div>
+            </ScrollReveal>
+
+            {/* Countdown */}
+            <ScrollReveal delay={320}>
+              <div className="mb-8 sm:mb-10">
+                <div className="flex items-center justify-center gap-2 text-cyan-300/80 text-xs font-bold tracking-widest uppercase mb-3">
                   <Clock className="w-3.5 h-3.5" />
                   <span>{text.countdownLabel}</span>
                 </div>
                 <CountdownTimer language={language} />
-                <div className="w-full h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
-                <div className="flex flex-col items-center gap-1 text-center">
-                  <div className="flex items-center gap-2 text-[10px] sm:text-[11px] font-bold tracking-[0.22em] uppercase text-cyan-300/90">
-                    <Calendar className="w-3.5 h-3.5" />
-                    <span>{text.eventDayLabel}</span>
-                  </div>
-                  <p className="font-oswald text-base sm:text-lg font-bold text-white tracking-wide">
-                    {text.eventDayValue}
-                  </p>
-                  <p className="text-[11px] sm:text-xs text-blue-100/70">
-                    {text.eventDayVenue}
-                  </p>
-                </div>
               </div>
             </ScrollReveal>
 
-            <ScrollReveal delay={400}>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-                <a href="#registro" className="btn-primary px-8 py-4 text-base w-full sm:w-auto">
-                  {text.registerNowBtn} <ArrowRight className="w-4 h-4" />
-                </a>
-                <a href="#patrocinadores" className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10 w-full sm:w-auto">
-                  {text.sponsorBtn}
-                </a>
-              </div>
-            </ScrollReveal>
+            {/* CTAs — removed per PDF mockup (CTAs exist in other sections) */}
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            2. SOCIAL PROOF BAR
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="py-8 bg-white border-b border-slate-100">
-          <div className="max-w-6xl mx-auto px-4 flex flex-wrap items-center justify-center gap-8 sm:gap-16">
-            {HERO_STATS[language].map((s, i) => (
-              <div key={i} className="text-center">
-                <div className="flex items-baseline justify-center gap-1">
-                  <AnimatedCounter target={s.number} className="number-accent text-3xl sm:text-4xl" />
-                  {s.suffix && <span className="number-accent text-2xl">{s.suffix}</span>}
-                </div>
-                <p className="text-xs text-slate-500 uppercase tracking-wider font-medium mt-1">
-                  {s.label}
-                </p>
-              </div>
-            ))}
-            <div className="hidden sm:block text-center border-l border-slate-200 pl-8">
-              <p className="text-xs text-slate-400 uppercase tracking-wider">{text.presentedBy}</p>
-              <p className="font-bold text-slate-700 text-sm mt-1">Lanz Logistics <span className="text-blue-500">+</span> Thynk Unlimited</p>
-            </div>
-          </div>
-        </section>
+        {/* ═══ MARQUEE STRIP — Awwwards-level social proof ticker ═══ */}
+        <MarqueeStrip
+          items={
+            language === "es"
+              ? [
+                  "300+ Profesionales",
+                  "24–25 Sep 2026",
+                  "Reynosa, Tamaulipas",
+                  "CTPAT · OEA · C-TPAT",
+                  "Networking B2B",
+                  "Business Hub",
+                  "20+ Speakers",
+                  "Seguridad Logística",
+                ]
+              : [
+                  "300+ Professionals",
+                  "Sep 24–25, 2026",
+                  "Reynosa, Tamaulipas",
+                  "CTPAT · OEA · C-TPAT",
+                  "B2B Networking",
+                  "Business Hub",
+                  "20+ Speakers",
+                  "Supply Chain Security",
+                ]
+          }
+          speed={40}
+        />
 
         {/* ═══════════════════════════════════════════════════════════
             3. ¿POR QUÉ ASISTIR? — Zig-Zag Layout
            ═══════════════════════════════════════════════════════════ */}
-        <section className="py-20 sm:py-28 bg-white">
+        <section className="py-20 sm:py-28 bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1179,104 +1206,37 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            <div className="grid sm:grid-cols-2 gap-6">
-              {WHY_ATTEND[language].map((item, i) => (
-                <ScrollReveal key={i} delay={i * 100}>
-                  <div className="group relative p-8 rounded-2xl border border-slate-100 bg-white hover:bg-blue-50/50 hover:border-blue-200 transition-all duration-500 hover:shadow-lg">
-                    <div className="flex items-start gap-5">
-                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-shadow">
-                        <item.icon className="w-6 h-6 text-white" />
-                      </div>
-                      <div>
-                        <h3 className="font-oswald text-xl font-bold text-slate-900 mb-2">
-                          {item.title}
-                        </h3>
-                        <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+            <MouseGlow color="rgba(37, 99, 235, 0.07)" radius={450}>
+              <div className="grid sm:grid-cols-2 gap-6">
+                {WHY_ATTEND[language].map((item, i) => (
+                  <ScrollReveal key={i} delay={i * 100}>
+                    <div className="group relative p-8 rounded-2xl border border-slate-100 bg-white hover:bg-blue-50/50 hover:border-blue-200 transition-all duration-500 hover:shadow-lg card-glow-border">
+                      <div className="flex items-start gap-5">
+                        <div className="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center flex-shrink-0 ring-1 ring-slate-700 group-hover:ring-blue-500/50 transition-all shadow-lg">
+                          <item.icon className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+                        </div>
+                        <div>
+                          <h3 className="font-oswald text-xl font-bold text-slate-900 mb-2">
+                            {item.title}
+                          </h3>
+                          <p className="text-slate-500 leading-relaxed">{item.desc}</p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
+                  </ScrollReveal>
+                ))}
+              </div>
+            </MouseGlow>
           </div>
         </section>
 
-        {/* ═══════════════════════════════════════════════════════════
-            VISIÓN & MISIÓN
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 sm:py-28 overflow-hidden">
-          {/* Decorative Pattern */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.2) 1px, transparent 1px)`,
-            backgroundSize: "28px 28px"
-          }} />
-          <div className="absolute top-10 right-10 w-40 h-40 border border-white/5 rounded-full float-shape" />
-          <div className="absolute bottom-10 left-10 w-28 h-28 border border-cyan-400/8 rounded-2xl float-shape-reverse" />
-
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 rounded-full px-4 py-2 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
-                  <Compass className="w-3.5 h-3.5 text-cyan-300" /> {text.purposeLabel}
-                </span>
-                <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-tight">
-                  {text.visionMissionTitle}
-                </h2>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* MISIÓN */}
-              <ScrollReveal>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-                      <Crosshair className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">{text.missionLabel}</h3>
-                  </div>
-                  <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>{text.missionP1}</p>
-                    <p>{text.missionP2}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-
-              {/* VISIÓN */}
-              <ScrollReveal delay={200}>
-                <div className="relative p-8 sm:p-10 rounded-2xl bg-white/[0.06] backdrop-blur-md border border-white/10 h-full">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-blue-500/20">
-                      <Lightbulb className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="font-oswald text-2xl font-bold text-white">{text.visionLabel}</h3>
-                  </div>
-                  <div className="space-y-4 text-blue-100/75 text-sm leading-relaxed">
-                    <p>{text.visionP1}</p>
-                    <p>{text.visionP2}</p>
-                  </div>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* Acerca del evento (About) */}
-            <ScrollReveal delay={300}>
-              <div className="mt-12 p-8 sm:p-10 rounded-2xl bg-white/[0.04] border border-white/8 text-center max-w-4xl mx-auto">
-                <p className="text-blue-100/70 text-sm leading-relaxed">
-                  {text.aboutText}
-                </p>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* Wave → */}
-        <WaveSeparator color="#F8FAFC" />
+        {/* ═══ VISIÓN & MISIÓN — removed from flow per PDF mockup ═══ */}
 
         {/* ═══════════════════════════════════════════════════════════
-            4. 3 EJES TEMÁTICOS — Numbered Cards
+            EJES TEMÁTICOS — Numbered Cards
            ═══════════════════════════════════════════════════════════ */}
-        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50">
+        <span id="agenda" aria-hidden="true" />
+        <section id="enfoque" className="py-20 sm:py-28 bg-slate-50 section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
@@ -1288,21 +1248,22 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
+            <MouseGlow color="rgba(37, 99, 235, 0.06)" radius={400}>
             <div className="grid md:grid-cols-3 gap-8">
               {PILARES[language].map((p, i) => (
                 <ScrollReveal key={i} delay={i * 150}>
-                  <div className="card-elevated p-8 h-full group">
+                  <div className="card-elevated p-8 h-full group geo-accent-stripe card-glow-border">
                     {/* Big number */}
                     <span className="number-accent text-6xl font-oswald font-bold opacity-20 group-hover:opacity-40 transition-opacity">{p.number}</span>
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center mb-5 group-hover:bg-blue-100 transition-colors">
-                      <p.icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-11 h-11 rounded-lg border border-slate-200 flex items-center justify-center mb-5 group-hover:border-blue-300 transition-colors">
+                      <p.icon className="w-5 h-5 text-slate-700" strokeWidth={1.5} />
                     </div>
                     <h3 className="font-oswald text-xl font-bold text-slate-900 mb-3">{p.title}</h3>
                     <p className="text-slate-500 text-sm leading-relaxed mb-5">{p.desc}</p>
                     <ul className="space-y-2">
                       {p.bullets.map((b, j) => (
                         <li key={j} className="flex items-start gap-2 text-sm text-slate-600">
-                          <CheckCircle2 className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+                          <PremiumCheck className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
                           {b}
                         </li>
                       ))}
@@ -1311,201 +1272,31 @@ export default function Home() {
                 </ScrollReveal>
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Wave → */}
-        <WaveSeparator color="#FFFFFF" flip />
-
-        {/* ═══════════════════════════════════════════════════════════
-            5. CONFERENCISTAS — with real photos
-           ═══════════════════════════════════════════════════════════ */}
-        <section id="speakers" className="relative overflow-hidden py-20 sm:py-28 bg-white">
-          {/* Animated background orbs */}
-          <div className="speaker-orb speaker-orb-1" aria-hidden="true" />
-          <div className="speaker-orb speaker-orb-2" aria-hidden="true" />
-
-          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="section-label flex items-center justify-center gap-2">
-                  <Mic2 className="w-4 h-4" /> {text.speakersLabel}
-                </span>
-                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
-                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  {text.speakersDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {SPEAKERS[language].map((s, i) => (
-                <ScrollReveal
-                  key={i}
-                  delay={i * 120}
-                  direction={(["left", "scale", "scale", "right"] as const)[i]}
-                >
-                  <div className="speaker-card group text-center">
-                    {/* Photo */}
-                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/30 transition-shadow speaker-photo-pulse">
-                      {/* Numbered badge — reveals on hover */}
-                      <span className="speaker-index">{String(i + 1).padStart(2, "0")}</span>
-
-                      <Image
-                        src={s.image}
-                        alt={s.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-
-                      {/* Shimmer sweep on hover */}
-                      <div className="speaker-shimmer" aria-hidden="true" />
-
-                      {/* Topic badge */}
-                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
-                        <span className="speaker-topic-glow text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
-                      </div>
-                    </div>
-
-                    <h3 className="font-oswald text-lg font-bold text-slate-900">
-                      <span className="speaker-name-anim">{s.name}</span>
-                    </h3>
-                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
-                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-
-            <ScrollReveal delay={500}>
-              <p className="text-center text-sm text-slate-400 mt-12">
-                {text.speakersMorePrefix}{" "}
-                <a href="#registro" className="text-blue-600 font-semibold hover:underline">
-                  {text.speakersMoreCTA}
-                </a>
-              </p>
-            </ScrollReveal>
+            </MouseGlow>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            6. VALOR DEL EVENTO — Bullet Points + Perfil de Asistentes
+            NETWORKING HUB — Business Hub B2B
            ═══════════════════════════════════════════════════════════ */}
-        <section className="py-20 sm:py-28 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid lg:grid-cols-5 gap-12 items-start">
-              {/* Left: Bullet Points (3 cols) */}
-              <div className="lg:col-span-3">
-                <ScrollReveal>
-                  <span className="section-label">{text.valueLabel}</span>
-                  <h2 className="section-title mt-3 mb-8">{text.valueTitle}</h2>
-                </ScrollReveal>
-                <ScrollReveal delay={100}>
-                  <div className="space-y-3">
-                    {VALUE_HIGHLIGHTS[language].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
-                        <CheckCircle2 className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-[15px] text-slate-700 font-medium leading-relaxed">{item}</span>
-                      </div>
-                    ))}
-                  </div>
-                </ScrollReveal>
-              </div>
-
-              {/* Right: Perfil de Asistentes (2 cols) */}
-              <div className="lg:col-span-2">
-                <ScrollReveal delay={200}>
-                  <div className="sticky top-24 p-8 rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-lg">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center shadow-md">
-                        <Users className="w-5 h-5 text-white" />
-                      </div>
-                      <h3 className="font-oswald text-xl font-bold text-slate-900">{text.audienceCardTitle}</h3>
-                    </div>
-                    <p className="text-[15px] text-slate-600 leading-relaxed mb-6">
-                      {text.audienceCardDesc}
-                    </p>
-                    <div className="space-y-3">
-                      {ASISTENTES[language].slice(0, 4).map((a, i) => (
-                        <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
-                          <a.icon className="w-4 h-4 text-blue-500 flex-shrink-0" />
-                          <span className="font-medium">{a.title}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <a href="#registro" className="btn-primary w-full mt-8 py-3 text-sm justify-center">
-                      {text.audienceCardCTA} <ArrowRight className="w-4 h-4" />
-                    </a>
-                  </div>
-                </ScrollReveal>
-              </div>
-            </div>
+        <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden noise-texture">
+          {/* Floating grid overlay */}
+          <div className="floating-grid" aria-hidden="true" />
+          {/* Background Photo — Business Hub atmosphere */}
+          <div className="absolute inset-0 z-0">
+            <Image
+              src="/images/gallery-hub.jpg"
+              alt=""
+              fill
+              unoptimized
+              className="object-cover opacity-[0.18]"
+              aria-hidden="true"
+            />
           </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            7. AUDIENCIA + PROVEEDORES
-           ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="audiencia" className="py-20 sm:py-28 bg-slate-50">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-16">
-                <span className="section-label">{text.participantsLabel}</span>
-                <h2 className="section-title mt-3">{text.participantsTitle}</h2>
-                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
-                  {text.participantsDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-16">
-              {ASISTENTES[language].map((a, i) => (
-                <ScrollReveal key={i} delay={i * 80}>
-                  <div className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 group-hover:bg-blue-100 transition-colors">
-                      <a.icon className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800 text-sm">{a.title}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">{a.desc}</p>
-                    </div>
-                  </div>
-                </ScrollReveal>
-              ))}
-            </div>
-
-            {/* Proveedores */}
-            <ScrollReveal>
-              <div className="card-elevated p-8 sm:p-10">
-                <div className="flex flex-col md:flex-row md:items-center gap-8">
-                  <div className="md:w-2/5">
-                    <span className="section-label text-xs">{text.providersLabel}</span>
-                    <h3 className="font-oswald text-2xl font-bold text-slate-900 mt-2">{text.providersTitle}</h3>
-                    <p className="text-slate-500 text-sm mt-3 leading-relaxed">
-                      {text.providersDesc}
-                    </p>
-                  </div>
-                  <div className="md:w-3/5 grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {PROVEEDORES[language].map((prov, i) => (
-                      <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 hover:bg-blue-50 border border-slate-100 hover:border-blue-200 transition-all text-sm font-medium text-slate-700">
-                        <prov.icon className="w-4 h-4 text-blue-500" />
-                        {prov.title}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            9. NETWORKING HUB — Blue Banner
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="bg-gradient-to-br from-blue-700 via-blue-800 to-blue-900 py-20 sm:py-28 relative overflow-hidden">
+          {/* Gradient overlay to blend photo into brand color */}
+          <div className="absolute inset-0 z-[1] bg-gradient-to-r from-blue-900/96 via-blue-900/80 to-blue-900/60" />
           {/* Decorative grid */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
+          <div className="absolute inset-0 z-[2] opacity-[0.04]" style={{
             backgroundImage: `linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px)`,
             backgroundSize: "40px 40px"
           }} />
@@ -1529,7 +1320,7 @@ export default function Home() {
                   <div className="grid grid-cols-2 gap-3 mb-8">
                     {text.networkingFeatures.map((item, i) => (
                       <div key={i} className="flex items-center gap-2 text-sm text-white/80">
-                        <CheckCircle2 className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                        <PremiumCheck className="w-4 h-4 text-cyan-300 flex-shrink-0" />
                         {item}
                       </div>
                     ))}
@@ -1543,32 +1334,309 @@ export default function Home() {
                 </ScrollReveal>
               </div>
 
-              {/* Stats */}
+              {/* Proveedores integrado */}
               <div className="md:w-2/5">
-                <div className="grid grid-cols-2 gap-4">
-                  {text.networkingStats.map((stat, i) => {
-                    const icons = [Users, Clock, Handshake, Award];
-                    const Icon = icons[i];
-                    return (
-                      <ScrollReveal key={i} delay={i * 100}>
-                        <div className="card-dark p-5 text-center group hover:-translate-y-1 transition-transform">
-                          <Icon className="w-6 h-6 text-cyan-300 mx-auto mb-2" />
-                          <span className="font-oswald text-2xl font-bold text-white block">{stat.number}</span>
-                          <span className="text-[10px] text-blue-200/60 tracking-widest font-semibold">{stat.label}</span>
-                        </div>
-                      </ScrollReveal>
-                    );
-                  })}
-                </div>
+                <ScrollReveal delay={150}>
+                  <span className="inline-block text-[10px] text-white/60 tracking-widest font-semibold uppercase mb-2">{text.providersLabel}</span>
+                  <h3 className="font-oswald text-xl font-bold text-white mb-3">{text.providersTitle}</h3>
+                  <p className="text-blue-100/70 text-sm leading-relaxed mb-5">{text.providersDesc}</p>
+                  <div className="grid grid-cols-2 gap-3">
+                    {PROVEEDORES[language].map((prov, i) => (
+                      <div key={i} className="flex items-center gap-2 p-3 rounded-lg bg-white/10 border border-white/10 text-sm font-medium text-white/80 hover:bg-white/15 transition-colors">
+                        <prov.icon className="w-4 h-4 text-cyan-300 flex-shrink-0" strokeWidth={1.5} />
+                        {prov.title}
+                      </div>
+                    ))}
+                  </div>
+                </ScrollReveal>
               </div>
             </div>
           </div>
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            10. PRICING / ACCESOS
+            CONFERENCISTAS — with real photos
            ═══════════════════════════════════════════════════════════ */}
-        <section id="accesos" className="py-20 sm:py-28 bg-white">
+        <section id="speakers" className="relative overflow-hidden py-20 sm:py-28 bg-white">
+          {/* Animated background orbs */}
+          <div className="speaker-orb speaker-orb-1" aria-hidden="true" />
+          <div className="speaker-orb speaker-orb-2" aria-hidden="true" />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
+        <section id="speakers" className="rhythm-pause-lg bg-white section-ambient">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-16">
+                <span className="section-label flex items-center justify-center gap-2">
+                  <Mic2 className="w-4 h-4" /> {text.speakersLabel}
+                </span>
+                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
+                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
+                  {text.speakersDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {SPEAKERS[language].map((s, i) => (
+                <ScrollReveal
+                  key={i}
+                  delay={i * 120}
+                  direction={(["left", "scale", "scale", "right"] as const)[i]}
+                >
+                  <div className="speaker-card group text-center">
+                    {/* Photo */}
+                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/30 transition-shadow speaker-photo-pulse">
+                      {/* Numbered badge — reveals on hover */}
+                      <span className="speaker-index">{String(i + 1).padStart(2, "0")}</span>
+
+                <ScrollReveal key={i} delay={i * 120} direction="scale">
+                  <div className="speaker-card group">
+                    {/* Photo — portrait ratio */}
+                    <div className="speaker-photo-wrap overflow-hidden">
+                      <Image
+                        src={s.image}
+                        alt={s.name}
+                        fill
+                        sizes="(max-width:640px) 80vw, (max-width:1024px) 45vw, 22vw"
+                        className="speaker-avatar object-cover object-top"
+                      />
+
+                      {/* Shimmer sweep on hover */}
+                      <div className="speaker-shimmer" aria-hidden="true" />
+
+                      {/* Topic badge */}
+                      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
+                        <span className="speaker-topic-glow text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-oswald text-lg font-bold text-slate-900">
+                      <span className="speaker-name-anim">{s.name}</span>
+                    </h3>
+                    <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
+                    <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
+                      {/* Topic badge — glassy pill top-left */}
+                      <span className="speaker-tag absolute top-3 left-3 z-10">{s.topic}</span>
+                      {/* Soft vignette at bottom */}
+                      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none" />
+                    </div>
+
+                    {/* Info block */}
+                    <div className="speaker-info p-5 pb-4">
+                      <h3 className="font-oswald text-base font-bold text-slate-900 leading-tight">{s.name}</h3>
+                      <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug">{s.role}</p>
+                    </div>
+
+                    {/* Accent line — slides in on hover */}
+                    <div className="speaker-accent-line" />
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+
+            <ScrollReveal delay={500}>
+              <p className="text-center text-sm text-slate-400 mt-12">
+                {text.speakersMorePrefix}{" "}
+                <a href="#registro" className="text-blue-600 font-semibold hover:underline">
+                  {text.speakersMoreCTA}
+                </a>
+              </p>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            GALERÍA — Preview del Evento
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="py-16 sm:py-24 bg-slate-50 overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-10 sm:mb-14">
+                <span className="section-label">{text.galleryLabel}</span>
+                <h2 className="section-title mt-3">{text.galleryTitle}</h2>
+                <p className="text-slate-500 max-w-xl mx-auto mt-4 text-base leading-relaxed">
+                  {text.galleryDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal delay={120}>
+              <div className="gallery-bento">
+                {/* Photo 1 — Exhibition Hall (feature, spans 2 cols on desktop) */}
+                <div className="gallery-photo gallery-p1">
+                  <Image
+                    src="/images/gallery-hall.jpg"
+                    alt={text.galleryTag1}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 100vw, 62vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Building2 className="w-3 h-3" /> {text.galleryTag1}
+                    </span>
+                    <p className="text-white font-oswald text-xl font-bold leading-tight mt-1 drop-shadow-sm">
+                      SC Security Summit 2026
+                    </p>
+                  </div>
+                </div>
+
+                {/* Photo 2 — Registration (tall portrait, spans 2 rows on desktop) */}
+                <div className="gallery-photo gallery-p2">
+                  <Image
+                    src="/images/gallery-registro.jpg"
+                    alt={text.galleryTag2}
+                    fill
+                    unoptimized
+                    className="object-cover object-top"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 26vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Users className="w-3 h-3" /> {text.galleryTag2}
+                    </span>
+                    <p className="text-white/85 text-xs mt-1">Reynosa, Tamaulipas</p>
+                  </div>
+                </div>
+
+                {/* Photo 3 — Keynote */}
+                <div className="gallery-photo gallery-p3">
+                  <Image
+                    src="/images/gallery-keynote.jpg"
+                    alt={text.galleryTag3}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 36vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Mic2 className="w-3 h-3" /> {text.galleryTag3}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Photo 4 — Business Hub */}
+                <div className="gallery-photo gallery-p4">
+                  <Image
+                    src="/images/gallery-hub.jpg"
+                    alt={text.galleryTag4}
+                    fill
+                    unoptimized
+                    className="object-cover"
+                    sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 30vw"
+                  />
+                  <div className="gallery-photo-overlay" />
+                  <div className="gallery-photo-label">
+                    <span className="gallery-photo-tag">
+                      <Network className="w-3 h-3" /> {text.galleryTag4}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            VALOR DEL EVENTO — Bullet Points + Perfil de Asistentes
+           ═══════════════════════════════════════════════════════════ */}
+        <section className="rhythm-pause-md bg-slate-50">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <div className="grid lg:grid-cols-5 gap-12 items-start">
+              {/* Left: Bullet Points (3 cols) */}
+              <div className="lg:col-span-3">
+                <ScrollReveal>
+                  <span className="section-label">{text.valueLabel}</span>
+                  <h2 className="section-title mt-3 mb-8">{text.valueTitle}</h2>
+                </ScrollReveal>
+                <ScrollReveal delay={100}>
+                  <div className="space-y-3">
+                    {VALUE_HIGHLIGHTS[language].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3 p-4 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all">
+                        <PremiumCheck className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[15px] text-slate-700 font-medium leading-relaxed">{item}</span>
+                      </div>
+                    ))}
+                  </div>
+                </ScrollReveal>
+              </div>
+
+              {/* Right: Perfil de Asistentes (2 cols) */}
+              <div className="lg:col-span-2">
+                <ScrollReveal delay={200}>
+                  <div className="sticky top-[62px] sm:top-[68px] lg:top-24 p-8 rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-lg">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center ring-1 ring-slate-700 shadow-md">
+                        <Users className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
+                      </div>
+                      <h3 className="font-oswald text-xl font-bold text-slate-900">{text.audienceCardTitle}</h3>
+                    </div>
+                    <p className="text-[15px] text-slate-600 leading-relaxed mb-6">
+                      {text.audienceCardDesc}
+                    </p>
+                    <div className="space-y-3">
+                      {ASISTENTES[language].slice(0, 4).map((a, i) => (
+                        <div key={i} className="flex items-center gap-3 text-sm text-slate-600">
+                          <a.icon className="w-4 h-4 text-slate-400 flex-shrink-0" strokeWidth={1.5} />
+                          <span className="font-medium">{a.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <a href="#registro" className="btn-primary w-full mt-8 py-3 text-sm justify-center">
+                      {text.audienceCardCTA} <ArrowRight className="w-4 h-4" />
+                    </a>
+                  </div>
+                </ScrollReveal>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            AUDIENCIA + PROVEEDORES
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="audiencia" className="py-20 sm:py-28 bg-slate-50 section-ambient">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-16">
+                <span className="section-label">{text.participantsLabel}</span>
+                <h2 className="section-title mt-3">{text.participantsTitle}</h2>
+                <p className="text-slate-500 max-w-2xl mx-auto mt-4">
+                  {text.participantsDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <MouseGlow color="rgba(37, 99, 235, 0.06)" radius={400}>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {ASISTENTES[language].map((a, i) => (
+                <ScrollReveal key={i} delay={i * 80}>
+                  <div className="flex items-center gap-4 p-5 rounded-xl bg-white border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all group">
+                    <div className="w-12 h-12 rounded-xl border border-slate-200 flex items-center justify-center flex-shrink-0 group-hover:border-blue-300 transition-colors">
+                      <a.icon className="w-5 h-5 text-slate-600" strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-slate-800 text-sm">{a.title}</h4>
+                      <p className="text-xs text-slate-400 mt-0.5">{a.desc}</p>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+            </MouseGlow>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            TIPOS DE ACCESO
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="accesos" className="rhythm-pause-lg bg-white section-ambient">
           <div className="max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-6">
@@ -1580,67 +1648,98 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            {/* Cards */}
-            <div className="grid md:grid-cols-3 gap-6 mt-12">
-              {PRICING[language].map((plan, i) => (
-                <ScrollReveal key={plan.id} delay={i * 100}>
-                  <div
-                    className={`relative p-8 rounded-2xl h-full flex flex-col transition-all duration-300 ${plan.featured
-                        ? "text-white border-2 border-amber-400/70 shadow-2xl md:scale-[1.03]"
-                        : "bg-white border-2 border-slate-200 shadow-lg hover:shadow-xl hover:border-blue-300"
-                      }`}
-                    style={plan.featured ? {
-                      background: "linear-gradient(135deg, #0f172a 0%, #1e1b4b 45%, #111827 100%)",
-                      boxShadow: "0 25px 50px -12px rgba(217, 119, 6, 0.4)",
-                    } : undefined}
-                  >
-                    <h3 className={`font-oswald text-xl font-bold ${plan.featured ? "text-amber-300" : "text-slate-900"}`}>
-                      {plan.label}
-                    </h3>
-                    <p className={`text-sm mt-1 ${plan.featured ? "text-amber-100/80" : "text-slate-400"}`}>
-                      {plan.desc}
-                    </p>
-                    <div className="mt-6 mb-6">
-                      <span className={`font-oswald text-4xl font-bold ${plan.featured ? "text-white" : "text-slate-900"}`}>
-                        {plan.price}
-                      </span>
-                      <span className={`text-sm ml-1 ${plan.featured ? "text-amber-100/80" : "text-slate-400"}`}>MXN</span>
-                      <p className={`text-xs mt-1 ${plan.featured ? "text-amber-200/70" : "text-slate-400"}`}>{text.taxNote}</p>
-                    </div>
-
-                    {/* Features list */}
-                    <ul className="space-y-3 mb-8 flex-1">
-                      {plan.features.map((f, j) => (
-                        <li key={j} className={`flex items-center gap-2 text-sm ${plan.featured ? "text-amber-50/95" : "text-slate-600"}`}>
-                          <CheckCircle2 className={`w-4 h-4 flex-shrink-0 ${plan.featured ? "text-amber-300" : "text-blue-500"}`} />
-                          {f}
-                        </li>
-                      ))}
-                    </ul>
-
-                    <a
-                      href="#registro"
-                      className={`w-full py-3.5 rounded-lg font-bold text-sm text-center block transition-all ${plan.featured
-                          ? "bg-amber-400 text-slate-900 hover:bg-amber-300 shadow-lg"
-                          : "btn-primary"
+            {/* Cards — VIP is the hero card (Stripe Sessions-inspired) */}
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-7 mt-14 md:items-stretch">
+              {PRICING[language].map((plan, i) => {
+                const isVip = plan.id === "vip";
+                return (
+                  <ScrollReveal key={plan.id} delay={i * 100}>
+                    <div
+                      className={`pricing-card-v2 relative group rounded-3xl h-full flex flex-col overflow-hidden transition-all duration-500 ${isVip
+                        ? "pricing-card-v2--vip text-white md:-translate-y-3 md:scale-[1.03]"
+                        : "bg-white border border-slate-200/80 shadow-[0_4px_20px_-8px_rgba(15,23,42,0.08)] hover:shadow-[0_24px_48px_-18px_rgba(15,23,42,0.18)] hover:-translate-y-1 hover:border-blue-200"
                         }`}
                     >
-                      {text.getAccessBtn}
-                    </a>
-                  </div>
-                </ScrollReveal>
-              ))}
+                      {/* Top accent stripe */}
+                      {!isVip && (
+                        <div className={`absolute inset-x-0 top-0 h-1 ${plan.id === "general" ? "bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400" : "bg-gradient-to-r from-slate-400 via-slate-300 to-slate-400"}`} aria-hidden="true" />
+                      )}
+
+                      {/* VIP — cinematic ambient glow */}
+                      {isVip && (
+                        <>
+                          <div
+                            className="absolute inset-0 opacity-[0.04] pointer-events-none"
+                            style={{
+                              backgroundImage: "radial-gradient(circle at 1px 1px, #ffffff 1px, transparent 1px)",
+                              backgroundSize: "22px 22px",
+                            }}
+                            aria-hidden="true"
+                          />
+                          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-400" aria-hidden="true" />
+                        </>
+                      )}
+
+                      <div className={`relative flex flex-col flex-1 ${isVip ? "p-8 sm:p-9 pt-10 sm:pt-11" : "p-7 sm:p-8 pt-8 sm:pt-9"}`}>
+                        {/* Tier header — typography only */}
+                        <div className="mb-6">
+                          <h3 className={`font-oswald text-2xl font-bold leading-none tracking-tight ${isVip ? "text-white" : "text-slate-900"}`}>
+                            {plan.label}
+                          </h3>
+                          <p className={`text-sm mt-2 leading-relaxed ${isVip ? "text-blue-200/80" : "text-slate-500"}`}>
+                            {plan.desc}
+                          </p>
+                        </div>
+
+                        {/* Price block */}
+                        <div className={`pb-6 mb-6 border-b ${isVip ? "border-white/10" : "border-slate-100"}`}>
+                          <div className="flex items-baseline gap-2">
+                            <span className={`font-oswald text-4xl sm:text-5xl font-bold tracking-tight leading-none ${isVip ? "text-white" : "text-slate-900"}`}>
+                              {plan.price}
+                            </span>
+                            <span className={`text-xs font-bold uppercase tracking-[0.18em] ${isVip ? "text-cyan-300" : "text-slate-400"}`}>MXN</span>
+                          </div>
+                          <p className={`text-[11px] mt-2 ${isVip ? "text-slate-400" : "text-slate-400"}`}>{text.taxNote}</p>
+                        </div>
+
+                        {/* Features list */}
+                        <ul className="space-y-2.5 mb-8 flex-1">
+                          {plan.features.map((f, j) => (
+                            <li key={j} className={`flex items-start gap-2.5 text-[13.5px] leading-snug ${isVip ? "text-slate-100" : "text-slate-600"}`}>
+                              <PremiumCheck className={`w-3.5 h-3.5 flex-shrink-0 mt-0.5 ${isVip ? "text-cyan-300" : "text-blue-600"}`} />
+                              <span>{f}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <a
+                          href="#registro"
+                          className={`relative w-full py-3.5 rounded-xl font-bold text-sm text-center inline-flex items-center justify-center gap-2 uppercase tracking-[0.12em] transition-all duration-300 ${isVip
+                            ? "bg-gradient-to-r from-cyan-400 to-blue-400 text-slate-900 hover:from-cyan-300 hover:to-blue-300 shadow-[0_10px_28px_-8px_rgba(6,182,212,0.55)] hover:shadow-[0_14px_32px_-8px_rgba(6,182,212,0.75)] hover:-translate-y-0.5"
+                            : "btn-primary"
+                            }`}
+                        >
+                          <span>{text.getAccessBtn}</span>
+                          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
+                        </a>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                );
+              })}
             </div>
 
             {/* Instrucciones de Pago */}
             <ScrollReveal delay={200}>
               <div className="mt-10 p-6 sm:p-8 rounded-2xl bg-blue-50 border border-blue-200">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <CheckCircle2 className="w-5 h-5 text-white" />
+                  <div className="w-10 h-10 rounded-xl border-2 border-blue-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                    <PremiumCheck className="w-5 h-5 text-blue-600" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-oswald text-lg font-bold text-slate-900 mb-1">{text.paymentTitle}</h3>
+                    {/* dangerouslySetInnerHTML is intentional: content is authored in UI_TEXT (this file),
+                        not user-supplied. It only contains <strong> tags. Do NOT replace with user data. */}
                     <p className="text-sm text-slate-600 leading-relaxed mb-4" dangerouslySetInnerHTML={{ __html: text.paymentIntroHtml }} />
                     <div className="grid sm:grid-cols-3 gap-3">
                       {text.paymentSteps.map((s) => (
@@ -1666,11 +1765,12 @@ export default function Home() {
           </div>
         </section>
 
+        {/* ═══ CINEMATIC STRIP — removed from flow per PDF mockup ═══ */}
+
         {/* ═══════════════════════════════════════════════════════════
             11. PATROCINADORES
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="patrocinadores" className="sponsors-section py-20 sm:py-28 relative overflow-hidden">
+        <section id="patrocinadores" className="sponsors-section py-20 sm:py-28 relative overflow-hidden section-ambient">
           <div className="sponsors-bg-glow" aria-hidden="true" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
@@ -1683,83 +1783,64 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
               {SPONSORS[language].map((s, i) => {
                 const meta = SPONSOR_TIER_META[i];
-                const TierIcon = meta.icon;
-                const levelLabel = String(meta.level).padStart(2, "0");
                 const benefitsCount = s.benefits.length;
+                const ctaClass = meta.featured
+                  ? "bg-slate-900 text-white hover:bg-slate-800 shadow-[0_10px_28px_-8px_rgba(15,23,42,0.5)]"
+                  : meta.highlighted
+                    ? "bg-gradient-to-r from-amber-500 to-amber-400 text-white hover:from-amber-400 hover:to-amber-300 shadow-[0_10px_28px_-8px_rgba(245,158,11,0.6)]"
+                    : i === 2
+                      ? "bg-slate-800 text-white hover:bg-slate-700 shadow-[0_10px_24px_-10px_rgba(15,23,42,0.45)]"
+                      : "bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:from-blue-500 hover:to-blue-400 shadow-[0_10px_28px_-8px_rgba(37,99,235,0.55)]";
                 return (
                   <ScrollReveal key={i} delay={i * 100}>
                     <div
-                      className={`sponsor-card relative h-full flex flex-col rounded-2xl bg-white border border-slate-200/70 overflow-hidden transition-all duration-500 ${meta.ring} ${
-                        meta.featured ? "sponsor-card--featured" : ""
-                      }`}
+                      className={`sponsor-card group relative h-full flex flex-col rounded-3xl bg-white border border-slate-200/80 overflow-hidden transition-all duration-500 ${meta.ring} ${meta.featured ? "sponsor-card--featured" : ""
+                        }`}
                     >
+                      {/* Top tier stripe */}
                       <div className={`h-1.5 w-full ${meta.stripe}`} aria-hidden="true" />
 
-                      {meta.featured && (
-                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-slate-900 text-slate-50 text-[9px] font-bold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full shadow-md">
-                          <Sparkles className="w-3 h-3" />
-                          <span>{text.sponsorExclusiveBadge}</span>
-                        </div>
-                      )}
-                      {meta.highlighted && (
-                        <div className="absolute top-4 right-4 flex items-center gap-1 bg-amber-500 text-white text-[9px] font-bold uppercase tracking-[0.16em] px-2.5 py-1 rounded-full shadow-md">
-                          <Star className="w-3 h-3 fill-white" />
-                          <span>{text.sponsorRecommendedBadge}</span>
-                        </div>
-                      )}
-
-                      <div className="p-6 pb-5 flex flex-col flex-1">
-                        <div className="flex items-start gap-3 mb-5">
-                          <div
-                            className={`relative w-12 h-12 rounded-xl ${meta.iconBg} ${meta.iconFg} flex items-center justify-center shadow-lg flex-shrink-0`}
-                            aria-hidden="true"
-                          >
-                            <TierIcon className="w-6 h-6" strokeWidth={2.2} />
-                          </div>
-                          <div className="min-w-0">
-                            <div className={`inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.18em] px-2 py-0.5 rounded-full ${meta.chipBg} ${meta.chipFg}`}>
-                              <span>{text.sponsorTierLabel}</span>
-                              <span className="font-mono">{levelLabel}</span>
-                            </div>
-                            <h3 className="font-oswald text-lg font-bold text-slate-900 mt-1.5 leading-tight">
-                              {s.tier}
-                            </h3>
-                          </div>
+                      <div className="relative p-6 pb-5 flex flex-col flex-1">
+                        {/* Tier name only — clean header */}
+                        <div className="mb-5">
+                          <h3 className="font-oswald text-xl font-bold text-slate-900 leading-tight tracking-tight">
+                            {s.tier}
+                          </h3>
                         </div>
 
+                        {/* Metric boxes */}
                         <div className="grid grid-cols-2 gap-2 mb-5">
-                          <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">
+                          <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
                             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
                               {text.sponsorStandLabel}
                             </p>
-                            <p className={`text-sm font-bold mt-0.5 ${meta.accent}`}>{meta.stand}</p>
+                            <p className={`text-sm font-bold mt-1 ${meta.accent}`}>{meta.stand}</p>
                           </div>
-                          <div className="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2">
+                          <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5">
                             <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">
                               {text.sponsorSlotsLabel}
                             </p>
-                            <p className={`text-sm font-bold mt-0.5 ${meta.accent}`}>
+                            <p className={`text-sm font-bold mt-1 ${meta.accent}`}>
                               <span className="font-mono">{meta.slotsTotal}</span>
                             </p>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-400">
+                        {/* Benefits header */}
+                        <div className="mb-3 pb-3 border-b border-slate-100">
+                          <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
                             {benefitsCount} {text.sponsorBenefitsLabel}
-                          </span>
-                          <span className={`text-[10px] font-mono font-bold ${meta.accent}`}>
-                            {"●".repeat(Math.min(benefitsCount, 5)).split("").join(" ")}
                           </span>
                         </div>
 
+                        {/* Benefits list */}
                         <ul className="space-y-2 flex-1">
                           {s.benefits.map((b, j) => (
                             <li key={j} className="flex items-start gap-2 text-[13px] leading-snug text-slate-600">
-                              <CheckCircle2 className={`w-4 h-4 ${meta.accent} flex-shrink-0 mt-0.5`} />
+                              <PremiumCheck className={`w-3.5 h-3.5 ${meta.accent} flex-shrink-0 mt-0.5`} />
                               <span>{b}</span>
                             </li>
                           ))}
@@ -1767,10 +1848,10 @@ export default function Home() {
 
                         <a
                           href={`mailto:Contacto@LanzLogistics.com?subject=${encodeURIComponent(`Patrocinio ${s.tier} – Summit 2026`)}`}
-                          className="sponsor-cta inline-flex items-center justify-center gap-2 mt-6 w-full py-2.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all bg-slate-900 text-white hover:bg-slate-800"
+                          className={`sponsor-cta inline-flex items-center justify-center gap-2 mt-6 w-full py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 ${ctaClass}`}
                         >
                           {text.sponsorRequestInfo}
-                          <ArrowRight className="w-4 h-4" />
+                          <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" strokeWidth={2.5} />
                         </a>
                       </div>
                     </div>
@@ -1782,140 +1863,15 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
-            12. UBICACIÓN
+            CTA Banner — Cupo Limitado
            ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#FFFFFF" flip />
-        <section id="ubicacion" className="py-20 sm:py-28 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-12">
-                <span className="section-label flex items-center justify-center gap-2">
-                  <MapPin className="w-4 h-4" /> {text.locationLabel}
-                </span>
-                <h2 className="section-title mt-3">{text.locationTitle}</h2>
-              </div>
-            </ScrollReveal>
-
-            <ScrollReveal>
-              <div className="grid md:grid-cols-5 gap-8 items-start">
-                {/* Map */}
-                <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
-                  <iframe
-                    src="https://www.google.com/maps?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico&output=embed"
-                    className="w-full h-[280px] sm:h-[350px]"
-                    style={{ border: 0 }}
-                    allowFullScreen
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    title="Centro de Convenciones de Reynosa"
-                  />
-                </div>
-
-                {/* Info */}
-                <div className="md:col-span-2 space-y-6">
-                  <div className="card-elevated p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <MapPin className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{text.addressLabel}</h4>
-                        <p className="text-sm text-slate-700 font-medium mt-1">{text.addressName}</p>
-                        <p className="text-sm text-slate-500 mt-0.5">{text.addressLine1}</p>
-                        <p className="text-sm text-slate-500">{text.addressLine2}</p>
-                        <a
-                          href="https://maps.google.com/?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
-                        >
-                          <ExternalLink className="w-3 h-3" /> {text.viewOnMaps}
-                        </a>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-elevated p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <Calendar className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{text.datesLabel}</h4>
-                        <p className="text-sm text-slate-500 mt-1">{text.datesValue}</p>
-                        <p className="text-xs text-slate-400 mt-1">{text.datesHours}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="card-elevated p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
-                        <Phone className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-slate-800 text-sm">{text.contactLabel}</h4>
-                        <p className="text-sm text-slate-500 mt-1">+1 (956) 515-8070</p>
-                        <a href="mailto:Contacto@LanzLogistics.com" className="text-sm text-blue-600 hover:underline">Contacto@LanzLogistics.com</a>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            13. FAQ
-           ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#F8FAFC" />
-        <section id="faq" className="py-20 sm:py-28 bg-slate-50">
-          <div className="max-w-3xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-12">
-                <span className="section-label">{text.faqLabel}</span>
-                <h2 className="section-title mt-3">{text.faqTitle}</h2>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal delay={200}>
-              <FAQAccordion items={language === "es" ? FAQ_ITEMS : FAQ_ITEMS_EN} />
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            14. REGISTRO
-           ═══════════════════════════════════════════════════════════ */}
-        <WaveSeparator color="#FFFFFF" flip />
-        <section id="registro" className="py-20 sm:py-28 bg-white">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6">
-            <ScrollReveal>
-              <div className="text-center mb-10">
-                <span className="section-label">{text.regLabel}</span>
-                <h2 className="section-title mt-3">{text.regTitle}</h2>
-                <p className="text-slate-500 max-w-xl mx-auto mt-4">
-                  {text.regDesc}
-                </p>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal delay={200}>
-              <div className="card-elevated p-6 sm:p-10">
-                <RegistroForm language={language} />
-              </div>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* ═══════════════════════════════════════════════════════════
-            15. FINAL CTA Banner
-           ═══════════════════════════════════════════════════════════ */}
-        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 overflow-hidden">
-          {/* Decorative */}
-          <div className="absolute inset-0 opacity-[0.04]" style={{
-            backgroundImage: `radial-gradient(circle, rgba(255,255,255,0.15) 1px, transparent 1px)`,
-            backgroundSize: "30px 30px"
-          }} />
-          <div className="absolute top-10 left-10 w-32 h-32 border border-white/5 rounded-full float-shape" />
-          <div className="absolute bottom-10 right-10 w-24 h-24 border border-cyan-400/10 rounded-2xl float-shape-reverse" />
+        <section className="relative bg-gradient-to-br from-blue-800 via-blue-900 to-blue-950 py-20 overflow-hidden noise-texture">
+          {/* Floating grid — masked centre */}
+          <div className="floating-grid" aria-hidden="true" />
+          {/* Decorative parallelogram shapes */}
+          <div className="absolute top-10 left-10 w-32 h-12 border border-white/5 float-shape" style={{ transform: "skewX(-12deg)" }} />
+          <div className="absolute bottom-10 right-10 w-24 h-10 border border-cyan-400/10 float-shape-reverse" style={{ transform: "skewX(12deg)" }} />
+          <div className="absolute top-1/3 right-[15%] w-16 h-6 border border-blue-400/8 opacity-30 float-shape" style={{ transform: "skewX(-15deg)", animationDelay: "2s" }} />
 
           <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center relative z-10">
             <ScrollReveal>
@@ -1946,17 +1902,144 @@ export default function Home() {
         </section>
 
         {/* ═══════════════════════════════════════════════════════════
+            FORMULARIO DE REGISTRO
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="registro" className="py-20 sm:py-28 bg-white section-ambient">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-10">
+                <span className="section-label">{text.regLabel}</span>
+                <h2 className="section-title mt-3">{text.regTitle}</h2>
+                <p className="text-slate-500 max-w-xl mx-auto mt-4">
+                  {text.regDesc}
+                </p>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <div className="card-elevated p-6 sm:p-10">
+                <RegistroForm language={language} />
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            UBICACIÓN
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="ubicacion" className="py-20 sm:py-28 bg-white">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-12">
+                <span className="section-label flex items-center justify-center gap-2">
+                  <MapPin className="w-4 h-4" /> {text.locationLabel}
+                </span>
+                <h2 className="section-title mt-3">{text.locationTitle}</h2>
+              </div>
+            </ScrollReveal>
+
+            <ScrollReveal>
+              <div className="grid md:grid-cols-5 gap-8 items-start">
+                {/* Map */}
+                <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
+                  <iframe
+                    src="https://www.google.com/maps?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico&output=embed"
+                    className="w-full h-[280px] sm:h-[350px]"
+                    style={{ border: 0 }}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Centro de Convenciones de Reynosa"
+                  />
+                </div>
+
+                {/* Info */}
+                <div className="md:col-span-2 space-y-6">
+                  <div className="card-elevated p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <MapPin className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.addressLabel}</h4>
+                        <p className="text-sm text-slate-700 font-medium mt-1">{text.addressName}</p>
+                        <p className="text-sm text-slate-500 mt-0.5">{text.addressLine1}</p>
+                        <p className="text-sm text-slate-500">{text.addressLine2}</p>
+                        <a
+                          href="https://maps.google.com/?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
+                        >
+                          <ExternalLink className="w-3 h-3" /> {text.viewOnMaps}
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-elevated p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <Calendar className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.datesLabel}</h4>
+                        <p className="text-sm text-slate-500 mt-1">{text.datesValue}</p>
+                        <p className="text-xs text-slate-400 mt-1">{text.datesHours}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="card-elevated p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                        <Phone className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">{text.contactLabel}</h4>
+                        <p className="text-sm text-slate-500 mt-1">+1 (956) 515-8070</p>
+                        <a href="mailto:Contacto@LanzLogistics.com" className="text-sm text-blue-600 hover:underline">Contacto@LanzLogistics.com</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
+            FAQ
+           ═══════════════════════════════════════════════════════════ */}
+        <section id="faq" className="rhythm-pause-md bg-slate-50 section-ambient">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6">
+            <ScrollReveal>
+              <div className="text-center mb-12">
+                <span className="section-label">{text.faqLabel}</span>
+                <h2 className="section-title mt-3">{text.faqTitle}</h2>
+              </div>
+            </ScrollReveal>
+            <ScrollReveal delay={200}>
+              <FAQAccordion items={language === "es" ? FAQ_ITEMS : FAQ_ITEMS_EN} />
+            </ScrollReveal>
+          </div>
+        </section>
+
+        {/* ═══════════════════════════════════════════════════════════
             16. FOOTER
            ═══════════════════════════════════════════════════════════ */}
-        <footer className="bg-slate-900 pt-16 pb-8">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <div className="grid md:grid-cols-4 gap-10 mb-12">
+        <footer className="footer-premium pt-16 pb-8">
+          <div className="noise-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
+          <div className="floating-grid" aria-hidden="true" />
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-12">
               {/* Brand */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center">
-                    <Shield className="w-5 h-5 text-white" />
-                  </div>
+                  <Image
+                    src="/images/logo-symbol-blue.png"
+                    alt="SC Security Summit"
+                    width={44}
+                    height={44}
+                    className="w-10 h-10 sm:w-11 sm:h-11 object-contain logo-on-dark"
+                  />
                   <div>
                     <span className="font-oswald text-lg font-bold text-white">SC SUMMIT</span>
                     <span className="block text-[10px] font-bold tracking-[0.2em] text-blue-400">REYNOSA 2026</span>

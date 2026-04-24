@@ -1,10 +1,15 @@
 "use server";
 
 import { headers } from "next/headers";
+import { randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
+
+function auditLog(event: string, data: Record<string, unknown>) {
+  console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
+}
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -24,6 +29,7 @@ export async function registrarAsistente(
   // 0. Honeypot anti-spam: si el campo "website" tiene contenido, es un bot
   const honeypot = formData.get("website");
   if (honeypot && String(honeypot).length > 0) {
+    auditLog("honeypot_triggered", { ip: "unknown" });
     // Respuesta falsa exitosa para no revelar la detección al bot
     return {
       success: true,
@@ -41,10 +47,10 @@ export async function registrarAsistente(
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
 
-  // 2. Rate limit — 5 intentos por IP cada 15 minutos
-  // TODO: migrar a Vercel KV (@vercel/kv) para rate limiting distribuido multi-región
-  const rl = checkRateLimit(ip);
+  // 2. Rate limit — 5 intentos por IP cada 15 minutos (Upstash Redis, distribuido multi-región)
+  const rl = await checkRateLimit(ip);
   if (!rl.ok) {
+    auditLog("rate_limit_exceeded", { ip });
     return {
       success: false,
       message: "Has realizado demasiados intentos. Espera 15 minutos e intenta de nuevo.",
@@ -56,6 +62,7 @@ export async function registrarAsistente(
   const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
   const turnstileOk = await verifyTurnstile(turnstileToken, ip);
   if (!turnstileOk) {
+    auditLog("turnstile_failed", { ip, userAgent });
     return {
       success: false,
       message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
@@ -117,11 +124,9 @@ export async function registrarAsistente(
     };
   }
 
-  // 7. Generate unique folio
-  const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${Math.random()
-    .toString(36)
-    .substring(2, 6)
-    .toUpperCase()}`;
+  // 7. Generate unique folio (CSPRNG suffix — Math.random is not cryptographically secure)
+  const folioSuffix = randomBytes(3).toString("hex").toUpperCase();
+  const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${folioSuffix}`;
 
   // 8. Insert into Supabase via service_role (bypasses RLS, server-side only)
   try {
@@ -163,6 +168,7 @@ export async function registrarAsistente(
     if (error) {
       // Duplicate email (unique constraint)
       if (error.code === "23505") {
+        auditLog("duplicate_email_attempt", { ip, userAgent });
         return {
           success: false,
           message: "Este correo electrónico ya tiene un registro activo.",
@@ -172,8 +178,7 @@ export async function registrarAsistente(
         };
       }
 
-      // Log estructurado para Vercel — no se expone al cliente
-      console.error("[registro] DB error", { code: error.code, hint: error.hint });
+      auditLog("db_error", { code: error.code, hint: error.hint, ip });
       return {
         success: false,
         message:
@@ -188,13 +193,14 @@ export async function registrarAsistente(
       ? " Se procesará tu factura CFDI con los datos proporcionados."
       : "";
 
+    auditLog("registration_success", { folio, tipo_acceso: data.tipo_acceso, ip });
     return {
       success: true,
       message: `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${cfdiNote}`,
       folio,
     };
   } catch (err) {
-    console.error("[registro] Unexpected error", err instanceof Error ? err.message : "unknown");
+    auditLog("unexpected_error", { ip, error: err instanceof Error ? err.message : "unknown" });
     return {
       success: false,
       message: "Error inesperado. Contacta a Contacto@LanzLogistics.com",

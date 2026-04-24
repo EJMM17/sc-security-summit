@@ -25,21 +25,30 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
+          // HSTS — prevents HTTPS→HTTP downgrade attacks; required for preload list
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
           { key: "X-Frame-Options", value: "SAMEORIGIN" },
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
           {
-            key: "Content-Security-Policy",
-            value: [
-              "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
-              "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-              "font-src 'self' https://fonts.gstatic.com",
-              "img-src 'self' data: blob:",
-              "frame-src https://www.google.com https://maps.google.com https://challenges.cloudflare.com",
-              "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com",
-            ].join("; "),
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          // CSP is handled by middleware.ts (nonce-based per-request).
+          // The middleware sets Content-Security-Policy on every response.
+        ],
+      },
+      {
+        // 1-year immutable cache for versioned image assets.
+        // If an image changes, rename the file to bust the cache.
+        source: "/images/(.*)",
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=31536000, immutable",
           },
         ],
       },

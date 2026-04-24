@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Shield, ArrowLeft } from "lucide-react";
 
+export const revalidate = 86400; // 24 hours — static content, revalidate daily
+
 export const metadata: Metadata = {
   title: "Términos y Condiciones | SC Security Summit 2026",
   description:
