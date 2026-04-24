@@ -485,7 +485,7 @@ const SPEAKERS = {
       name: "Eduardo Luna",
       role: "Especialista en Innovación Estratégica",
       org: "Certificación Internacional en Enseñanza",
-      topic: "Innovación & Aprendizaje",
+      topic: "Organización & Expansión",
       image: "/images/speaker-eduardo.png",
     },
   ],
@@ -515,7 +515,7 @@ const SPEAKERS = {
       name: "Eduardo Luna",
       role: "Strategic Innovation Specialist",
       org: "International Teaching Certification",
-      topic: "Innovation & Learning",
+      topic: "Organization & Expansion",
       image: "/images/speaker-eduardo.png",
     },
   ],
@@ -1320,8 +1320,12 @@ export default function Home() {
         {/* ═══════════════════════════════════════════════════════════
             5. CONFERENCISTAS — with real photos
            ═══════════════════════════════════════════════════════════ */}
-        <section id="speakers" className="py-20 sm:py-28 bg-white">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <section id="speakers" className="relative overflow-hidden py-20 sm:py-28 bg-white">
+          {/* Animated background orbs */}
+          <div className="speaker-orb speaker-orb-1" aria-hidden="true" />
+          <div className="speaker-orb speaker-orb-2" aria-hidden="true" />
+
+          <div className="relative max-w-6xl mx-auto px-4 sm:px-6">
             <ScrollReveal>
               <div className="text-center mb-16">
                 <span className="section-label flex items-center justify-center gap-2">
@@ -1336,23 +1340,36 @@ export default function Home() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
               {SPEAKERS[language].map((s, i) => (
-                <ScrollReveal key={i} delay={i * 100}>
+                <ScrollReveal
+                  key={i}
+                  delay={i * 120}
+                  direction={(["left", "scale", "scale", "right"] as const)[i]}
+                >
                   <div className="speaker-card group text-center">
                     {/* Photo */}
-                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/20 transition-shadow">
+                    <div className="relative w-44 h-44 mx-auto mb-5 rounded-2xl overflow-hidden shadow-xl shadow-blue-500/10 group-hover:shadow-blue-500/30 transition-shadow speaker-photo-pulse">
+                      {/* Numbered badge — reveals on hover */}
+                      <span className="speaker-index">{String(i + 1).padStart(2, "0")}</span>
+
                       <Image
                         src={s.image}
                         alt={s.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
+
+                      {/* Shimmer sweep on hover */}
+                      <div className="speaker-shimmer" aria-hidden="true" />
+
                       {/* Topic badge */}
                       <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-blue-900/90 to-transparent pt-8 pb-3 px-3">
-                        <span className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
+                        <span className="speaker-topic-glow text-[10px] font-bold text-cyan-300 uppercase tracking-wider">{s.topic}</span>
                       </div>
                     </div>
 
-                    <h3 className="font-oswald text-lg font-bold text-slate-900">{s.name}</h3>
+                    <h3 className="font-oswald text-lg font-bold text-slate-900">
+                      <span className="speaker-name-anim">{s.name}</span>
+                    </h3>
                     <p className="text-sm text-slate-500 mt-1 leading-snug">{s.role}</p>
                     <p className="text-xs text-blue-600 font-medium mt-1">{s.org}</p>
                   </div>
