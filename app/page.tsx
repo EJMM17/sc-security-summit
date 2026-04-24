@@ -503,7 +503,7 @@ const SPEAKERS = {
     {
       name: "Eduardo Luna",
       role: "Organización Operativa y Expansión Comercial",
-      topic: "Innovación & Aprendizaje",
+      topic: "Organización & Expansión",
       image: "/images/speaker-eduardo.webp",
     },
   ],
@@ -529,7 +529,7 @@ const SPEAKERS = {
     {
       name: "Eduardo Luna",
       role: "Operational Organization & Commercial Expansion",
-      topic: "Innovation & Learning",
+      topic: "Organization & Expansion",
       image: "/images/speaker-eduardo.webp",
     },
   ],
@@ -1383,7 +1383,7 @@ export default function Home() {
                     </div>
 
                     {/* Info block */}
-                    <div className="p-5 pb-4">
+                    <div className="speaker-info p-5 pb-4">
                       <h3 className="font-oswald text-base font-bold text-slate-900 leading-tight">{s.name}</h3>
                       <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug">{s.role}</p>
                     </div>
