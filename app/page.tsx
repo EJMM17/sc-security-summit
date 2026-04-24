@@ -1043,7 +1043,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={() => setLanguage((prev) => (prev === "es" ? "en" : "es"))}
-                className="inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+                className="inline-flex items-center justify-center w-11 h-11 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors touch-manipulation"
                 aria-label={text.switchLangLabel}
               >
                 {language === "es" ? "EN" : "ES"}
@@ -1086,7 +1086,7 @@ export default function Home() {
           <div className="relative z-10 text-center px-5 sm:px-6 py-10 sm:py-16 max-w-5xl mx-auto flex flex-col items-center">
             {/* Title */}
             <ScrollReveal delay={100}>
-              <h1 className="font-oswald text-[2rem] sm:text-5xl md:text-[4.2rem] lg:text-7xl font-bold text-white leading-[1.06] mb-6 sm:mb-7 tracking-tight">
+              <h1 className="font-oswald text-[2rem] sm:text-[2.8rem] md:text-[4.2rem] lg:text-7xl font-bold text-white leading-[1.06] mb-6 sm:mb-7 tracking-tight">
                 {text.heroTitlePrefix}{" "}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-blue-300">
                   {text.heroTitleHighlight}
@@ -1530,7 +1530,7 @@ export default function Home() {
               {/* Right: Perfil de Asistentes (2 cols) */}
               <div className="lg:col-span-2">
                 <ScrollReveal delay={200}>
-                  <div className="sticky top-24 p-8 rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-lg">
+                  <div className="sticky top-[62px] sm:top-[68px] lg:top-24 p-8 rounded-2xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 via-white to-blue-50 shadow-lg">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center ring-1 ring-slate-700 shadow-md">
                         <Users className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
@@ -1654,7 +1654,7 @@ export default function Home() {
                         {/* Price block */}
                         <div className={`pb-6 mb-6 border-b ${isVip ? "border-white/10" : "border-slate-100"}`}>
                           <div className="flex items-baseline gap-2">
-                            <span className={`font-oswald text-5xl font-bold tracking-tight leading-none ${isVip ? "text-white" : "text-slate-900"}`}>
+                            <span className={`font-oswald text-4xl sm:text-5xl font-bold tracking-tight leading-none ${isVip ? "text-white" : "text-slate-900"}`}>
                               {plan.price}
                             </span>
                             <span className={`text-xs font-bold uppercase tracking-[0.18em] ${isVip ? "text-cyan-300" : "text-slate-400"}`}>MXN</span>
@@ -1743,7 +1743,7 @@ export default function Home() {
               </div>
             </ScrollReveal>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
+            <div className="grid sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-5 lg:gap-6">
               {SPONSORS[language].map((s, i) => {
                 const meta = SPONSOR_TIER_META[i];
                 const benefitsCount = s.benefits.length;
@@ -1989,7 +1989,7 @@ export default function Home() {
           <div className="noise-texture absolute inset-0 pointer-events-none" aria-hidden="true" />
           <div className="floating-grid" aria-hidden="true" />
           <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
-            <div className="grid md:grid-cols-4 gap-10 mb-12">
+            <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 mb-12">
               {/* Brand */}
               <div className="md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
