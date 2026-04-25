@@ -84,7 +84,7 @@ export const SPEAKERS = [
     id: 4,
     name: "Eduardo Luna",
     role: "Organización Operativa y Expansión Comercial",
-    topic: "Innovación Tecnológica en Supply Chain",
+    topic: "Organización & Expansión",
     image: "/images/speaker-eduardo.webp",
   },
 ] as const;

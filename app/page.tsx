@@ -502,7 +502,7 @@ const SPEAKERS = {
     {
       name: "Eduardo Luna",
       role: "Organización Operativa y Expansión Comercial",
-      topic: "Innovación & Aprendizaje",
+      topic: "Organización & Expansión",
       image: "/images/speaker-eduardo.webp",
     },
   ],
@@ -528,7 +528,7 @@ const SPEAKERS = {
     {
       name: "Eduardo Luna",
       role: "Operational Organization & Commercial Expansion",
-      topic: "Innovation & Learning",
+      topic: "Organization & Expansion",
       image: "/images/speaker-eduardo.webp",
     },
   ],
@@ -1375,7 +1375,9 @@ export default function Home() {
                 <span className="section-label flex items-center justify-center gap-2">
                   <Mic2 className="w-4 h-4" /> {text.speakersLabel}
                 </span>
-                <h2 className="section-title mt-3">{text.speakersTitle}</h2>
+                <h2 className="section-title mt-3">
+                  <span className="speaker-section-title">{text.speakersTitle}</span>
+                </h2>
                 <p className="text-slate-500 max-w-2xl mx-auto mt-4">
                   {text.speakersDesc}
                 </p>
@@ -1384,10 +1386,10 @@ export default function Home() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {SPEAKERS[language].map((s, i) => (
-                <ScrollReveal key={i} delay={i * 120} direction="scale">
+                <ScrollReveal key={i} delay={i * 150} direction="scale">
                   <div className="speaker-card group">
                     {/* Photo — portrait ratio */}
-                    <div className="speaker-photo-wrap overflow-hidden">
+                    <div className="speaker-photo-wrap">
                       <Image
                         src={s.image}
                         alt={s.name}
@@ -1398,13 +1400,18 @@ export default function Home() {
                       {/* Topic badge — glassy pill top-left */}
                       <span className="speaker-tag absolute top-3 left-3 z-10">{s.topic}</span>
                       {/* Soft vignette at bottom */}
-                      <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-slate-900/40 to-transparent pointer-events-none" />
+                      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/55 to-transparent pointer-events-none z-[1]" />
+                      {/* Decorative index number */}
+                      <span className="speaker-number">{String(i + 1).padStart(2, "0")}</span>
                     </div>
 
                     {/* Info block */}
-                    <div className="p-5 pb-4">
+                    <div className="speaker-info p-5 pb-4">
                       <h3 className="font-oswald text-base font-bold text-slate-900 leading-tight">{s.name}</h3>
-                      <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug">{s.role}</p>
+                      <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug flex items-center">
+                        <span className="speaker-role-dot" />
+                        {s.role}
+                      </p>
                     </div>
 
                     {/* Accent line — slides in on hover */}
@@ -1414,7 +1421,7 @@ export default function Home() {
               ))}
             </div>
 
-            <ScrollReveal delay={500}>
+            <ScrollReveal delay={600}>
               <p className="text-center text-sm text-slate-400 mt-12">
                 {text.speakersMorePrefix}{" "}
                 <a href="#registro" className="text-blue-600 font-semibold hover:underline">
