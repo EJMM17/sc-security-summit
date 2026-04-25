@@ -4,17 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/check-env.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "lint:eslint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "check-env": "node scripts/check-env.mjs",
-    "vercel:env:push": "node scripts/push-env-to-vercel.mjs",
-    "vercel:env:pull": "vercel env pull .env.local",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
     "typecheck": "tsc --noEmit"
   },
   "engines": {
