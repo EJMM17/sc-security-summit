@@ -403,13 +403,11 @@ const HERO_STATS = {
     { number: 2, suffix: "", label: "Días de Capacitación" },
     { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
-    { number: 4, suffix: "+", label: "sectores de la cadena de suministros" },
   ],
   en: [
     { number: 2, suffix: "", label: "Training Days" },
     { number: 4, suffix: "+", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
-    { number: 4, suffix: "+", label: "supply chain sectors" },
   ],
 } as const;
 
@@ -1163,7 +1161,7 @@ export default function Home() {
                 {HERO_STATS[language].map((s, i) => (
                   <div
                     key={i}
-                    className={`text-center px-5 py-3 rounded-xl ${i === 3 ? "bg-blue-700 shadow-lg shadow-blue-900/40" : ""}`}
+                    className="text-center px-5 py-3"
                   >
                     <div className="flex items-baseline justify-center gap-1">
                       <AnimatedCounter target={s.number} className="font-oswald text-3xl sm:text-4xl font-bold text-white" />
