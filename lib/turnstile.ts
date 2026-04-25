@@ -1,27 +1,27 @@
-export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
-  const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) {
-    if (process.env.NODE_ENV === "production") {
-      throw new Error("[turnstile] TURNSTILE_SECRET_KEY is required in production");
-    }
-    console.warn("[turnstile] TURNSTILE_SECRET_KEY no configurada, validación deshabilitada en dev");
-    return true;
-  }
+import "server-only";
 
+import { env } from "@/env";
+
+export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const body = new FormData();
-  body.append("secret", secret);
+  body.append("secret", env.TURNSTILE_SECRET_KEY);
   body.append("response", token);
   body.append("remoteip", ip);
 
   try {
-    const res = await fetch(
-      "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-      { method: "POST", body }
-    );
-    const data = await res.json();
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body,
+    });
+
+    if (!res.ok) {
+      throw new Error(`Turnstile verification HTTP ${res.status}`);
+    }
+
+    const data = (await res.json()) as { success?: boolean };
     return data.success === true;
   } catch (err) {
     console.error("[turnstile] verification error", err);
-    return false; // fail-closed en producción
+    return false;
   }
 }
