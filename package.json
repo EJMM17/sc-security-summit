@@ -7,6 +7,7 @@
     "prebuild": "node scripts/check-env.mjs",
     "build": "next build",
     "start": "next start",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
     "lint": "next lint",
     "check-env": "node scripts/check-env.mjs",
     "vercel:env:push": "node scripts/push-env-to-vercel.mjs",
@@ -40,6 +41,8 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^15.5.15",
     "@vitest/coverage-v8": "^2.1.9",
     "sharp": "^0.34.5",
     "typescript": "^5",
