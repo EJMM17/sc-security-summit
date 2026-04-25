@@ -18,8 +18,28 @@ CREATE POLICY service_role_full_access ON public.registros
   WITH CHECK (true);
 
 -- 4. Endurecer funciones con search_path (previene secuestro de schema)
-ALTER FUNCTION public.set_updated_at() SET search_path = public, pg_temp;
-ALTER FUNCTION public.notify_new_registro() SET search_path = public, pg_temp;
+-- Guardas idempotentes: solo endurecer funciones si existen en el esquema public.
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'update_updated_at_column'
+  ) THEN
+    ALTER FUNCTION public.update_updated_at_column() SET search_path = public, pg_temp;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM pg_proc p
+    JOIN pg_namespace n ON n.oid = p.pronamespace
+    WHERE n.nspname = 'public' AND p.proname = 'notify_new_registro'
+  ) THEN
+    ALTER FUNCTION public.notify_new_registro() SET search_path = public, pg_temp;
+  END IF;
+END
+$$;
 
 -- 5. Agregar columnas de auditoría y atribución
 ALTER TABLE public.registros
