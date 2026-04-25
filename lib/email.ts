@@ -14,6 +14,7 @@
 
 import { Resend } from "resend";
 import {
+  buildAdminLoginLink,
   buildOrganizerNotification,
   buildRegistrationConfirmation,
   type OrganizerEmailData,
@@ -135,5 +136,19 @@ export async function sendOrganizerNotification(
     html,
     text,
     tag: "organizer_notification",
+  });
+}
+
+export async function sendAdminLoginLink(args: {
+  to: string;
+  url: string;
+}): Promise<SendResult> {
+  const { subject, html, text } = buildAdminLoginLink({ url: args.url });
+  return send({
+    to: args.to,
+    subject,
+    html,
+    text,
+    tag: "admin_login",
   });
 }

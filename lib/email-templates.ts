@@ -318,3 +318,35 @@ function row(label: string, value: string): string {
       <td style="padding:10px 16px;border-bottom:1px solid #1f2430;font-size:13px;color:#ffffff;">${value}</td>
     </tr>`;
 }
+
+// =============================================================
+// 3. Admin login magic link (sent to operators on /admin/login)
+// =============================================================
+export function buildAdminLoginLink(args: { url: string }): RenderedEmail {
+  const subject = "Acceso al panel · SC Security Summit 2026";
+  const text = [
+    "Acceso al panel de administración",
+    "",
+    "Haz click en el siguiente link para entrar al panel. El link expira en 15 minutos.",
+    "",
+    args.url,
+    "",
+    "Si no solicitaste este link, puedes ignorar este correo.",
+  ].join("\n");
+
+  const bodyHtml = `
+<div style="font-size:15px;line-height:1.6;color:#e6e8ee;">
+  <p style="margin:0 0 14px;">Acceso al panel de administración</p>
+  <p style="margin:0 0 22px;color:#c5cad4;font-size:14px;">El link expira en 15 minutos. Si no solicitaste este acceso, ignora este correo.</p>
+  <p style="margin:0 0 24px;">
+    <a href="${args.url}" style="display:inline-block;background:#2563eb;color:#ffffff;padding:14px 24px;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;">Entrar al panel</a>
+  </p>
+  <p style="margin:0;color:#7a8294;font-size:12px;word-break:break-all;">${args.url}</p>
+</div>`;
+
+  return {
+    subject,
+    html: htmlShell({ previewText: "Link de acceso al panel — expira en 15 min", bodyHtml }),
+    text,
+  };
+}
