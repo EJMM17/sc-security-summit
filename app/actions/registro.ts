@@ -5,10 +5,34 @@ import { randomBytes } from "crypto";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import {
+  sendOrganizerNotification,
+  sendRegistrationConfirmation,
+  type SendResult,
+} from "@/lib/email";
+import type { EmailLanguage } from "@/lib/email-templates";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
+}
+
+// Pick "es" | "en" from form data or Accept-Language header. Defaults to "es"
+// since the site primary language is Spanish.
+function pickLanguage(formData: FormData, acceptLanguage: string | null): EmailLanguage {
+  const explicit = String(formData.get("language") ?? "").toLowerCase();
+  if (explicit === "en" || explicit === "es") return explicit;
+  if (acceptLanguage && /^en\b/i.test(acceptLanguage)) return "en";
+  return "es";
+}
+
+// Returns a human-readable failure reason when an email send did not succeed,
+// otherwise null. Lets us narrow the SendResult discriminated union cleanly.
+function emailFailureReason(result: PromiseSettledResult<SendResult>): string | null {
+  if (result.status === "rejected") {
+    return result.reason instanceof Error ? result.reason.message : String(result.reason);
+  }
+  return result.value.ok ? null : result.value.error;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -46,6 +70,8 @@ export async function registrarAsistente(
     "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
+  const acceptLanguage = h.get("accept-language");
+  const language = pickLanguage(formData, acceptLanguage);
 
   // 2. Rate limit — 5 intentos por IP cada 15 minutos (Upstash Redis, distribuido multi-región)
   const rl = await checkRateLimit(ip);
@@ -189,14 +215,59 @@ export async function registrarAsistente(
       };
     }
 
-    const cfdiNote = data.requiere_cfdi
-      ? " Se procesará tu factura CFDI con los datos proporcionados."
-      : "";
-
     auditLog("registration_success", { folio, tipo_acceso: data.tipo_acceso, ip });
+
+    // 9. Send confirmation + organizer notification emails. We await
+    // Promise.allSettled so Vercel doesn't terminate the lambda before the
+    // sends complete, but failures here MUST NOT break the user's success
+    // response — the registration is already persisted.
+    const [confirmResult, organizerResult] = await Promise.allSettled([
+      sendRegistrationConfirmation({
+        to: data.email,
+        folio,
+        nombre: data.nombre,
+        tipoAcceso: data.tipo_acceso,
+        montoMxn: PRECIOS[data.tipo_acceso],
+        language,
+      }),
+      sendOrganizerNotification({
+        folio,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        email: data.email,
+        telefono: data.telefono?.trim() || null,
+        empresa: data.empresa,
+        cargo: data.cargo,
+        tipoAcceso: data.tipo_acceso,
+        montoMxn: PRECIOS[data.tipo_acceso],
+        requiereCfdi: data.requiere_cfdi ?? false,
+        rfc: data.rfc?.trim().toUpperCase() || null,
+        ipRegistro: ip,
+      }),
+    ]);
+
+    const confirmReason = emailFailureReason(confirmResult);
+    if (confirmReason) {
+      auditLog("email_confirmation_failed", { folio, to: data.email, reason: confirmReason });
+    }
+
+    const organizerReason = emailFailureReason(organizerResult);
+    if (organizerReason) {
+      auditLog("email_organizer_failed", { folio, reason: organizerReason });
+    }
+
+    const successMessage =
+      language === "en"
+        ? `Registration complete. Your confirmation folio is ${folio}. Payment instructions are on the way to your inbox.${
+            data.requiere_cfdi ? " Your CFDI invoice will be issued with the data provided." : ""
+          }`
+        : `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${
+            data.requiere_cfdi ? " Se procesará tu factura CFDI con los datos proporcionados." : ""
+          }`;
+
     return {
       success: true,
-      message: `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${cfdiNote}`,
+      message: successMessage,
       folio,
     };
   } catch (err) {
