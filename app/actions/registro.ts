@@ -1,8 +1,8 @@
 "use server";
 
 import { headers } from "next/headers";
-import { randomBytes } from "crypto";
 import * as Sentry from "@sentry/nextjs";
+import { generateFolio } from "@/lib/folio";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
@@ -161,9 +161,8 @@ export async function registrarAsistente(
     };
   }
 
-  // 7. Generate unique folio (CSPRNG suffix — Math.random is not cryptographically secure)
-  const folioSuffix = randomBytes(3).toString("hex").toUpperCase();
-  const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${folioSuffix}`;
+  // 7. Generate unique folio (CSPRNG suffix — see lib/folio.ts)
+  const folio = generateFolio();
 
   // 8. Insert into Supabase via service_role (bypasses RLS, server-side only)
   try {
