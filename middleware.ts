@@ -15,7 +15,11 @@ export function middleware(request: NextRequest) {
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob:",
     "frame-src https://www.google.com https://maps.google.com https://challenges.cloudflare.com",
-    `connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com`,
+    "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com",
+    "form-action 'self'",
+    "base-uri 'self'",
+    "frame-ancestors 'self'",
+    "object-src 'none'",
   ].join("; ");
 
   const response = NextResponse.next();
