@@ -1,14 +1,49 @@
 "use server";
 
 import { headers } from "next/headers";
-import { randomBytes } from "crypto";
+import * as Sentry from "@sentry/nextjs";
+import { generateFolio } from "@/lib/folio";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
+import {
+  sendOrganizerNotification,
+  sendRegistrationConfirmation,
+  type SendResult,
+} from "@/lib/email";
+import type { EmailLanguage } from "@/lib/email-templates";
 import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
+}
+
+// Tells Sentry the request failed in a known, non-error way (rate limit,
+// duplicate email, etc) so we can alert on real exceptions but still see
+// trends in expected-failure paths via the messages tab.
+function captureControlledFailure(message: string, context: Record<string, unknown>) {
+  Sentry.captureMessage(message, {
+    level: "warning",
+    extra: context,
+  });
+}
+
+// Pick "es" | "en" from form data or Accept-Language header. Defaults to "es"
+// since the site primary language is Spanish.
+function pickLanguage(formData: FormData, acceptLanguage: string | null): EmailLanguage {
+  const explicit = String(formData.get("language") ?? "").toLowerCase();
+  if (explicit === "en" || explicit === "es") return explicit;
+  if (acceptLanguage && /^en\b/i.test(acceptLanguage)) return "en";
+  return "es";
+}
+
+// Returns a human-readable failure reason when an email send did not succeed,
+// otherwise null. Lets us narrow the SendResult discriminated union cleanly.
+function emailFailureReason(result: PromiseSettledResult<SendResult>): string | null {
+  if (result.status === "rejected") {
+    return result.reason instanceof Error ? result.reason.message : String(result.reason);
+  }
+  return result.value.ok ? null : result.value.error;
 }
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -46,6 +81,8 @@ export async function registrarAsistente(
     "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
+  const acceptLanguage = h.get("accept-language");
+  const language = pickLanguage(formData, acceptLanguage);
 
   // 2. Rate limit — 5 intentos por IP cada 15 minutos (Upstash Redis, distribuido multi-región)
   const rl = await checkRateLimit(ip);
@@ -124,9 +161,8 @@ export async function registrarAsistente(
     };
   }
 
-  // 7. Generate unique folio (CSPRNG suffix — Math.random is not cryptographically secure)
-  const folioSuffix = randomBytes(3).toString("hex").toUpperCase();
-  const folio = `SCSS2026-${Date.now().toString(36).toUpperCase()}-${folioSuffix}`;
+  // 7. Generate unique folio (CSPRNG suffix — see lib/folio.ts)
+  const folio = generateFolio();
 
   // 8. Insert into Supabase via service_role (bypasses RLS, server-side only)
   try {
@@ -179,6 +215,9 @@ export async function registrarAsistente(
       }
 
       auditLog("db_error", { code: error.code, hint: error.hint, ip });
+      Sentry.captureException(new Error(`registro db_error: ${error.code}`), {
+        extra: { code: error.code, hint: error.hint, message: error.message },
+      });
       return {
         success: false,
         message:
@@ -189,18 +228,66 @@ export async function registrarAsistente(
       };
     }
 
-    const cfdiNote = data.requiere_cfdi
-      ? " Se procesará tu factura CFDI con los datos proporcionados."
-      : "";
-
     auditLog("registration_success", { folio, tipo_acceso: data.tipo_acceso, ip });
+
+    // 9. Send confirmation + organizer notification emails. We await
+    // Promise.allSettled so Vercel doesn't terminate the lambda before the
+    // sends complete, but failures here MUST NOT break the user's success
+    // response — the registration is already persisted.
+    const [confirmResult, organizerResult] = await Promise.allSettled([
+      sendRegistrationConfirmation({
+        to: data.email,
+        folio,
+        nombre: data.nombre,
+        tipoAcceso: data.tipo_acceso,
+        montoMxn: PRECIOS[data.tipo_acceso],
+        language,
+      }),
+      sendOrganizerNotification({
+        folio,
+        nombre: data.nombre,
+        apellido: data.apellido,
+        email: data.email,
+        telefono: data.telefono?.trim() || null,
+        empresa: data.empresa,
+        cargo: data.cargo,
+        tipoAcceso: data.tipo_acceso,
+        montoMxn: PRECIOS[data.tipo_acceso],
+        requiereCfdi: data.requiere_cfdi ?? false,
+        rfc: data.rfc?.trim().toUpperCase() || null,
+        ipRegistro: ip,
+      }),
+    ]);
+
+    const confirmReason = emailFailureReason(confirmResult);
+    if (confirmReason) {
+      auditLog("email_confirmation_failed", { folio, to: data.email, reason: confirmReason });
+      captureControlledFailure("email_confirmation_failed", { folio, reason: confirmReason });
+    }
+
+    const organizerReason = emailFailureReason(organizerResult);
+    if (organizerReason) {
+      auditLog("email_organizer_failed", { folio, reason: organizerReason });
+      captureControlledFailure("email_organizer_failed", { folio, reason: organizerReason });
+    }
+
+    const successMessage =
+      language === "en"
+        ? `Registration complete. Your confirmation folio is ${folio}. Payment instructions are on the way to your inbox.${
+            data.requiere_cfdi ? " Your CFDI invoice will be issued with the data provided." : ""
+          }`
+        : `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${
+            data.requiere_cfdi ? " Se procesará tu factura CFDI con los datos proporcionados." : ""
+          }`;
+
     return {
       success: true,
-      message: `Registro completado exitosamente. Tu folio de confirmación es ${folio}. Recibirás instrucciones de pago en tu correo.${cfdiNote}`,
+      message: successMessage,
       folio,
     };
   } catch (err) {
     auditLog("unexpected_error", { ip, error: err instanceof Error ? err.message : "unknown" });
+    Sentry.captureException(err, { tags: { surface: "registro_action" } });
     return {
       success: false,
       message: "Error inesperado. Contacta a Contacto@LanzLogistics.com",

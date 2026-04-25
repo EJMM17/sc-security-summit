@@ -1,0 +1,87 @@
+import { Check, X } from "lucide-react";
+import { markRegistroCancelled, markRegistroPaid } from "@/app/actions/admin";
+import type { RegistroRow as RegistroRowData } from "./page";
+
+const TIER_LABEL: Record<RegistroRowData["tipo_acceso"], string> = {
+  estudiante: "Estudiante",
+  general: "General",
+  vip: "VIP",
+};
+
+const ESTADO_TONE: Record<RegistroRowData["estado_pago"], string> = {
+  pendiente: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+  pagado: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+  cancelado: "bg-slate-500/10 text-slate-400 border-slate-500/30",
+};
+
+const formatMxn = (n: number): string =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(n);
+
+const formatDate = (iso: string): string =>
+  new Date(iso).toLocaleString("es-MX", {
+    timeZone: "America/Monterrey",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+export default function RegistroRow({ row }: { row: RegistroRowData }) {
+  return (
+    <tr className="border-t border-slate-800 hover:bg-slate-900/50">
+      <td className="px-3 py-2 font-mono text-[11px]">{row.folio}</td>
+      <td className="px-3 py-2">
+        {row.nombre} {row.apellido}
+      </td>
+      <td className="px-3 py-2 text-slate-300">
+        <a className="hover:text-blue-300" href={`mailto:${row.email}`}>
+          {row.email}
+        </a>
+      </td>
+      <td className="px-3 py-2 text-slate-300">
+        <div>{row.empresa}</div>
+        <div className="text-[10px] text-slate-500">{row.cargo}</div>
+      </td>
+      <td className="px-3 py-2">{TIER_LABEL[row.tipo_acceso]}</td>
+      <td className="px-3 py-2 text-right tabular-nums">{formatMxn(row.monto_mxn)}</td>
+      <td className="px-3 py-2">
+        <span
+          className={`inline-block px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider border rounded ${ESTADO_TONE[row.estado_pago]}`}
+        >
+          {row.estado_pago}
+        </span>
+      </td>
+      <td className="px-3 py-2 text-slate-300">
+        {row.requiere_cfdi ? <span title={row.rfc ?? ""}>Sí · {row.rfc ?? "—"}</span> : "—"}
+      </td>
+      <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
+      <td className="px-3 py-2">
+        {row.estado_pago === "pendiente" && (
+          <div className="flex items-center gap-1">
+            <form action={markRegistroPaid}>
+              <input type="hidden" name="folio" value={row.folio} />
+              <button
+                type="submit"
+                title="Marcar pagado"
+                className="inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300"
+              >
+                <Check className="w-3.5 h-3.5" aria-label="Marcar pagado" />
+              </button>
+            </form>
+            <form action={markRegistroCancelled}>
+              <input type="hidden" name="folio" value={row.folio} />
+              <button
+                type="submit"
+                title="Cancelar"
+                className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
+              >
+                <X className="w-3.5 h-3.5" aria-label="Cancelar" />
+              </button>
+            </form>
+          </div>
+        )}
+      </td>
+    </tr>
+  );
+}

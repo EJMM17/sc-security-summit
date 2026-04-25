@@ -1,11 +1,28 @@
 "use client";
 
-import { useActionState, useState, useEffect } from "react";
-import { Send, FileText, Loader2 } from "lucide-react";
+import { useActionState, useState, useEffect, useRef } from "react";
+import { Send, FileText, Loader2, AlertCircle } from "lucide-react";
 import { registrarAsistente, type RegistroState } from "@/app/actions/registro";
 import { toast } from "sonner";
 
 type Language = "es" | "en";
+
+// Field name → input element id, used to focus the first invalid field after a
+// failed submit. Order matches visual layout for consistent UX.
+const FIELD_TO_INPUT_ID: Array<{ field: string; id: string }> = [
+  { field: "nombre", id: "reg-nombre" },
+  { field: "apellido", id: "reg-apellido" },
+  { field: "email", id: "reg-email" },
+  { field: "empresa", id: "reg-empresa" },
+  { field: "cargo", id: "reg-cargo" },
+  { field: "telefono", id: "reg-telefono" },
+  { field: "tipo_acceso", id: "reg-tipo" },
+  { field: "credencial_estudiantil", id: "reg-credencial" },
+  { field: "rfc", id: "reg-rfc" },
+  { field: "razon_social", id: "reg-razon" },
+  { field: "codigo_postal_fiscal", id: "reg-cp" },
+  { field: "acepta_terminos", id: "reg-terminos" },
+];
 
 const formText = {
   es: {
@@ -47,6 +64,11 @@ const formText = {
     submit: "Completar Registro",
     successToastTitle: "¡Operación Exitosa!",
     errorToastTitle: "Aviso",
+    errorSummaryHeading: "Hay errores en tu registro",
+    errorSummaryBody: (n: number) =>
+      n === 1
+        ? "Corrige el campo marcado debajo para continuar."
+        : `Corrige los ${n} campos marcados debajo para continuar.`,
   },
   en: {
     successTitle: "Registration Successful!",
@@ -87,6 +109,11 @@ const formText = {
     submit: "Complete Registration",
     successToastTitle: "Success!",
     errorToastTitle: "Notice",
+    errorSummaryHeading: "Your registration has errors",
+    errorSummaryBody: (n: number) =>
+      n === 1
+        ? "Fix the highlighted field below to continue."
+        : `Fix the ${n} highlighted fields below to continue.`,
   },
 } as const;
 
@@ -114,6 +141,7 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
   const [requiresCFDI, setRequiresCFDI] = useState(false);
   const [utms, setUtms] = useState({ source: "", medium: "", campaign: "" });
   const text = formText[language];
+  const errorSummaryRef = useRef<HTMLDivElement | null>(null);
 
   /* ── UTM capture from URL ── */
   useEffect(() => {
@@ -139,6 +167,32 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
       }
     }
   }, [state, text.errorToastTitle, text.successToastTitle]);
+
+  /* ── A11y: after a failed submit, move focus to the error summary so
+   *    screen-reader users hear the alert, then scroll the first invalid
+   *    field into view. */
+  useEffect(() => {
+    if (state.success || !state.errors) return;
+    if (errorSummaryRef.current) {
+      errorSummaryRef.current.focus({ preventScroll: false });
+    }
+    const firstErroredField = FIELD_TO_INPUT_ID.find(
+      ({ field }) => state.errors?.[field as keyof typeof state.errors],
+    );
+    if (firstErroredField) {
+      const el = document.getElementById(firstErroredField.id);
+      if (el) {
+        // Defer so the summary scroll completes first; we want both visible.
+        setTimeout(() => {
+          (el as HTMLInputElement).focus({ preventScroll: true });
+        }, 100);
+      }
+    }
+  }, [state]);
+
+  const errorCount = state.errors
+    ? Object.keys(state.errors).filter((k) => k !== "_form").length
+    : 0;
 
   if (state.success) {
     return (
@@ -183,10 +237,27 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
   }
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction} className="space-y-6" noValidate>
       <input type="hidden" name="utm_source" value={utms.source} />
       <input type="hidden" name="utm_medium" value={utms.medium} />
       <input type="hidden" name="utm_campaign" value={utms.campaign} />
+      <input type="hidden" name="language" value={language} />
+
+      {errorCount > 0 && (
+        <div
+          ref={errorSummaryRef}
+          role="alert"
+          aria-live="assertive"
+          tabIndex={-1}
+          className="flex items-start gap-3 rounded-lg border border-red-300 bg-red-50 p-4 text-red-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+        >
+          <AlertCircle className="w-5 h-5 mt-0.5 shrink-0 text-red-600" aria-hidden="true" />
+          <div className="text-sm leading-snug">
+            <p className="font-semibold">{text.errorSummaryHeading}</p>
+            <p>{text.errorSummaryBody(errorCount)}</p>
+          </div>
+        </div>
+      )}
 
       <div
         aria-hidden="true"
@@ -212,110 +283,257 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="reg-nombre" className={labelClass}>{text.firstName}</label>
-          <input id="reg-nombre" name="nombre" type="text" required placeholder={text.firstNamePlaceholder} className={inputClass} />
-          {state.errors?.nombre && <p className={errorClass}>{state.errors.nombre[0]}</p>}
+          <input
+            id="reg-nombre"
+            name="nombre"
+            type="text"
+            required
+            autoComplete="given-name"
+            placeholder={text.firstNamePlaceholder}
+            className={inputClass}
+            aria-describedby={state.errors?.nombre ? "err-nombre" : undefined}
+            aria-invalid={state.errors?.nombre ? true : undefined}
+          />
+          {state.errors?.nombre && (
+            <p id="err-nombre" role="alert" className={errorClass}>{state.errors.nombre[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor="reg-apellido" className={labelClass}>{text.lastName}</label>
-          <input id="reg-apellido" name="apellido" type="text" required placeholder={text.lastNamePlaceholder} className={inputClass} />
-          {state.errors?.apellido && <p className={errorClass}>{state.errors.apellido[0]}</p>}
+          <input
+            id="reg-apellido"
+            name="apellido"
+            type="text"
+            required
+            autoComplete="family-name"
+            placeholder={text.lastNamePlaceholder}
+            className={inputClass}
+            aria-describedby={state.errors?.apellido ? "err-apellido" : undefined}
+            aria-invalid={state.errors?.apellido ? true : undefined}
+          />
+          {state.errors?.apellido && (
+            <p id="err-apellido" role="alert" className={errorClass}>{state.errors.apellido[0]}</p>
+          )}
         </div>
       </div>
 
       <div>
         <label htmlFor="reg-email" className={labelClass}>{text.email}</label>
-        <input id="reg-email" name="email" type="email" required placeholder={text.emailPlaceholder} className={inputClass} />
-        {state.errors?.email && <p className={errorClass}>{state.errors.email[0]}</p>}
+        <input
+          id="reg-email"
+          name="email"
+          type="email"
+          required
+          autoComplete="email"
+          placeholder={text.emailPlaceholder}
+          className={inputClass}
+          aria-describedby={state.errors?.email ? "err-email" : undefined}
+          aria-invalid={state.errors?.email ? true : undefined}
+        />
+        {state.errors?.email && (
+          <p id="err-email" role="alert" className={errorClass}>{state.errors.email[0]}</p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="reg-empresa" className={labelClass}>{text.company}</label>
-          <input id="reg-empresa" name="empresa" type="text" required placeholder={text.companyPlaceholder} className={inputClass} />
-          {state.errors?.empresa && <p className={errorClass}>{state.errors.empresa[0]}</p>}
+          <input
+            id="reg-empresa"
+            name="empresa"
+            type="text"
+            required
+            autoComplete="organization"
+            placeholder={text.companyPlaceholder}
+            className={inputClass}
+            aria-describedby={state.errors?.empresa ? "err-empresa" : undefined}
+            aria-invalid={state.errors?.empresa ? true : undefined}
+          />
+          {state.errors?.empresa && (
+            <p id="err-empresa" role="alert" className={errorClass}>{state.errors.empresa[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor="reg-cargo" className={labelClass}>{text.role}</label>
-          <input id="reg-cargo" name="cargo" type="text" required placeholder={text.rolePlaceholder} className={inputClass} />
-          {state.errors?.cargo && <p className={errorClass}>{state.errors.cargo[0]}</p>}
+          <input
+            id="reg-cargo"
+            name="cargo"
+            type="text"
+            required
+            autoComplete="organization-title"
+            placeholder={text.rolePlaceholder}
+            className={inputClass}
+            aria-describedby={state.errors?.cargo ? "err-cargo" : undefined}
+            aria-invalid={state.errors?.cargo ? true : undefined}
+          />
+          {state.errors?.cargo && (
+            <p id="err-cargo" role="alert" className={errorClass}>{state.errors.cargo[0]}</p>
+          )}
         </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="reg-telefono" className={labelClass}>{text.phone}</label>
-          <input id="reg-telefono" name="telefono" type="tel" placeholder={text.phonePlaceholder} className={inputClass} />
-          {state.errors?.telefono && <p className={errorClass}>{state.errors.telefono[0]}</p>}
+          <input
+            id="reg-telefono"
+            name="telefono"
+            type="tel"
+            autoComplete="tel"
+            placeholder={text.phonePlaceholder}
+            className={inputClass}
+            aria-describedby={state.errors?.telefono ? "err-telefono" : undefined}
+            aria-invalid={state.errors?.telefono ? true : undefined}
+          />
+          {state.errors?.telefono && (
+            <p id="err-telefono" role="alert" className={errorClass}>{state.errors.telefono[0]}</p>
+          )}
         </div>
         <div>
           <label htmlFor="reg-tipo" className={labelClass}>{text.accessType}</label>
-          <select id="reg-tipo" name="tipo_acceso" defaultValue="general" className={inputClass}>
+          <select
+            id="reg-tipo"
+            name="tipo_acceso"
+            defaultValue="general"
+            className={inputClass}
+            aria-describedby={state.errors?.tipo_acceso ? "err-tipo" : undefined}
+            aria-invalid={state.errors?.tipo_acceso ? true : undefined}
+          >
             <option value="general">{text.accessGeneral}</option>
             <option value="vip">{text.accessVip}</option>
             <option value="estudiante">{text.accessStudent}</option>
           </select>
-          {state.errors?.tipo_acceso && <p className={errorClass}>{state.errors.tipo_acceso[0]}</p>}
+          {state.errors?.tipo_acceso && (
+            <p id="err-tipo" role="alert" className={errorClass}>{state.errors.tipo_acceso[0]}</p>
+          )}
         </div>
       </div>
 
       <div>
         <label className="flex items-start gap-3 cursor-pointer p-4 bg-blue-50 border border-blue-100 rounded-lg">
-          <input type="checkbox" name="credencial_estudiantil" className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500" />
+          <input
+            id="reg-credencial"
+            type="checkbox"
+            name="credencial_estudiantil"
+            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
+            aria-describedby={state.errors?.credencial_estudiantil ? "err-credencial" : undefined}
+            aria-invalid={state.errors?.credencial_estudiantil ? true : undefined}
+          />
           <span className="text-sm text-blue-900 leading-snug">{text.studentNotice}</span>
         </label>
-        {state.errors?.credencial_estudiantil && <p className={errorClass}>{state.errors.credencial_estudiantil[0]}</p>}
+        {state.errors?.credencial_estudiantil && (
+          <p id="err-credencial" role="alert" className={errorClass}>{state.errors.credencial_estudiantil[0]}</p>
+        )}
       </div>
 
       <hr className="border-slate-200" />
 
       <div>
-        <label className="flex items-center gap-3 cursor-pointer select-none">
+        <label htmlFor="reg-cfdi-toggle" className="flex items-center gap-3 cursor-pointer select-none">
           <span className="relative">
             <input
+              id="reg-cfdi-toggle"
               type="checkbox"
               name="requiere_cfdi"
               value="true"
               checked={requiresCFDI}
               onChange={(e) => setRequiresCFDI(e.target.checked)}
               className="sr-only peer"
+              aria-expanded={requiresCFDI}
+              aria-controls="cfdi-panel"
             />
             <span className="block w-12 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
             <span className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-6 transition-transform shadow-sm" />
           </span>
           <span className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-slate-400" />
+            <FileText className="w-4 h-4 text-slate-400" aria-hidden="true" />
             <span className="text-sm font-semibold text-slate-700">{text.requiresInvoice}</span>
           </span>
         </label>
       </div>
 
-      {/* CFDI panel — CSS grid height animation (0fr → 1fr) avoids JS measurement */}
-      <div className="cfdi-panel" data-open={requiresCFDI ? "true" : "false"} aria-expanded={requiresCFDI}>
+      {/* CFDI panel — CSS grid height animation (0fr → 1fr) avoids JS measurement.
+          aria-live="polite" announces the panel state change to screen readers
+          when the user toggles the CFDI switch. */}
+      <div
+        id="cfdi-panel"
+        className="cfdi-panel"
+        data-open={requiresCFDI ? "true" : "false"}
+        aria-live="polite"
+      >
         <div className="cfdi-panel-inner">
           <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4">
             <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
             <div>
               <label htmlFor="reg-rfc" className={labelClass}>{text.rfc}</label>
-              <input id="reg-rfc" name="rfc" type="text" placeholder={text.rfcPlaceholder} className={inputClass} maxLength={13} />
-              {state.errors?.rfc && <p className={errorClass}>{state.errors.rfc[0]}</p>}
+              <input
+                id="reg-rfc"
+                name="rfc"
+                type="text"
+                placeholder={text.rfcPlaceholder}
+                className={inputClass}
+                maxLength={13}
+                aria-required={requiresCFDI || undefined}
+                aria-describedby={state.errors?.rfc ? "err-rfc" : undefined}
+                aria-invalid={state.errors?.rfc ? true : undefined}
+              />
+              {state.errors?.rfc && (
+                <p id="err-rfc" role="alert" className={errorClass}>{state.errors.rfc[0]}</p>
+              )}
             </div>
             <div>
               <label htmlFor="reg-razon" className={labelClass}>{text.legalName}</label>
-              <input id="reg-razon" name="razon_social" type="text" placeholder={text.legalNamePlaceholder} className={inputClass} />
-              {state.errors?.razon_social && <p className={errorClass}>{state.errors.razon_social[0]}</p>}
+              <input
+                id="reg-razon"
+                name="razon_social"
+                type="text"
+                placeholder={text.legalNamePlaceholder}
+                className={inputClass}
+                aria-required={requiresCFDI || undefined}
+                aria-describedby={state.errors?.razon_social ? "err-razon" : undefined}
+                aria-invalid={state.errors?.razon_social ? true : undefined}
+              />
+              {state.errors?.razon_social && (
+                <p id="err-razon" role="alert" className={errorClass}>{state.errors.razon_social[0]}</p>
+              )}
             </div>
             <div>
               <label htmlFor="reg-cp" className={labelClass}>{text.zip}</label>
-              <input id="reg-cp" name="codigo_postal_fiscal" type="text" placeholder={text.zipPlaceholder} className={inputClass} maxLength={5} />
-              {state.errors?.codigo_postal_fiscal && <p className={errorClass}>{state.errors.codigo_postal_fiscal[0]}</p>}
+              <input
+                id="reg-cp"
+                name="codigo_postal_fiscal"
+                type="text"
+                placeholder={text.zipPlaceholder}
+                className={inputClass}
+                maxLength={5}
+                inputMode="numeric"
+                aria-required={requiresCFDI || undefined}
+                aria-describedby={state.errors?.codigo_postal_fiscal ? "err-cp" : undefined}
+                aria-invalid={state.errors?.codigo_postal_fiscal ? true : undefined}
+              />
+              {state.errors?.codigo_postal_fiscal && (
+                <p id="err-cp" role="alert" className={errorClass}>{state.errors.codigo_postal_fiscal[0]}</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       <div className="pt-2">
-        <label className="flex items-start gap-3 cursor-pointer">
-          <input type="checkbox" name="acepta_terminos" required className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500" />
+        <label
+          className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 ${
+            state.errors?.acepta_terminos ? "border border-red-300 bg-red-50" : ""
+          }`}
+        >
+          <input
+            id="reg-terminos"
+            type="checkbox"
+            name="acepta_terminos"
+            required
+            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500 focus-visible:ring-2"
+            aria-describedby={state.errors?.acepta_terminos ? "err-terminos" : undefined}
+            aria-invalid={state.errors?.acepta_terminos ? true : undefined}
+          />
           <span className="text-sm text-slate-600 leading-snug">
             {text.termsPrefix}{" "}
             <a href="/terminos-y-condiciones" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
@@ -328,7 +546,9 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
             {text.termsSuffix}
           </span>
         </label>
-        {state.errors?.acepta_terminos && <p className={errorClass}>{state.errors.acepta_terminos[0]}</p>}
+        {state.errors?.acepta_terminos && (
+          <p id="err-terminos" role="alert" className={errorClass}>{state.errors.acepta_terminos[0]}</p>
+        )}
       </div>
 
       {turnstileSiteKey && (

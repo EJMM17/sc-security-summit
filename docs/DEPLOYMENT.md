@@ -1,0 +1,188 @@
+# Deployment — Vercel
+
+The `prebuild` hook (`scripts/check-env.mjs`) aborts the build if any required
+env var is missing or holds a placeholder value. This is intentional — a deploy
+that ships without (e.g.) `TURNSTILE_SECRET_KEY` would silently break the
+registration form. **The build failing is the system working.**
+
+This guide is the playbook for getting a deploy green on the first try.
+
+---
+
+## 1. First-time setup (per developer / per laptop)
+
+```bash
+# One-time: install Vercel CLI globally and authenticate.
+npm i -g vercel
+vercel login
+
+# Inside the repo: link this checkout to the Vercel project.
+# Pick the existing "sc-security-summit" project when prompted; do NOT
+# create a new one.
+vercel link
+```
+
+`vercel link` writes `.vercel/project.json` (already in `.gitignore`).
+
+---
+
+## 2. The single source of truth: `.env.local`
+
+Local `.env.local` drives both local builds and what we push to Vercel.
+
+```bash
+cp .env.local.example .env.local
+# Edit .env.local with real values from:
+#   - Supabase Dashboard → Settings → API
+#   - Cloudflare Dashboard → Turnstile
+#   - Resend → API Keys
+#   - Upstash → Redis instance → REST tab
+#   - Sentry → Project → Client Keys (DSN)
+```
+
+Verify locally:
+
+```bash
+npm run check-env   # green ✓ before you push to Vercel
+```
+
+---
+
+## 3. Push env vars to Vercel
+
+Two options; **prefer the CLI helper** so a typo in the dashboard can't bite us.
+
+### Option A — `npm run vercel:env:push` (recommended)
+
+```bash
+npm run vercel:env:push
+```
+
+What it does:
+
+- Reads `.env.local`, skips placeholders and unset values.
+- For each known var, calls `vercel env rm` then `vercel env add` for both
+  `production` and `preview` targets.
+- Prints what was pushed and what was skipped.
+
+Flags:
+
+```bash
+npm run vercel:env:push -- --dry-run                 # see what would happen
+npm run vercel:env:push -- --target=production       # only one target
+npm run vercel:env:push -- --only=RESEND_API_KEY     # rotate a single key
+```
+
+### Option B — Vercel Dashboard
+
+Project → Settings → Environment Variables → "Add". Add each variable for both
+**Production** and **Preview**. Slow and error-prone for the initial set; fine
+for one-off changes after that.
+
+---
+
+## 4. Pull Vercel env vars back to `.env.local`
+
+When you join the project from a new laptop, or someone rotated a secret in
+the dashboard:
+
+```bash
+npm run vercel:env:pull
+```
+
+This wraps `vercel env pull .env.local` and overwrites your local file with
+the values currently set in Vercel for the linked environment.
+
+---
+
+## 5. Required vars at a glance
+
+The full list and validation rules live in `scripts/env-spec.mjs` — that's the
+canonical source. Summary:
+
+**Required for every build (local and Vercel):**
+
+| Name                              | Format                                                |
+| --------------------------------- | ----------------------------------------------------- |
+| `NEXT_PUBLIC_SUPABASE_URL`        | `https://<ref>.supabase.co`                           |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY`   | JWT, ≥40 chars                                        |
+| `SUPABASE_SERVICE_ROLE_KEY`       | JWT, ≥40 chars (server-only)                          |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`  | Cloudflare Turnstile site key                         |
+| `TURNSTILE_SECRET_KEY`            | Cloudflare Turnstile secret                           |
+| `CONTACT_EMAIL`                   | `name@domain.tld`                                     |
+| `NEXT_PUBLIC_SITE_URL`            | `https://www.scsecuritysummit.com` (no trailing `/`)  |
+
+**Required additionally on Vercel (production + preview):**
+
+| Name                       | Why                                                    |
+| -------------------------- | ------------------------------------------------------ |
+| `UPSTASH_REDIS_REST_URL`   | Distributed rate limiting (fail-closed in production)  |
+| `UPSTASH_REDIS_REST_TOKEN` | "                                                      |
+| `RESEND_API_KEY`           | Transactional email                                    |
+
+**Optional (set if used):**
+`EMAIL_FROM`, `ADMIN_EMAILS`, `ADMIN_SESSION_SECRET`, `SENTRY_DSN`,
+`NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
+
+---
+
+## 6. Pre-deploy checklist
+
+Run before merging to `main` (Vercel auto-deploys `main` to production):
+
+```bash
+npm run check-env       # all required vars present locally
+npm run typecheck       # TS clean
+npm test                # unit tests green
+npm run build           # full prod build succeeds locally
+```
+
+If `check-env` is red, fix `.env.local` first; then `npm run vercel:env:push`
+to mirror those values onto the project before the next Vercel deploy.
+
+---
+
+## 7. Recovering from a red Vercel build
+
+Symptom in Vercel logs:
+
+```
+✖ [check-env] Build aborted. Fix these env vars:
+  • TURNSTILE_SECRET_KEY: missing
+  ...
+```
+
+Fix:
+
+```bash
+# 1. Make sure your local .env.local has the right values.
+npm run check-env
+
+# 2. Push them to Vercel.
+npm run vercel:env:push
+
+# 3. Re-trigger the deploy: Vercel Dashboard → Deployments → ⋯ → Redeploy.
+#    (Or just push a new commit.)
+```
+
+For an actual emergency hotfix where you need to ship _without_ a working env
+(e.g. validate a non-runtime change):
+
+```bash
+SKIP_ENV_VALIDATION=1 npm run build
+```
+
+Set `SKIP_ENV_VALIDATION=1` as a one-off Vercel env var, redeploy, then
+**remove it again** — leaving it on permanently defeats the safety net.
+
+---
+
+## 8. Adding a new env var
+
+1. Add it to `scripts/env-spec.mjs` (`ALWAYS_REQUIRED`, `PROD_REQUIRED`, or
+   `OPTIONAL`).
+2. Add it to `.env.local.example` with a placeholder + comment explaining
+   where to source the value.
+3. Reference it in code via `process.env.<NAME>`.
+4. If sensitive, document in `CLAUDE.md` under "Environment Variables".
+5. Update your local `.env.local`, then `npm run vercel:env:push`.

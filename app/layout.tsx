@@ -6,8 +6,9 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SPEAKERS, FAQ_SCHEMA_ITEMS, BASE_URL } from "@/lib/site-content";
+import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import AmbientCanvas from "@/components/AmbientCanvas";
+import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -41,10 +42,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
+        url: "/images/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
+        type: "image/webp",
+      },
+      {
         url: "/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
+        type: "image/png",
       },
     ],
   },
@@ -53,7 +62,7 @@ export const metadata: Metadata = {
     title: "SC Security Summit 2026 | Reynosa",
     description:
       "El encuentro de seguridad en cadena de suministros más relevante del norte de México.",
-    images: ["/images/og-image.png"],
+    images: ["/images/og-image.webp"],
   },
   robots: {
     index: true,
@@ -62,8 +71,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE_URL,
     languages: {
-      "es-MX": BASE_URL,
-      "en-US": BASE_URL,
+      "es-MX": `${BASE_URL}/?lang=es`,
+      "en-US": `${BASE_URL}/?lang=en`,
       "x-default": BASE_URL,
     },
   },
@@ -92,6 +101,7 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
+  const language = await getRequestLanguage();
 
   const businessEventSchema = {
     "@context": "https://schema.org",
@@ -196,11 +206,11 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang={language} className="scroll-smooth">
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
-        <AmbientCanvas />
+        <AmbientCanvasLazy />
         {children}
         <WhatsAppButton />
         <Toaster theme="light" position="bottom-right" richColors />
