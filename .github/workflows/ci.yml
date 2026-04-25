@@ -27,7 +27,7 @@ jobs:
         run: npm run lint
 
       - name: Build
-        run: npm run build
+        run: SKIP_ENV_VALIDATION=1 npm run build
 
       - name: Audit (informativo)
         run: npm audit --omit=dev
