@@ -39,6 +39,8 @@ const nextConfig: NextConfig = {
             key: "Permissions-Policy",
             value: "camera=(), microphone=(), geolocation=()",
           },
+          // Blocks legacy Adobe Flash / PDF cross-domain-policy files.
+          { key: "X-Permitted-Cross-Origin-Policies", value: "none" },
           // CSP is handled by middleware.ts (nonce-based per-request).
           // The middleware sets Content-Security-Policy on every response.
         ],
