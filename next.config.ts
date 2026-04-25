@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { withSentryConfig } from "@sentry/nextjs";
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
@@ -60,4 +61,25 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Sentry wraps the Next config so source maps upload at build time and the
+// /monitoring tunnel route proxies events around ad blockers (and keeps
+// ingest.sentry.io off the CSP allowlist).
+//
+// Source map uploads only happen when SENTRY_AUTH_TOKEN is present in the
+// environment (set in Vercel → Project Settings → Environment Variables).
+// Local builds skip the upload step.
+const sentryEnabled = Boolean(process.env.SENTRY_DSN);
+
+export default sentryEnabled
+  ? withSentryConfig(nextConfig, {
+      org: process.env.SENTRY_ORG,
+      project: process.env.SENTRY_PROJECT,
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      silent: !process.env.CI,
+      widenClientFileUpload: true,
+      sourcemaps: { deleteSourcemapsAfterUpload: true },
+      disableLogger: true,
+      tunnelRoute: "/monitoring",
+      automaticVercelMonitors: false,
+    })
+  : nextConfig;

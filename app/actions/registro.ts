@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { randomBytes } from "crypto";
+import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { verifyTurnstile } from "@/lib/turnstile";
@@ -15,6 +16,16 @@ import { RegistroSchema, PRECIOS, type RegistroInput } from "@/lib/schemas";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
+}
+
+// Tells Sentry the request failed in a known, non-error way (rate limit,
+// duplicate email, etc) so we can alert on real exceptions but still see
+// trends in expected-failure paths via the messages tab.
+function captureControlledFailure(message: string, context: Record<string, unknown>) {
+  Sentry.captureMessage(message, {
+    level: "warning",
+    extra: context,
+  });
 }
 
 // Pick "es" | "en" from form data or Accept-Language header. Defaults to "es"
@@ -205,6 +216,9 @@ export async function registrarAsistente(
       }
 
       auditLog("db_error", { code: error.code, hint: error.hint, ip });
+      Sentry.captureException(new Error(`registro db_error: ${error.code}`), {
+        extra: { code: error.code, hint: error.hint, message: error.message },
+      });
       return {
         success: false,
         message:
@@ -249,11 +263,13 @@ export async function registrarAsistente(
     const confirmReason = emailFailureReason(confirmResult);
     if (confirmReason) {
       auditLog("email_confirmation_failed", { folio, to: data.email, reason: confirmReason });
+      captureControlledFailure("email_confirmation_failed", { folio, reason: confirmReason });
     }
 
     const organizerReason = emailFailureReason(organizerResult);
     if (organizerReason) {
       auditLog("email_organizer_failed", { folio, reason: organizerReason });
+      captureControlledFailure("email_organizer_failed", { folio, reason: organizerReason });
     }
 
     const successMessage =
@@ -272,6 +288,7 @@ export async function registrarAsistente(
     };
   } catch (err) {
     auditLog("unexpected_error", { ip, error: err instanceof Error ? err.message : "unknown" });
+    Sentry.captureException(err, { tags: { surface: "registro_action" } });
     return {
       success: false,
       message: "Error inesperado. Contacta a Contacto@LanzLogistics.com",
