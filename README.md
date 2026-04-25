@@ -121,4 +121,24 @@ supabase-migration.sql    ← DDL para crear tabla registros
 npm run build
 ```
 
-Compatible con Vercel (recomendado). Agrega las env vars en el dashboard de Vercel.
+Compatible con Vercel (recomendado). El `prebuild` corre `scripts/check-env.mjs`
+y aborta el build si faltan env vars o siguen siendo placeholders.
+
+### Sincronizar env vars locales → Vercel
+
+En lugar de pegar valores uno por uno en el dashboard:
+
+```bash
+npm i -g vercel
+vercel link                  # una sola vez
+npm run vercel:env:push      # sube todo .env.local a production + preview
+```
+
+Para traer los valores actuales de Vercel a tu `.env.local`:
+
+```bash
+npm run vercel:env:pull
+```
+
+Lista canónica de variables y reglas de validación: `scripts/env-spec.mjs`.
+Guía completa de deploy y troubleshooting: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).

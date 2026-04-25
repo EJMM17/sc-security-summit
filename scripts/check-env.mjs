@@ -10,6 +10,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { resolve, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
+import { ALWAYS_REQUIRED, PROD_REQUIRED, checkVar } from "./env-spec.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..");
@@ -45,97 +46,11 @@ if (existsSync(envFile)) {
 
 // In Vercel, VERCEL_ENV is "production" | "preview" | "development".
 // Treat preview as production for required-vars purposes (real users hit it).
+const isVercel = Boolean(process.env.VERCEL);
 const isProductionLike =
   process.env.VERCEL_ENV === "production" ||
   process.env.VERCEL_ENV === "preview" ||
   process.env.NODE_ENV === "production";
-
-// Vars required in every build, including local `npm run build`.
-const ALWAYS_REQUIRED = [
-  {
-    name: "NEXT_PUBLIC_SUPABASE_URL",
-    pattern: /^https:\/\/[a-z0-9-]+\.supabase\.co$/,
-    hint: "Supabase project URL (Settings → API)",
-  },
-  {
-    name: "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-    minLength: 40,
-    hint: "Supabase anon key (Settings → API)",
-  },
-  {
-    name: "SUPABASE_SERVICE_ROLE_KEY",
-    minLength: 40,
-    hint: "Supabase service_role key (Settings → API). NEVER expose to browser.",
-  },
-  {
-    name: "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
-    minLength: 10,
-    hint: "Cloudflare Turnstile site key (dash.cloudflare.com)",
-  },
-  {
-    name: "TURNSTILE_SECRET_KEY",
-    minLength: 10,
-    hint: "Cloudflare Turnstile secret key",
-  },
-  {
-    name: "CONTACT_EMAIL",
-    pattern: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-    hint: "Organizer email shown to users on errors",
-  },
-  {
-    name: "NEXT_PUBLIC_SITE_URL",
-    pattern: /^https?:\/\/[^\s/]+$/,
-    hint: "Canonical site URL, no trailing slash",
-  },
-];
-
-// Vars required only in production-like builds (Vercel preview/prod, or NODE_ENV=production).
-// Local dev builds can omit these without failure but get a warning.
-const PROD_REQUIRED = [
-  {
-    name: "UPSTASH_REDIS_REST_URL",
-    pattern: /^https:\/\/[a-z0-9-]+\.upstash\.io$/,
-    hint: "Upstash Redis REST URL (required for distributed rate limiting)",
-  },
-  {
-    name: "UPSTASH_REDIS_REST_TOKEN",
-    minLength: 20,
-    hint: "Upstash Redis REST token",
-  },
-  {
-    name: "RESEND_API_KEY",
-    pattern: /^re_[A-Za-z0-9_-]+$/,
-    hint: "Resend API key (resend.com → API Keys)",
-  },
-];
-
-// Common placeholder values that mean the var was set to the example default.
-const PLACEHOLDER_VALUES = [
-  "TU_PROJECT_REF",
-  "TU_INSTANCE",
-  "TU_TOKEN_AQUI",
-  "PLACEHOLDER",
-  "re_PLACEHOLDER",
-  "1x00000000000000000000AA",
-  "1x0000000000000000000000000000000AA",
-];
-
-function checkVar({ name, pattern, minLength, hint }) {
-  const value = process.env[name];
-  if (!value) {
-    return { ok: false, name, reason: "missing", hint };
-  }
-  if (PLACEHOLDER_VALUES.some((p) => value.includes(p))) {
-    return { ok: false, name, reason: "placeholder value not replaced", hint };
-  }
-  if (pattern && !pattern.test(value)) {
-    return { ok: false, name, reason: `does not match expected format ${pattern}`, hint };
-  }
-  if (minLength && value.length < minLength) {
-    return { ok: false, name, reason: `too short (got ${value.length}, expected ≥${minLength})`, hint };
-  }
-  return { ok: true, name };
-}
 
 const errors = [];
 const warnings = [];
@@ -167,9 +82,27 @@ if (errors.length > 0) {
     console.error(`  • ${e.name}: ${e.reason}`);
     if (e.hint) console.error(`    → ${e.hint}`);
   }
-  console.error("\nSet variables in:");
-  console.error("  • Local:  .env.local (copy from .env.local.example)");
-  console.error("  • Vercel: Project Settings → Environment Variables");
+
+  if (isVercel) {
+    // The build is running on Vercel — the env vars must be set in the
+    // project. Point the operator at the dashboard and the CLI helper.
+    const project = process.env.VERCEL_PROJECT_NAME || process.env.VERCEL_PROJECT_ID || "<project>";
+    console.error("\nHow to fix on Vercel:");
+    console.error(`  1) Vercel Dashboard → Project (${project}) → Settings → Environment Variables`);
+    console.error("     Add each missing var for Production AND Preview (and Development if used).");
+    console.error("  2) OR sync from a local .env.local in one shot:");
+    console.error("       npm i -g vercel && vercel link && npm run vercel:env:push");
+    console.error("  3) Re-deploy (Deployments → ⋯ → Redeploy, or push a new commit).");
+    console.error("\nSee docs/DEPLOYMENT.md for the full checklist.");
+  } else {
+    console.error("\nHow to fix locally:");
+    console.error("  1) cp .env.local.example .env.local   # if you haven't already");
+    console.error("  2) Fill in real values for the vars listed above.");
+    console.error("\nHow to fix on Vercel (next deploy):");
+    console.error("  npm i -g vercel && vercel link && npm run vercel:env:push");
+    console.error("  (or set them manually in Vercel Dashboard → Settings → Environment Variables)");
+  }
+
   console.error("\nTo bypass for emergency builds: SKIP_ENV_VALIDATION=1 npm run build\n");
   process.exit(1);
 }
