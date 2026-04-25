@@ -403,11 +403,13 @@ const HERO_STATS = {
     { number: 2, suffix: "", label: "Días de Capacitación" },
     { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
+    { number: 4, suffix: "+", label: "Sectores de la Cadena de Suministros" },
   ],
   en: [
     { number: 2, suffix: "", label: "Training Days" },
     { number: 4, suffix: "+", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
+    { number: 4, suffix: "+", label: "Supply Chain Sectors" },
   ],
 } as const;
 
