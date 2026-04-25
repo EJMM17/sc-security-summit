@@ -11,6 +11,7 @@ import AmbientCanvas from "@/components/AmbientCanvas";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
+const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.scsecuritysummit.com"),
@@ -203,7 +204,7 @@ export default async function RootLayout({
         {children}
         <WhatsAppButton />
         <Toaster theme="light" position="bottom-right" richColors />
-        <SpeedInsights />
+        {enableSpeedInsights && <SpeedInsights />}
         {/* Turnstile loaded here so the browser has it ready before the form hydrates */}
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"

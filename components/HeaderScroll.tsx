@@ -1,28 +1,33 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 
 export default function HeaderScroll({ children }: { children?: ReactNode }) {
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    function onScroll() {
-      setScrolled(window.scrollY > 60);
-    }
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  /* Toggle class on <header> element */
   useEffect(() => {
     const header = document.querySelector("header");
     if (!header) return;
-    if (scrolled) {
-      header.classList.add("header-scrolled");
-    } else {
-      header.classList.remove("header-scrolled");
+    const headerEl = header;
+
+    let scrolled = false;
+    let ticking = false;
+
+    function onScroll() {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const nextScrolled = window.scrollY > 60;
+        if (nextScrolled !== scrolled) {
+          scrolled = nextScrolled;
+          headerEl.classList.toggle("header-scrolled", scrolled);
+        }
+        ticking = false;
+      });
     }
-  }, [scrolled]);
+
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   return <>{children}</>;
 }

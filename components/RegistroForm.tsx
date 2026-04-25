@@ -97,6 +97,7 @@ const inputClass =
 const labelClass = "block text-sm font-semibold text-slate-700 mb-1.5";
 
 const errorClass = "text-xs text-red-500 mt-1.5 flex items-center gap-1";
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
 /* ─── Initial state ────────────────────────────────────────────────────────── */
 const initialState: RegistroState = {
@@ -330,7 +331,14 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
         {state.errors?.acepta_terminos && <p className={errorClass}>{state.errors.acepta_terminos[0]}</p>}
       </div>
 
-      <div className="cf-turnstile" data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY} data-theme="light" data-size="flexible" />
+      {turnstileSiteKey && (
+        <div
+          className="cf-turnstile"
+          data-sitekey={turnstileSiteKey}
+          data-theme="light"
+          data-size="flexible"
+        />
+      )}
 
       <button type="submit" disabled={isPending} className="btn-primary w-full py-4 text-base mt-2">
         {isPending ? (

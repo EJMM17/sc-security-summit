@@ -9,11 +9,18 @@ export default function ScrollProgress() {
     const bar = barRef.current;
     if (!bar) return;
 
+    let ticking = false;
+
     const onScroll = () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      bar.style.transform = `scaleX(${progress / 100})`;
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollTop = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+        bar.style.transform = `scaleX(${progress / 100})`;
+        ticking = false;
+      });
     };
 
     window.addEventListener("scroll", onScroll, { passive: true });

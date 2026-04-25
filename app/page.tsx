@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import {
   Shield,
@@ -44,13 +45,19 @@ import {
   LayoutGrid,
 } from "lucide-react";
 import MobileNav from "@/components/MobileNav";
-import RegistroForm from "@/components/RegistroForm";
 import CountdownTimer from "@/components/CountdownTimer";
 import ScrollReveal from "@/components/ScrollReveal";
 import AnimatedCounter from "@/components/AnimatedCounter";
-import FAQAccordion from "@/components/FAQAccordion";
 import HeaderScroll from "@/components/HeaderScroll";
 import ScrollProgress from "@/components/ScrollProgress";
+
+const RegistroForm = dynamic(() => import("@/components/RegistroForm"), {
+  ssr: false,
+});
+
+const FAQAccordion = dynamic(() => import("@/components/FAQAccordion"), {
+  ssr: false,
+});
 
 /* ═══════════════════════════════════════════════════════════════
    DATA
@@ -1101,8 +1108,9 @@ export default function Home() {
             alt={text.heroAlt}
             fill
             className="object-cover object-center"
+            sizes="100vw"
             priority
-            quality={90}
+            quality={82}
           />
           {/* Gradient Overlay */}
           <div className="hero-image-overlay" />
@@ -1296,8 +1304,8 @@ export default function Home() {
               src="/images/gallery-hub.jpg"
               alt=""
               fill
-              unoptimized
               className="object-cover opacity-[0.18]"
+              sizes="100vw"
               aria-hidden="true"
             />
           </div>
@@ -1455,7 +1463,6 @@ export default function Home() {
                     src="/images/gallery-hall.jpg"
                     alt={text.galleryTag1}
                     fill
-                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 100vw, 62vw"
                   />
@@ -1476,7 +1483,6 @@ export default function Home() {
                     src="/images/gallery-registro.jpg"
                     alt={text.galleryTag2}
                     fill
-                    unoptimized
                     className="object-cover object-top"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 26vw"
                   />
@@ -1495,7 +1501,6 @@ export default function Home() {
                     src="/images/gallery-keynote.jpg"
                     alt={text.galleryTag3}
                     fill
-                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 36vw"
                   />
@@ -1513,7 +1518,6 @@ export default function Home() {
                     src="/images/gallery-hub.jpg"
                     alt={text.galleryTag4}
                     fill
-                    unoptimized
                     className="object-cover"
                     sizes="(max-width: 480px) 100vw, (max-width: 1024px) 50vw, 30vw"
                   />
