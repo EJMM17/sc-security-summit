@@ -80,6 +80,7 @@ export default function AmbientCanvas() {
   useEffect(() => {
     /* Respect user motion preference — body::before static radials serve as fallback */
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (window.matchMedia("(pointer: coarse), (max-width: 767px)").matches) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -123,7 +124,7 @@ export default function AmbientCanvas() {
     /* Render at 38% of logical resolution — imperceptible for smooth noise, major GPU saving */
     function resize() {
       const dpr   = Math.min(window.devicePixelRatio || 1, 1.5);
-      const scale = 0.38;
+      const scale = window.innerWidth < 1024 ? 0.28 : 0.38;
       canvas!.width  = Math.round(window.innerWidth  * dpr * scale);
       canvas!.height = Math.round(window.innerHeight * dpr * scale);
       gl!.viewport(0, 0, canvas!.width, canvas!.height);
