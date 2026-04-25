@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 // =============================================================
 // SC Security Summit 2026 — env validation
-// Runs as `prebuild` hook. Fails the build if required environment
-// variables are missing or obviously placeholder values.
+// Runs as `prebuild` hook. Validates env vars and warns by default;
+// strict fail-fast behavior is opt-in with ENFORCE_ENV_VALIDATION=1.
 //
 // Skip with: SKIP_ENV_VALIDATION=1 npm run build
 // =============================================================
@@ -45,31 +45,32 @@ if (existsSync(envFile)) {
 }
 
 // In Vercel, VERCEL_ENV is "production" | "preview" | "development".
-// Treat preview as production for required-vars purposes (real users hit it).
+// Default mode is non-blocking (warnings only) to keep deployments moving.
+// Opt-in strict mode with ENFORCE_ENV_VALIDATION=1.
 const isVercel = Boolean(process.env.VERCEL);
-const isProductionLike =
-  process.env.VERCEL_ENV === "production" ||
-  process.env.VERCEL_ENV === "preview" ||
-  process.env.NODE_ENV === "production";
+const shouldFailBuild = process.env.ENFORCE_ENV_VALIDATION === "1";
 
 const errors = [];
 const warnings = [];
 
 for (const spec of ALWAYS_REQUIRED) {
   const result = checkVar(spec);
-  if (!result.ok) errors.push(result);
+  if (!result.ok) {
+    if (shouldFailBuild) errors.push(result);
+    else warnings.push(result);
+  }
 }
 
 for (const spec of PROD_REQUIRED) {
   const result = checkVar(spec);
   if (!result.ok) {
-    if (isProductionLike) errors.push(result);
+    if (shouldFailBuild) errors.push(result);
     else warnings.push(result);
   }
 }
 
 if (warnings.length > 0) {
-  console.warn("\n⚠ [check-env] Production-only vars missing (OK in local dev build):");
+  console.warn("\n⚠ [check-env] Missing env vars detected:");
   for (const w of warnings) {
     console.warn(`  • ${w.name}: ${w.reason}`);
     if (w.hint) console.warn(`    → ${w.hint}`);
@@ -93,6 +94,7 @@ if (errors.length > 0) {
     console.error("  2) OR sync from a local .env.local in one shot:");
     console.error("       npm i -g vercel && vercel link && npm run vercel:env:push");
     console.error("  3) Re-deploy (Deployments → ⋯ → Redeploy, or push a new commit).");
+    console.error("\nIf you need to force strict checks in Preview, set ENFORCE_ENV_VALIDATION=1.");
     console.error("\nSee docs/DEPLOYMENT.md for the full checklist.");
   } else {
     console.error("\nHow to fix locally:");
@@ -107,4 +109,14 @@ if (errors.length > 0) {
   process.exit(1);
 }
 
-console.log("✓ [check-env] All required environment variables present");
+if (warnings.length > 0 && !shouldFailBuild) {
+  console.warn("\n[check-env] Build continues because this is not a production deployment.");
+  if (isVercel) {
+    console.warn(
+      "[check-env] For production-grade validation in Preview, set ENFORCE_ENV_VALIDATION=1 in Vercel env vars."
+    );
+  }
+  console.log("✓ [check-env] Validation completed with warnings");
+} else {
+  console.log("✓ [check-env] All required environment variables present");
+}

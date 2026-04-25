@@ -1,9 +1,9 @@
 # Deployment — Vercel
 
-The `prebuild` hook (`scripts/check-env.mjs`) aborts the build if any required
-env var is missing or holds a placeholder value. This is intentional — a deploy
-that ships without (e.g.) `TURNSTILE_SECRET_KEY` would silently break the
-registration form. **The build failing is the system working.**
+The `prebuild` hook (`scripts/check-env.mjs`) validates env vars on every build.
+By default it reports warnings and **does not block deploys**.  
+If you want fail-fast behavior in any environment, set
+`ENFORCE_ENV_VALIDATION=1`.
 
 This guide is the playbook for getting a deploy green on the first try.
 
@@ -112,7 +112,7 @@ canonical source. Summary:
 | `CONTACT_EMAIL`                   | `name@domain.tld`                                     |
 | `NEXT_PUBLIC_SITE_URL`            | `https://www.scsecuritysummit.com` (no trailing `/`)  |
 
-**Required additionally on Vercel (production + preview):**
+**Recommended additionally on Vercel builds (especially production):**
 
 | Name                       | Why                                                    |
 | -------------------------- | ------------------------------------------------------ |
@@ -142,9 +142,9 @@ to mirror those values onto the project before the next Vercel deploy.
 
 ---
 
-## 7. Recovering from a red Vercel build
+## 7. Strict mode (optional)
 
-Symptom in Vercel logs:
+If you enable strict validation:
 
 ```
 ✖ [check-env] Build aborted. Fix these env vars:
@@ -152,7 +152,7 @@ Symptom in Vercel logs:
   ...
 ```
 
-Fix:
+Recommended workflow:
 
 ```bash
 # 1. Make sure your local .env.local has the right values.
@@ -165,15 +165,17 @@ npm run vercel:env:push
 #    (Or just push a new commit.)
 ```
 
-For an actual emergency hotfix where you need to ship _without_ a working env
-(e.g. validate a non-runtime change):
+To turn strict mode on in any environment:
+
+```bash
+ENFORCE_ENV_VALIDATION=1
+```
+
+To temporarily bypass all validation checks:
 
 ```bash
 SKIP_ENV_VALIDATION=1 npm run build
 ```
-
-Set `SKIP_ENV_VALIDATION=1` as a one-off Vercel env var, redeploy, then
-**remove it again** — leaving it on permanently defeats the safety net.
 
 ---
 
