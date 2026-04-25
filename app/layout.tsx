@@ -41,10 +41,18 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
+        url: "/images/og-image.webp",
+        width: 1200,
+        height: 630,
+        alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
+        type: "image/webp",
+      },
+      {
         url: "/images/og-image.png",
         width: 1200,
         height: 630,
         alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
+        type: "image/png",
       },
     ],
   },
@@ -53,7 +61,7 @@ export const metadata: Metadata = {
     title: "SC Security Summit 2026 | Reynosa",
     description:
       "El encuentro de seguridad en cadena de suministros más relevante del norte de México.",
-    images: ["/images/og-image.png"],
+    images: ["/images/og-image.webp"],
   },
   robots: {
     index: true,
