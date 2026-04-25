@@ -6,6 +6,7 @@ import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import { SPEAKERS, FAQ_SCHEMA_ITEMS, BASE_URL } from "@/lib/site-content";
+import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 
@@ -70,8 +71,8 @@ export const metadata: Metadata = {
   alternates: {
     canonical: BASE_URL,
     languages: {
-      "es-MX": BASE_URL,
-      "en-US": BASE_URL,
+      "es-MX": `${BASE_URL}/?lang=es`,
+      "en-US": `${BASE_URL}/?lang=en`,
       "x-default": BASE_URL,
     },
   },
@@ -100,6 +101,7 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
+  const language = await getRequestLanguage();
 
   const businessEventSchema = {
     "@context": "https://schema.org",
@@ -204,7 +206,7 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="es" className="scroll-smooth">
+    <html lang={language} className="scroll-smooth">
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >

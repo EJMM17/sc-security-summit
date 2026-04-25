@@ -3,6 +3,7 @@
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
+import { setLanguageCookie } from "@/app/actions/language";
 import {
   Shield,
   MapPin,
@@ -1018,6 +1019,14 @@ export default function Home() {
   const [language, setLanguage] = useState<"es" | "en">("es");
 
   useEffect(() => {
+    // Cookie wins over localStorage so the SSR-rendered <html lang> matches
+    // what we hydrate to. Only fall back to localStorage / browser locale
+    // when there's no cookie yet (first visit).
+    const cookieMatch = document.cookie.match(/(?:^|;\s*)NEXT_LOCALE=(es|en)/);
+    if (cookieMatch) {
+      setLanguage(cookieMatch[1] as "es" | "en");
+      return;
+    }
     const saved = window.localStorage.getItem("scss-language");
     if (saved === "es" || saved === "en") {
       setLanguage(saved);
@@ -1029,6 +1038,10 @@ export default function Home() {
   useEffect(() => {
     document.documentElement.lang = language;
     window.localStorage.setItem("scss-language", language);
+    // Mirror to server-readable cookie so server actions and the next SSR
+    // render see the same value. Fire-and-forget — the local UI is already
+    // updated optimistically.
+    void setLanguageCookie(language);
   }, [language]);
 
   const navLinks = NAV_LINKS[language];
