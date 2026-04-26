@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Inter, Oswald } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "sonner";
@@ -10,8 +9,6 @@ import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
@@ -207,9 +204,7 @@ export default async function RootLayout({
 
   return (
     <html lang={language} className="scroll-smooth">
-      <body
-        className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
-      >
+      <body className="font-sans bg-white text-[#0F172A] antialiased">
         <AmbientCanvasLazy />
         {children}
         <WhatsAppButton />
