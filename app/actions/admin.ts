@@ -14,6 +14,7 @@ import {
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { sendAdminLoginLink } from "@/lib/email";
+import { FOLIO_PATTERN } from "@/lib/folio";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
@@ -96,7 +97,7 @@ export async function adminLogout(): Promise<never> {
 // Mark a registration as paid (manual SPEI/transfer)
 // =============================================================
 
-const FolioSchema = z.string().regex(/^SCSS2026-[A-Z0-9-]+$/);
+const FolioSchema = z.string().regex(FOLIO_PATTERN);
 
 export async function markRegistroPaid(formData: FormData): Promise<void> {
   const adminEmail = await requireAdmin();

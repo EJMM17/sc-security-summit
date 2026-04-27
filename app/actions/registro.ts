@@ -2,6 +2,7 @@
 
 import { headers } from "next/headers";
 import { verifyTurnstile } from "@/lib/turnstile";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { RegistroSchema, type RegistroInput } from "@/lib/schemas";
 import { createLead } from "@/server/use-cases/create-lead";
 import type { EmailLanguage } from "@/lib/email-templates";
@@ -30,9 +31,16 @@ export async function registrarAsistente(
 ): Promise<RegistroState> {
   void prevState;
 
+  const h = await headers();
+  const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
+  const userAgent = h.get("user-agent") ?? "unknown";
+  const referer = h.get("referer") ?? null;
+  const acceptLanguage = h.get("accept-language");
+  const language = pickLanguage(formData, acceptLanguage);
+
   const honeypot = formData.get("website");
   if (honeypot && String(honeypot).length > 0) {
-    auditLog("honeypot_triggered", { ip: "unknown" });
+    auditLog("honeypot_triggered", { ip });
     return {
       success: true,
       message: "Registro completado. Recibirás instrucciones en tu correo.",
@@ -40,12 +48,17 @@ export async function registrarAsistente(
     };
   }
 
-  const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
-  const userAgent = h.get("user-agent") ?? "unknown";
-  const referer = h.get("referer") ?? null;
-  const acceptLanguage = h.get("accept-language");
-  const language = pickLanguage(formData, acceptLanguage);
+  // Rate-limit must run BEFORE Turnstile so abusive IPs can't burn through
+  // our Cloudflare quota by spamming bot-verifications.
+  const rl = await checkRateLimit(ip);
+  if (!rl.ok) {
+    auditLog("registro_rate_limited", { ip });
+    return {
+      success: false,
+      message: "Demasiados intentos. Por favor espera 15 minutos e inténtalo de nuevo.",
+      errors: { _form: ["Demasiados intentos."] },
+    };
+  }
 
   const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
   const turnstileOk = await verifyTurnstile(turnstileToken, ip);

@@ -61,13 +61,18 @@ export default async function RegistrosPage({
 
   if (params.estado) query = query.eq("estado_pago", params.estado);
   if (params.tipo) query = query.eq("tipo_acceso", params.tipo);
-  if (params.q) {
-    const q = params.q.trim();
-    if (q.length > 0) {
-      query = query.or(
-        `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,
-      );
-    }
+  const safeQ = sanitizeSearchTerm(params.q);
+  if (safeQ) {
+    const pattern = `%${safeQ}%`;
+    query = query.or(
+      [
+        `folio.ilike.${pattern}`,
+        `email.ilike.${pattern}`,
+        `nombre.ilike.${pattern}`,
+        `apellido.ilike.${pattern}`,
+        `empresa.ilike.${pattern}`,
+      ].join(","),
+    );
   }
 
   const { data: rows, error } = await query.returns<RegistroRow[]>();
@@ -169,18 +174,34 @@ export default async function RegistrosPage({
 }
 
 async function loadCounts(supabase: ReturnType<typeof createAdminClient>) {
-  const { count: total } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true });
-  const { count: pagado } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_pago", "pagado");
-  const { count: pendiente } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_pago", "pendiente");
-  return { total: total ?? 0, pagado: pagado ?? 0, pendiente: pendiente ?? 0 };
+  const [totalRes, pagadoRes, pendienteRes] = await Promise.all([
+    supabase.from("registros").select("*", { count: "exact", head: true }),
+    supabase
+      .from("registros")
+      .select("*", { count: "exact", head: true })
+      .eq("estado_pago", "pagado"),
+    supabase
+      .from("registros")
+      .select("*", { count: "exact", head: true })
+      .eq("estado_pago", "pendiente"),
+  ]);
+  return {
+    total: totalRes.count ?? 0,
+    pagado: pagadoRes.count ?? 0,
+    pendiente: pendienteRes.count ?? 0,
+  };
+}
+
+// PostgREST `.or()` parses a comma-separated filter list. Untrusted input must
+// not contain `,`, `.`, `(`, `)` or it can graft additional filters onto the
+// query. ILIKE wildcards `%` and `_` must also be escaped so the user's literal
+// search terms aren't interpreted as patterns.
+function sanitizeSearchTerm(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim().slice(0, 64);
+  if (!trimmed) return null;
+  if (/[,.()*"'\\]/.test(trimmed)) return null;
+  return trimmed.replace(/[\\%_]/g, "\\$&");
 }
 
 function Field({

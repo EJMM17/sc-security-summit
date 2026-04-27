@@ -24,10 +24,10 @@ function getResend(): Resend | null {
 }
 export const resend = getResend();
 
-let _warned = false;
+const _warnedTags = new Set<string>();
 function warnDisabledOnce(tag: string) {
-  if (_warned) return;
-  _warned = true;
+  if (_warnedTags.has(tag)) return;
+  _warnedTags.add(tag);
   console.warn(
     `[email] RESEND_API_KEY/EMAIL_FROM no configurados — envío "${tag}" omitido`,
   );
