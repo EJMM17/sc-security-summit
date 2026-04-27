@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase";
 
 // =============================================================
 // GET /api/health
@@ -10,23 +9,28 @@ import { createAdminClient } from "@/lib/supabase";
 //   • returns 503 { ok: false, error } on any failure so Vercel uptime
 //     monitors and the on-page status banner can react
 //
-// Intentionally never returns row data — only a count. Bypass cache via
-// vercel.json /api/* no-store header so the check always hits origin.
+// Build hardening: imports de `@/lib/supabase` (y por transitivo de
+// `@/env`) se hacen DENTRO del handler con `await import(...)`. Eso
+// garantiza que durante "Collecting page data" Next.js no evalúe ningún
+// código que dependa de variables de entorno — sólo el shape del
+// módulo (exports `dynamic`, `runtime`) se inspecciona estáticamente.
 // =============================================================
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
 export const runtime = "nodejs";
 
 const TIMEOUT_MS = 3000;
+
+const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
 
 export async function GET() {
   const startedAt = Date.now();
 
   try {
+    const { createAdminClient } = await import("@/lib/supabase");
     const supabase = createAdminClient();
 
-    // Race the DB query against a hard timeout so a slow Supabase doesn't
-    // make the health endpoint itself slow.
     const dbCheck = supabase
       .from("registros")
       .select("*", { count: "exact", head: true });
@@ -34,7 +38,10 @@ export async function GET() {
     const result = await Promise.race([
       dbCheck,
       new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error(`db timeout after ${TIMEOUT_MS}ms`)), TIMEOUT_MS)
+        setTimeout(
+          () => reject(new Error(`db timeout after ${TIMEOUT_MS}ms`)),
+          TIMEOUT_MS,
+        ),
       ),
     ]);
 
@@ -49,7 +56,7 @@ export async function GET() {
         durationMs: Date.now() - startedAt,
         timestamp: new Date().toISOString(),
       },
-      { status: 200 }
+      { status: 200, headers: NO_STORE },
     );
   } catch (err) {
     return NextResponse.json(
@@ -60,7 +67,7 @@ export async function GET() {
         durationMs: Date.now() - startedAt,
         timestamp: new Date().toISOString(),
       },
-      { status: 503 }
+      { status: 503, headers: NO_STORE },
     );
   }
 }
