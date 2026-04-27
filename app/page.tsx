@@ -5,7 +5,6 @@ import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { setLanguageCookie } from "@/app/actions/language";
 import {
-  Shield,
   MapPin,
   Calendar,
   Building2,
@@ -24,20 +23,11 @@ import {
 
   Users,
   Clock,
-  Award,
   Mail,
   Phone,
   ExternalLink,
   Mic2,
   Target,
-  TrendingUp,
-  Zap,
-  ChevronRight,
-  Quote,
-  Briefcase,
-  Lightbulb,
-  Compass,
-  Crosshair,
   Crown,
   Trophy,
   Medal,
