@@ -4,7 +4,6 @@ import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { generateFolio } from "@/lib/folio";
 import { PRECIOS } from "@/lib/schemas";
-import { checkRateLimit } from "@/lib/ratelimit";
 import {
   sendOrganizerNotification,
   sendRegistrationConfirmation,
@@ -67,15 +66,6 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
     }
 
     const data = parsed.data;
-
-    const rl = await checkRateLimit(data.ip);
-    if (!rl.ok) {
-      return {
-        ok: false,
-        status: 429,
-        message: "Too many attempts. Please wait 15 minutes and try again.",
-      };
-    }
 
     if (data.tipo_acceso === "estudiante" && !data.credencial_estudiantil) {
       return {
