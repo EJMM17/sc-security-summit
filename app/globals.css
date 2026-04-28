@@ -747,12 +747,18 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .faq-trigger:hover {
   color: var(--blue-600);
 }
+.faq-trigger::marker {
+  content: "";
+}
+.faq-trigger::-webkit-details-marker {
+  display: none;
+}
 .faq-icon {
   transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
   color: var(--blue-500);
   flex-shrink: 0;
 }
-.faq-item[data-open="true"] .faq-icon {
+.faq-item[open] .faq-icon {
   transform: rotate(45deg);
 }
 .faq-content {
@@ -762,7 +768,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
               padding 0.4s cubic-bezier(0.22, 1, 0.36, 1);
   padding: 0 0;
 }
-.faq-item[data-open="true"] .faq-content {
+.faq-item[open] .faq-content {
   max-height: 500px;
   padding: 0 0 1.5rem 0;
 }
@@ -1293,11 +1299,11 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   transition: grid-template-rows 0.42s cubic-bezier(0.22, 1, 0.36, 1),
               opacity            0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.cfdi-panel[data-open="false"] {
+.cfdi-panel {
   grid-template-rows: 0fr;
   opacity: 0;
 }
-.cfdi-panel[data-open="true"] {
+.cfdi-toggle-peer:checked ~ .cfdi-panel {
   grid-template-rows: 1fr;
   opacity: 1;
 }

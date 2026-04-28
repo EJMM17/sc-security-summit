@@ -1,10 +1,9 @@
 "use server";
 
 import { headers } from "next/headers";
-import { verifyTurnstile } from "@/lib/turnstile";
-import { checkRateLimit } from "@/lib/rate-limit";
-import { RegistroSchema, type RegistroInput } from "@/lib/schemas";
-import { createLead } from "@/server/use-cases/create-lead";
+import { redirect } from "next/navigation";
+import type { RegistroInput } from "@/lib/schemas";
+import { serializeRegistroFlashState } from "@/lib/registro-form-state";
 import type { EmailLanguage } from "@/lib/email-templates";
 
 function auditLog(event: string, data: Record<string, unknown>) {
@@ -23,20 +22,45 @@ export type RegistroState = {
   message: string;
   errors?: Partial<Record<keyof RegistroInput | "_form", string[]>>;
   folio?: string;
+  values?: Partial<Record<keyof RegistroInput, string | boolean>>;
 };
 
-export async function registrarAsistente(
-  prevState: RegistroState,
-  formData: FormData
-): Promise<RegistroState> {
-  void prevState;
+function getPersistedValues(formData: FormData) {
+  const tipoAcceso = String(formData.get("tipo_acceso") ?? "general");
 
+  return {
+    nombre: String(formData.get("nombre") ?? ""),
+    apellido: String(formData.get("apellido") ?? ""),
+    email: String(formData.get("email") ?? ""),
+    telefono: String(formData.get("telefono") ?? ""),
+    empresa: String(formData.get("empresa") ?? ""),
+    cargo: String(formData.get("cargo") ?? ""),
+    tipo_acceso:
+      tipoAcceso === "vip" || tipoAcceso === "estudiante" ? tipoAcceso : "general",
+    credencial_estudiantil: formData.get("credencial_estudiantil") === "on",
+    acepta_terminos: formData.get("acepta_terminos") === "on",
+    requiere_cfdi: formData.get("requiere_cfdi") === "true",
+    rfc: String(formData.get("rfc") ?? ""),
+    razon_social: String(formData.get("razon_social") ?? ""),
+    codigo_postal_fiscal: String(formData.get("codigo_postal_fiscal") ?? ""),
+  } satisfies Partial<Record<keyof RegistroInput, string | boolean>>;
+}
+
+async function processRegistro(formData: FormData): Promise<RegistroState> {
+  const [{ checkRateLimit }, { verifyTurnstile }, { RegistroSchema }, { createLead }] =
+    await Promise.all([
+      import("@/lib/rate-limit"),
+      import("@/lib/turnstile"),
+      import("@/lib/schemas"),
+      import("@/server/use-cases/create-lead"),
+    ]);
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
   const acceptLanguage = h.get("accept-language");
   const language = pickLanguage(formData, acceptLanguage);
+  const values = getPersistedValues(formData);
 
   const honeypot = formData.get("website");
   if (honeypot && String(honeypot).length > 0) {
@@ -57,6 +81,7 @@ export async function registrarAsistente(
       success: false,
       message: "Demasiados intentos. Por favor espera 15 minutos e inténtalo de nuevo.",
       errors: { _form: ["Demasiados intentos."] },
+      values,
     };
   }
 
@@ -68,6 +93,7 @@ export async function registrarAsistente(
       success: false,
       message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
       errors: { _form: ["Verificación de seguridad fallida."] },
+      values,
     };
   }
 
@@ -100,6 +126,7 @@ export async function registrarAsistente(
         ...(fieldErrors as RegistroState["errors"]),
         ...(formErrors.length > 0 ? { _form: formErrors } : {}),
       },
+      values,
     };
   }
 
@@ -122,6 +149,7 @@ export async function registrarAsistente(
         ...(result.fieldErrors as RegistroState["errors"]),
         ...(result.status === 500 ? { _form: [result.message] } : {}),
       },
+      values,
     };
   }
 
@@ -130,4 +158,28 @@ export async function registrarAsistente(
     message: result.message,
     folio: result.folio,
   };
+}
+
+export async function registrarAsistente(
+  prevState: RegistroState,
+  formData: FormData,
+): Promise<RegistroState> {
+  void prevState;
+
+  return processRegistro(formData);
+}
+
+export async function submitRegistroForm(formData: FormData): Promise<void> {
+  const h = await headers();
+  const language = pickLanguage(formData, h.get("accept-language"));
+  const result = await processRegistro(formData);
+  const params = new URLSearchParams();
+
+  if (language === "en") {
+    params.set("lang", "en");
+  }
+
+  params.set("registro", serializeRegistroFlashState(result));
+
+  redirect(`/?${params.toString()}#registro`);
 }
