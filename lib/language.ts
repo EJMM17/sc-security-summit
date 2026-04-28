@@ -24,16 +24,21 @@ export function isLanguage(value: unknown): value is Language {
   return value === "es" || value === "en";
 }
 
-export async function getRequestLanguage(searchParam?: string | null): Promise<Language> {
+export function resolveRequestLanguage(
+  searchParam?: string | null,
+  cookieValue?: string,
+  acceptLanguage?: string | null,
+): Language {
   if (isLanguage(searchParam)) return searchParam;
+  if (isLanguage(cookieValue)) return cookieValue;
+  if (acceptLanguage && /^en\b/i.test(acceptLanguage)) return "en";
+  return "es";
+}
 
+export async function getRequestLanguage(searchParam?: string | null): Promise<Language> {
   const cookieStore = await cookies();
   const cookieValue = cookieStore.get(LANGUAGE_COOKIE)?.value;
-  if (isLanguage(cookieValue)) return cookieValue;
 
   const h = await headers();
-  const accept = h.get("accept-language");
-  if (accept && /^en\b/i.test(accept)) return "en";
-
-  return "es";
+  return resolveRequestLanguage(searchParam, cookieValue, h.get("accept-language"));
 }
