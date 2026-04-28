@@ -5,7 +5,7 @@ import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import { SPEAKERS, FAQ_SCHEMA_ITEMS, BASE_URL } from "@/lib/site-content";
+import { BASE_URL, CONTENT, PRECIOS } from "@/lib/content";
 import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
@@ -133,8 +133,8 @@ export default async function RootLayout({
     offers: [
       {
         "@type": "Offer",
-        name: "Acceso Estudiante",
-        price: "1200",
+        name: CONTENT.es.pricing.find((plan) => plan.id === "estudiante")?.label,
+        price: String(PRECIOS.estudiante),
         priceCurrency: "MXN",
         url: `${BASE_URL}/#registro`,
         availability: "https://schema.org/InStock",
@@ -143,8 +143,8 @@ export default async function RootLayout({
       },
       {
         "@type": "Offer",
-        name: "Acceso General",
-        price: "5800",
+        name: CONTENT.es.pricing.find((plan) => plan.id === "general")?.label,
+        price: String(PRECIOS.general),
         priceCurrency: "MXN",
         url: `${BASE_URL}/#registro`,
         availability: "https://schema.org/InStock",
@@ -153,8 +153,8 @@ export default async function RootLayout({
       },
       {
         "@type": "Offer",
-        name: "Acceso VIP",
-        price: "7200",
+        name: CONTENT.es.pricing.find((plan) => plan.id === "vip")?.label,
+        price: String(PRECIOS.vip),
         priceCurrency: "MXN",
         url: `${BASE_URL}/#registro`,
         availability: "https://schema.org/InStock",
@@ -167,7 +167,7 @@ export default async function RootLayout({
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: FAQ_SCHEMA_ITEMS.map(({ question, answer }) => ({
+    mainEntity: CONTENT.es.faq.map(({ question, answer }) => ({
       "@type": "Question",
       name: question,
       acceptedAnswer: {
@@ -177,7 +177,7 @@ export default async function RootLayout({
     })),
   };
 
-  const speakersSchema = SPEAKERS.map((s) => ({
+  const speakersSchema = CONTENT.es.speakers.map((s) => ({
     "@context": "https://schema.org",
     "@type": "Person",
     name: s.name,

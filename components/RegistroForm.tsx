@@ -1,28 +1,10 @@
-"use client";
-
-import { useActionState, useState, useEffect, useRef } from "react";
-import { Send, FileText, Loader2, AlertCircle } from "lucide-react";
-import { registrarAsistente, type RegistroState } from "@/app/actions/registro";
-import { toast } from "sonner";
+import { AlertCircle, FileText } from "lucide-react";
+import { submitRegistroForm } from "@/app/actions/registro";
+import type { RegistroFlashState } from "@/lib/registro-form-state";
+import RegistroFormEnhancer from "./RegistroFormEnhancer";
+import RegistroSubmitButton from "./RegistroSubmitButton";
 
 type Language = "es" | "en";
-
-// Field name → input element id, used to focus the first invalid field after a
-// failed submit. Order matches visual layout for consistent UX.
-const FIELD_TO_INPUT_ID: Array<{ field: string; id: string }> = [
-  { field: "nombre", id: "reg-nombre" },
-  { field: "apellido", id: "reg-apellido" },
-  { field: "email", id: "reg-email" },
-  { field: "empresa", id: "reg-empresa" },
-  { field: "cargo", id: "reg-cargo" },
-  { field: "telefono", id: "reg-telefono" },
-  { field: "tipo_acceso", id: "reg-tipo" },
-  { field: "credencial_estudiantil", id: "reg-credencial" },
-  { field: "rfc", id: "reg-rfc" },
-  { field: "razon_social", id: "reg-razon" },
-  { field: "codigo_postal_fiscal", id: "reg-cp" },
-  { field: "acepta_terminos", id: "reg-terminos" },
-];
 
 const formText = {
   es: {
@@ -125,76 +107,94 @@ const labelClass = "block text-sm font-semibold text-slate-700 mb-1.5";
 
 const errorClass = "text-xs text-red-500 mt-1.5 flex items-center gap-1";
 const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
+type PersistedValues = NonNullable<RegistroFlashState["values"]>;
 
-/* ─── Initial state ────────────────────────────────────────────────────────── */
-const initialState: RegistroState = {
-  success: false,
-  message: "",
+type TextFieldProps = {
+  name: keyof PersistedValues;
+  id: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  autoComplete?: string;
+  placeholder?: string;
+  maxLength?: number;
+  inputMode?: "numeric" | "text";
+  errors?: string[];
+  ariaRequired?: boolean;
+  defaultValue?: string;
 };
 
-/* ─── Component ────────────────────────────────────────────────────────────── */
-export default function RegistroForm({ language = "es" }: { language?: Language }) {
-  const [state, formAction, isPending] = useActionState(
-    registrarAsistente,
-    initialState,
+function TextField({
+  name,
+  id,
+  label,
+  type = "text",
+  required,
+  autoComplete,
+  placeholder,
+  maxLength,
+  inputMode,
+  errors,
+  ariaRequired,
+  defaultValue,
+}: TextFieldProps) {
+  const errorId = errors?.length ? `err-${id.replace("reg-", "")}` : undefined;
+
+  return (
+    <div>
+      <label htmlFor={id} className={labelClass}>
+        {label}
+      </label>
+      <input
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        className={inputClass}
+        maxLength={maxLength}
+        inputMode={inputMode}
+        aria-required={ariaRequired || undefined}
+        aria-describedby={errorId}
+        aria-invalid={errors?.length ? true : undefined}
+        defaultValue={defaultValue}
+      />
+      {errors?.[0] && (
+        <p id={errorId} role="alert" className={errorClass}>
+          {errors[0]}
+        </p>
+      )}
+    </div>
   );
-  const [requiresCFDI, setRequiresCFDI] = useState(false);
-  const [utms, setUtms] = useState({ source: "", medium: "", campaign: "" });
+}
+
+function getValue(values: PersistedValues | undefined, key: keyof PersistedValues): string {
+  const value = values?.[key];
+  return typeof value === "string" ? value : "";
+}
+
+function getChecked(values: PersistedValues | undefined, key: keyof PersistedValues): boolean {
+  return values?.[key] === true;
+}
+
+/* ─── Component ────────────────────────────────────────────────────────────── */
+export default function RegistroForm({
+  language = "es",
+  state = null,
+  utms,
+}: {
+  language?: Language;
+  state?: RegistroFlashState | null;
+  utms?: { source?: string; medium?: string; campaign?: string };
+}) {
   const text = formText[language];
-  const errorSummaryRef = useRef<HTMLDivElement | null>(null);
+  const values = state?.values;
+  const errors = state?.errors;
+  const errorCount = errors ? Object.keys(errors).filter((key) => key !== "_form").length : 0;
+  const requiresCFDI = getChecked(values, "requiere_cfdi");
 
-  /* ── UTM capture from URL ── */
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setUtms({
-      source: params.get("utm_source") ?? "",
-      medium: params.get("utm_medium") ?? "",
-      campaign: params.get("utm_campaign") ?? "",
-    });
-  }, []);
-
-  /* ── Toasts Feedback ── */
-  useEffect(() => {
-    if (state.message) {
-      if (state.success) {
-        toast.success(text.successToastTitle, {
-          description: state.message,
-        });
-      } else {
-        toast.error(text.errorToastTitle, {
-          description: state.message,
-        });
-      }
-    }
-  }, [state, text.errorToastTitle, text.successToastTitle]);
-
-  /* ── A11y: after a failed submit, move focus to the error summary so
-   *    screen-reader users hear the alert, then scroll the first invalid
-   *    field into view. */
-  useEffect(() => {
-    if (state.success || !state.errors) return;
-    if (errorSummaryRef.current) {
-      errorSummaryRef.current.focus({ preventScroll: false });
-    }
-    const firstErroredField = FIELD_TO_INPUT_ID.find(
-      ({ field }) => state.errors?.[field as keyof typeof state.errors],
-    );
-    if (firstErroredField) {
-      const el = document.getElementById(firstErroredField.id);
-      if (el) {
-        // Defer so the summary scroll completes first; we want both visible.
-        setTimeout(() => {
-          (el as HTMLInputElement).focus({ preventScroll: true });
-        }, 100);
-      }
-    }
-  }, [state]);
-
-  const errorCount = state.errors
-    ? Object.keys(state.errors).filter((k) => k !== "_form").length
-    : 0;
-
-  if (state.success) {
+  if (state?.success) {
     return (
       <div className="animate-scale-in flex flex-col items-center justify-center py-12 text-center">
         {/* Animated SVG checkmark — circle fades in, path draws itself */}
@@ -218,7 +218,7 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
         >
           {text.successTitle}
         </h3>
-        {state.folio && (
+        {state?.folio && (
           <div className="inline-flex flex-col items-center gap-1 px-6 py-4 bg-slate-50 border border-slate-200 rounded-xl mb-6">
             <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
               {text.accessFolio}
@@ -227,25 +227,26 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
               className="text-2xl font-bold text-blue-600"
               style={{ fontFamily: "var(--font-oswald)" }}
             >
-              {state.folio}
+              {state?.folio}
             </span>
           </div>
         )}
-        <p className="text-slate-600 text-sm leading-relaxed max-w-sm">{state.message}</p>
+        <p className="text-slate-600 text-sm leading-relaxed max-w-sm">{state?.message}</p>
       </div>
     );
   }
 
   return (
-    <form action={formAction} className="space-y-6" noValidate>
-      <input type="hidden" name="utm_source" value={utms.source} />
-      <input type="hidden" name="utm_medium" value={utms.medium} />
-      <input type="hidden" name="utm_campaign" value={utms.campaign} />
+    <form action={submitRegistroForm} className="space-y-6" noValidate>
+      <RegistroFormEnhancer state={state} language={language} />
+      <input type="hidden" name="utm_source" value={utms?.source ?? ""} />
+      <input type="hidden" name="utm_medium" value={utms?.medium ?? ""} />
+      <input type="hidden" name="utm_campaign" value={utms?.campaign ?? ""} />
       <input type="hidden" name="language" value={language} />
 
       {errorCount > 0 && (
         <div
-          ref={errorSummaryRef}
+          id="registro-error-summary"
           role="alert"
           aria-live="assertive"
           tabIndex={-1}
@@ -255,6 +256,7 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
           <div className="text-sm leading-snug">
             <p className="font-semibold">{text.errorSummaryHeading}</p>
             <p>{text.errorSummaryBody(errorCount)}</p>
+            {errors?._form?.[0] && <p className="mt-1">{errors._form[0]}</p>}
           </div>
         </div>
       )}
@@ -281,130 +283,94 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div>
-          <label htmlFor="reg-nombre" className={labelClass}>{text.firstName}</label>
-          <input
-            id="reg-nombre"
-            name="nombre"
-            type="text"
-            required
-            autoComplete="given-name"
-            placeholder={text.firstNamePlaceholder}
-            className={inputClass}
-            aria-describedby={state.errors?.nombre ? "err-nombre" : undefined}
-            aria-invalid={state.errors?.nombre ? true : undefined}
-          />
-          {state.errors?.nombre && (
-            <p id="err-nombre" role="alert" className={errorClass}>{state.errors.nombre[0]}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="reg-apellido" className={labelClass}>{text.lastName}</label>
-          <input
-            id="reg-apellido"
-            name="apellido"
-            type="text"
-            required
-            autoComplete="family-name"
-            placeholder={text.lastNamePlaceholder}
-            className={inputClass}
-            aria-describedby={state.errors?.apellido ? "err-apellido" : undefined}
-            aria-invalid={state.errors?.apellido ? true : undefined}
-          />
-          {state.errors?.apellido && (
-            <p id="err-apellido" role="alert" className={errorClass}>{state.errors.apellido[0]}</p>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <label htmlFor="reg-email" className={labelClass}>{text.email}</label>
-        <input
-          id="reg-email"
-          name="email"
-          type="email"
+        <TextField
+          id="reg-nombre"
+          name="nombre"
+          label={text.firstName}
           required
-          autoComplete="email"
-          placeholder={text.emailPlaceholder}
-          className={inputClass}
-          aria-describedby={state.errors?.email ? "err-email" : undefined}
-          aria-invalid={state.errors?.email ? true : undefined}
+          autoComplete="given-name"
+          placeholder={text.firstNamePlaceholder}
+          errors={errors?.nombre}
+          defaultValue={getValue(values, "nombre")}
         />
-        {state.errors?.email && (
-          <p id="err-email" role="alert" className={errorClass}>{state.errors.email[0]}</p>
-        )}
+        <TextField
+          id="reg-apellido"
+          name="apellido"
+          label={text.lastName}
+          required
+          autoComplete="family-name"
+          placeholder={text.lastNamePlaceholder}
+          errors={errors?.apellido}
+          defaultValue={getValue(values, "apellido")}
+        />
+      </div>
+
+      <TextField
+        id="reg-email"
+        name="email"
+        label={text.email}
+        type="email"
+        required
+        autoComplete="email"
+        placeholder={text.emailPlaceholder}
+        errors={errors?.email}
+        defaultValue={getValue(values, "email")}
+      />
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <TextField
+          id="reg-empresa"
+          name="empresa"
+          label={text.company}
+          required
+          autoComplete="organization"
+          placeholder={text.companyPlaceholder}
+          errors={errors?.empresa}
+          defaultValue={getValue(values, "empresa")}
+        />
+        <TextField
+          id="reg-cargo"
+          name="cargo"
+          label={text.role}
+          required
+          autoComplete="organization-title"
+          placeholder={text.rolePlaceholder}
+          errors={errors?.cargo}
+          defaultValue={getValue(values, "cargo")}
+        />
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <TextField
+          id="reg-telefono"
+          name="telefono"
+          label={text.phone}
+          type="tel"
+          autoComplete="tel"
+          placeholder={text.phonePlaceholder}
+          errors={errors?.telefono}
+          defaultValue={getValue(values, "telefono")}
+        />
         <div>
-          <label htmlFor="reg-empresa" className={labelClass}>{text.company}</label>
-          <input
-            id="reg-empresa"
-            name="empresa"
-            type="text"
-            required
-            autoComplete="organization"
-            placeholder={text.companyPlaceholder}
-            className={inputClass}
-            aria-describedby={state.errors?.empresa ? "err-empresa" : undefined}
-            aria-invalid={state.errors?.empresa ? true : undefined}
-          />
-          {state.errors?.empresa && (
-            <p id="err-empresa" role="alert" className={errorClass}>{state.errors.empresa[0]}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="reg-cargo" className={labelClass}>{text.role}</label>
-          <input
-            id="reg-cargo"
-            name="cargo"
-            type="text"
-            required
-            autoComplete="organization-title"
-            placeholder={text.rolePlaceholder}
-            className={inputClass}
-            aria-describedby={state.errors?.cargo ? "err-cargo" : undefined}
-            aria-invalid={state.errors?.cargo ? true : undefined}
-          />
-          {state.errors?.cargo && (
-            <p id="err-cargo" role="alert" className={errorClass}>{state.errors.cargo[0]}</p>
-          )}
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div>
-          <label htmlFor="reg-telefono" className={labelClass}>{text.phone}</label>
-          <input
-            id="reg-telefono"
-            name="telefono"
-            type="tel"
-            autoComplete="tel"
-            placeholder={text.phonePlaceholder}
-            className={inputClass}
-            aria-describedby={state.errors?.telefono ? "err-telefono" : undefined}
-            aria-invalid={state.errors?.telefono ? true : undefined}
-          />
-          {state.errors?.telefono && (
-            <p id="err-telefono" role="alert" className={errorClass}>{state.errors.telefono[0]}</p>
-          )}
-        </div>
-        <div>
-          <label htmlFor="reg-tipo" className={labelClass}>{text.accessType}</label>
+          <label htmlFor="reg-tipo" className={labelClass}>
+            {text.accessType}
+          </label>
           <select
             id="reg-tipo"
             name="tipo_acceso"
-            defaultValue="general"
+            defaultValue={getValue(values, "tipo_acceso") || "general"}
             className={inputClass}
-            aria-describedby={state.errors?.tipo_acceso ? "err-tipo" : undefined}
-            aria-invalid={state.errors?.tipo_acceso ? true : undefined}
+            aria-describedby={errors?.tipo_acceso ? "err-tipo" : undefined}
+            aria-invalid={errors?.tipo_acceso ? true : undefined}
           >
             <option value="general">{text.accessGeneral}</option>
             <option value="vip">{text.accessVip}</option>
             <option value="estudiante">{text.accessStudent}</option>
           </select>
-          {state.errors?.tipo_acceso && (
-            <p id="err-tipo" role="alert" className={errorClass}>{state.errors.tipo_acceso[0]}</p>
+          {errors?.tipo_acceso && (
+            <p id="err-tipo" role="alert" className={errorClass}>
+              {errors.tipo_acceso[0]}
+            </p>
           )}
         </div>
       </div>
@@ -416,32 +382,34 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
             type="checkbox"
             name="credencial_estudiantil"
             className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
-            aria-describedby={state.errors?.credencial_estudiantil ? "err-credencial" : undefined}
-            aria-invalid={state.errors?.credencial_estudiantil ? true : undefined}
+            aria-describedby={errors?.credencial_estudiantil ? "err-credencial" : undefined}
+            aria-invalid={errors?.credencial_estudiantil ? true : undefined}
+            defaultChecked={getChecked(values, "credencial_estudiantil")}
           />
           <span className="text-sm text-blue-900 leading-snug">{text.studentNotice}</span>
         </label>
-        {state.errors?.credencial_estudiantil && (
-          <p id="err-credencial" role="alert" className={errorClass}>{state.errors.credencial_estudiantil[0]}</p>
+        {errors?.credencial_estudiantil && (
+          <p id="err-credencial" role="alert" className={errorClass}>
+            {errors.credencial_estudiantil[0]}
+          </p>
         )}
       </div>
 
       <hr className="border-slate-200" />
 
       <div>
+        <input
+          id="reg-cfdi-toggle"
+          type="checkbox"
+          name="requiere_cfdi"
+          value="true"
+          defaultChecked={requiresCFDI}
+          className="cfdi-toggle-peer sr-only peer"
+          aria-expanded={requiresCFDI}
+          aria-controls="cfdi-panel"
+        />
         <label htmlFor="reg-cfdi-toggle" className="flex items-center gap-3 cursor-pointer select-none">
           <span className="relative">
-            <input
-              id="reg-cfdi-toggle"
-              type="checkbox"
-              name="requiere_cfdi"
-              value="true"
-              checked={requiresCFDI}
-              onChange={(e) => setRequiresCFDI(e.target.checked)}
-              className="sr-only peer"
-              aria-expanded={requiresCFDI}
-              aria-controls="cfdi-panel"
-            />
             <span className="block w-12 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
             <span className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-6 transition-transform shadow-sm" />
           </span>
@@ -458,63 +426,41 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
       <div
         id="cfdi-panel"
         className="cfdi-panel"
-        data-open={requiresCFDI ? "true" : "false"}
         aria-live="polite"
       >
         <div className="cfdi-panel-inner">
           <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4">
             <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
-            <div>
-              <label htmlFor="reg-rfc" className={labelClass}>{text.rfc}</label>
-              <input
-                id="reg-rfc"
-                name="rfc"
-                type="text"
-                placeholder={text.rfcPlaceholder}
-                className={inputClass}
-                maxLength={13}
-                aria-required={requiresCFDI || undefined}
-                aria-describedby={state.errors?.rfc ? "err-rfc" : undefined}
-                aria-invalid={state.errors?.rfc ? true : undefined}
-              />
-              {state.errors?.rfc && (
-                <p id="err-rfc" role="alert" className={errorClass}>{state.errors.rfc[0]}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="reg-razon" className={labelClass}>{text.legalName}</label>
-              <input
-                id="reg-razon"
-                name="razon_social"
-                type="text"
-                placeholder={text.legalNamePlaceholder}
-                className={inputClass}
-                aria-required={requiresCFDI || undefined}
-                aria-describedby={state.errors?.razon_social ? "err-razon" : undefined}
-                aria-invalid={state.errors?.razon_social ? true : undefined}
-              />
-              {state.errors?.razon_social && (
-                <p id="err-razon" role="alert" className={errorClass}>{state.errors.razon_social[0]}</p>
-              )}
-            </div>
-            <div>
-              <label htmlFor="reg-cp" className={labelClass}>{text.zip}</label>
-              <input
-                id="reg-cp"
-                name="codigo_postal_fiscal"
-                type="text"
-                placeholder={text.zipPlaceholder}
-                className={inputClass}
-                maxLength={5}
-                inputMode="numeric"
-                aria-required={requiresCFDI || undefined}
-                aria-describedby={state.errors?.codigo_postal_fiscal ? "err-cp" : undefined}
-                aria-invalid={state.errors?.codigo_postal_fiscal ? true : undefined}
-              />
-              {state.errors?.codigo_postal_fiscal && (
-                <p id="err-cp" role="alert" className={errorClass}>{state.errors.codigo_postal_fiscal[0]}</p>
-              )}
-            </div>
+            <TextField
+              id="reg-rfc"
+              name="rfc"
+              label={text.rfc}
+              placeholder={text.rfcPlaceholder}
+              maxLength={13}
+              ariaRequired={requiresCFDI}
+              errors={errors?.rfc}
+              defaultValue={getValue(values, "rfc")}
+            />
+            <TextField
+              id="reg-razon"
+              name="razon_social"
+              label={text.legalName}
+              placeholder={text.legalNamePlaceholder}
+              ariaRequired={requiresCFDI}
+              errors={errors?.razon_social}
+              defaultValue={getValue(values, "razon_social")}
+            />
+            <TextField
+              id="reg-cp"
+              name="codigo_postal_fiscal"
+              label={text.zip}
+              placeholder={text.zipPlaceholder}
+              maxLength={5}
+              inputMode="numeric"
+              ariaRequired={requiresCFDI}
+              errors={errors?.codigo_postal_fiscal}
+              defaultValue={getValue(values, "codigo_postal_fiscal")}
+            />
           </div>
         </div>
       </div>
@@ -522,7 +468,7 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
       <div className="pt-2">
         <label
           className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 ${
-            state.errors?.acepta_terminos ? "border border-red-300 bg-red-50" : ""
+            errors?.acepta_terminos ? "border border-red-300 bg-red-50" : ""
           }`}
         >
           <input
@@ -531,8 +477,9 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
             name="acepta_terminos"
             required
             className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500 focus-visible:ring-2"
-            aria-describedby={state.errors?.acepta_terminos ? "err-terminos" : undefined}
-            aria-invalid={state.errors?.acepta_terminos ? true : undefined}
+            aria-describedby={errors?.acepta_terminos ? "err-terminos" : undefined}
+            aria-invalid={errors?.acepta_terminos ? true : undefined}
+            defaultChecked={getChecked(values, "acepta_terminos")}
           />
           <span className="text-sm text-slate-600 leading-snug">
             {text.termsPrefix}{" "}
@@ -546,8 +493,10 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
             {text.termsSuffix}
           </span>
         </label>
-        {state.errors?.acepta_terminos && (
-          <p id="err-terminos" role="alert" className={errorClass}>{state.errors.acepta_terminos[0]}</p>
+        {errors?.acepta_terminos && (
+          <p id="err-terminos" role="alert" className={errorClass}>
+            {errors.acepta_terminos[0]}
+          </p>
         )}
       </div>
 
@@ -560,19 +509,7 @@ export default function RegistroForm({ language = "es" }: { language?: Language 
         />
       )}
 
-      <button type="submit" disabled={isPending} className="btn-primary w-full py-4 text-base mt-2">
-        {isPending ? (
-          <>
-            <Loader2 className="w-5 h-5 animate-spin" />
-            {text.pending}
-          </>
-        ) : (
-          <>
-            {text.submit}
-            <Send className="w-4 h-4 ml-1" />
-          </>
-        )}
-      </button>
+      <RegistroSubmitButton pendingLabel={text.pending} idleLabel={text.submit} />
     </form>
   );
 }

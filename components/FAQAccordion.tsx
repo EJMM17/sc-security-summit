@@ -1,6 +1,3 @@
-"use client";
-
-import { useState } from "react";
 import { Plus } from "lucide-react";
 
 type FAQItem = {
@@ -20,31 +17,25 @@ const FALLBACK_FAQ: FAQItem[] = [
 ];
 
 export default function FAQAccordion({ items }: { items?: FAQItem[] }) {
-  const [openIndex, setOpenIndex] = useState<number | null>(null);
   const data = items ?? FALLBACK_FAQ;
 
   return (
     <div className="w-full">
       {data.map((item, i) => (
-        <div
+        <details
           key={i}
           className="faq-item"
-          data-open={openIndex === i ? "true" : "false"}
         >
-          <button
-            className="faq-trigger"
-            onClick={() => setOpenIndex(openIndex === i ? null : i)}
-            aria-expanded={openIndex === i}
-          >
+          <summary className="faq-trigger cursor-pointer list-none">
             <span>{item.question}</span>
             <Plus className="faq-icon w-5 h-5 ml-4" />
-          </button>
+          </summary>
           <div className="faq-content">
             <p className="text-[var(--text-secondary)] text-sm leading-relaxed pr-12">
               {item.answer}
             </p>
           </div>
-        </div>
+        </details>
       ))}
     </div>
   );
