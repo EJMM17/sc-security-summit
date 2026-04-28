@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { PRECIOS } from "@/lib/content";
 
 // ─── Registro Schema ──────────────────────────────────────────────────────────
 
@@ -107,9 +108,4 @@ export const RegistroSchema = z
 export type RegistroInput = z.infer<typeof RegistroSchema>;
 
 // ─── Precios ──────────────────────────────────────────────────────────────────
-
-export const PRECIOS: Record<RegistroInput["tipo_acceso"], number> = {
-  estudiante: 1200,
-  general: 5800,
-  vip: 7200,
-};
+export { PRECIOS };
