@@ -28,8 +28,8 @@ export default function WhyAttend({ language }: { language: Language }) {
             <ScrollReveal key={index} delay={index * 100}>
               <div className="group relative p-8 rounded-2xl border border-slate-100 bg-white hover:bg-blue-50/50 hover:border-blue-200 transition-all duration-500 hover:shadow-lg">
                 <div className="flex items-start gap-5">
-                  <div className="w-14 h-14 rounded-xl bg-slate-900 flex items-center justify-center flex-shrink-0 ring-1 ring-slate-700 group-hover:ring-blue-500/50 transition-all shadow-lg">
-                    <Icon name={item.icon} className="w-6 h-6 text-blue-400" strokeWidth={1.5} />
+                  <div className="w-14 h-14 rounded-lg bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center flex-shrink-0 group-hover:from-blue-600 group-hover:to-blue-700 transition-all shadow-md hover:shadow-lg">
+                    <Icon name={item.icon} className="w-6 h-6 text-white" strokeWidth={1.5} />
                   </div>
                   <div>
                     <h3 className="font-oswald text-xl font-bold text-slate-900 mb-2">
