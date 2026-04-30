@@ -3,8 +3,16 @@ import { submitRegistroForm } from "@/app/actions/registro";
 import type { RegistroFlashState } from "@/lib/registro-form-state";
 import RegistroFormEnhancer from "./RegistroFormEnhancer";
 import RegistroSubmitButton from "./RegistroSubmitButton";
+import { ACCESO_OPTIONS } from "@/lib/constants";
 
 type Language = "es" | "en";
+
+const _opt = (v: "general" | "vip" | "estudiante") =>
+  ACCESO_OPTIONS.find((o) => o.value === v)!;
+const _label = (v: "general" | "vip" | "estudiante") => {
+  const o = _opt(v);
+  return `${o.price} ${o.currency}`;
+};
 
 const formText = {
   es: {
@@ -24,9 +32,9 @@ const formText = {
     phone: "Teléfono Móvil",
     phonePlaceholder: "+52 899 123 4567",
     accessType: "Tipo de Acceso",
-    accessGeneral: "Acceso General — $5,800 MXN",
-    accessVip: "Acceso VIP — $7,200 MXN",
-    accessStudent: "Acceso Estudiante — $1,200 MXN",
+    accessGeneral: `Acceso General — ${_label("general")}`,
+    accessVip: `Acceso VIP — ${_label("vip")}`,
+    accessStudent: `Acceso Estudiante — ${_label("estudiante")}`,
     studentNotice:
       "Al seleccionar acceso Estudiante, entiendo que deberé presentar credencial estudiantil física y vigente el día del evento.",
     requiresInvoice: "Requiero factura (CFDI)",
@@ -69,9 +77,9 @@ const formText = {
     phone: "Mobile Phone",
     phonePlaceholder: "+1 956 123 4567",
     accessType: "Access Type",
-    accessGeneral: "General Pass — $5,800 MXN",
-    accessVip: "VIP Pass — $7,200 MXN",
-    accessStudent: "Student Pass — $1,200 MXN",
+    accessGeneral: `General Pass — ${_label("general")}`,
+    accessVip: `VIP Pass — ${_label("vip")}`,
+    accessStudent: `Student Pass — ${_label("estudiante")}`,
     studentNotice:
       "By selecting Student pass, I understand I must present a valid physical student ID on event day.",
     requiresInvoice: "I need an invoice (CFDI)",
