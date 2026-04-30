@@ -76,7 +76,7 @@ export const UI_TEXT = {
     skipToForm: "Ir al formulario de registro",
     switchLangLabel: "Cambiar a inglés",
     registerBtn: "REGISTRARME",
-    dateLocation: "24 y 25 de septiembre, 2026 · Reynosa, Tamaulipas",
+    dateLocation: "24 de septiembre, 2026 · Reynosa, Tamaulipas",
     heroAlt: "Summit de Seguridad en la Cadena de Suministros",
     heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
     heroTitleHighlight: "CADENA DE SUMINISTROS",
@@ -121,7 +121,7 @@ export const UI_TEXT = {
       "Personal de la industria maquiladora, transportistas, agencias aduanales, compliance y seguridad de cadena de suministro.",
     audienceCardCTA: "Registrarme Ahora",
     eventDayLabel: "Día del evento",
-    eventDayValue: "24 y 25 de septiembre, 2026",
+    eventDayValue: "24 de septiembre, 2026",
     eventDayVenue: "Centro de Convenciones · Reynosa, Tamaulipas",
     participantsLabel: "PARTICIPANTES",
     participantsTitle: "¿A Quién Va Dirigido?",
@@ -141,19 +141,19 @@ export const UI_TEXT = {
       "Área de presentaciones",
       "Acceso prioritario VIP",
       "Coffee break en sesiones",
-      "Networking los 2 días",
+      "Networking el día del evento",
     ],
     networkingCTA: "RESERVAR MI LUGAR",
     networkingStats: [
       { number: "500+", label: "LUGARES DISPONIBLES" },
       { number: "15+", label: "HORAS DE NETWORKING" },
-      { number: "2", label: "DÍAS DE EVENTO" },
+      { number: "1", label: "DÍA DE EVENTO" },
       { number: "4", label: "SECTORES DE LA CADENA DE SUMINISTROS" },
     ],
     pricingLabel: "TIPOS DE ACCESO",
     pricingTitle: "Elige Tu Acceso",
     pricingDesc:
-      "Dos días de capacitación especializada · 24 y 25 de septiembre de 2026 · Centro de Convenciones, Reynosa",
+      "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
     taxNote: "* Más I.V.A.",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
@@ -195,7 +195,7 @@ export const UI_TEXT = {
     addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
     viewOnMaps: "Ver en Google Maps",
     datesLabel: "Fechas",
-    datesValue: "24 y 25 de septiembre, 2026",
+    datesValue: "24 de septiembre, 2026",
     datesHours: "8:00 AM — 5:30 PM",
     contactLabel: "Contacto",
     faqLabel: "PREGUNTAS FRECUENTES",
@@ -210,7 +210,7 @@ export const UI_TEXT = {
       "El registro garantiza tu lugar en el evento de seguridad en cadena de suministros más relevante del norte de México. No te quedes fuera.",
     contactOrg: "CONTACTAR ORGANIZADOR",
     footerDesc:
-      "1er Summit de Seguridad en la Cadena de Suministros. 24 y 25 de septiembre, 2026. Centro de Convenciones de Reynosa, Tamaulipas, México.",
+      "1er Summit de Seguridad en la Cadena de Suministros. 24 de septiembre, 2026. Centro de Convenciones de Reynosa, Tamaulipas, México.",
     footerPresentedBy: "Presentado por",
     footerEvent: "Evento",
     footerContact: "Contacto",
@@ -231,7 +231,7 @@ export const UI_TEXT = {
     skipToForm: "Skip to registration form",
     switchLangLabel: "Switch to Spanish",
     registerBtn: "REGISTER",
-    dateLocation: "September 24-25, 2026 · Reynosa, Tamaulipas",
+    dateLocation: "September 24, 2026 · Reynosa, Tamaulipas",
     heroAlt: "Supply Chain Security Summit",
     heroTitlePrefix: "SECURITY SUMMIT FOR THE",
     heroTitleHighlight: "SUPPLY CHAIN",
@@ -276,7 +276,7 @@ export const UI_TEXT = {
       "Professionals from the maquiladora industry, carriers, customs brokers, compliance and supply chain security.",
     audienceCardCTA: "Register Now",
     eventDayLabel: "Event day",
-    eventDayValue: "September 24 & 25, 2026",
+    eventDayValue: "September 24, 2026",
     eventDayVenue: "Convention Center · Reynosa, Tamaulipas",
     participantsLabel: "PARTICIPANTS",
     participantsTitle: "Who Is It For?",
@@ -296,19 +296,19 @@ export const UI_TEXT = {
       "Presentation area",
       "VIP priority access",
       "Coffee breaks during sessions",
-      "Networking both days",
+      "Networking on event day",
     ],
     networkingCTA: "RESERVE MY SPOT",
     networkingStats: [
       { number: "500+", label: "AVAILABLE SEATS" },
       { number: "15+", label: "NETWORKING HOURS" },
-      { number: "2", label: "EVENT DAYS" },
+      { number: "1", label: "EVENT DAY" },
       { number: "4", label: "INDUSTRY SECTORS" },
     ],
     pricingLabel: "ACCESS TYPES",
     pricingTitle: "Choose Your Pass",
     pricingDesc:
-      "Two days of specialized training · September 24-25, 2026 · Reynosa Convention Center",
+      "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
     taxNote: "* Plus VAT",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
@@ -350,7 +350,7 @@ export const UI_TEXT = {
     addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
     viewOnMaps: "View on Google Maps",
     datesLabel: "Dates",
-    datesValue: "September 24-25, 2026",
+    datesValue: "September 24, 2026",
     datesHours: "8:00 AM — 5:30 PM",
     contactLabel: "Contact",
     faqLabel: "FREQUENTLY ASKED QUESTIONS",
@@ -365,7 +365,7 @@ export const UI_TEXT = {
       "Registering guarantees your spot at the most relevant supply chain security event in northern Mexico. Don't miss out.",
     contactOrg: "CONTACT ORGANIZER",
     footerDesc:
-      "1st Supply Chain Security Summit. September 24 and 25, 2026. Reynosa Convention Center, Tamaulipas, Mexico.",
+      "1st Supply Chain Security Summit. September 24, 2026. Reynosa Convention Center, Tamaulipas, Mexico.",
     footerPresentedBy: "Presented by",
     footerEvent: "Event",
     footerContact: "Contact",
@@ -386,13 +386,13 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: 2, suffix: "", label: "Días de Capacitación" },
-    { number: 4, suffix: "+", label: "Conferencistas Confirmados" },
+    { number: 1, suffix: "", label: "Día de Capacitación" },
+    { number: 3, suffix: "+", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
   ],
   en: [
-    { number: 2, suffix: "", label: "Training Days" },
-    { number: 4, suffix: "+", label: "Confirmed Speakers" },
+    { number: 1, suffix: "", label: "Training Day" },
+    { number: 3, suffix: "+", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
   ],
 } as const;
@@ -473,12 +473,6 @@ export const PILARES = {
 export const SPEAKERS = {
   es: [
     {
-      name: "Fidel Guerrero",
-      role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
-      topic: "Aduanas & Comercio Exterior",
-      image: "/images/speaker-fidel.webp",
-    },
-    {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       topic: "Aduanas & Compliance",
@@ -498,12 +492,6 @@ export const SPEAKERS = {
     },
   ],
   en: [
-    {
-      name: "Fidel Guerrero",
-      role: "Deputy Director, National Committee of Customs & Foreign Trade",
-      topic: "Customs & Foreign Trade",
-      image: "/images/speaker-fidel.webp",
-    },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
@@ -527,20 +515,22 @@ export const SPEAKERS = {
 
 export const ASISTENTES = {
   es: [
-    { title: "Operaciones & Supply Chain", desc: "Directores, gerentes y coordinaciones", icon: "building-2" },
-    { title: "Logística & Transporte", desc: "Responsables de tráfico y distribución", icon: "truck" },
-    { title: "Aduanas & Comercio Exterior", desc: "Import-export y cumplimiento operativo", icon: "globe" },
-    { title: "Compliance & Seguridad", desc: "Seguridad patrimonial y control interno", icon: "shield-check" },
-    { title: "Abastecimiento & Compras", desc: "Decisores de compra y proveedores", icon: "shopping-cart" },
-    { title: "Sistemas & Tecnología", desc: "Monitoreo e innovación IT", icon: "monitor" },
+    { title: "Operaciones y Cadena de Suministro", desc: "Directores, gerentes, supervisores y coordinadores", icon: "building-2" },
+    { title: "Logística y Transporte", desc: "Responsables de tráfico, distribución y transporte", icon: "truck" },
+    { title: "Aduanas y Comercio Exterior", desc: "Import-export, cumplimiento aduanero y agencias aduanales", icon: "globe" },
+    { title: "Seguridad patrimonial y corporativa", desc: "Protección de instalaciones, unidades, personal y mercancías", icon: "shield-check" },
+    { title: "Abastecimiento y Compras", desc: "Compradores y gestión de proveedores", icon: "shopping-cart" },
+    { title: "Tecnología, Sistemas y Ciberseguridad", desc: "Monitoreo, innovación IT y seguridad informática", icon: "monitor" },
+    { title: "Recursos Humanos", desc: "Reclutamiento, capacitación y entrenamiento", icon: "users" },
   ],
   en: [
-    { title: "Operations & Supply Chain", desc: "Directors, managers and coordinators", icon: "building-2" },
-    { title: "Logistics & Transportation", desc: "Traffic and distribution leads", icon: "truck" },
-    { title: "Customs & Foreign Trade", desc: "Import-export and operational compliance", icon: "globe" },
-    { title: "Compliance & Security", desc: "Asset protection and internal control", icon: "shield-check" },
-    { title: "Sourcing & Procurement", desc: "Purchasing decision-makers and suppliers", icon: "shopping-cart" },
-    { title: "Systems & Technology", desc: "Monitoring and IT innovation", icon: "monitor" },
+    { title: "Operations & Supply Chain", desc: "Directors, managers, supervisors and coordinators", icon: "building-2" },
+    { title: "Logistics & Transportation", desc: "Traffic, distribution and transport leads", icon: "truck" },
+    { title: "Customs & Foreign Trade", desc: "Import-export, customs compliance and customs brokers", icon: "globe" },
+    { title: "Asset & Corporate Security", desc: "Protection of facilities, units, personnel and goods", icon: "shield-check" },
+    { title: "Sourcing & Procurement", desc: "Buyers and supplier management", icon: "shopping-cart" },
+    { title: "Technology, Systems & Cybersecurity", desc: "Monitoring, IT innovation and information security", icon: "monitor" },
+    { title: "Human Resources", desc: "Recruitment, training and development", icon: "users" },
   ],
 } as const;
 
@@ -572,7 +562,7 @@ export const PRICING = {
       featured: true,
       desc: "Profesionales y operación",
       features: [
-        "Capacitación de 2 días",
+        "Capacitación de 1 día",
         "Acceso a paneles",
         "Gafete nivel General",
         "Kit operativo estándar",
@@ -588,7 +578,7 @@ export const PRICING = {
       featured: false,
       desc: "Ejecutivos y tomadores de decisión",
       features: [
-        "Capacitación de 2 días",
+        "Capacitación de 1 día",
         "Acceso a paneles",
         "Gafete VIP Premium",
         "Kit operativo completo",
@@ -606,7 +596,7 @@ export const PRICING = {
       featured: false,
       desc: "Perfil académico con credencial vigente",
       features: [
-        "Capacitación de 2 días",
+        "Capacitación de 1 día",
         "Acceso a paneles",
         "Gafete nivel Básico",
         "Kit operativo mínimo",
@@ -622,7 +612,7 @@ export const PRICING = {
       featured: true,
       desc: "Professionals and operations",
       features: [
-        "2-day training",
+        "1-day training",
         "Panel access",
         "General badge level",
         "Standard operational kit",
@@ -638,7 +628,7 @@ export const PRICING = {
       featured: false,
       desc: "Executives and decision makers",
       features: [
-        "2-day training",
+        "1-day training",
         "Panel access",
         "VIP Premium badge",
         "Complete operational kit",
@@ -656,7 +646,7 @@ export const PRICING = {
       featured: false,
       desc: "Academic profile with valid ID",
       features: [
-        "2-day training",
+        "1-day training",
         "Panel access",
         "Basic badge level",
         "Minimal operational kit",
@@ -878,7 +868,7 @@ export const WHY_ATTEND = {
     {
       icon: "book-open",
       title: "Actualización Estratégica",
-      desc: "Domina los estándares para anticipar riesgos antes de que interrumpan tu operación",
+      desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
     },
     {
       icon: "mic-2",
@@ -888,12 +878,12 @@ export const WHY_ATTEND = {
     {
       icon: "target",
       title: "Impacto Real",
-      desc: "Convierte el cumplimiento en una ventaja competitiva que abra nuevos canales de venta B2B",
+      desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
     },
     {
       icon: "globe",
       title: "Visión Binacional y Comercial",
-      desc: "Networking con tomadores de decisiones que están definiendo el futuro de la seguridad logística y mejoras para tu empresa",
+      desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
     },
   ],
   en: [
@@ -924,7 +914,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Dónde y cuándo se llevará a cabo el Summit?",
     answer:
-      "El Summit se realizará los días 24 y 25 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 5:30 PM cada día.",
+      "El Summit se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 5:30 PM.",
   },
   {
     question: "¿A quién está dirigido este evento?",
@@ -939,7 +929,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué incluye cada tipo de acceso?",
     answer:
-      "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+      "El acceso Estudiante incluye capacitación de 1 día, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
   },
   {
     question: "¿Puedo obtener factura (CFDI)?",
@@ -957,7 +947,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Where and when will the Summit take place?",
     answer:
-      "The Summit will be held on September 24 and 25, 2026, at the Reynosa Convention Center in Reynosa, Tamaulipas, Mexico. Activities begin at 8:00 AM and run through 5:30 PM each day.",
+      "The Summit will be held on September 24, 2026, at the Reynosa Convention Center in Reynosa, Tamaulipas, Mexico. Activities begin at 8:00 AM and run through 5:30 PM.",
   },
   {
     question: "Who is this event designed for?",
@@ -972,7 +962,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "What is included with each access type?",
     answer:
-      "Student access includes 2-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
+      "Student access includes 1-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
   },
   {
     question: "Can I request an invoice (CFDI)?",
