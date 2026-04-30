@@ -13,10 +13,10 @@ describe("content SSOT", () => {
 
   it("preserves the live speaker copy from app/page.tsx", () => {
     expect(CONTENT.es.speakers[0]).toMatchObject({
-      name: "Fidel Guerrero",
-      role: "Subdirector, Comité Nacional de Aduanas y Comercio Exterior",
-      topic: "Aduanas & Comercio Exterior",
-      image: "/images/speaker-fidel.webp",
+      name: "Isidoro Juárez",
+      role: "Mandatario Aduanal Certificado",
+      topic: "Aduanas & Compliance",
+      image: "/images/speaker-isidoro.webp",
     });
   });
 });
