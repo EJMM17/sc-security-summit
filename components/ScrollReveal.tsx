@@ -14,7 +14,6 @@ export default function ScrollReveal({
   className = "",
   direction = "up",
   delay = 0,
-  threshold: _threshold = 0.15,
   stagger = false,
 }: ScrollRevealProps) {
   const dirClass =
