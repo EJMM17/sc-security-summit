@@ -1,9 +1,9 @@
 export const BASE_URL = "https://www.scsecuritysummit.com" as const;
 
 export const PRECIOS = {
-  estudiante: 1200,
-  general: 5800,
-  vip: 7200,
+  estudiante: 850,
+  general: 2200,
+  vip: 4800,
 } as const;
 
 export type IconKey =
@@ -558,7 +558,7 @@ export const PRICING = {
     {
       id: "general",
       label: "Acceso General",
-      price: "$5,800",
+      price: "$2,200",
       featured: true,
       desc: "Profesionales y operación",
       features: [
@@ -573,7 +573,7 @@ export const PRICING = {
     {
       id: "vip",
       label: "Acceso VIP",
-      price: "$7,200",
+      price: "$4,800",
       featured: false,
       desc: "Ejecutivos y tomadores de decisión",
       features: [
@@ -593,7 +593,7 @@ export const PRICING = {
     {
       id: "estudiante",
       label: "Acceso Estudiante",
-      price: "$1,200",
+      price: "$850",
       featured: false,
       desc: "Perfil académico con credencial vigente",
       features: [
@@ -609,7 +609,7 @@ export const PRICING = {
     {
       id: "general",
       label: "General Pass",
-      price: "$5,800",
+      price: "$2,200",
       featured: true,
       desc: "Professionals and operations",
       features: [
@@ -624,7 +624,7 @@ export const PRICING = {
     {
       id: "vip",
       label: "VIP Pass",
-      price: "$7,200",
+      price: "$4,800",
       featured: false,
       desc: "Executives and decision makers",
       features: [
@@ -644,7 +644,7 @@ export const PRICING = {
     {
       id: "estudiante",
       label: "Student Pass",
-      price: "$1,200",
+      price: "$850",
       featured: false,
       desc: "Academic profile with valid ID",
       features: [

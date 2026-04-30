@@ -101,7 +101,7 @@ export const ACCESO_OPTIONS = [
   {
     value: "estudiante" as const,
     label: "ESTUDIANTE",
-    price: "$1,200",
+    price: "$850",
     currency: "MXN",
     note: "Requiere credencial vigente",
     perks: ["Acceso a capacitación especializada", "Gafete de acceso", "Kit básico del participante"],
@@ -109,7 +109,7 @@ export const ACCESO_OPTIONS = [
   {
     value: "general" as const,
     label: "GENERAL",
-    price: "$5,800",
+    price: "$2,200",
     currency: "MXN",
     note: "Acceso completo",
     perks: ["Acceso a capacitación especializada", "Participación en paneles", "Gafete de acceso", "Kit del participante", "Constancia oficial y DC-3", "Business Hub y networking"],
@@ -118,7 +118,7 @@ export const ACCESO_OPTIONS = [
   {
     value: "vip" as const,
     label: "VIP",
-    price: "$7,200",
+    price: "$4,800",
     currency: "MXN",
     note: "Experiencia premium",
     perks: ["Conferencias magistrales y sesiones especializadas", "Paneles con expertos", "Gafete y pulsera de acceso", "Kit de bienvenida premium", "Constancia oficial y DC-3", "Business Hub prioritario", "Asiento preferente", "Workshop especializado incluido", "Coffee break durante el evento"],
