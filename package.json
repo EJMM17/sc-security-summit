@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@google/design.md": "^0.1.1",
-    "@sentry/nextjs": "^6.3.5",
+    "@sentry/nextjs": "^10.51.0",
     "@supabase/supabase-js": "^2.45.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@upstash/ratelimit": "^2.0.8",
