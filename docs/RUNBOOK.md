@@ -178,3 +178,53 @@ Mirrors the original task brief — re-run on Sept 17, 2026.
       paid from `/admin`, confirm the email lands in their inbox.
 - [ ] DNS pointing at Vercel, SSL valid (cert expiry > Sept 30, 2026).
 - [ ] Code freeze 72h before the event (Sept 21, 18:00).
+
+---
+
+## 9. Payments operations (Conekta v2)
+
+This section was added when the platform moved to automated payments.
+
+### 9.1 Webhook contract
+
+- URL: `https://www.scsecuritysummit.com/api/webhooks/conekta`
+- Events handled: `order.paid`, `charge.paid`, `order.expired`, `order.canceled`
+- Optional shared secret: header `x-conekta-webhook-secret` must match
+  `CONEKTA_WEBHOOK_SECRET` if set in Vercel.
+- The endpoint always returns 200 — failures are captured to Sentry to
+  prevent Conekta retry storms (`audit_log.evento = 'pago_conekta_webhook'`).
+- The endpoint is rate-limited to 100 req/min per source IP.
+
+### 9.2 If the webhook stops firing
+
+1. Confirm the URL in Conekta dashboard → Webhooks.
+2. Tail Vercel logs filtering on `/api/webhooks/conekta`.
+3. Cross-check Conekta dashboard → Orders for the affected `conekta_order_id`.
+4. Manual fix:
+   ```sql
+   UPDATE registros
+      SET estado_pago = 'pagado',
+          conekta_payment_status = 'paid',
+          pagado_at = now()
+    WHERE conekta_order_id = 'ord_XXXX';
+   ```
+5. Click "Retry" on the specific webhook delivery in Conekta dashboard.
+
+### 9.3 Refund / dispute
+
+- Issue refunds from Conekta dashboard → Order → Refund (full or partial).
+- Mark the registro as cancelled from `/admin/registros` (this writes the
+  `cancelado_*` audit fields and blocks the seat).
+- Add `audit_log` row with `evento='refund_issued'` if you do this manually.
+
+### 9.4 Capacity / waitlist
+
+- Live capacity exposed via the `get_cupos_disponibles()` Postgres RPC.
+- Increase capacity by editing `app_config` row `capacity_total`.
+- Trigger waitlist emails with `sendWaitlistNotification()` (server only).
+
+### 9.5 Email retry behaviour
+
+`lib/email.ts` retries failed sends 2× with 1s/3s backoff. Final failures
+are reported to Sentry with the message `email.send_failed_after_retries`.
+The captured payload includes `tag` (which template), `to`, and `error`.

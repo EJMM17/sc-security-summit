@@ -10,6 +10,7 @@ import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 import CookieConsent from "@/components/CookieConsent";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -215,6 +216,7 @@ export default async function RootLayout({
         {children}
         <WhatsAppButton />
         <CookieConsent language={language} />
+        <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
         {enableSpeedInsights && <SpeedInsights />}
         {/* Turnstile loaded here so the browser has it ready before the form hydrates */}

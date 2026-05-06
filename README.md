@@ -142,3 +142,84 @@ npm run vercel:env:pull
 
 Lista canónica de variables y reglas de validación: `scripts/env-spec.mjs`.
 Guía completa de deploy y troubleshooting: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
+
+---
+
+## Pagos (Conekta v2)
+
+El flujo completo de pago vive en:
+
+- `lib/conekta.ts` — wrapper REST (auth Basic con secret key, sin SDK).
+- `app/actions/crear-orden-pago.ts` — Server Action con rate-limit
+  (`checkOrdenRateLimit`), capacity check, idempotency por `(folio, método)`.
+- `app/api/webhooks/conekta/route.ts` — recibe `order.paid` / `order.expired` /
+  `order.canceled`. Always 200 (Sentry registra fallos). Opcional:
+  `CONEKTA_WEBHOOK_SECRET` para validar header.
+- `app/pago/page.tsx` — UI por método (SPEI clabe, OXXO barcode, tarjeta).
+- `app/registro-exitoso/page.tsx` — confirmación con calendario y WhatsApp.
+
+### Diagrama del flujo
+
+```
+Form submit
+   │
+   ▼
+Server Action: registrar
+   │  rate-limit + Turnstile + Zod + capacity
+   │  insert into registros (idempotency_key UNIQUE)
+   │  send registration_confirmation email
+   ▼
+/pago?folio=...
+   │  user picks método
+   ▼
+Server Action: crearOrdenPago
+   │  Conekta.createOrder (Idempotency-Key per folio+método)
+   │  persist conekta_order_id + spei_clabe / oxxo_barcode / checkout_url
+   ▼
+Conekta hosted checkout / SPEI deposit / OXXO cash
+   │
+   ▼
+Webhook: order.paid
+   │  registros.estado_pago = 'pagado'
+   │  audit_log row + sendPaymentConfirmation()
+```
+
+---
+
+## Scripts
+
+```bash
+npm run dev             # dev server
+npm run build           # production build (prebuild valida envs)
+npm run typecheck       # tsc --noEmit
+npm run lint            # eslint
+npm run test            # vitest (unit)
+npm run test:run        # alias used by pre-push hook + CI
+npm run test:coverage   # vitest with v8 coverage
+npm run test:e2e        # playwright (asume http://localhost:3000)
+npm run test:e2e:ui     # playwright modo interactivo
+npm run check-env       # valida .env.local sin construir
+```
+
+---
+
+## Documentación operativa
+
+- [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) — provisionamiento inicial.
+- [`docs/RUNBOOK.md`](docs/RUNBOOK.md) — procedimientos de oncall y emergencias.
+- [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — diagnósticos comunes.
+- [`docs/DNS.md`](docs/DNS.md) — SPF / DKIM / DMARC / Vercel apex.
+
+---
+
+## Calidad
+
+- Pre-commit (`.husky/pre-commit`): `lint-staged` (ESLint --fix sobre archivos staged).
+- Pre-push (`.husky/pre-push`): `typecheck` + `test:run`.
+- CI (`.github/workflows/ci.yml`): typecheck → lint → unit → build → e2e
+  (Playwright matrix) → Lighthouse en `main`.
+- Dependabot (`.github/dependabot.yml`): npm + GitHub Actions semanales.
+
+## Licencia
+
+MIT. Ver [`LICENSE`](LICENSE).
