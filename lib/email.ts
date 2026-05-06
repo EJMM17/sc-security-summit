@@ -4,8 +4,10 @@ import { Resend } from "resend";
 import { env, features } from "@/env";
 import {
   buildOrganizerNotification,
+  buildPaymentConfirmation,
   buildRegistrationConfirmation,
   type OrganizerEmailData,
+  type PaymentConfirmationData,
   type RegistrationEmailData,
 } from "./email-templates";
 
@@ -71,6 +73,13 @@ export async function sendRegistrationConfirmation(
 ): Promise<SendResult> {
   const { subject, html, text } = buildRegistrationConfirmation(data);
   return send({ to: data.to, subject, html, text, tag: "registration_confirmation" });
+}
+
+export async function sendPaymentConfirmation(
+  data: PaymentConfirmationData & { to: string },
+): Promise<SendResult> {
+  const { subject, html, text } = buildPaymentConfirmation(data);
+  return send({ to: data.to, subject, html, text, tag: "payment_confirmation" });
 }
 
 export async function sendOrganizerNotification(data: OrganizerEmailData): Promise<SendResult> {

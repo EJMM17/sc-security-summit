@@ -311,6 +311,134 @@ export function buildOrganizerNotification(
   };
 }
 
+// =============================================================
+// 3. Payment confirmation (sent to attendee after Conekta webhook)
+// =============================================================
+export type PaymentConfirmationData = RegistrationEmailData;
+
+export function buildPaymentConfirmation(
+  data: PaymentConfirmationData,
+): RenderedEmail {
+  const tier = TIER_LABEL[data.tipoAcceso][data.language];
+  const monto = formatMxn(data.montoMxn);
+
+  if (data.language === "en") {
+    const subject = `Payment received · Folio ${data.folio}`;
+    const greeting = `Hi ${data.nombre},`;
+    const intro = `Your payment is confirmed. You're all set for the ${EVENT.title}.`;
+    const paidLabel = "Status";
+    const paidValue = "PAID";
+    const folioLabel = "Your folio";
+    const tierLabel = "Access tier";
+    const amountLabel = "Amount";
+    const checkinTitle = "Day of the event";
+    const checkinBody = `On Sept 24 bring your ID and the QR code we'll send you the week of the event. Doors open at ${EVENT.schedule}. ${EVENT.venueDetail}.`;
+    const sign = `— ${ORGANIZERS.presented_by.join(" & ")}`;
+
+    const text = [
+      greeting,
+      "",
+      intro,
+      "",
+      `${paidLabel}: ${paidValue}`,
+      `${folioLabel}: ${data.folio}`,
+      `${tierLabel}: ${tier}`,
+      `${amountLabel}: ${monto}`,
+      "",
+      checkinTitle,
+      checkinBody,
+      "",
+      sign,
+    ].join("\n");
+
+    const bodyHtml = `
+<div style="font-size:15px;line-height:1.6;color:#e6e8ee;">
+  <p style="margin:0 0 14px;">${greeting}</p>
+  <p style="margin:0 0 22px;color:#c5cad4;">${intro}</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1017;border:1px solid #22c55e;border-radius:8px;margin-bottom:24px;">
+    <tr><td style="padding:18px 20px;">
+      <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:#14532d;color:#86efac;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;">${paidValue}</div>
+      <div style="margin-top:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:18px;font-weight:600;color:#ffffff;letter-spacing:0.04em;">${data.folio}</div>
+    </td></tr>
+    <tr><td style="padding:0 20px 18px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr><td style="padding-top:10px;border-top:1px solid #1f2430;font-size:13px;color:#9aa3b2;">${tierLabel}</td>
+            <td style="padding-top:10px;border-top:1px solid #1f2430;font-size:13px;color:#ffffff;text-align:right;">${tier}</td></tr>
+        <tr><td style="padding-top:8px;font-size:13px;color:#9aa3b2;">${amountLabel}</td>
+            <td style="padding-top:8px;font-size:13px;color:#ffffff;text-align:right;font-weight:600;">${monto}</td></tr>
+      </table>
+    </td></tr>
+  </table>
+  <h3 style="margin:0 0 8px;font-size:14px;color:#ffffff;text-transform:uppercase;letter-spacing:0.08em;">${checkinTitle}</h3>
+  <p style="margin:0 0 24px;color:#c5cad4;font-size:14px;">${checkinBody}</p>
+  <p style="margin:0;color:#9aa3b2;font-size:13px;">${sign}</p>
+</div>`;
+
+    return {
+      subject,
+      html: htmlShell({ previewText: `Pago confirmado · ${data.folio}`, bodyHtml }),
+      text,
+    };
+  }
+
+  const subject = `Pago confirmado · Folio ${data.folio}`;
+  const greeting = `Hola ${data.nombre},`;
+  const intro = `Tu pago está confirmado. Tu lugar en el ${EVENT.title} está asegurado.`;
+  const paidLabel = "Estado";
+  const paidValue = "PAGADO";
+  const folioLabel = "Folio";
+  const tierLabel = "Tipo de acceso";
+  const amountLabel = "Monto";
+  const checkinTitle = "El día del evento";
+  const checkinBody = `El 24 de septiembre trae una identificación oficial y el código QR que enviaremos la semana del evento. Apertura ${EVENT.schedule}. ${EVENT.venueDetail}.`;
+  const sign = `— ${ORGANIZERS.presented_by.join(" & ")}`;
+
+  const text = [
+    greeting,
+    "",
+    intro,
+    "",
+    `${paidLabel}: ${paidValue}`,
+    `${folioLabel}: ${data.folio}`,
+    `${tierLabel}: ${tier}`,
+    `${amountLabel}: ${monto}`,
+    "",
+    checkinTitle,
+    checkinBody,
+    "",
+    sign,
+  ].join("\n");
+
+  const bodyHtml = `
+<div style="font-size:15px;line-height:1.6;color:#e6e8ee;">
+  <p style="margin:0 0 14px;">${greeting}</p>
+  <p style="margin:0 0 22px;color:#c5cad4;">${intro}</p>
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:#0d1017;border:1px solid #22c55e;border-radius:8px;margin-bottom:24px;">
+    <tr><td style="padding:18px 20px;">
+      <div style="display:inline-block;padding:4px 10px;border-radius:999px;background:#14532d;color:#86efac;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;font-weight:700;">${paidValue}</div>
+      <div style="margin-top:12px;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:18px;font-weight:600;color:#ffffff;letter-spacing:0.04em;">${data.folio}</div>
+    </td></tr>
+    <tr><td style="padding:0 20px 18px;">
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr><td style="padding-top:10px;border-top:1px solid #1f2430;font-size:13px;color:#9aa3b2;">${tierLabel}</td>
+            <td style="padding-top:10px;border-top:1px solid #1f2430;font-size:13px;color:#ffffff;text-align:right;">${tier}</td></tr>
+        <tr><td style="padding-top:8px;font-size:13px;color:#9aa3b2;">${amountLabel}</td>
+            <td style="padding-top:8px;font-size:13px;color:#ffffff;text-align:right;font-weight:600;">${monto}</td></tr>
+      </table>
+    </td></tr>
+  </table>
+  <h3 style="margin:0 0 8px;font-size:14px;color:#ffffff;text-transform:uppercase;letter-spacing:0.08em;">${checkinTitle}</h3>
+  <p style="margin:0 0 24px;color:#c5cad4;font-size:14px;">${checkinBody}</p>
+  <p style="margin:0;color:#9aa3b2;font-size:13px;">${sign}</p>
+</div>`;
+
+  return {
+    subject,
+    html: htmlShell({ previewText: `Pago confirmado · ${data.folio}`, bodyHtml }),
+    text,
+  };
+}
+
 function row(label: string, value: string): string {
   return `
     <tr>

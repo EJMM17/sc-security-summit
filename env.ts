@@ -46,6 +46,10 @@ const schema = z.object({
   SENTRY_DSN: z.string().url().optional().or(z.literal("")),
   ADMIN_SESSION_SECRET: z.string().optional(),
   BCRYPT_ROUNDS: z.coerce.number().min(4).max(20).optional().default(12),
+
+  // Conekta (server-only secret; payments are off when unset)
+  CONEKTA_API_KEY: z.string().min(10).optional(),
+  CONEKTA_WEBHOOK_SECRET: z.string().optional(),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -67,6 +71,7 @@ export const features = {
   turnstile: Boolean(
     env.TURNSTILE_SECRET_KEY && env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
   ),
+  conekta: Boolean(env.CONEKTA_API_KEY),
 } as const;
 
 // Helper para code paths que SÍ necesitan el valor: lanza un error claro
