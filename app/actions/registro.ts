@@ -47,13 +47,19 @@ function getPersistedValues(formData: FormData) {
 }
 
 async function processRegistro(formData: FormData): Promise<RegistroState> {
-  const [{ checkRateLimit }, { verifyTurnstile }, { RegistroSchema }, { createLead }] =
-    await Promise.all([
-      import("@/lib/rate-limit"),
-      import("@/lib/turnstile"),
-      import("@/lib/schemas"),
-      import("@/server/use-cases/create-lead"),
-    ]);
+  const [
+    { checkRateLimit },
+    { verifyTurnstile },
+    { RegistroSchema },
+    { createLead },
+    { getIdempotentResult, setIdempotentResult, isValidIdempotencyKey },
+  ] = await Promise.all([
+    import("@/lib/rate-limit"),
+    import("@/lib/turnstile"),
+    import("@/lib/schemas"),
+    import("@/server/use-cases/create-lead"),
+    import("@/lib/idempotency"),
+  ]);
   const h = await headers();
   const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
@@ -61,6 +67,21 @@ async function processRegistro(formData: FormData): Promise<RegistroState> {
   const acceptLanguage = h.get("accept-language");
   const language = pickLanguage(formData, acceptLanguage);
   const values = getPersistedValues(formData);
+
+  const idempotencyKey = String(formData.get("idempotency_key") ?? "");
+  if (isValidIdempotencyKey(idempotencyKey)) {
+    const cachedFolio = await getIdempotentResult(idempotencyKey);
+    if (cachedFolio) {
+      return {
+        success: true,
+        message:
+          language === "en"
+            ? `Registration complete. Your confirmation folio is ${cachedFolio}.`
+            : `Registro completado exitosamente. Tu folio de confirmación es ${cachedFolio}.`,
+        folio: cachedFolio,
+      };
+    }
+  }
 
   const honeypot = formData.get("website");
   if (honeypot && String(honeypot).length > 0) {
@@ -151,6 +172,10 @@ async function processRegistro(formData: FormData): Promise<RegistroState> {
       },
       values,
     };
+  }
+
+  if (isValidIdempotencyKey(idempotencyKey)) {
+    await setIdempotentResult(idempotencyKey, result.folio);
   }
 
   return {

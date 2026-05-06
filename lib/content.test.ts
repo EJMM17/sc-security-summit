@@ -6,7 +6,7 @@ describe("content SSOT", () => {
     expect(BASE_URL).toBe("https://www.scsecuritysummit.com");
     expect(PRECIOS).toStrictEqual({
       estudiante: 850,
-      general: 2200,
+      general: 2500,
       vip: 4800,
     });
   });

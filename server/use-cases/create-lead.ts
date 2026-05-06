@@ -80,6 +80,29 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       };
     }
 
+    const { data: cuposData, error: cuposError } = await supabaseAdmin.rpc(
+      "get_cupos_disponibles",
+    );
+
+    if (cuposError) {
+      Sentry.captureMessage("createLead.capacity_check_failed", {
+        level: "warning",
+        extra: { code: cuposError.code, message: cuposError.message },
+      });
+    } else {
+      const cuposDisponibles = typeof cuposData === "number" ? cuposData : 0;
+      if (cuposDisponibles <= 0) {
+        return {
+          ok: false,
+          status: 409,
+          message:
+            data.language === "en"
+              ? "We're sorry — all seats for the event are sold out."
+              : "Lo sentimos, los cupos para este evento se han agotado.",
+        };
+      }
+    }
+
     const folio = generateFolio();
 
     const insertPayload: Record<string, unknown> = {
