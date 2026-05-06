@@ -2,7 +2,6 @@ import { ArrowRight, LayoutGrid, Ruler } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
-import PremiumCheck from "./_primitives/PremiumCheck";
 import WaveSeparator from "./_primitives/WaveSeparator";
 
 export default function Sponsors({ language }: { language: Language }) {
@@ -112,20 +111,15 @@ export default function Sponsors({ language }: { language: Language }) {
                           </span>
                         </div>
 
-                        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-2">
+                        <div className="grid sm:grid-cols-2 gap-x-8 gap-y-0">
                           {[col1, col2].map((col, ci) => (
-                            <ul key={ci} className="space-y-2">
+                            <ul key={ci} className="divide-y divide-slate-100">
                               {col.map((benefit, bi) => (
                                 <li
                                   key={bi}
-                                  className="flex items-start gap-2 text-[13px] leading-snug text-slate-600"
+                                  className="py-2 text-[13px] leading-snug text-slate-600"
                                 >
-                                  <span
-                                    className={`w-4 h-4 rounded-full ${meta.chipBg} flex items-center justify-center flex-shrink-0 mt-0.5`}
-                                  >
-                                    <PremiumCheck className={`w-2.5 h-2.5 ${meta.accent}`} />
-                                  </span>
-                                  <span>{benefit}</span>
+                                  {benefit}
                                 </li>
                               ))}
                             </ul>
