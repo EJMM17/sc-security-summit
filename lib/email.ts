@@ -105,7 +105,11 @@ async function send(args: {
 
   Sentry.captureMessage("email.send_failed_after_retries", {
     level: "warning",
-    extra: { tag: args.tag, to: args.to, error: last.error },
+    extra: {
+      tag: args.tag,
+      to: args.to,
+      error: last.ok ? undefined : last.error,
+    },
   });
 
   return last;
