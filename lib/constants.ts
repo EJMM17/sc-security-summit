@@ -99,28 +99,28 @@ export const SOCIAL_PROOF = [
 
 export const ACCESO_OPTIONS = [
   {
-    value: "estudiante" as const,
-    label: "ESTUDIANTE",
-    price: "$850",
-    currency: "MXN",
-    note: "Requiere credencial vigente",
-    perks: ["Acceso a capacitación especializada", "Gafete de acceso", "Kit básico del participante"],
-  },
-  {
-    value: "general" as const,
-    label: "GENERAL",
-    price: "$2,200",
-    currency: "MXN",
-    note: "Acceso completo",
-    perks: ["Acceso a capacitación especializada", "Participación en paneles", "Gafete de acceso", "Kit del participante", "Constancia oficial y DC-3", "Business Hub y networking"],
-    popular: true,
-  },
-  {
     value: "vip" as const,
     label: "VIP",
     price: "$4,800",
     currency: "MXN",
-    note: "Experiencia premium",
-    perks: ["Conferencias magistrales y sesiones especializadas", "Paneles con expertos", "Gafete y pulsera de acceso", "Kit de bienvenida premium", "Constancia oficial y DC-3", "Business Hub prioritario", "Asiento preferente", "Workshop especializado incluido", "Coffee break durante el evento"],
+    note: "Ejecutivos y tomadores de decisión",
+    perks: ["Acceso a conferencias especializadas", "Workshops estratégicos y sesiones en Business Hub", "Participación prioritaria en Q&A", "Business Hub para networking empresarial", "Asesoría CTPAT/OEA", "Asiento preferente", "Constancia de participación", "Material descargable y plantillas", "Coffee break", "Kit de bienvenida premium", "Gafete y pulsera de acceso"],
+    popular: true,
+  },
+  {
+    value: "general" as const,
+    label: "GENERAL",
+    price: "$2,500",
+    currency: "MXN",
+    note: "Profesionales y operación",
+    perks: ["Acceso a conferencias especializadas", "Paneles con expertos de la industria", "Constancia de participación", "Kit de bienvenida", "Gafete de acceso"],
+  },
+  {
+    value: "estudiante" as const,
+    label: "ESTUDIANTE",
+    price: "$850",
+    currency: "MXN",
+    note: "Perfil académico con credencial vigente / Cupo limitado",
+    perks: ["Acceso a conferencias especializadas", "Kit básico de bienvenida", "Gafete de acceso", "Constancia de participación con costo preferencial"],
   },
 ] as const;

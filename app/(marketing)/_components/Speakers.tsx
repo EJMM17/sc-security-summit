@@ -25,7 +25,7 @@ export default function Speakers({ language }: { language: Language }) {
             </div>
           </ScrollReveal>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {speakers.map((speaker, index) => (
               <ScrollReveal key={index} delay={index * 150} direction="scale">
                 <div className="speaker-card group">
