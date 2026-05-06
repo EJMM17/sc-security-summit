@@ -1,4 +1,4 @@
-import { LogOut, Download, Users, Shield } from "lucide-react";
+import { LogOut, Download, Users, Shield, Ticket } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { adminLogout } from "@/app/actions/admin";
@@ -10,8 +10,13 @@ export const dynamic = "force-dynamic";
 type SearchParams = {
   estado?: string;
   tipo?: string;
+  metodo?: string;
+  pago_status?: string;
   q?: string;
   page?: string;
+  per_page?: string;
+  from?: string;
+  to?: string;
 };
 
 const ESTADO_OPTS = [
@@ -28,7 +33,25 @@ const TIPO_OPTS = [
   { value: "vip", label: "VIP" },
 ];
 
-const PAGE_SIZE = 50;
+const METODO_OPTS = [
+  { value: "", label: "Todos" },
+  { value: "spei", label: "SPEI" },
+  { value: "tarjeta", label: "Tarjeta" },
+  { value: "oxxo", label: "OXXO" },
+  { value: "transferencia_manual", label: "Transferencia manual" },
+];
+
+const PAGO_STATUS_OPTS = [
+  { value: "", label: "Todos" },
+  { value: "pending", label: "Pending" },
+  { value: "paid", label: "Paid" },
+  { value: "expired", label: "Expired" },
+  { value: "canceled", label: "Canceled" },
+  { value: "failed", label: "Failed" },
+];
+
+const PAGE_SIZE_OPTS = [10, 25, 50] as const;
+const DEFAULT_PAGE_SIZE = 25;
 
 export type RegistroRow = {
   folio: string;
@@ -41,6 +64,16 @@ export type RegistroRow = {
   tipo_acceso: "estudiante" | "general" | "vip";
   monto_mxn: number;
   estado_pago: "pendiente" | "pagado" | "cancelado";
+  metodo_pago: "spei" | "tarjeta" | "oxxo" | "transferencia_manual" | null;
+  conekta_order_id: string | null;
+  conekta_payment_status:
+    | "pending"
+    | "paid"
+    | "expired"
+    | "canceled"
+    | "failed"
+    | null;
+  pagado_at: string | null;
   requiere_cfdi: boolean;
   rfc: string | null;
   razon_social: string | null;
@@ -68,16 +101,21 @@ export default async function RegistrosPage({
   const adminEmail = await requireAdmin();
   const params = await searchParams;
 
+  const requestedPerPage = parseInt(params.per_page ?? "", 10);
+  const perPage = (PAGE_SIZE_OPTS as readonly number[]).includes(requestedPerPage)
+    ? requestedPerPage
+    : DEFAULT_PAGE_SIZE;
+
   const page = Math.max(1, parseInt(params.page ?? "1", 10));
-  const from = (page - 1) * PAGE_SIZE;
-  const to = from + PAGE_SIZE - 1;
+  const from = (page - 1) * perPage;
+  const to = from + perPage - 1;
 
   const supabase = createAdminClient();
 
   let query = supabase
     .from("registros")
     .select(
-      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
+      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,metodo_pago,conekta_order_id,conekta_payment_status,pagado_at,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
       { count: "exact" },
     )
     .order("created_at", { ascending: false })
@@ -85,6 +123,16 @@ export default async function RegistrosPage({
 
   if (params.estado) query = query.eq("estado_pago", params.estado);
   if (params.tipo) query = query.eq("tipo_acceso", params.tipo);
+  if (params.metodo) query = query.eq("metodo_pago", params.metodo);
+  if (params.pago_status) query = query.eq("conekta_payment_status", params.pago_status);
+  if (params.from) {
+    const fromIso = parseDateBoundary(params.from, "start");
+    if (fromIso) query = query.gte("created_at", fromIso);
+  }
+  if (params.to) {
+    const toIso = parseDateBoundary(params.to, "end");
+    if (toIso) query = query.lte("created_at", toIso);
+  }
   if (params.q) {
     const q = params.q.trim();
     if (q.length > 0) {
@@ -97,8 +145,11 @@ export default async function RegistrosPage({
   const { data: rows, error, count } = await query.returns<RegistroRow[]>();
 
   const stats = await loadStats(supabase);
+  const cuposRes = await supabase.rpc("get_cupos_disponibles");
+  const cuposDisponibles =
+    typeof cuposRes.data === "number" ? cuposRes.data : null;
   const totalItems = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
 
   const exportHref =
     "/admin/registros/export.csv?" +
@@ -116,6 +167,21 @@ export default async function RegistrosPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
+          {cuposDisponibles !== null && (
+            <span
+              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium border ${
+                cuposDisponibles <= 0
+                  ? "bg-red-500/10 border-red-500/30 text-red-300"
+                  : cuposDisponibles < 50
+                  ? "bg-amber-500/10 border-amber-500/30 text-amber-300"
+                  : "bg-emerald-500/10 border-emerald-500/30 text-emerald-300"
+              }`}
+              title="Cupos disponibles"
+            >
+              <Ticket className="w-3.5 h-3.5" aria-hidden="true" />
+              {cuposDisponibles} cupo(s)
+            </span>
+          )}
           <a
             href="/admin/admins"
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
@@ -155,13 +221,29 @@ export default async function RegistrosPage({
         <Field name="q" label="Búsqueda" defaultValue={params.q ?? ""} placeholder="folio, email, nombre, empresa..." />
         <Select name="estado" label="Estado de pago" defaultValue={params.estado ?? ""} options={ESTADO_OPTS} />
         <Select name="tipo" label="Tipo de acceso" defaultValue={params.tipo ?? ""} options={TIPO_OPTS} />
+        <Select name="metodo" label="Método" defaultValue={params.metodo ?? ""} options={METODO_OPTS} />
+        <Select name="pago_status" label="Conekta status" defaultValue={params.pago_status ?? ""} options={PAGO_STATUS_OPTS} />
+        <Field name="from" label="Desde" type="date" defaultValue={params.from ?? ""} />
+        <Field name="to" label="Hasta" type="date" defaultValue={params.to ?? ""} />
+        <Select
+          name="per_page"
+          label="Por página"
+          defaultValue={String(perPage)}
+          options={PAGE_SIZE_OPTS.map((n) => ({ value: String(n), label: String(n) }))}
+        />
         <button
           type="submit"
           className="px-3 py-2 bg-blue-600 hover:bg-blue-500 rounded-md text-xs font-medium"
         >
           Aplicar
         </button>
-        {(params.q || params.estado || params.tipo) && (
+        {(params.q ||
+          params.estado ||
+          params.tipo ||
+          params.metodo ||
+          params.pago_status ||
+          params.from ||
+          params.to) && (
           <a href="/admin/registros" className="text-xs text-slate-400 hover:text-slate-200">
             Limpiar
           </a>
@@ -185,6 +267,8 @@ export default async function RegistrosPage({
               <th className="text-left px-3 py-2 font-medium">Tier</th>
               <th className="text-right px-3 py-2 font-medium">Monto</th>
               <th className="text-left px-3 py-2 font-medium">Estado</th>
+              <th className="text-left px-3 py-2 font-medium">Método</th>
+              <th className="text-left px-3 py-2 font-medium">Conekta</th>
               <th className="text-left px-3 py-2 font-medium">CFDI</th>
               <th className="text-left px-3 py-2 font-medium">Creado</th>
               <th className="text-left px-3 py-2 font-medium">Acciones</th>
@@ -196,7 +280,7 @@ export default async function RegistrosPage({
             ))}
             {rows && rows.length === 0 && (
               <tr>
-                <td colSpan={10} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={12} className="px-3 py-8 text-center text-slate-500">
                   Sin registros que coincidan con los filtros.
                 </td>
               </tr>
@@ -205,7 +289,7 @@ export default async function RegistrosPage({
         </table>
       </div>
 
-      <Pagination page={page} totalPages={totalPages} totalItems={totalItems} />
+      <Pagination page={page} totalPages={totalPages} totalItems={totalItems} perPage={perPage} />
     </main>
   );
 }
@@ -282,11 +366,13 @@ function Field({
   label,
   defaultValue,
   placeholder,
+  type = "text",
 }: {
   name: string;
   label: string;
   defaultValue: string;
   placeholder?: string;
+  type?: string;
 }) {
   return (
     <div>
@@ -295,12 +381,21 @@ function Field({
       </label>
       <input
         name={name}
+        type={type}
         defaultValue={defaultValue}
         placeholder={placeholder}
         className="px-3 py-1.5 bg-slate-900 border border-slate-700 rounded-md text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-blue-500"
       />
     </div>
   );
+}
+
+function parseDateBoundary(value: string, edge: "start" | "end"): string | null {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  // Treat dates as America/Monterrey (UTC-6, no DST). Approximate: append T00 / T23:59.
+  const suffix = edge === "start" ? "T00:00:00-06:00" : "T23:59:59-06:00";
+  const iso = new Date(`${value}${suffix}`).toISOString();
+  return iso;
 }
 
 function Select({

@@ -3,6 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 
 import { env } from "@/env";
 import { sendPaymentConfirmation } from "@/lib/email";
+import { checkWebhookRateLimit } from "@/lib/rate-limit";
 import { supabaseAdmin } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -19,6 +20,23 @@ function ok(body: Record<string, unknown> = { ok: true }) {
 
 export async function POST(req: NextRequest) {
   try {
+    const ip =
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ??
+      req.headers.get("x-real-ip") ??
+      "unknown";
+
+    const rl = await checkWebhookRateLimit(ip);
+    if (!rl.ok) {
+      // Soft reject: 200 keeps Conekta from retry-storming; we capture the
+      // anomaly in audit_log to investigate.
+      await supabaseAdmin.from("audit_log").insert({
+        evento: "webhook_rate_limited",
+        ip,
+        detalles: { source: "conekta" },
+      });
+      return ok({ ok: true, throttled: true });
+    }
+
     // Optional shared-secret header validation. Conekta supports a custom
     // header on webhooks; if CONEKTA_WEBHOOK_SECRET is set we require it.
     if (env.CONEKTA_WEBHOOK_SECRET) {

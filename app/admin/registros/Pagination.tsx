@@ -6,11 +6,14 @@ export default function Pagination({
   page,
   totalPages,
   totalItems,
+  perPage,
 }: {
   page: number;
   totalPages: number;
   totalItems: number;
+  perPage?: number;
 }) {
+  void perPage; // current page size is rendered server-side via the per_page select.
   const buildHref = (p: number) => {
     const params = new URLSearchParams(window.location.search);
     params.set("page", String(p));

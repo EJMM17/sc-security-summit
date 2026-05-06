@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 
 import { env } from "@/env";
-import { checkRateLimit } from "@/lib/rate-limit";
+import { checkOrdenRateLimit } from "@/lib/rate-limit";
 import { getConekta, warnConektaDisabled } from "@/lib/conekta";
 import { supabaseAdmin } from "@/lib/supabase";
 
@@ -39,7 +39,7 @@ export async function crearOrdenPago(formData: FormData): Promise<CrearOrdenResu
   const ip =
     h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
 
-  const rl = await checkRateLimit(`crear-orden:${ip}`);
+  const rl = await checkOrdenRateLimit(ip);
   if (!rl.ok) {
     return { ok: false, message: "Demasiados intentos. Espera 15 minutos." };
   }

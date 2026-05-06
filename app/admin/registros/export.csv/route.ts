@@ -16,6 +16,10 @@ type Row = {
   tipo_acceso: string;
   monto_mxn: number;
   estado_pago: string;
+  metodo_pago: string | null;
+  conekta_order_id: string | null;
+  conekta_payment_status: string | null;
+  pagado_at: string | null;
   requiere_cfdi: boolean;
   rfc: string | null;
   razon_social: string | null;
@@ -34,6 +38,10 @@ const HEADERS = [
   "tipo_acceso",
   "monto_mxn",
   "estado_pago",
+  "metodo_pago",
+  "conekta_order_id",
+  "conekta_payment_status",
+  "pagado_at",
   "requiere_cfdi",
   "rfc",
   "razon_social",
@@ -58,6 +66,10 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const estado = url.searchParams.get("estado");
   const tipo = url.searchParams.get("tipo");
+  const metodo = url.searchParams.get("metodo");
+  const pagoStatus = url.searchParams.get("pago_status");
+  const fromDate = url.searchParams.get("from");
+  const toDate = url.searchParams.get("to");
   const q = url.searchParams.get("q")?.trim();
 
   const supabase = createAdminClient();
@@ -68,6 +80,14 @@ export async function GET(req: NextRequest) {
 
   if (estado) query = query.eq("estado_pago", estado);
   if (tipo) query = query.eq("tipo_acceso", tipo);
+  if (metodo) query = query.eq("metodo_pago", metodo);
+  if (pagoStatus) query = query.eq("conekta_payment_status", pagoStatus);
+  if (fromDate && /^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
+    query = query.gte("created_at", `${fromDate}T00:00:00-06:00`);
+  }
+  if (toDate && /^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
+    query = query.lte("created_at", `${toDate}T23:59:59-06:00`);
+  }
   if (q && q.length > 0) {
     query = query.or(
       `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,
