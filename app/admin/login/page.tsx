@@ -13,7 +13,7 @@ export default async function AdminLoginPage() {
       <div className="w-full max-w-sm">
         <h1 className="text-2xl font-semibold mb-2">Panel administrativo</h1>
         <p className="text-sm text-slate-400 mb-8">
-          Recibirás un link de acceso por correo. El link expira en 15 minutos.
+          Inicia sesión con tus credenciales de administrador.
         </p>
         <AdminLoginForm />
       </div>

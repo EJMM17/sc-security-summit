@@ -71,7 +71,7 @@ export const PROD_REQUIRED = [
 // but not required by check-env. Listed here so the sync script knows the
 // full universe of vars it should mirror.
 export const OPTIONAL = [
-  { name: "EMAIL_FROM", hint: "Verified Resend sender (defaults to noreply@scsecuritysummit.com)" },
+  { name: "EMAIL_FROM", hint: "Verified Resend sender (defaults to hola@scsecuritysummit.com.mx)" },
   { name: "ADMIN_EMAILS", hint: "CSV allow-list for /admin (falls back to CONTACT_EMAIL)" },
   { name: "ADMIN_SESSION_SECRET", hint: "≥32 chars; signs admin magic-link tokens and cookies" },
   { name: "SENTRY_DSN", hint: "Sentry server DSN (SDK no-ops when unset)" },

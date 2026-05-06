@@ -60,7 +60,7 @@ When an attendee writes via email or WhatsApp:
      not. Resend payment link manually (see SOP #4).
    - **Found, estado_pago = pagado**: copy their folio and reply with it.
      Their inbox likely blocked Resend; ask them to check spam or add the
-     `noreply@scsecuritysummit.com` sender to their allow-list.
+     `hola@scsecuritysummit.com.mx` sender to their allow-list.
    - **Not found**: the registration didn't persist. Walk them through
      re-registering from scratch.
 3. If you reply with a folio manually, log it in `#summit-ops` with the

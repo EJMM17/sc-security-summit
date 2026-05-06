@@ -1,8 +1,9 @@
-import { LogOut, Download } from "lucide-react";
+import { LogOut, Download, Users, Shield } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { adminLogout } from "@/app/actions/admin";
 import RegistroRow from "./RegistroRow";
+import Pagination from "./Pagination";
 
 export const dynamic = "force-dynamic";
 
@@ -10,6 +11,7 @@ type SearchParams = {
   estado?: string;
   tipo?: string;
   q?: string;
+  page?: string;
 };
 
 const ESTADO_OPTS = [
@@ -26,6 +28,8 @@ const TIPO_OPTS = [
   { value: "vip", label: "VIP" },
 ];
 
+const PAGE_SIZE = 50;
+
 export type RegistroRow = {
   folio: string;
   nombre: string;
@@ -39,7 +43,21 @@ export type RegistroRow = {
   estado_pago: "pendiente" | "pagado" | "cancelado";
   requiere_cfdi: boolean;
   rfc: string | null;
+  razon_social: string | null;
+  codigo_postal_fiscal: string | null;
   created_at: string;
+  ip_registro: string | null;
+  user_agent: string | null;
+  referer: string | null;
+  utm_source: string | null;
+  utm_medium: string | null;
+  utm_campaign: string | null;
+  pagado_en: string | null;
+  pagado_por: string | null;
+  pago_nota: string | null;
+  cancelado_en: string | null;
+  cancelado_por: string | null;
+  cancelacion_nota: string | null;
 };
 
 export default async function RegistrosPage({
@@ -50,39 +68,42 @@ export default async function RegistrosPage({
   const adminEmail = await requireAdmin();
   const params = await searchParams;
 
+  const page = Math.max(1, parseInt(params.page ?? "1", 10));
+  const from = (page - 1) * PAGE_SIZE;
+  const to = from + PAGE_SIZE - 1;
+
   const supabase = createAdminClient();
+
   let query = supabase
     .from("registros")
     .select(
-      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,requiere_cfdi,rfc,created_at",
+      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
+      { count: "exact" },
     )
     .order("created_at", { ascending: false })
-    .limit(500);
+    .range(from, to);
 
   if (params.estado) query = query.eq("estado_pago", params.estado);
   if (params.tipo) query = query.eq("tipo_acceso", params.tipo);
-  const safeQ = sanitizeSearchTerm(params.q);
-  if (safeQ) {
-    const pattern = `%${safeQ}%`;
-    query = query.or(
-      [
-        `folio.ilike.${pattern}`,
-        `email.ilike.${pattern}`,
-        `nombre.ilike.${pattern}`,
-        `apellido.ilike.${pattern}`,
-        `empresa.ilike.${pattern}`,
-      ].join(","),
-    );
+  if (params.q) {
+    const q = params.q.trim();
+    if (q.length > 0) {
+      query = query.or(
+        `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,
+      );
+    }
   }
 
-  const { data: rows, error } = await query.returns<RegistroRow[]>();
+  const { data: rows, error, count } = await query.returns<RegistroRow[]>();
 
-  const counts = await loadCounts(supabase);
+  const stats = await loadStats(supabase);
+  const totalItems = count ?? 0;
+  const totalPages = Math.max(1, Math.ceil(totalItems / PAGE_SIZE));
 
   const exportHref =
     "/admin/registros/export.csv?" +
     new URLSearchParams(
-      Object.entries(params).filter(([, v]) => Boolean(v)) as [string, string][],
+      Object.entries(params).filter(([, v]) => Boolean(v) && v !== "1") as [string, string][],
     ).toString();
 
   return (
@@ -91,11 +112,16 @@ export default async function RegistrosPage({
         <div>
           <h1 className="text-xl font-semibold">Registros</h1>
           <p className="text-xs text-slate-400">
-            Sesión: {adminEmail} · {rows?.length ?? 0} resultado(s) · Total{" "}
-            {counts.total} · Pagados {counts.pagado} · Pendientes {counts.pendiente}
+            Sesión: {adminEmail} · {totalItems} registro(s) en total
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <a
+            href="/admin/admins"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
+          >
+            <Shield className="w-3.5 h-3.5" aria-hidden="true" /> Admins
+          </a>
           <a
             href={exportHref}
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
@@ -112,6 +138,15 @@ export default async function RegistrosPage({
           </form>
         </div>
       </header>
+
+      {/* Stats cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
+        <StatCard label="Total" value={String(stats.total)} icon={<Users className="w-3.5 h-3.5" />} />
+        <StatCard label="Pagados" value={String(stats.pagado)} tone="emerald" />
+        <StatCard label="Pendientes" value={String(stats.pendiente)} tone="amber" />
+        <StatCard label="Cancelados" value={String(stats.cancelado)} tone="slate" />
+        <StatCard label="Ingresos" value={stats.ingresos} tone="emerald" />
+      </div>
 
       <form
         method="get"
@@ -169,39 +204,77 @@ export default async function RegistrosPage({
           </tbody>
         </table>
       </div>
+
+      <Pagination page={page} totalPages={totalPages} totalItems={totalItems} />
     </main>
   );
 }
 
-async function loadCounts(supabase: ReturnType<typeof createAdminClient>) {
-  const [totalRes, pagadoRes, pendienteRes] = await Promise.all([
-    supabase.from("registros").select("*", { count: "exact", head: true }),
-    supabase
-      .from("registros")
-      .select("*", { count: "exact", head: true })
-      .eq("estado_pago", "pagado"),
-    supabase
-      .from("registros")
-      .select("*", { count: "exact", head: true })
-      .eq("estado_pago", "pendiente"),
-  ]);
+async function loadStats(supabase: ReturnType<typeof createAdminClient>) {
+  const { count: total } = await supabase
+    .from("registros")
+    .select("*", { count: "exact", head: true });
+  const { count: pagado } = await supabase
+    .from("registros")
+    .select("*", { count: "exact", head: true })
+    .eq("estado_pago", "pagado");
+  const { count: pendiente } = await supabase
+    .from("registros")
+    .select("*", { count: "exact", head: true })
+    .eq("estado_pago", "pendiente");
+  const { count: cancelado } = await supabase
+    .from("registros")
+    .select("*", { count: "exact", head: true })
+    .eq("estado_pago", "cancelado");
+
+  const { data: ingresosData } = await supabase
+    .from("registros")
+    .select("monto_mxn")
+    .eq("estado_pago", "pagado");
+
+  const ingresos = (ingresosData ?? []).reduce((sum, r) => sum + (r.monto_mxn ?? 0), 0);
+
   return {
-    total: totalRes.count ?? 0,
-    pagado: pagadoRes.count ?? 0,
-    pendiente: pendienteRes.count ?? 0,
+    total: total ?? 0,
+    pagado: pagado ?? 0,
+    pendiente: pendiente ?? 0,
+    cancelado: cancelado ?? 0,
+    ingresos: new Intl.NumberFormat("es-MX", {
+      style: "currency",
+      currency: "MXN",
+      minimumFractionDigits: 0,
+    }).format(ingresos),
   };
 }
 
-// PostgREST `.or()` parses a comma-separated filter list. Untrusted input must
-// not contain `,`, `.`, `(`, `)` or it can graft additional filters onto the
-// query. ILIKE wildcards `%` and `_` must also be escaped so the user's literal
-// search terms aren't interpreted as patterns.
-function sanitizeSearchTerm(raw: string | undefined): string | null {
-  if (!raw) return null;
-  const trimmed = raw.trim().slice(0, 64);
-  if (!trimmed) return null;
-  if (/[,.()*"'\\]/.test(trimmed)) return null;
-  return trimmed.replace(/[\\%_]/g, "\\$&");
+function StatCard({
+  label,
+  value,
+  icon,
+  tone,
+}: {
+  label: string;
+  value: string;
+  icon?: React.ReactNode;
+  tone?: "emerald" | "amber" | "slate";
+}) {
+  const toneClasses = {
+    emerald: "text-emerald-400",
+    amber: "text-amber-400",
+    slate: "text-slate-400",
+  };
+
+  return (
+    <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-md">
+      <div className="flex items-center gap-1.5 text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+        {icon}
+        {label}
+      </div>
+      <div className={`text-lg font-semibold tabular-nums ${tone ? toneClasses[tone] : "text-slate-100"}`}>
+        {value}
+      </div>
+    </div>
+  );
 }
 
 function Field({

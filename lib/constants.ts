@@ -11,7 +11,7 @@ export const EVENT = {
   city: "Reynosa, Tamaulipas",
   schedule: "08:00 – 18:00 hrs",
   edition: "1RA EDICIÓN",
-  contact: "Contacto@LanzLogistics.com",
+  contact: "hola@scsecuritysummit.com.mx",
 } as const;
 
 // ─── SPONSOR CONSTANTS ───────────────────────────────────────────────────────

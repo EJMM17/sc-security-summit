@@ -1,31 +1,30 @@
 // =============================================================
-// Admin auth — HMAC-signed magic-link sessions
+// Admin auth — password-based sessions
 // =============================================================
-// Lightweight passwordless auth for the organizer dashboard. No
-// dependency on Supabase Auth or NextAuth — every step is custom but
-// deliberately minimal:
+// Replaces the previous magic-link HMAC flow with email+password
+// authentication backed by the public.admins table in Supabase.
 //
-//   1. /admin/login — operator types their email
-//   2. server checks the email is in ADMIN_EMAILS (csv) allowlist
-//   3. server mints a signed token { email, exp } and emails the link
-//   4. /admin/auth?t=... verifies the HMAC, sets a session cookie that
-//      itself is HMAC-signed with the same secret
-//   5. /admin/* pages call requireAdmin(); the layout redirects to
-//      /admin/login when unauthenticated
+// Flow:
+//   1. /admin/login — operator types email + password
+//   2. server verifies credentials against bcrypt hash in DB
+//   3. on success, sets an HMAC-signed session cookie
+//   4. /admin/* pages call requireAdmin(); unauthenticated users
+//      are redirected to /admin/login
 //
-// Threat model: the token IS the auth — anyone with the link can log
-// in. So tokens expire in 15 min, are single-purpose (login only), and
-// the email is sent to a known operator address only. Sessions live for
-// 7 days, are HttpOnly + Secure + SameSite=Strict.
+// Sessions live 7 days, are HttpOnly + Secure + SameSite=Strict.
+// The session cookie contains a signed payload { email, exp, kind }.
 // =============================================================
+
+import "server-only";
 
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import bcrypt from "bcryptjs";
+import { createAdminClient } from "./supabase";
 
 const SESSION_COOKIE = "scss_admin_session";
 const SESSION_TTL_S = 60 * 60 * 24 * 7; // 7 days
-const LOGIN_TOKEN_TTL_S = 60 * 15; // 15 minutes
 
 let _devWarned = false;
 function getSecret(): string {
@@ -38,8 +37,6 @@ function getSecret(): string {
     );
   }
 
-  // Dev fallback. The secret is per-process (hostname) but otherwise stable
-  // so reloads don't invalidate sessions during local dev. NEVER ship to prod.
   if (!_devWarned) {
     console.warn(
       "[admin-auth] ADMIN_SESSION_SECRET no configurado — usando fallback inseguro (solo dev)",
@@ -49,21 +46,37 @@ function getSecret(): string {
   return "DEV-INSECURE-fallback-secret-do-not-use-in-prod-32+chars";
 }
 
-export function getAllowlist(): string[] {
-  const list = process.env.ADMIN_EMAILS ?? process.env.CONTACT_EMAIL ?? "";
-  return list
-    .split(",")
-    .map((e) => e.trim().toLowerCase())
-    .filter(Boolean);
+export async function hashPassword(password: string): Promise<string> {
+  const rounds = Number(process.env.BCRYPT_ROUNDS ?? 12);
+  return bcrypt.hash(password, rounds);
 }
 
-export function isAllowedEmail(email: string): boolean {
-  return getAllowlist().includes(email.trim().toLowerCase());
+export async function verifyPassword(password: string, hash: string): Promise<boolean> {
+  return bcrypt.compare(password, hash);
+}
+
+export async function verifyAdminCredentials(
+  email: string,
+  password: string,
+): Promise<string | null> {
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("admins")
+    .select("email, password_hash, active")
+    .eq("email", email.trim().toLowerCase())
+    .single();
+
+  if (error || !data || !data.active) return null;
+
+  const valid = await verifyPassword(password, data.password_hash);
+  if (!valid) return null;
+
+  return data.email as string;
 }
 
 // ─── Token / cookie helpers ──────────────────────────────────────────────────
 
-type TokenPayload = { email: string; exp: number; kind: "login" | "session" };
+type TokenPayload = { email: string; exp: number; kind: "session" };
 
 function base64url(bytes: Buffer): string {
   return bytes.toString("base64").replaceAll("+", "-").replaceAll("/", "_").replace(/=+$/, "");
@@ -100,20 +113,6 @@ function verify(token: string): TokenPayload | null {
   }
 }
 
-export function mintLoginToken(email: string): string {
-  return sign({
-    email: email.trim().toLowerCase(),
-    exp: Math.floor(Date.now() / 1000) + LOGIN_TOKEN_TTL_S,
-    kind: "login",
-  });
-}
-
-export function consumeLoginToken(token: string): string | null {
-  const payload = verify(token);
-  if (!payload || payload.kind !== "login") return null;
-  return payload.email;
-}
-
 export async function setSessionCookie(email: string): Promise<void> {
   const token = sign({
     email: email.trim().toLowerCase(),
@@ -141,20 +140,22 @@ export async function getCurrentAdmin(): Promise<string | null> {
   if (!token) return null;
   const payload = verify(token);
   if (!payload || payload.kind !== "session") return null;
-  if (!isAllowedEmail(payload.email)) return null;
-  return payload.email;
+
+  // Verify the admin still exists and is active in the database
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("admins")
+    .select("email")
+    .eq("email", payload.email)
+    .eq("active", true)
+    .single();
+
+  if (error || !data) return null;
+  return data.email as string;
 }
 
 export async function requireAdmin(): Promise<string> {
   const email = await getCurrentAdmin();
   if (!email) redirect("/admin/login");
   return email;
-}
-
-// ─── Magic link URL ──────────────────────────────────────────────────────────
-
-export function buildLoginUrl(token: string): string {
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
-  return `${base}/admin/auth?t=${encodeURIComponent(token)}`;
 }

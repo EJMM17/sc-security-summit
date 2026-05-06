@@ -44,8 +44,8 @@ const schema = z.object({
   NEXT_PUBLIC_SITE_URL: optionalUrl,
 
   SENTRY_DSN: z.string().url().optional().or(z.literal("")),
-  ADMIN_EMAILS: z.string().optional(),
   ADMIN_SESSION_SECRET: z.string().optional(),
+  BCRYPT_ROUNDS: z.coerce.number().min(4).max(20).optional().default(12),
 });
 
 const parsed = schema.safeParse(process.env);

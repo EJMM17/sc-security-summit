@@ -1,21 +1,54 @@
-import { BASE_URL, CONTENT, PRECIOS, SPEAKERS } from "./content";
+// ─── Site-wide content constants ─────────────────────────────────────────────
+// Single source of truth for all copy, names, and data.
 
-export { BASE_URL };
+export const BASE_URL = "https://www.scsecuritysummit.com" as const;
 
-export const FAQ_SCHEMA_ITEMS = CONTENT.es.faq;
+// FAQ items exported for FAQPage JSON-LD schema in layout.tsx
+export const FAQ_SCHEMA_ITEMS = [
+  {
+    question: "¿Dónde y cuándo se llevará a cabo el Summit?",
+    answer:
+      "El Summit se realizará los días 24 y 25 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 5:30 PM cada día.",
+  },
+  {
+    question: "¿A quién está dirigido este evento?",
+    answer:
+      "Está diseñado para profesionales y ejecutivos del sector de cadena de suministros: directores de operaciones, gerentes de logística, especialistas en comercio exterior, responsables de compliance, entre otros perfiles clave en la industria.",
+  },
+  {
+    question: "¿Qué incluye cada tipo de acceso?",
+    answer:
+      "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+  },
+  {
+    question: "¿Puedo obtener factura (CFDI)?",
+    answer:
+      "Sí. Al momento de tu registro puedes indicar que requieres factura y proporcionar tus datos fiscales. El CFDI se emitirá dentro de las 72 horas posteriores a la confirmación de tu pago.",
+  },
+  {
+    question: "¿El acceso estudiantil requiere credencial?",
+    answer:
+      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
+  },
+  {
+    question: "¿Cómo puedo convertirme en patrocinador?",
+    answer:
+      "Contáctanos directamente a hola@scsecuritysummit.com.mx o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
+  },
+] as const;
 
 export const EVENT = {
   title: "1ER SUMMIT DE SEGURIDAD EN LA CADENA DE SUMINISTROS",
   year: "2026",
   edition: "Primera Edición",
   tagline: "Cumplimiento Internacional · Estándares Globales · Seguridad Operativa",
-  dates: "24 de Septiembre, 2026",
-  datesShort: "SEP 24, 2026",
+  dates: "24 y 25 de Septiembre, 2026",
+  datesShort: "SEP 24–25, 2026",
   venue: "Centro de Convenciones Reynosa",
   venueCity: "Reynosa, Tamaulipas",
   venueDetail: "A 10 minutos de la frontera",
   schedule: "08:00 – 18:00 hrs",
-  contact: "Contacto@LanzLogistics.com",
+  contact: "hola@scsecuritysummit.com.mx",
   website: "www.scsecuritysummit.com",
 } as const;
 
@@ -24,61 +57,87 @@ export const ORGANIZERS = {
   aval: "Avalado por cámaras industriales de Tamaulipas y Texas",
 } as const;
 
+// ─── Speakers ─────────────────────────────────────────────────────────────────
+export const SPEAKERS = [
+  {
+    id: 1,
+    name: "Fidel Guerrero",
+    role: "Director General",
+    topic: "Panorama Industrial del Norte de México",
+    image: "/images/speaker-fidel.webp",
+  },
+  {
+    id: 2,
+    name: "Isidoro Juárez",
+    role: "Mandatario Aduanal Certificado",
+    topic: "Operaciones Aduanales y Cumplimiento",
+    image: "/images/speaker-isidoro.webp",
+  },
+  {
+    id: 3,
+    name: "Julio César Suárez",
+    role: "Director de Trade Compliance",
+    topic: "Certificaciones Internacionales y Estándares Globales",
+    image: "/images/speaker-julio.webp",
+  },
+  {
+    id: 4,
+    name: "Eduardo Luna",
+    role: "Organización Operativa y Expansión Comercial",
+    topic: "Organización & Expansión",
+    image: "/images/speaker-eduardo.webp",
+  },
+] as const;
+
+// ─── Pricing ──────────────────────────────────────────────────────────────────
 export const PRICING = [
   {
     id: "estudiante",
-    label: CONTENT.es.pricing.find((plan) => plan.id === "estudiante")!.label,
-    price: PRECIOS.estudiante,
+    label: "Estudiante",
+    price: 1200,
     currency: "MXN",
     note: "Requiere credencial vigente",
     featured: false,
     perks: [
-      "Acceso a capacitación especializada",
-      "Participación en paneles con expertos del sector",
-      "Gafete de acceso",
-      "Kit básico del participante",
-      "Constancia de participación disponible con costo adicional",
+      "Acceso general al evento",
+      "Materiales digitales",
+      "Coffee breaks incluidos",
+      "Certificado de participación",
     ],
   },
   {
     id: "general",
-    label: CONTENT.es.pricing.find((plan) => plan.id === "general")!.label,
-    price: PRECIOS.general,
+    label: "General",
+    price: 5800,
     currency: "MXN",
     note: "Acceso completo",
     featured: true,
     perks: [
-      "Acceso a capacitación especializada",
-      "Participación en paneles con expertos de la industria",
-      "Gafete de acceso",
-      "Material impreso y kit del participante",
-      "Constancia oficial de participación y DC-3",
-      "Acceso al Business Hub y espacios de networking",
+      "Acceso a todas las sesiones",
+      "Directorio de asistentes",
+      "Almuerzo ejecutivo incluido",
+      "Materiales impresos y digitales",
+      "Certificado de participación",
     ],
   },
   {
     id: "vip",
-    label: CONTENT.es.pricing.find((plan) => plan.id === "vip")!.label,
-    price: PRECIOS.vip,
+    label: "VIP",
+    price: 7200,
     currency: "MXN",
     note: "Experiencia premium",
     featured: false,
     perks: [
-      "Conferencias magistrales y sesiones especializadas",
-      "Paneles con expertos de la industria",
-      "Gafete de acceso, pulsera de acceso y registro oficial",
-      "Kit de bienvenida premium",
-      "Constancia oficial de participación y formato DC-3",
-      "Ingreso al Business Hub para networking y vinculación empresarial",
-      "Asiento preferente en las sesiones principales",
-      "Acceso prioritario en filas, preguntas y actividades del Hub",
-      "Material descargable, recursos y plantillas de trabajo",
-      "Workshop especializado incluido",
-      "Coffee break durante el evento",
+      "Todo lo de General",
+      "Asiento preferencial front-row",
+      "Cena de clausura ejecutiva",
+      "Meet & Greet con ponentes",
+      "Acceso a sala VIP",
     ],
   },
 ] as const;
 
+// ─── Stats ────────────────────────────────────────────────────────────────────
 export const STATS = [
   { value: "300+", label: "Asistentes Ejecutivos" },
   { value: "15+", label: "Horas de Networking" },
@@ -86,6 +145,7 @@ export const STATS = [
   { value: "4", label: "Sectores Industriales" },
 ] as const;
 
+// ─── Hub Features ─────────────────────────────────────────────────────────────
 export const HUB_FEATURES = [
   {
     icon: "Handshake",
@@ -109,6 +169,7 @@ export const HUB_FEATURES = [
   },
 ] as const;
 
+// ─── Social Proof ─────────────────────────────────────────────────────────────
 export const SOCIAL_PROOF = [
   "Organizado por Lanz Logistics — 15 años en comercio exterior",
   "Co-producido con Thynk Unlimited — Especialistas en eventos corporativos",
@@ -116,6 +177,3 @@ export const SOCIAL_PROOF = [
   "Más de 120 empresas registradas en preventa",
   "Ponentes confirmados del CBP, SAT y sector privado",
 ] as const;
-
-export const SPEAKERS_ES = SPEAKERS.es;
-export const SPEAKERS_EN = SPEAKERS.en;

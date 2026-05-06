@@ -193,7 +193,7 @@ export default async function RootLayout({
     url: "https://www.lanzlogistics.com",
     contactPoint: {
       "@type": "ContactPoint",
-      email: "Contacto@LanzLogistics.com",
+      email: "hola@scsecuritysummit.com.mx",
       telephone: "+1-956-515-8070",
       contactType: "customer service",
       availableLanguage: ["Spanish", "English"],

@@ -1,6 +1,10 @@
-import { Check, X } from "lucide-react";
+"use client";
+
+import { useState } from "react";
+import { Check, X, Eye, FileText } from "lucide-react";
 import { markRegistroCancelled, markRegistroPaid } from "@/app/actions/admin";
 import type { RegistroRow as RegistroRowData } from "./page";
+import RegistroDetail from "./RegistroDetail";
 
 const TIER_LABEL: Record<RegistroRowData["tipo_acceso"], string> = {
   estudiante: "Estudiante",
@@ -28,60 +32,134 @@ const formatDate = (iso: string): string =>
   });
 
 export default function RegistroRow({ row }: { row: RegistroRowData }) {
+  const [showDetail, setShowDetail] = useState(false);
+  const [showNote, setShowNote] = useState<"paid" | "cancelled" | null>(null);
+  const [note, setNote] = useState("");
+
   return (
-    <tr className="border-t border-slate-800 hover:bg-slate-900/50">
-      <td className="px-3 py-2 font-mono text-[11px]">{row.folio}</td>
-      <td className="px-3 py-2">
-        {row.nombre} {row.apellido}
-      </td>
-      <td className="px-3 py-2 text-slate-300">
-        <a className="hover:text-blue-300" href={`mailto:${row.email}`}>
-          {row.email}
-        </a>
-      </td>
-      <td className="px-3 py-2 text-slate-300">
-        <div>{row.empresa}</div>
-        <div className="text-[10px] text-slate-500">{row.cargo}</div>
-      </td>
-      <td className="px-3 py-2">{TIER_LABEL[row.tipo_acceso]}</td>
-      <td className="px-3 py-2 text-right tabular-nums">{formatMxn(row.monto_mxn)}</td>
-      <td className="px-3 py-2">
-        <span
-          className={`inline-block px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider border rounded ${ESTADO_TONE[row.estado_pago]}`}
-        >
-          {row.estado_pago}
-        </span>
-      </td>
-      <td className="px-3 py-2 text-slate-300">
-        {row.requiere_cfdi ? <span title={row.rfc ?? ""}>Sí · {row.rfc ?? "—"}</span> : "—"}
-      </td>
-      <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
-      <td className="px-3 py-2">
-        {row.estado_pago === "pendiente" && (
+    <>
+      <tr className="border-t border-slate-800 hover:bg-slate-900/50">
+        <td className="px-3 py-2 font-mono text-[11px]">{row.folio}</td>
+        <td className="px-3 py-2">
+          {row.nombre} {row.apellido}
+        </td>
+        <td className="px-3 py-2 text-slate-300">
+          <a className="hover:text-blue-300" href={`mailto:${row.email}`}>
+            {row.email}
+          </a>
+        </td>
+        <td className="px-3 py-2 text-slate-300">
+          <div>{row.empresa}</div>
+          <div className="text-[10px] text-slate-500">{row.cargo}</div>
+        </td>
+        <td className="px-3 py-2">{TIER_LABEL[row.tipo_acceso]}</td>
+        <td className="px-3 py-2 text-right tabular-nums">{formatMxn(row.monto_mxn)}</td>
+        <td className="px-3 py-2">
+          <span
+            className={`inline-block px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider border rounded ${ESTADO_TONE[row.estado_pago]}`}
+          >
+            {row.estado_pago}
+          </span>
+        </td>
+        <td className="px-3 py-2 text-slate-300">
+          {row.requiere_cfdi ? <span title={row.rfc ?? ""}>Sí · {row.rfc ?? "—"}</span> : "—"}
+        </td>
+        <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
+        <td className="px-3 py-2">
           <div className="flex items-center gap-1">
-            <form action={markRegistroPaid}>
-              <input type="hidden" name="folio" value={row.folio} />
-              <button
-                type="submit"
-                title="Marcar pagado"
-                className="inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300"
-              >
-                <Check className="w-3.5 h-3.5" aria-label="Marcar pagado" />
-              </button>
-            </form>
-            <form action={markRegistroCancelled}>
-              <input type="hidden" name="folio" value={row.folio} />
-              <button
-                type="submit"
-                title="Cancelar"
-                className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
-              >
-                <X className="w-3.5 h-3.5" aria-label="Cancelar" />
-              </button>
-            </form>
+            <button
+              type="button"
+              onClick={() => setShowDetail(true)}
+              title="Ver detalle"
+              className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
+            >
+              <Eye className="w-3.5 h-3.5" aria-label="Ver detalle" />
+            </button>
+
+            {row.estado_pago === "pendiente" && (
+              <>
+                {showNote === "paid" ? (
+                  <form action={markRegistroPaid} className="flex items-center gap-1">
+                    <input type="hidden" name="folio" value={row.folio} />
+                    <input type="hidden" name="note" value={note} />
+                    <input
+                      type="text"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="Nota (opcional)"
+                      className="w-24 px-2 py-1 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      title="Confirmar pagado"
+                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowNote(null); setNote(""); }}
+                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowNote("paid")}
+                    title="Marcar pagado"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300"
+                  >
+                    <Check className="w-3.5 h-3.5" aria-label="Marcar pagado" />
+                  </button>
+                )}
+
+                {showNote === "cancelled" ? (
+                  <form action={markRegistroCancelled} className="flex items-center gap-1">
+                    <input type="hidden" name="folio" value={row.folio} />
+                    <input type="hidden" name="note" value={note} />
+                    <input
+                      type="text"
+                      value={note}
+                      onChange={(e) => setNote(e.target.value)}
+                      placeholder="Nota (opcional)"
+                      className="w-24 px-2 py-1 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                      autoFocus
+                    />
+                    <button
+                      type="submit"
+                      title="Confirmar cancelar"
+                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-red-600/20 hover:bg-red-600/40 text-red-300"
+                    >
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { setShowNote(null); setNote(""); }}
+                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowNote("cancelled")}
+                    title="Cancelar"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
+                  >
+                    <X className="w-3.5 h-3.5" aria-label="Cancelar" />
+                  </button>
+                )}
+              </>
+            )}
           </div>
-        )}
-      </td>
-    </tr>
+        </td>
+      </tr>
+
+      {showDetail && <RegistroDetail row={row} onClose={() => setShowDetail(false)} />}
+    </>
   );
 }

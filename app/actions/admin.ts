@@ -5,83 +5,62 @@ import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import {
-  buildLoginUrl,
   clearSessionCookie,
-  isAllowedEmail,
-  mintLoginToken,
+  hashPassword,
   requireAdmin,
+  setSessionCookie,
+  verifyAdminCredentials,
 } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { checkRateLimit } from "@/lib/rate-limit";
-import { sendAdminLoginLink } from "@/lib/email";
-import { FOLIO_PATTERN } from "@/lib/folio";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
 }
 
 // =============================================================
-// Magic-link request
+// Login
 // =============================================================
 
 export type LoginState = { ok: boolean; message: string };
 
-const LoginSchema = z.string().email().max(255);
+const LoginSchema = z.object({
+  email: z.string().email().max(255),
+  password: z.string().min(1).max(255),
+});
 
-const NEUTRAL_LOGIN_MESSAGE =
-  "Si tu correo está autorizado, recibirás un link de acceso en los próximos minutos.";
+const NEUTRAL_LOGIN_MESSAGE = "Credenciales incorrectas. Verifica tu email y contraseña.";
 
-export async function requestAdminLogin(
-  _prev: LoginState,
-  formData: FormData,
-): Promise<LoginState> {
+export async function loginAdmin(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const h = await headers();
   const ip =
     h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
 
-  // Reuse the same Upstash window so an attacker brute-forcing emails hits
-  // the global rate limit fast.
   const rl = await checkRateLimit(`admin-login:${ip}`);
   if (!rl.ok) {
     auditLog("admin_login_rate_limited", { ip });
     return { ok: false, message: "Demasiados intentos. Espera 15 minutos." };
   }
 
-  const parsed = LoginSchema.safeParse(formData.get("email"));
+  const parsed = LoginSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
   if (!parsed.success) {
-    return { ok: false, message: "Correo inválido." };
-  }
-  const email = parsed.data.toLowerCase().trim();
-
-  // Privacy: same response whether email is allow-listed or not so we can't
-  // be used to enumerate admin emails.
-  if (!isAllowedEmail(email)) {
-    auditLog("admin_login_email_not_allowed", { ip, email_suffix: email.split("@")[1] });
-    return { ok: true, message: NEUTRAL_LOGIN_MESSAGE };
+    return { ok: false, message: NEUTRAL_LOGIN_MESSAGE };
   }
 
-  try {
-    const token = mintLoginToken(email);
-    const url = buildLoginUrl(token);
-    const result = await sendAdminLoginLink({ to: email, url });
-    if (!result.ok) {
-      auditLog("admin_login_email_failed", { ip, reason: result.error });
-      Sentry.captureMessage("admin_login_email_failed", {
-        level: "error",
-        extra: { reason: result.error },
-      });
-    } else {
-      auditLog("admin_login_email_sent", { ip });
-    }
-  } catch (err) {
-    auditLog("admin_login_unexpected_error", {
-      ip,
-      error: err instanceof Error ? err.message : "unknown",
-    });
-    Sentry.captureException(err, { tags: { surface: "admin_login" } });
+  const { email, password } = parsed.data;
+
+  const verifiedEmail = await verifyAdminCredentials(email, password);
+  if (!verifiedEmail) {
+    auditLog("admin_login_failed", { ip, email_suffix: email.split("@")[1] });
+    return { ok: false, message: NEUTRAL_LOGIN_MESSAGE };
   }
 
-  return { ok: true, message: NEUTRAL_LOGIN_MESSAGE };
+  await setSessionCookie(verifiedEmail);
+  auditLog("admin_login_success", { ip });
+  redirect("/admin/registros");
 }
 
 // =============================================================
@@ -97,7 +76,7 @@ export async function adminLogout(): Promise<never> {
 // Mark a registration as paid (manual SPEI/transfer)
 // =============================================================
 
-const FolioSchema = z.string().regex(FOLIO_PATTERN);
+const FolioSchema = z.string().regex(/^SCSS2026-[A-Z0-9-]+$/);
 
 export async function markRegistroPaid(formData: FormData): Promise<void> {
   const adminEmail = await requireAdmin();
@@ -148,4 +127,155 @@ export async function markRegistroCancelled(formData: FormData): Promise<void> {
     return;
   }
   auditLog("admin_mark_cancelled", { folio: folio.data, by: adminEmail });
+}
+
+// =============================================================
+// Admin management
+// =============================================================
+
+const AdminEmailSchema = z.string().email().max(255);
+const AdminPasswordSchema = z.string().min(6).max(255);
+const AdminNameSchema = z.string().trim().min(1).max(255);
+
+export type AdminCrudState = { ok: boolean; message: string };
+
+export async function createAdmin(_prev: AdminCrudState, formData: FormData): Promise<AdminCrudState> {
+  await requireAdmin();
+
+  const parsed = z
+    .object({
+      email: AdminEmailSchema,
+      nombre: AdminNameSchema,
+      password: AdminPasswordSchema,
+    })
+    .safeParse({
+      email: formData.get("email"),
+      nombre: formData.get("nombre"),
+      password: formData.get("password"),
+    });
+
+  if (!parsed.success) {
+    return { ok: false, message: "Datos inválidos. Revisa los campos." };
+  }
+
+  const { email, nombre, password } = parsed.data;
+  const supabase = createAdminClient();
+
+  const { data: existing } = await supabase
+    .from("admins")
+    .select("id")
+    .eq("email", email.toLowerCase())
+    .maybeSingle();
+
+  if (existing) {
+    return { ok: false, message: "Ya existe un administrador con ese correo." };
+  }
+
+  const passwordHash = await hashPassword(password);
+
+  const { error } = await supabase.from("admins").insert({
+    email: email.toLowerCase(),
+    nombre,
+    password_hash: passwordHash,
+    active: true,
+  });
+
+  if (error) {
+    auditLog("admin_create_failed", { email, error: error.message });
+    return { ok: false, message: "Error al crear el administrador. Intenta de nuevo." };
+  }
+
+  auditLog("admin_created", { email, by: "admin" });
+  return { ok: true, message: "Administrador creado correctamente." };
+}
+
+export async function updateAdmin(_prev: AdminCrudState, formData: FormData): Promise<AdminCrudState> {
+  await requireAdmin();
+
+  const parsed = z
+    .object({
+      id: z.string().uuid(),
+      nombre: AdminNameSchema,
+      active: z.enum(["true", "false"]),
+      password: z.string().max(255).optional().or(z.literal("")),
+    })
+    .safeParse({
+      id: formData.get("id"),
+      nombre: formData.get("nombre"),
+      active: formData.get("active"),
+      password: formData.get("password"),
+    });
+
+  if (!parsed.success) {
+    return { ok: false, message: "Datos inválidos." };
+  }
+
+  const { id, nombre, active, password } = parsed.data;
+  const supabase = createAdminClient();
+
+  const updateData: Record<string, unknown> = {
+    nombre,
+    active: active === "true",
+    updated_at: new Date().toISOString(),
+  };
+
+  if (password && password.length >= 6) {
+    updateData.password_hash = await hashPassword(password);
+  }
+
+  const { error } = await supabase.from("admins").update(updateData).eq("id", id);
+
+  if (error) {
+    auditLog("admin_update_failed", { id, error: error.message });
+    return { ok: false, message: "Error al actualizar el administrador." };
+  }
+
+  auditLog("admin_updated", { id });
+  return { ok: true, message: "Administrador actualizado correctamente." };
+}
+
+export async function deleteAdmin(_prev: AdminCrudState, formData: FormData): Promise<AdminCrudState> {
+  await requireAdmin();
+
+  const id = z.string().uuid().safeParse(formData.get("id"));
+  if (!id.success) {
+    return { ok: false, message: "ID inválido." };
+  }
+
+  const supabase = createAdminClient();
+
+  // Prevent deleting the last active admin
+  const { count } = await supabase
+    .from("admins")
+    .select("id", { count: "exact", head: true })
+    .eq("active", true);
+
+  if ((count ?? 0) <= 1) {
+    return { ok: false, message: "No puedes eliminar el último administrador activo." };
+  }
+
+  const { error } = await supabase.from("admins").delete().eq("id", id.data);
+
+  if (error) {
+    auditLog("admin_delete_failed", { id: id.data, error: error.message });
+    return { ok: false, message: "Error al eliminar el administrador." };
+  }
+
+  auditLog("admin_deleted", { id: id.data });
+  return { ok: true, message: "Administrador eliminado correctamente." };
+}
+
+export async function listAdmins() {
+  await requireAdmin();
+  const supabase = createAdminClient();
+  const { data, error } = await supabase
+    .from("admins")
+    .select("id, email, nombre, active, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    Sentry.captureException(new Error(`listAdmins: ${error.message}`));
+    return [];
+  }
+  return data ?? [];
 }

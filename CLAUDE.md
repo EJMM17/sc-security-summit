@@ -71,7 +71,7 @@ SUPABASE_SERVICE_ROLE_KEY
 TURNSTILE_SECRET_KEY
 CONTACT_EMAIL
 RESEND_API_KEY
-EMAIL_FROM                  # optional override; default "SC Security Summit <noreply@scsecuritysummit.com>"
+EMAIL_FROM                  # optional override; default "SC Security Summit <hola@scsecuritysummit.com.mx>"
 UPSTASH_REDIS_REST_URL      # required in production for distributed rate limiting
 UPSTASH_REDIS_REST_TOKEN
 SENTRY_DSN                  # optional; SDK no-ops when unset
