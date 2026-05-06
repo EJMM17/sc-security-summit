@@ -1,6 +1,13 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 export function middleware(request: NextRequest) {
+  // Webhooks are server-to-server JSON endpoints. They never render HTML so
+  // a strict per-request CSP is meaningless overhead and could clash with
+  // upstream signature/header expectations. Skip middleware processing.
+  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
+    return NextResponse.next();
+  }
+
   // Web Crypto API (Edge Runtime compatible — not Node's crypto module)
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);

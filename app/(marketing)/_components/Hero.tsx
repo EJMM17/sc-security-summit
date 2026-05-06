@@ -12,7 +12,7 @@ export default function Hero({ language }: { language: Language }) {
   return (
     <section className="relative w-full min-h-[92vh] sm:min-h-[94vh] flex items-center justify-center overflow-hidden">
       <Image
-        src="/images/hero-bg.jpg"
+        src="/images/hero-bg.webp"
         alt={ui.heroAlt}
         fill
         className="object-cover object-center"

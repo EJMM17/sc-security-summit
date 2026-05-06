@@ -6,7 +6,7 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/api/", "/_next/"],
+        disallow: ["/admin/", "/api/", "/_next/", "/pago", "/registro-exitoso"],
       },
     ],
     sitemap: "https://www.scsecuritysummit.com/sitemap.xml",

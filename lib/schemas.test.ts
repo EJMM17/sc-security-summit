@@ -18,11 +18,11 @@ const validBase = {
 
 describe("PRECIOS", () => {
   it("matches the DB CHECK constraint exactly", () => {
-    // Migration 005_update_prices.sql enforces these prices at the DB level. If
-    // these change here, the DB CHECK must be updated in the same PR.
+    // Migration 006_capacity_and_price_update.sql enforces these prices at the
+    // DB level. If these change here, the DB CHECK must be updated in the same PR.
     expect(PRECIOS).toStrictEqual({
       estudiante: 850,
-      general: 2200,
+      general: 2500,
       vip: 4800,
     });
   });

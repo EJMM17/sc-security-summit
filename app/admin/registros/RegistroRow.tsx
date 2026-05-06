@@ -1,10 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { Check, X, Eye, FileText } from "lucide-react";
+import { useState, useTransition } from "react";
+import { Check, X, Eye, ExternalLink, Mail, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { markRegistroCancelled, markRegistroPaid } from "@/app/actions/admin";
+import { reenviarInstrucciones } from "@/app/actions/reenviar-instrucciones";
 import type { RegistroRow as RegistroRowData } from "./page";
 import RegistroDetail from "./RegistroDetail";
+
+const METODO_LABEL: Record<NonNullable<RegistroRowData["metodo_pago"]>, string> = {
+  spei: "SPEI",
+  tarjeta: "Tarjeta",
+  oxxo: "OXXO",
+  transferencia_manual: "Manual",
+};
+
+const CONEKTA_TONE: Record<
+  NonNullable<RegistroRowData["conekta_payment_status"]>,
+  string
+> = {
+  pending: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+  paid: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+  expired: "bg-slate-500/10 text-slate-400 border-slate-500/30",
+  canceled: "bg-slate-500/10 text-slate-400 border-slate-500/30",
+  failed: "bg-red-500/10 text-red-300 border-red-500/30",
+};
 
 const TIER_LABEL: Record<RegistroRowData["tipo_acceso"], string> = {
   estudiante: "Estudiante",
@@ -35,6 +55,33 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
   const [showDetail, setShowDetail] = useState(false);
   const [showNote, setShowNote] = useState<"paid" | "cancelled" | null>(null);
   const [note, setNote] = useState("");
+  const [pendingResend, startResend] = useTransition();
+
+  const conektaUrl = row.conekta_order_id
+    ? `https://panel.conekta.com/dashboard/order/${row.conekta_order_id}`
+    : null;
+
+  const handleResend = () => {
+    if (!confirm(`¿Reenviar instrucciones de pago a ${row.email}?`)) return;
+    startResend(async () => {
+      const result = await reenviarInstrucciones(row.folio);
+      if (result.ok) {
+        toast.success("Reenviado", { description: result.message });
+      } else {
+        toast.error("Error", { description: result.message });
+      }
+    });
+  };
+
+  const handleMarkPaid = (e: React.FormEvent<HTMLFormElement>) => {
+    if (
+      !confirm(
+        `¿Confirmar el pago del folio ${row.folio} por ${formatMxn(row.monto_mxn)}?`,
+      )
+    ) {
+      e.preventDefault();
+    }
+  };
 
   return (
     <>
@@ -62,6 +109,31 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
           </span>
         </td>
         <td className="px-3 py-2 text-slate-300">
+          {row.metodo_pago ? METODO_LABEL[row.metodo_pago] : "—"}
+        </td>
+        <td className="px-3 py-2 text-slate-300">
+          {row.conekta_payment_status ? (
+            <span
+              className={`inline-block px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider border rounded ${CONEKTA_TONE[row.conekta_payment_status]}`}
+            >
+              {row.conekta_payment_status}
+            </span>
+          ) : (
+            <span className="text-slate-600">—</span>
+          )}
+          {conektaUrl && (
+            <a
+              href={conektaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Abrir en Conekta"
+              className="inline-flex items-center ml-1.5 text-slate-400 hover:text-blue-300"
+            >
+              <ExternalLink className="w-3 h-3" aria-label="Abrir en Conekta" />
+            </a>
+          )}
+        </td>
+        <td className="px-3 py-2 text-slate-300">
           {row.requiere_cfdi ? <span title={row.rfc ?? ""}>Sí · {row.rfc ?? "—"}</span> : "—"}
         </td>
         <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
@@ -78,8 +150,21 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
 
             {row.estado_pago === "pendiente" && (
               <>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={pendingResend}
+                  title="Reenviar instrucciones de pago"
+                  className="inline-flex items-center justify-center w-7 h-7 rounded bg-blue-600/20 hover:bg-blue-600/40 text-blue-300 disabled:opacity-50"
+                >
+                  {pendingResend ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Mail className="w-3.5 h-3.5" aria-label="Reenviar instrucciones" />
+                  )}
+                </button>
                 {showNote === "paid" ? (
-                  <form action={markRegistroPaid} className="flex items-center gap-1">
+                  <form action={markRegistroPaid} onSubmit={handleMarkPaid} className="flex items-center gap-1">
                     <input type="hidden" name="folio" value={row.folio} />
                     <input type="hidden" name="note" value={note} />
                     <input

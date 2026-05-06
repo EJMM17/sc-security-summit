@@ -2,7 +2,7 @@ export const BASE_URL = "https://www.scsecuritysummit.com" as const;
 
 export const PRECIOS = {
   estudiante: 850,
-  general: 2200,
+  general: 2500,
   vip: 4800,
 } as const;
 
