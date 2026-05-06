@@ -13,10 +13,6 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 export type MetodoPago = "spei" | "tarjeta" | "oxxo" | "transferencia_manual";
 
-export type CrearOrdenResult =
-  | { ok: true; redirectUrl?: string }
-  | { ok: false; message: string };
-
 const ALLOWED_METODOS: ReadonlySet<MetodoPago> = new Set([
   "spei",
   "tarjeta",
@@ -29,20 +25,16 @@ function siteUrl(): string {
 }
 
 function pagoRedirect(folio: string, error?: string): never {
-  const params = new URLSearchParams({ folio });
+  const params = new URLSearchParams();
+  if (folio) params.set("folio", folio);
   if (error) params.set("error", error);
   redirect(`/pago?${params.toString()}`);
 }
 
-export async function crearOrdenPago(formData: FormData): Promise<CrearOrdenResult> {
+export async function crearOrdenPago(formData: FormData): Promise<void> {
   const h = await headers();
   const ip =
     h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
-
-  const rl = await checkOrdenRateLimit(ip);
-  if (!rl.ok) {
-    return { ok: false, message: "Demasiados intentos. Espera 15 minutos." };
-  }
 
   const folio = String(formData.get("folio") ?? "").trim();
   const metodoPagoRaw = String(formData.get("metodo_pago") ?? "spei");
@@ -50,16 +42,15 @@ export async function crearOrdenPago(formData: FormData): Promise<CrearOrdenResu
     ALLOWED_METODOS.has(metodoPagoRaw as MetodoPago) ? metodoPagoRaw : "spei"
   ) as MetodoPago;
 
-  if (!folio) {
-    return { ok: false, message: "Folio requerido." };
-  }
+  if (!folio) pagoRedirect("", "missing_folio");
+
+  const rl = await checkOrdenRateLimit(ip);
+  if (!rl.ok) pagoRedirect(folio, "rate_limited");
 
   // Cupos: bloqueo previo a crear orden externa.
   const { data: cuposData } = await supabaseAdmin.rpc("get_cupos_disponibles");
   const cupos = typeof cuposData === "number" ? cuposData : 0;
-  if (cupos <= 0) {
-    return { ok: false, message: "Los cupos se han agotado." };
-  }
+  if (cupos <= 0) pagoRedirect(folio, "sin_cupos");
 
   const { data: registro, error: regErr } = await supabaseAdmin
     .from("registros")
@@ -67,9 +58,7 @@ export async function crearOrdenPago(formData: FormData): Promise<CrearOrdenResu
     .eq("folio", folio)
     .single();
 
-  if (regErr || !registro) {
-    return { ok: false, message: "Registro no encontrado." };
-  }
+  if (regErr || !registro) pagoRedirect(folio, "no_encontrado");
 
   if (registro.estado_pago === "pagado") {
     redirect(`/registro-exitoso?folio=${encodeURIComponent(folio)}`);
@@ -179,6 +168,6 @@ export async function crearOrdenPago(formData: FormData): Promise<CrearOrdenResu
       tags: { action: "crear_orden_pago" },
       extra: { folio, metodoPago },
     });
-    return { ok: false, message: "Error al crear la orden de pago." };
+    pagoRedirect(folio, "error_orden");
   }
 }
