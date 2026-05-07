@@ -213,7 +213,7 @@ export default async function PagoPage({
               instrucciones de pago. También puedes escribirnos directamente.
             </p>
             <a
-              href={`mailto:Contacto@LanzLogistics.com?subject=Pago folio ${registro.folio}`}
+              href={`mailto:hola@scsecuritysummit.com.mx?subject=Pago folio ${registro.folio}`}
               className="block w-full rounded-lg border border-slate-300 bg-white px-5 py-3 text-center text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
             >
               Contactar al organizador

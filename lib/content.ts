@@ -386,12 +386,12 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: 1, suffix: "", label: "Día de Capacitación" },
+    { number: 10, suffix: "", label: "Horas de Capacitación" },
     { number: 3, suffix: "+", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
   ],
   en: [
-    { number: 1, suffix: "", label: "Training Day" },
+    { number: 10, suffix: "", label: "Training Hours" },
     { number: 3, suffix: "+", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
   ],
@@ -932,7 +932,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
     answer:
-      "Contáctanos directamente a Contacto@LanzLogistics.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Participante de Soluciones de Seguridad) y los beneficios detallados de cada uno.",
+      "Contáctanos directamente a hola@scsecuritysummit.com.mx o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Participante de Soluciones de Seguridad) y los beneficios detallados de cada uno.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -965,7 +965,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How can I become a sponsor?",
     answer:
-      "Contact us at Contacto@LanzLogistics.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Participating Security Solutions Provider) and the benefits for each tier.",
+      "Contact us at hola@scsecuritysummit.com.mx or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Participating Security Solutions Provider) and the benefits for each tier.",
   },
   {
     question: "What is included with each access type?",
