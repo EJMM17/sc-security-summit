@@ -57,10 +57,10 @@ export default function Footer({ language }: { language: Language }) {
             </h4>
             <div className="space-y-3">
               <a
-                href="mailto:Contacto@LanzLogistics.com"
+                href="mailto:hola@scsecuritysummit.com.mx"
                 className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors"
               >
-                <Mail className="w-4 h-4" /> Contacto@LanzLogistics.com
+                <Mail className="w-4 h-4" /> hola@scsecuritysummit.com.mx
               </a>
               <a
                 href="tel:+19565158070"

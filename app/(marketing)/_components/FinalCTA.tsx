@@ -35,7 +35,7 @@ export default function FinalCTA({ language }: { language: Language }) {
               {ui.registerNowBtn} <ArrowRight className="w-4 h-4" />
             </a>
             <a
-              href="mailto:Contacto@LanzLogistics.com"
+              href="mailto:hola@scsecuritysummit.com.mx"
               className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10"
             >
               {ui.contactOrg}

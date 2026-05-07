@@ -75,10 +75,10 @@ export default function Location({ language }: { language: Language }) {
                     <h4 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h4>
                     <p className="text-sm text-slate-500 mt-1">+1 (956) 515-8070</p>
                     <a
-                      href="mailto:Contacto@LanzLogistics.com"
+                      href="mailto:hola@scsecuritysummit.com.mx"
                       className="text-sm text-blue-600 hover:underline"
                     >
-                      Contacto@LanzLogistics.com
+                      hola@scsecuritysummit.com.mx
                     </a>
                   </div>
                 </div>
