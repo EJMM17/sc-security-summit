@@ -4,13 +4,14 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { RegistroInput } from "@/lib/schemas";
 import { serializeRegistroFlashState } from "@/lib/registro-form-state";
-import type { EmailLanguage } from "@/lib/email-templates";
+
+type Language = "es" | "en";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
 }
 
-function pickLanguage(formData: FormData, acceptLanguage: string | null): EmailLanguage {
+function pickLanguage(formData: FormData, acceptLanguage: string | null): Language {
   const explicit = String(formData.get("language") ?? "").toLowerCase();
   if (explicit === "en" || explicit === "es") return explicit;
   if (acceptLanguage && /^en\b/i.test(acceptLanguage)) return "en";
@@ -46,78 +47,62 @@ function getPersistedValues(formData: FormData) {
   } satisfies Partial<Record<keyof RegistroInput, string | boolean>>;
 }
 
-async function processRegistro(formData: FormData): Promise<RegistroState> {
-  const [
-    { checkRateLimit },
-    { verifyTurnstile },
-    { RegistroSchema },
-    { createLead },
-    { getIdempotentResult, setIdempotentResult, isValidIdempotencyKey },
-  ] = await Promise.all([
-    import("@/lib/rate-limit"),
+type ProcessResult =
+  | {
+      ok: true;
+      folio: string;
+      tipo: "estudiante" | "general" | "vip";
+      monto: number;
+      language: Language;
+    }
+  | { ok: false; state: RegistroState; language: Language };
+
+async function processRegistro(formData: FormData): Promise<ProcessResult> {
+  const [{ verifyTurnstile }, { RegistroSchema }, { createLead }] = await Promise.all([
     import("@/lib/turnstile"),
     import("@/lib/schemas"),
     import("@/server/use-cases/create-lead"),
-    import("@/lib/idempotency"),
   ]);
+
   const h = await headers();
-  const ip = h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
+  const ip =
+    h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
   const acceptLanguage = h.get("accept-language");
   const language = pickLanguage(formData, acceptLanguage);
   const values = getPersistedValues(formData);
 
-  const idempotencyKey = String(formData.get("idempotency_key") ?? "");
-  if (isValidIdempotencyKey(idempotencyKey)) {
-    const cachedFolio = await getIdempotentResult(idempotencyKey);
-    if (cachedFolio) {
-      return {
-        success: true,
-        message:
-          language === "en"
-            ? `Registration complete. Your confirmation folio is ${cachedFolio}.`
-            : `Registro completado exitosamente. Tu folio de confirmación es ${cachedFolio}.`,
-        folio: cachedFolio,
-      };
-    }
-  }
-
+  // 1. Honeypot — pretend success so bots don't get a useful signal.
   const honeypot = formData.get("website");
   if (honeypot && String(honeypot).length > 0) {
     auditLog("honeypot_triggered", { ip });
     return {
-      success: true,
-      message: "Registro completado. Recibirás instrucciones en tu correo.",
+      ok: true,
       folio: `SCSS2026-BOT-${Date.now().toString(36).toUpperCase()}`,
+      tipo: "general",
+      monto: 0,
+      language,
     };
   }
 
-  // Rate-limit must run BEFORE Turnstile so abusive IPs can't burn through
-  // our Cloudflare quota by spamming bot-verifications.
-  const rl = await checkRateLimit(ip);
-  if (!rl.ok) {
-    auditLog("registro_rate_limited", { ip });
-    return {
-      success: false,
-      message: "Demasiados intentos. Por favor espera 15 minutos e inténtalo de nuevo.",
-      errors: { _form: ["Demasiados intentos."] },
-      values,
-    };
-  }
-
+  // 2. Turnstile — verifyTurnstile fails open when the secret is not configured.
   const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
   const turnstileOk = await verifyTurnstile(turnstileToken, ip);
-
   if (!turnstileOk) {
     return {
-      success: false,
-      message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
-      errors: { _form: ["Verificación de seguridad fallida."] },
-      values,
+      ok: false,
+      language,
+      state: {
+        success: false,
+        message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
+        errors: { _form: ["Verificación de seguridad fallida."] },
+        values,
+      },
     };
   }
 
+  // 3. Zod validation
   const requiresCFDI = formData.get("requiere_cfdi") === "true";
   const rawData = {
     nombre: formData.get("nombre"),
@@ -139,18 +124,22 @@ async function processRegistro(formData: FormData): Promise<RegistroState> {
   if (!parsed.success) {
     const fieldErrors = parsed.error.flatten().fieldErrors;
     const formErrors = parsed.error.flatten().formErrors;
-
     return {
-      success: false,
-      message: "Por favor corrige los errores en el formulario.",
-      errors: {
-        ...(fieldErrors as RegistroState["errors"]),
-        ...(formErrors.length > 0 ? { _form: formErrors } : {}),
+      ok: false,
+      language,
+      state: {
+        success: false,
+        message: "Por favor corrige los errores en el formulario.",
+        errors: {
+          ...(fieldErrors as RegistroState["errors"]),
+          ...(formErrors.length > 0 ? { _form: formErrors } : {}),
+        },
+        values,
       },
-      values,
     };
   }
 
+  // 4. Insert via use-case
   const result = await createLead({
     ...parsed.data,
     language,
@@ -164,47 +153,44 @@ async function processRegistro(formData: FormData): Promise<RegistroState> {
 
   if (!result.ok) {
     return {
-      success: false,
-      message: result.message,
-      errors: {
-        ...(result.fieldErrors as RegistroState["errors"]),
-        ...(result.status === 500 ? { _form: [result.message] } : {}),
+      ok: false,
+      language,
+      state: {
+        success: false,
+        message: result.message,
+        errors: {
+          ...(result.fieldErrors as RegistroState["errors"]),
+          ...(result.status === 500 ? { _form: [result.message] } : {}),
+        },
+        values,
       },
-      values,
     };
   }
 
-  if (isValidIdempotencyKey(idempotencyKey)) {
-    await setIdempotentResult(idempotencyKey, result.folio);
-  }
-
   return {
-    success: true,
-    message: result.message,
+    ok: true,
     folio: result.folio,
+    tipo: result.tipo,
+    monto: result.monto,
+    language,
   };
 }
 
-export async function registrarAsistente(
-  prevState: RegistroState,
-  formData: FormData,
-): Promise<RegistroState> {
-  void prevState;
-
-  return processRegistro(formData);
-}
-
 export async function submitRegistroForm(formData: FormData): Promise<void> {
-  const h = await headers();
-  const language = pickLanguage(formData, h.get("accept-language"));
   const result = await processRegistro(formData);
-  const params = new URLSearchParams();
 
-  if (language === "en") {
-    params.set("lang", "en");
+  if (result.ok) {
+    const params = new URLSearchParams({
+      folio: result.folio,
+      tipo: result.tipo,
+      monto: String(result.monto),
+    });
+    if (result.language === "en") params.set("lang", "en");
+    redirect(`/registro-exitoso?${params.toString()}`);
   }
 
-  params.set("registro", serializeRegistroFlashState(result));
-
+  const params = new URLSearchParams();
+  if (result.language === "en") params.set("lang", "en");
+  params.set("registro", serializeRegistroFlashState(result.state));
   redirect(`/?${params.toString()}#registro`);
 }

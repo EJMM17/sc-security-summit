@@ -1,11 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { verifyAdminSession } from "@/lib/admin-session";
 
-export function middleware(request: NextRequest) {
-  // Webhooks are server-to-server JSON endpoints. They never render HTML so
-  // a strict per-request CSP is meaningless overhead and could clash with
-  // upstream signature/header expectations. Skip middleware processing.
-  if (request.nextUrl.pathname.startsWith("/api/webhooks/")) {
-    return NextResponse.next();
+export async function middleware(request: NextRequest) {
+  // ─── Admin guard (runs first) ─────────────────────────────────────────────
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    !request.nextUrl.pathname.startsWith("/admin/login") &&
+    !request.nextUrl.pathname.startsWith("/admin/logout")
+  ) {
+    const session = await verifyAdminSession(request.headers.get("cookie"));
+    if (!session) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
   }
 
   // Web Crypto API (Edge Runtime compatible — not Node's crypto module)

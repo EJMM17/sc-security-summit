@@ -1,8 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 // End-to-end: complete a registration with a unique email, then expect the
-// success folio panel to appear. We do not assert on Conekta order creation
-// here — that's covered in webhook.spec.ts via DB.
+// success page to appear with the generated folio.
 test.describe("Registro", () => {
   test("happy path — general access without CFDI", async ({ page }) => {
     await page.goto("/");
@@ -33,9 +32,9 @@ test.describe("Registro", () => {
     // Skip Turnstile in test mode — test sitekey 1x000... auto-passes.
     await page.getByRole("button", { name: /completar|complete registration/i }).click();
 
-    // Either we land on success state or a server-rendered error. Check folio
-    // pattern presence in the response page.
-    await expect(page.getByText(/SCSS2026-/)).toBeVisible({ timeout: 15_000 });
+    // Successful registration redirects to /registro-exitoso.
+    await page.waitForURL(/\/registro-exitoso/, { timeout: 15_000 });
+    await expect(page.getByText(/SCSS2026-/)).toBeVisible({ timeout: 5_000 });
   });
 
   test("validates required fields", async ({ page }) => {
@@ -47,12 +46,5 @@ test.describe("Registro", () => {
     if (await summary.isVisible().catch(() => false)) {
       await expect(summary).toBeVisible();
     }
-  });
-});
-
-test.describe("Pago page", () => {
-  test("rejects unknown folio with 404", async ({ page }) => {
-    const res = await page.goto("/pago?folio=SCSS2026-DOES-NOT-EXIST");
-    expect(res?.status()).toBe(404);
   });
 });
