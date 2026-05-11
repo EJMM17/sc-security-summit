@@ -162,15 +162,15 @@ export const UI_TEXT = {
       parts: [
         { text: "Al completar el formulario de registro recibirás un " },
         { text: "folio de confirmación", strong: true },
-        { text: " en pantalla y por correo. Un representante de Lanz Logistics te contactará en un plazo de " },
+        { text: " en pantalla. Un representante de Lanz Logistics te contactará en un plazo de " },
         { text: "24–48 horas hábiles", strong: true },
         {
-          text: " con las instrucciones de pago (transferencia bancaria, depósito o pago en línea). Tu lugar queda reservado una vez confirmado el pago.",
+          text: " con las instrucciones de pago (transferencia bancaria o depósito). Tu lugar queda reservado una vez confirmado el pago.",
         },
       ],
     },
     paymentSteps: [
-      { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio" },
+      { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio en pantalla" },
       { step: "2", title: "Recibe instrucciones", desc: "Te contactamos en 24-48 hrs hábiles" },
       { step: "3", title: "Confirma tu lugar", desc: "Realiza el pago y recibes tu confirmación" },
     ],
@@ -317,15 +317,15 @@ export const UI_TEXT = {
       parts: [
         { text: "After completing the registration form you will receive a " },
         { text: "confirmation code", strong: true },
-        { text: " on screen and by email. A Lanz Logistics representative will contact you within " },
+        { text: " on screen. A Lanz Logistics representative will contact you within " },
         { text: "24–48 business hours", strong: true },
         {
-          text: " with payment instructions (bank transfer, deposit or online payment). Your spot is reserved once payment is confirmed.",
+          text: " with payment instructions (bank transfer or deposit). Your spot is reserved once payment is confirmed.",
         },
       ],
     },
     paymentSteps: [
-      { step: "1", title: "Register", desc: "Fill out the form and receive your code" },
+      { step: "1", title: "Register", desc: "Fill out the form and receive your code on screen" },
       { step: "2", title: "Get instructions", desc: "We contact you within 24-48 business hours" },
       { step: "3", title: "Confirm your spot", desc: "Complete the payment and receive confirmation" },
     ],

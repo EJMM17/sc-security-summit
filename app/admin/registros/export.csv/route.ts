@@ -17,14 +17,14 @@ type Row = {
   monto_mxn: number;
   estado_pago: string;
   metodo_pago: string | null;
-  conekta_order_id: string | null;
-  conekta_payment_status: string | null;
-  pagado_at: string | null;
   requiere_cfdi: boolean;
   rfc: string | null;
   razon_social: string | null;
   codigo_postal_fiscal: string | null;
   created_at: string;
+  pagado_en: string | null;
+  pagado_por: string | null;
+  pago_nota: string | null;
 };
 
 const HEADERS = [
@@ -39,14 +39,14 @@ const HEADERS = [
   "monto_mxn",
   "estado_pago",
   "metodo_pago",
-  "conekta_order_id",
-  "conekta_payment_status",
-  "pagado_at",
   "requiere_cfdi",
   "rfc",
   "razon_social",
   "codigo_postal_fiscal",
   "created_at",
+  "pagado_en",
+  "pagado_por",
+  "pago_nota",
 ];
 
 function csvEscape(value: unknown): string {
@@ -66,8 +66,6 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url);
   const estado = url.searchParams.get("estado");
   const tipo = url.searchParams.get("tipo");
-  const metodo = url.searchParams.get("metodo");
-  const pagoStatus = url.searchParams.get("pago_status");
   const fromDate = url.searchParams.get("from");
   const toDate = url.searchParams.get("to");
   const q = url.searchParams.get("q")?.trim();
@@ -80,8 +78,6 @@ export async function GET(req: NextRequest) {
 
   if (estado) query = query.eq("estado_pago", estado);
   if (tipo) query = query.eq("tipo_acceso", tipo);
-  if (metodo) query = query.eq("metodo_pago", metodo);
-  if (pagoStatus) query = query.eq("conekta_payment_status", pagoStatus);
   if (fromDate && /^\d{4}-\d{2}-\d{2}$/.test(fromDate)) {
     query = query.gte("created_at", `${fromDate}T00:00:00-06:00`);
   }
@@ -99,8 +95,7 @@ export async function GET(req: NextRequest) {
     return new NextResponse(`Error: ${error.message}`, { status: 500 });
   }
 
-  // Excel reads UTF-8 CSVs correctly only if there's a BOM. Without it, é/ñ
-  // render as mojibake on Excel for Windows.
+  // Excel reads UTF-8 CSVs correctly only if there's a BOM.
   const BOM = "﻿";
   const lines = [
     HEADERS.join(","),

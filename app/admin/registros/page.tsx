@@ -10,8 +10,6 @@ export const dynamic = "force-dynamic";
 type SearchParams = {
   estado?: string;
   tipo?: string;
-  metodo?: string;
-  pago_status?: string;
   q?: string;
   page?: string;
   per_page?: string;
@@ -33,23 +31,6 @@ const TIPO_OPTS = [
   { value: "vip", label: "VIP" },
 ];
 
-const METODO_OPTS = [
-  { value: "", label: "Todos" },
-  { value: "spei", label: "SPEI" },
-  { value: "tarjeta", label: "Tarjeta" },
-  { value: "oxxo", label: "OXXO" },
-  { value: "transferencia_manual", label: "Transferencia manual" },
-];
-
-const PAGO_STATUS_OPTS = [
-  { value: "", label: "Todos" },
-  { value: "pending", label: "Pending" },
-  { value: "paid", label: "Paid" },
-  { value: "expired", label: "Expired" },
-  { value: "canceled", label: "Canceled" },
-  { value: "failed", label: "Failed" },
-];
-
 const PAGE_SIZE_OPTS = [10, 25, 50] as const;
 const DEFAULT_PAGE_SIZE = 25;
 
@@ -64,16 +45,7 @@ export type RegistroRow = {
   tipo_acceso: "estudiante" | "general" | "vip";
   monto_mxn: number;
   estado_pago: "pendiente" | "pagado" | "cancelado";
-  metodo_pago: "spei" | "tarjeta" | "oxxo" | "transferencia_manual" | null;
-  conekta_order_id: string | null;
-  conekta_payment_status:
-    | "pending"
-    | "paid"
-    | "expired"
-    | "canceled"
-    | "failed"
-    | null;
-  pagado_at: string | null;
+  metodo_pago: string | null;
   requiere_cfdi: boolean;
   rfc: string | null;
   razon_social: string | null;
@@ -98,7 +70,7 @@ export default async function RegistrosPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const adminEmail = await requireAdmin();
+  const admin = await requireAdmin();
   const params = await searchParams;
 
   const requestedPerPage = parseInt(params.per_page ?? "", 10);
@@ -115,7 +87,7 @@ export default async function RegistrosPage({
   let query = supabase
     .from("registros")
     .select(
-      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,metodo_pago,conekta_order_id,conekta_payment_status,pagado_at,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
+      "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,metodo_pago,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
       { count: "exact" },
     )
     .order("created_at", { ascending: false })
@@ -123,8 +95,6 @@ export default async function RegistrosPage({
 
   if (params.estado) query = query.eq("estado_pago", params.estado);
   if (params.tipo) query = query.eq("tipo_acceso", params.tipo);
-  if (params.metodo) query = query.eq("metodo_pago", params.metodo);
-  if (params.pago_status) query = query.eq("conekta_payment_status", params.pago_status);
   if (params.from) {
     const fromIso = parseDateBoundary(params.from, "start");
     if (fromIso) query = query.gte("created_at", fromIso);
@@ -163,7 +133,7 @@ export default async function RegistrosPage({
         <div>
           <h1 className="text-xl font-semibold">Registros</h1>
           <p className="text-xs text-slate-400">
-            Sesión: {adminEmail} · {totalItems} registro(s) en total
+            Sesión: {admin.nombre || admin.email} · {totalItems} registro(s) en total
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -199,7 +169,7 @@ export default async function RegistrosPage({
               type="submit"
               className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
             >
-              <LogOut className="w-3.5 h-3.5" aria-hidden="true" /> Salir
+              <LogOut className="w-3.5 h-3.5" aria-hidden="true" /> Cerrar sesión
             </button>
           </form>
         </div>
@@ -221,8 +191,6 @@ export default async function RegistrosPage({
         <Field name="q" label="Búsqueda" defaultValue={params.q ?? ""} placeholder="folio, email, nombre, empresa..." />
         <Select name="estado" label="Estado de pago" defaultValue={params.estado ?? ""} options={ESTADO_OPTS} />
         <Select name="tipo" label="Tipo de acceso" defaultValue={params.tipo ?? ""} options={TIPO_OPTS} />
-        <Select name="metodo" label="Método" defaultValue={params.metodo ?? ""} options={METODO_OPTS} />
-        <Select name="pago_status" label="Conekta status" defaultValue={params.pago_status ?? ""} options={PAGO_STATUS_OPTS} />
         <Field name="from" label="Desde" type="date" defaultValue={params.from ?? ""} />
         <Field name="to" label="Hasta" type="date" defaultValue={params.to ?? ""} />
         <Select
@@ -240,8 +208,6 @@ export default async function RegistrosPage({
         {(params.q ||
           params.estado ||
           params.tipo ||
-          params.metodo ||
-          params.pago_status ||
           params.from ||
           params.to) && (
           <a href="/admin/registros" className="text-xs text-slate-400 hover:text-slate-200">
@@ -267,10 +233,9 @@ export default async function RegistrosPage({
               <th className="text-left px-3 py-2 font-medium">Tier</th>
               <th className="text-right px-3 py-2 font-medium">Monto</th>
               <th className="text-left px-3 py-2 font-medium">Estado</th>
-              <th className="text-left px-3 py-2 font-medium">Método</th>
-              <th className="text-left px-3 py-2 font-medium">Conekta</th>
               <th className="text-left px-3 py-2 font-medium">CFDI</th>
               <th className="text-left px-3 py-2 font-medium">Creado</th>
+              <th className="text-left px-3 py-2 font-medium">Pagado</th>
               <th className="text-left px-3 py-2 font-medium">Acciones</th>
             </tr>
           </thead>
@@ -280,7 +245,7 @@ export default async function RegistrosPage({
             ))}
             {rows && rows.length === 0 && (
               <tr>
-                <td colSpan={12} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={11} className="px-3 py-8 text-center text-slate-500">
                   Sin registros que coincidan con los filtros.
                 </td>
               </tr>
@@ -392,7 +357,6 @@ function Field({
 
 function parseDateBoundary(value: string, edge: "start" | "end"): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  // Treat dates as America/Monterrey (UTC-6, no DST). Approximate: append T00 / T23:59.
   const suffix = edge === "start" ? "T00:00:00-06:00" : "T23:59:59-06:00";
   const iso = new Date(`${value}${suffix}`).toISOString();
   return iso;

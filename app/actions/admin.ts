@@ -12,7 +12,6 @@ import {
   verifyAdminCredentials,
 } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
-import { checkRateLimit } from "@/lib/rate-limit";
 
 function auditLog(event: string, data: Record<string, unknown>) {
   console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
@@ -29,18 +28,12 @@ const LoginSchema = z.object({
   password: z.string().min(1).max(255),
 });
 
-const NEUTRAL_LOGIN_MESSAGE = "Credenciales incorrectas. Verifica tu email y contraseña.";
+const NEUTRAL_LOGIN_MESSAGE = "Credenciales incorrectas";
 
 export async function loginAdmin(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const h = await headers();
   const ip =
     h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
-
-  const rl = await checkRateLimit(`admin-login:${ip}`);
-  if (!rl.ok) {
-    auditLog("admin_login_rate_limited", { ip });
-    return { ok: false, message: "Demasiados intentos. Espera 15 minutos." };
-  }
 
   const parsed = LoginSchema.safeParse({
     email: formData.get("email"),
@@ -52,14 +45,14 @@ export async function loginAdmin(_prev: LoginState, formData: FormData): Promise
 
   const { email, password } = parsed.data;
 
-  const verifiedEmail = await verifyAdminCredentials(email, password);
-  if (!verifiedEmail) {
+  const admin = await verifyAdminCredentials(email, password);
+  if (!admin) {
     auditLog("admin_login_failed", { ip, email_suffix: email.split("@")[1] });
     return { ok: false, message: NEUTRAL_LOGIN_MESSAGE };
   }
 
-  await setSessionCookie(verifiedEmail);
-  auditLog("admin_login_success", { ip });
+  await setSessionCookie(admin);
+  auditLog("admin_login_success", { ip, admin: admin.email });
   redirect("/admin/registros");
 }
 
@@ -73,13 +66,13 @@ export async function adminLogout(): Promise<never> {
 }
 
 // =============================================================
-// Mark a registration as paid (manual SPEI/transfer)
+// Mark a registration as paid (manual transfer)
 // =============================================================
 
 const FolioSchema = z.string().regex(/^SCSS2026-[A-Z0-9-]+$/);
 
 export async function markRegistroPaid(formData: FormData): Promise<void> {
-  const adminEmail = await requireAdmin();
+  const admin = await requireAdmin();
   const folio = FolioSchema.safeParse(formData.get("folio"));
   if (!folio.success) return;
   const note = String(formData.get("note") ?? "").slice(0, 500);
@@ -90,10 +83,11 @@ export async function markRegistroPaid(formData: FormData): Promise<void> {
     .update({
       estado_pago: "pagado",
       pagado_en: new Date().toISOString(),
-      pagado_por: adminEmail,
+      pagado_por: admin.email,
       pago_nota: note || null,
     })
-    .eq("folio", folio.data);
+    .eq("folio", folio.data)
+    .eq("estado_pago", "pendiente");
 
   if (error) {
     auditLog("admin_mark_paid_failed", { folio: folio.data, error: error.message });
@@ -102,11 +96,19 @@ export async function markRegistroPaid(formData: FormData): Promise<void> {
     });
     return;
   }
-  auditLog("admin_mark_paid", { folio: folio.data, by: adminEmail });
+
+  await supabase.from("audit_log").insert({
+    evento: "pago_confirmado",
+    folio: folio.data,
+    usuario_email: admin.email,
+    detalles: { notas: note || null },
+  });
+
+  auditLog("admin_mark_paid", { folio: folio.data, by: admin.email });
 }
 
 export async function markRegistroCancelled(formData: FormData): Promise<void> {
-  const adminEmail = await requireAdmin();
+  const admin = await requireAdmin();
   const folio = FolioSchema.safeParse(formData.get("folio"));
   if (!folio.success) return;
   const note = String(formData.get("note") ?? "").slice(0, 500);
@@ -117,7 +119,7 @@ export async function markRegistroCancelled(formData: FormData): Promise<void> {
     .update({
       estado_pago: "cancelado",
       cancelado_en: new Date().toISOString(),
-      cancelado_por: adminEmail,
+      cancelado_por: admin.email,
       cancelacion_nota: note || null,
     })
     .eq("folio", folio.data);
@@ -126,7 +128,15 @@ export async function markRegistroCancelled(formData: FormData): Promise<void> {
     auditLog("admin_mark_cancelled_failed", { folio: folio.data, error: error.message });
     return;
   }
-  auditLog("admin_mark_cancelled", { folio: folio.data, by: adminEmail });
+
+  await supabase.from("audit_log").insert({
+    evento: "registro_cancelado",
+    folio: folio.data,
+    usuario_email: admin.email,
+    detalles: { notas: note || null },
+  });
+
+  auditLog("admin_mark_cancelled", { folio: folio.data, by: admin.email });
 }
 
 // =============================================================
@@ -185,7 +195,7 @@ export async function createAdmin(_prev: AdminCrudState, formData: FormData): Pr
     return { ok: false, message: "Error al crear el administrador. Intenta de nuevo." };
   }
 
-  auditLog("admin_created", { email, by: "admin" });
+  auditLog("admin_created", { email });
   return { ok: true, message: "Administrador creado correctamente." };
 }
 
@@ -244,7 +254,6 @@ export async function deleteAdmin(_prev: AdminCrudState, formData: FormData): Pr
 
   const supabase = createAdminClient();
 
-  // Prevent deleting the last active admin
   const { count } = await supabase
     .from("admins")
     .select("id", { count: "exact", head: true })

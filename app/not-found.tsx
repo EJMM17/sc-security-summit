@@ -19,18 +19,12 @@ export default function NotFound() {
         <p className="mt-3 text-sm text-slate-600">
           La página que buscas no existe o fue movida.
         </p>
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+        <div className="mt-6">
           <Link
             href="/"
-            className="flex-1 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-blue-700"
+            className="inline-block rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-blue-700"
           >
             Ir al inicio
-          </Link>
-          <Link
-            href="/recuperar-folio"
-            className="flex-1 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
-          >
-            Recuperar folio
           </Link>
         </div>
       </div>

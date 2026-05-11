@@ -2,7 +2,6 @@ import { AlertCircle, FileText } from "lucide-react";
 import { submitRegistroForm } from "@/app/actions/registro";
 import type { RegistroFlashState } from "@/lib/registro-form-state";
 import RegistroFormEnhancer from "./RegistroFormEnhancer";
-import RegistroIdempotencyField from "./RegistroIdempotencyField";
 import RegistroSubmitButton from "./RegistroSubmitButton";
 import { ACCESO_OPTIONS } from "@/lib/constants";
 
@@ -248,7 +247,6 @@ export default function RegistroForm({
   return (
     <form action={submitRegistroForm} className="space-y-6" noValidate>
       <RegistroFormEnhancer state={state} language={language} />
-      <RegistroIdempotencyField />
       <input type="hidden" name="utm_source" value={utms?.source ?? ""} />
       <input type="hidden" name="utm_medium" value={utms?.medium ?? ""} />
       <input type="hidden" name="utm_campaign" value={utms?.campaign ?? ""} />

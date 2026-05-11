@@ -4,13 +4,7 @@ import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
 import { generateFolio } from "@/lib/folio";
 import { PRECIOS } from "@/lib/schemas";
-import {
-  sendOrganizerNotification,
-  sendRegistrationConfirmation,
-  type SendResult,
-} from "@/lib/email";
 import { supabaseAdmin } from "@/lib/supabase";
-import type { EmailLanguage } from "@/lib/email-templates";
 
 const createLeadInputSchema = z.object({
   nombre: z.string().trim().min(2),
@@ -37,20 +31,13 @@ const createLeadInputSchema = z.object({
 export type CreateLeadInput = z.input<typeof createLeadInputSchema>;
 
 export type CreateLeadResult =
-  | { ok: true; folio: string; message: string }
+  | { ok: true; folio: string; tipo: "estudiante" | "general" | "vip"; monto: number; message: string }
   | {
       ok: false;
       status: 400 | 409 | 429 | 500;
       message: string;
       fieldErrors?: Record<string, string[]>;
     };
-
-function toFailureReason(result: PromiseSettledResult<SendResult>) {
-  if (result.status === "rejected") {
-    return result.reason instanceof Error ? result.reason.message : String(result.reason);
-  }
-  return result.value.ok ? null : result.value.error;
-}
 
 export async function createLead(input: CreateLeadInput): Promise<CreateLeadResult> {
   try {
@@ -104,6 +91,7 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
     }
 
     const folio = generateFolio();
+    const monto = PRECIOS[data.tipo_acceso];
 
     const insertPayload: Record<string, unknown> = {
       folio,
@@ -114,8 +102,9 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       empresa: data.empresa,
       cargo: data.cargo,
       tipo_acceso: data.tipo_acceso,
-      monto_mxn: PRECIOS[data.tipo_acceso],
+      monto_mxn: monto,
       estado_pago: "pendiente",
+      metodo_pago: "transferencia_manual",
       credencial_estudiantil: data.credencial_estudiantil,
       requiere_cfdi: data.requiere_cfdi,
       created_at: new Date().toISOString(),
@@ -148,47 +137,12 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       throw new Error(`supabase_insert_failed:${error.code}:${error.message}`);
     }
 
-    const [confirmResult, organizerResult] = await Promise.allSettled([
-      sendRegistrationConfirmation({
-        to: data.email,
-        folio,
-        nombre: data.nombre,
-        tipoAcceso: data.tipo_acceso,
-        montoMxn: PRECIOS[data.tipo_acceso],
-        language: data.language as EmailLanguage,
-      }),
-      sendOrganizerNotification({
-        folio,
-        nombre: data.nombre,
-        apellido: data.apellido,
-        email: data.email,
-        telefono: data.telefono || null,
-        empresa: data.empresa,
-        cargo: data.cargo,
-        tipoAcceso: data.tipo_acceso,
-        montoMxn: PRECIOS[data.tipo_acceso],
-        requiereCfdi: data.requiere_cfdi,
-        rfc: data.rfc?.toUpperCase() ?? null,
-        ipRegistro: data.ip,
-      }),
-    ]);
-
-    const confirmErr = toFailureReason(confirmResult);
-    const organizerErr = toFailureReason(organizerResult);
-
-    if (confirmErr || organizerErr) {
-      Sentry.captureMessage("createLead.email_delivery_failure", {
-        level: "warning",
-        extra: { folio, confirmErr, organizerErr },
-      });
-    }
-
     const message =
       data.language === "en"
         ? `Registration complete. Your confirmation folio is ${folio}.`
         : `Registro completado exitosamente. Tu folio de confirmación es ${folio}.`;
 
-    return { ok: true, folio, message };
+    return { ok: true, folio, tipo: data.tipo_acceso, monto, message };
   } catch (error) {
     Sentry.captureException(error, {
       tags: { use_case: "create_lead" },
