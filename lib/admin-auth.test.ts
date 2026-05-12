@@ -50,7 +50,7 @@ describe("session cookie round-trip", () => {
   });
 
   it("returns null for a tampered cookie", async () => {
-    const { setSessionCookie, getCurrentAdmin } = await load();
+    const { setSessionCookie } = await load();
     await setSessionCookie(SAMPLE_ADMIN);
     process.env.ADMIN_SESSION_SECRET = "different-secret-32-chars-long!!";
     vi.resetModules();

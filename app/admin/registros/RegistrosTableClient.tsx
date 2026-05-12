@@ -73,7 +73,11 @@ export default function RegistrosTableClient({
   function toggle(folio: string) {
     setSelected((prev) => {
       const next = new Set(prev);
-      next.has(folio) ? next.delete(folio) : next.add(folio);
+      if (next.has(folio)) {
+        next.delete(folio);
+      } else {
+        next.add(folio);
+      }
       return next;
     });
   }

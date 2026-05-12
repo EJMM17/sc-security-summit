@@ -1,4 +1,4 @@
-import { LogOut, Download, Users, Shield, Ticket, ClipboardList, ArrowUpDown } from "lucide-react";
+import { LogOut, Download, Users, Shield, Ticket, ClipboardList } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { adminLogout } from "@/app/actions/admin";
@@ -379,29 +379,6 @@ function MiniBarChart({ data }: { data: DayCount[] }) {
       ))}
     </svg>
   );
-}
-
-// =============================================================
-// Sort link helper — exported so RegistrosTableClient can use it
-// =============================================================
-
-export function sortHref(
-  col: SortCol,
-  currentCol: SortCol,
-  currentAsc: boolean,
-  params: SearchParams,
-): string {
-  const nextAsc = col === currentCol ? !currentAsc : false;
-  const sp = new URLSearchParams();
-  if (params.q) sp.set("q", params.q);
-  if (params.estado) sp.set("estado", params.estado);
-  if (params.tipo) sp.set("tipo", params.tipo);
-  if (params.from) sp.set("from", params.from);
-  if (params.to) sp.set("to", params.to);
-  if (params.per_page) sp.set("per_page", params.per_page);
-  sp.set("sort", col);
-  sp.set("dir", nextAsc ? "asc" : "desc");
-  return `/admin/registros?${sp.toString()}`;
 }
 
 // =============================================================
