@@ -25,9 +25,12 @@ type Row = {
   pagado_en: string | null;
   pagado_por: string | null;
   pago_nota: string | null;
+  cancelado_en: string | null;
+  cancelado_por: string | null;
+  cancelacion_nota: string | null;
 };
 
-const HEADERS = [
+const HEADERS: (keyof Row)[] = [
   "folio",
   "nombre",
   "apellido",
@@ -47,6 +50,9 @@ const HEADERS = [
   "pagado_en",
   "pagado_por",
   "pago_nota",
+  "cancelado_en",
+  "cancelado_por",
+  "cancelacion_nota",
 ];
 
 function csvEscape(value: unknown): string {
@@ -99,7 +105,7 @@ export async function GET(req: NextRequest) {
   const BOM = "﻿";
   const lines = [
     HEADERS.join(","),
-    ...(data ?? []).map((row) => HEADERS.map((h) => csvEscape(row[h as keyof Row])).join(",")),
+    ...(data ?? []).map((row) => HEADERS.map((h) => csvEscape(row[h])).join(",")),
   ];
   const body = BOM + lines.join("\r\n");
 
