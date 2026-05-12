@@ -22,9 +22,15 @@ describe("generateFolio", () => {
   });
 
   it("does not collide across 10k iterations", () => {
+    // Step the simulated clock per iteration so we exercise the random suffix
+    // under realistic conditions (registrations are spread across ms in prod).
+    // Without this, a tight loop completing in a single ms bucket would rely
+    // on only 24 bits of suffix entropy and could hit a birthday-paradox
+    // collision across 10k samples.
+    const base = Date.now();
     const seen = new Set<string>();
     for (let i = 0; i < 10_000; i++) {
-      seen.add(generateFolio());
+      seen.add(generateFolio(base + i));
     }
     expect(seen.size).toBe(10_000);
   });
