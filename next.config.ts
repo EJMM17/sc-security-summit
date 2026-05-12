@@ -23,6 +23,18 @@ const nextConfig: NextConfig = {
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
+  webpack: (config) => {
+    // @sentry/node bundles @opentelemetry/instrumentation, which uses dynamic
+    // require() to load platform code. Webpack flags this as a critical
+    // dependency. The runtime behavior is safe (Sentry-documented), so silence
+    // the warning to keep build logs clean.
+    config.ignoreWarnings = [
+      ...(config.ignoreWarnings ?? []),
+      { module: /@opentelemetry\/instrumentation/, message: /Critical dependency/ },
+      { module: /@prisma\/instrumentation/, message: /Critical dependency/ },
+    ];
+    return config;
+  },
   async headers() {
     return [
       {
