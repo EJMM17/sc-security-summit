@@ -1,10 +1,22 @@
 "use client";
 
-import { X } from "lucide-react";
+import { useState, useActionState } from "react";
+import { X, Check, RotateCcw, Mail } from "lucide-react";
+import {
+  markRegistroPaid,
+  markRegistroCancelled,
+  revertRegistroPendiente,
+  resendConfirmationEmail,
+  type ResendEmailState,
+} from "@/app/actions/admin";
 import type { RegistroRow as RegistroRowData } from "./page";
 
 const formatMxn = (n: number): string =>
-  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 0,
+  }).format(n);
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return "—";
@@ -18,6 +30,8 @@ const formatDate = (iso: string | null): string => {
   });
 };
 
+const initResend: ResendEmailState = { ok: false, message: "" };
+
 export default function RegistroDetail({
   row,
   onClose,
@@ -25,6 +39,29 @@ export default function RegistroDetail({
   row: RegistroRowData;
   onClose: () => void;
 }) {
+  const [resendState, resendAction, resendPending] = useActionState(resendConfirmationEmail, initResend);
+  const [paidNote, setPaidNote] = useState("");
+  const [cancelNote, setCancelNote] = useState("");
+  const [revertNote, setRevertNote] = useState("");
+
+  const handleMarkPaid = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm(`¿Confirmar el pago del folio ${row.folio} por ${formatMxn(row.monto_mxn)}?`)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleMarkCancelled = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm(`¿Cancelar el folio ${row.folio}?`)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleRevert = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm(`¿Revertir el folio ${row.folio} a "pendiente"? Se borrará la información de pago.`)) {
+      e.preventDefault();
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
       <div className="w-full max-w-lg bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
@@ -83,6 +120,97 @@ export default function RegistroDetail({
               <DetailLine label="UTM Campaign" value={row.utm_campaign} />
             </div>
           )}
+
+          {/* Actions section */}
+          <div className="pt-2 border-t border-slate-800 space-y-2">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500">Acciones</p>
+
+            {/* Resend email */}
+            <div className="flex items-center gap-2">
+              <form action={resendAction}>
+                <input type="hidden" name="folio" value={row.folio} />
+                <button
+                  type="submit"
+                  disabled={resendPending}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 rounded-md text-xs"
+                >
+                  <Mail className="w-3.5 h-3.5" />
+                  {resendPending ? "Enviando…" : "Reenviar email"}
+                </button>
+              </form>
+              {resendState.message && (
+                <span className={`text-xs ${resendState.ok ? "text-emerald-400" : "text-red-400"}`}>
+                  {resendState.message}
+                </span>
+              )}
+            </div>
+
+            {/* Mark paid — only pendiente */}
+            {row.estado_pago === "pendiente" && (
+              <form action={markRegistroPaid} onSubmit={handleMarkPaid} className="flex items-center gap-2">
+                <input type="hidden" name="folio" value={row.folio} />
+                <input
+                  type="text"
+                  name="note"
+                  value={paidNote}
+                  onChange={(e) => setPaidNote(e.target.value)}
+                  placeholder="Nota (opcional)"
+                  maxLength={500}
+                  className="flex-1 px-2 py-1.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-600/30 text-emerald-300 rounded-md text-xs whitespace-nowrap"
+                >
+                  <Check className="w-3.5 h-3.5" /> Marcar pagado
+                </button>
+              </form>
+            )}
+
+            {/* Cancel — pendiente or pagado */}
+            {(row.estado_pago === "pendiente" || row.estado_pago === "pagado") && (
+              <form action={markRegistroCancelled} onSubmit={handleMarkCancelled} className="flex items-center gap-2">
+                <input type="hidden" name="folio" value={row.folio} />
+                <input
+                  type="text"
+                  name="note"
+                  value={cancelNote}
+                  onChange={(e) => setCancelNote(e.target.value)}
+                  placeholder="Nota (opcional)"
+                  maxLength={500}
+                  className="flex-1 px-2 py-1.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-600/10 hover:bg-red-600/30 border border-red-600/30 text-red-300 rounded-md text-xs whitespace-nowrap"
+                >
+                  <X className="w-3.5 h-3.5" /> Cancelar
+                </button>
+              </form>
+            )}
+
+            {/* Revert paid → pendiente */}
+            {row.estado_pago === "pagado" && (
+              <form action={revertRegistroPendiente} onSubmit={handleRevert} className="flex items-center gap-2">
+                <input type="hidden" name="folio" value={row.folio} />
+                <input
+                  type="text"
+                  name="note"
+                  value={revertNote}
+                  onChange={(e) => setRevertNote(e.target.value)}
+                  placeholder="Motivo (opcional)"
+                  maxLength={500}
+                  className="flex-1 px-2 py-1.5 bg-slate-800 border border-slate-700 rounded text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-600/20 hover:bg-amber-600/40 border border-amber-600/30 text-amber-300 rounded-md text-xs whitespace-nowrap"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" /> Revertir a pendiente
+                </button>
+              </form>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-end px-4 py-3 border-t border-slate-800 bg-slate-950/50">

@@ -1,9 +1,9 @@
-import { LogOut, Download, Users, Shield, Ticket } from "lucide-react";
+import { LogOut, Download, Users, Shield, Ticket, ClipboardList, ArrowUpDown } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { adminLogout } from "@/app/actions/admin";
-import RegistroRow from "./RegistroRow";
 import Pagination from "./Pagination";
+import RegistrosTableClient from "./RegistrosTableClient";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +15,8 @@ type SearchParams = {
   per_page?: string;
   from?: string;
   to?: string;
+  sort?: string;
+  dir?: string;
 };
 
 const ESTADO_OPTS = [
@@ -33,6 +35,9 @@ const TIPO_OPTS = [
 
 const PAGE_SIZE_OPTS = [10, 25, 50] as const;
 const DEFAULT_PAGE_SIZE = 25;
+
+const SORT_COLS = ["created_at", "nombre", "empresa", "monto_mxn", "estado_pago", "pagado_en"] as const;
+type SortCol = (typeof SORT_COLS)[number];
 
 export type RegistroRow = {
   folio: string;
@@ -82,49 +87,71 @@ export default async function RegistrosPage({
   const from = (page - 1) * perPage;
   const to = from + perPage - 1;
 
+  const sortCol: SortCol = (SORT_COLS as readonly string[]).includes(params.sort ?? "")
+    ? (params.sort as SortCol)
+    : "created_at";
+  const sortAsc = params.dir === "asc";
+
   const supabase = createAdminClient();
 
-  let query = supabase
+  let rowsQuery = supabase
     .from("registros")
     .select(
       "folio,nombre,apellido,email,empresa,cargo,telefono,tipo_acceso,monto_mxn,estado_pago,metodo_pago,requiere_cfdi,rfc,razon_social,codigo_postal_fiscal,created_at,ip_registro,user_agent,referer,utm_source,utm_medium,utm_campaign,pagado_en,pagado_por,pago_nota,cancelado_en,cancelado_por,cancelacion_nota",
       { count: "exact" },
     )
-    .order("created_at", { ascending: false })
+    .order(sortCol, { ascending: sortAsc })
     .range(from, to);
 
-  if (params.estado) query = query.eq("estado_pago", params.estado);
-  if (params.tipo) query = query.eq("tipo_acceso", params.tipo);
+  if (params.estado) rowsQuery = rowsQuery.eq("estado_pago", params.estado);
+  if (params.tipo) rowsQuery = rowsQuery.eq("tipo_acceso", params.tipo);
   if (params.from) {
     const fromIso = parseDateBoundary(params.from, "start");
-    if (fromIso) query = query.gte("created_at", fromIso);
+    if (fromIso) rowsQuery = rowsQuery.gte("created_at", fromIso);
   }
   if (params.to) {
     const toIso = parseDateBoundary(params.to, "end");
-    if (toIso) query = query.lte("created_at", toIso);
+    if (toIso) rowsQuery = rowsQuery.lte("created_at", toIso);
   }
   if (params.q) {
     const q = params.q.trim();
     if (q.length > 0) {
-      query = query.or(
+      rowsQuery = rowsQuery.or(
         `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,
       );
     }
   }
 
-  const { data: rows, error, count } = await query.returns<RegistroRow[]>();
+  // Parallel fetches: rows + stats + cupos + chart data
+  const [
+    { data: rows, error, count },
+    stats,
+    cuposRes,
+    chartRes,
+  ] = await Promise.all([
+    rowsQuery.returns<RegistroRow[]>(),
+    loadStats(supabase),
+    supabase.rpc("get_cupos_disponibles"),
+    supabase
+      .from("registros")
+      .select("created_at")
+      .gte("created_at", new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()),
+  ]);
 
-  const stats = await loadStats(supabase);
-  const cuposRes = await supabase.rpc("get_cupos_disponibles");
   const cuposDisponibles =
     typeof cuposRes.data === "number" ? cuposRes.data : null;
   const totalItems = count ?? 0;
   const totalPages = Math.max(1, Math.ceil(totalItems / perPage));
 
+  const chartData = buildChartData(chartRes.data ?? []);
+
   const exportHref =
     "/admin/registros/export.csv?" +
     new URLSearchParams(
-      Object.entries(params).filter(([, v]) => Boolean(v) && v !== "1") as [string, string][],
+      Object.entries(params).filter(([k, v]) => Boolean(v) && v !== "1" && k !== "page") as [
+        string,
+        string,
+      ][],
     ).toString();
 
   return (
@@ -153,6 +180,12 @@ export default async function RegistrosPage({
             </span>
           )}
           <a
+            href="/admin/audit-log"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
+          >
+            <ClipboardList className="w-3.5 h-3.5" aria-hidden="true" /> Auditoría
+          </a>
+          <a
             href="/admin/admins"
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
           >
@@ -175,19 +208,31 @@ export default async function RegistrosPage({
         </div>
       </header>
 
-      {/* Stats cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3 mb-6">
-        <StatCard label="Total" value={String(stats.total)} icon={<Users className="w-3.5 h-3.5" />} />
-        <StatCard label="Pagados" value={String(stats.pagado)} tone="emerald" />
-        <StatCard label="Pendientes" value={String(stats.pendiente)} tone="amber" />
-        <StatCard label="Cancelados" value={String(stats.cancelado)} tone="slate" />
-        <StatCard label="Ingresos" value={stats.ingresos} tone="emerald" />
+      {/* Stats + mini chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr,auto] gap-4 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-3">
+          <StatCard label="Total" value={String(stats.total)} icon={<Users className="w-3.5 h-3.5" />} />
+          <StatCard label="Pagados" value={String(stats.pagado)} tone="emerald" />
+          <StatCard label="Pendientes" value={String(stats.pendiente)} tone="amber" />
+          <StatCard label="Cancelados" value={String(stats.cancelado)} tone="slate" />
+          <StatCard label="Ingresos" value={stats.ingresos} tone="emerald" />
+        </div>
+        {chartData.length > 0 && (
+          <div className="p-3 bg-slate-900/60 border border-slate-800 rounded-md min-w-[220px]">
+            <p className="text-[10px] uppercase tracking-wider text-slate-500 mb-2">Registros (30 días)</p>
+            <MiniBarChart data={chartData} />
+          </div>
+        )}
       </div>
 
+      {/* Filters */}
       <form
         method="get"
         className="flex flex-wrap items-end gap-3 mb-6 p-3 bg-slate-900/50 border border-slate-800 rounded-md"
       >
+        {/* Preserve sort/dir */}
+        {sortCol !== "created_at" && <input type="hidden" name="sort" value={sortCol} />}
+        {params.dir && <input type="hidden" name="dir" value={params.dir} />}
         <Field name="q" label="Búsqueda" defaultValue={params.q ?? ""} placeholder="folio, email, nombre, empresa..." />
         <Select name="estado" label="Estado de pago" defaultValue={params.estado ?? ""} options={ESTADO_OPTS} />
         <Select name="tipo" label="Tipo de acceso" defaultValue={params.tipo ?? ""} options={TIPO_OPTS} />
@@ -205,11 +250,7 @@ export default async function RegistrosPage({
         >
           Aplicar
         </button>
-        {(params.q ||
-          params.estado ||
-          params.tipo ||
-          params.from ||
-          params.to) && (
+        {(params.q || params.estado || params.tipo || params.from || params.to) && (
           <a href="/admin/registros" className="text-xs text-slate-400 hover:text-slate-200">
             Limpiar
           </a>
@@ -222,72 +263,38 @@ export default async function RegistrosPage({
         </div>
       )}
 
-      <div className="overflow-x-auto border border-slate-800 rounded-md">
-        <table className="w-full text-xs">
-          <thead className="bg-slate-900 text-slate-400">
-            <tr>
-              <th className="text-left px-3 py-2 font-medium">Folio</th>
-              <th className="text-left px-3 py-2 font-medium">Nombre</th>
-              <th className="text-left px-3 py-2 font-medium">Email</th>
-              <th className="text-left px-3 py-2 font-medium">Empresa</th>
-              <th className="text-left px-3 py-2 font-medium">Tier</th>
-              <th className="text-right px-3 py-2 font-medium">Monto</th>
-              <th className="text-left px-3 py-2 font-medium">Estado</th>
-              <th className="text-left px-3 py-2 font-medium">CFDI</th>
-              <th className="text-left px-3 py-2 font-medium">Creado</th>
-              <th className="text-left px-3 py-2 font-medium">Pagado</th>
-              <th className="text-left px-3 py-2 font-medium">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            {(rows ?? []).map((r) => (
-              <RegistroRow key={r.folio} row={r} />
-            ))}
-            {rows && rows.length === 0 && (
-              <tr>
-                <td colSpan={11} className="px-3 py-8 text-center text-slate-500">
-                  Sin registros que coincidan con los filtros.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <RegistrosTableClient
+        rows={rows ?? []}
+        sortCol={sortCol}
+        sortAsc={sortAsc}
+        currentParams={params}
+      />
 
       <Pagination page={page} totalPages={totalPages} totalItems={totalItems} perPage={perPage} />
     </main>
   );
 }
 
+// =============================================================
+// Stats — parallel queries, then aggregate ingresos in JS
+// =============================================================
+
 async function loadStats(supabase: ReturnType<typeof createAdminClient>) {
-  const { count: total } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true });
-  const { count: pagado } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_pago", "pagado");
-  const { count: pendiente } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_pago", "pendiente");
-  const { count: cancelado } = await supabase
-    .from("registros")
-    .select("*", { count: "exact", head: true })
-    .eq("estado_pago", "cancelado");
+  const [totalRes, pagadoRes, pendienteRes, canceladoRes, ingresosRes] = await Promise.all([
+    supabase.from("registros").select("*", { count: "exact", head: true }),
+    supabase.from("registros").select("*", { count: "exact", head: true }).eq("estado_pago", "pagado"),
+    supabase.from("registros").select("*", { count: "exact", head: true }).eq("estado_pago", "pendiente"),
+    supabase.from("registros").select("*", { count: "exact", head: true }).eq("estado_pago", "cancelado"),
+    supabase.from("registros").select("monto_mxn").eq("estado_pago", "pagado"),
+  ]);
 
-  const { data: ingresosData } = await supabase
-    .from("registros")
-    .select("monto_mxn")
-    .eq("estado_pago", "pagado");
-
-  const ingresos = (ingresosData ?? []).reduce((sum, r) => sum + (r.monto_mxn ?? 0), 0);
+  const ingresos = (ingresosRes.data ?? []).reduce((sum, r) => sum + (r.monto_mxn ?? 0), 0);
 
   return {
-    total: total ?? 0,
-    pagado: pagado ?? 0,
-    pendiente: pendiente ?? 0,
-    cancelado: cancelado ?? 0,
+    total: totalRes.count ?? 0,
+    pagado: pagadoRes.count ?? 0,
+    pendiente: pendienteRes.count ?? 0,
+    cancelado: canceladoRes.count ?? 0,
     ingresos: new Intl.NumberFormat("es-MX", {
       style: "currency",
       currency: "MXN",
@@ -295,6 +302,111 @@ async function loadStats(supabase: ReturnType<typeof createAdminClient>) {
     }).format(ingresos),
   };
 }
+
+// =============================================================
+// Chart helpers
+// =============================================================
+
+type DayCount = { label: string; count: number };
+
+function buildChartData(rows: { created_at: string }[]): DayCount[] {
+  const counts = new Map<string, number>();
+  const now = new Date();
+  // Initialize last 14 days
+  for (let i = 13; i >= 0; i--) {
+    const d = new Date(now);
+    d.setDate(d.getDate() - i);
+    const key = d.toLocaleDateString("es-MX", {
+      timeZone: "America/Monterrey",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    counts.set(key, 0);
+  }
+  for (const r of rows) {
+    const key = new Date(r.created_at).toLocaleDateString("es-MX", {
+      timeZone: "America/Monterrey",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    if (counts.has(key)) counts.set(key, (counts.get(key) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([label, count]) => ({ label, count }));
+}
+
+function MiniBarChart({ data }: { data: DayCount[] }) {
+  const max = Math.max(...data.map((d) => d.count), 1);
+  const W = 200;
+  const H = 48;
+  const barW = Math.floor(W / data.length) - 1;
+
+  return (
+    <svg width={W} height={H} aria-label="Registros por día (últimos 14 días)">
+      {data.map((d, i) => {
+        const barH = Math.max(2, Math.round((d.count / max) * (H - 12)));
+        const x = i * (barW + 1);
+        const y = H - barH - 10;
+        return (
+          <g key={d.label}>
+            <rect
+              x={x}
+              y={y}
+              width={barW}
+              height={barH}
+              fill={d.count > 0 ? "#3b82f6" : "#1e293b"}
+              rx={1}
+            />
+            {d.count > 0 && (
+              <text x={x + barW / 2} y={y - 2} textAnchor="middle" fontSize={8} fill="#94a3b8">
+                {d.count}
+              </text>
+            )}
+          </g>
+        );
+      })}
+      {/* X axis labels: first, middle, last */}
+      {[0, Math.floor(data.length / 2), data.length - 1].map((i) => (
+        <text
+          key={i}
+          x={i * (barW + 1) + barW / 2}
+          y={H}
+          textAnchor="middle"
+          fontSize={7}
+          fill="#475569"
+        >
+          {data[i]?.label}
+        </text>
+      ))}
+    </svg>
+  );
+}
+
+// =============================================================
+// Sort link helper — exported so RegistrosTableClient can use it
+// =============================================================
+
+export function sortHref(
+  col: SortCol,
+  currentCol: SortCol,
+  currentAsc: boolean,
+  params: SearchParams,
+): string {
+  const nextAsc = col === currentCol ? !currentAsc : false;
+  const sp = new URLSearchParams();
+  if (params.q) sp.set("q", params.q);
+  if (params.estado) sp.set("estado", params.estado);
+  if (params.tipo) sp.set("tipo", params.tipo);
+  if (params.from) sp.set("from", params.from);
+  if (params.to) sp.set("to", params.to);
+  if (params.per_page) sp.set("per_page", params.per_page);
+  sp.set("sort", col);
+  sp.set("dir", nextAsc ? "asc" : "desc");
+  return `/admin/registros?${sp.toString()}`;
+}
+
+// =============================================================
+// UI components
+// =============================================================
 
 function StatCard({
   label,
@@ -319,7 +431,9 @@ function StatCard({
         {icon}
         {label}
       </div>
-      <div className={`text-lg font-semibold tabular-nums ${tone ? toneClasses[tone] : "text-slate-100"}`}>
+      <div
+        className={`text-lg font-semibold tabular-nums ${tone ? toneClasses[tone] : "text-slate-100"}`}
+      >
         {value}
       </div>
     </div>
@@ -358,8 +472,7 @@ function Field({
 function parseDateBoundary(value: string, edge: "start" | "end"): string | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
   const suffix = edge === "start" ? "T00:00:00-06:00" : "T23:59:59-06:00";
-  const iso = new Date(`${value}${suffix}`).toISOString();
-  return iso;
+  return new Date(`${value}${suffix}`).toISOString();
 }
 
 function Select({

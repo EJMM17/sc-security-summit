@@ -1,10 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { Check, X, Eye } from "lucide-react";
-import { markRegistroCancelled, markRegistroPaid } from "@/app/actions/admin";
+import { Check, X, Eye, RotateCcw, Pencil, Square, CheckSquare } from "lucide-react";
+import {
+  markRegistroCancelled,
+  markRegistroPaid,
+  revertRegistroPendiente,
+} from "@/app/actions/admin";
 import type { RegistroRow as RegistroRowData } from "./page";
 import RegistroDetail from "./RegistroDetail";
+import EditRegistroModal from "./EditRegistroModal";
 
 const TIER_LABEL: Record<RegistroRowData["tipo_acceso"], string> = {
   estudiante: "Estudiante",
@@ -19,7 +24,11 @@ const ESTADO_TONE: Record<RegistroRowData["estado_pago"], string> = {
 };
 
 const formatMxn = (n: number): string =>
-  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", minimumFractionDigits: 0 }).format(n);
+  new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 0,
+  }).format(n);
 
 const formatDate = (iso: string | null): string => {
   if (!iso) return "—";
@@ -43,17 +52,45 @@ const formatDateShort = (iso: string | null): string => {
   });
 };
 
-export default function RegistroRow({ row }: { row: RegistroRowData }) {
+type ActionMode = "paid" | "cancelled" | "revert" | null;
+
+export default function RegistroRow({
+  row,
+  selected,
+  onToggleSelect,
+}: {
+  row: RegistroRowData;
+  selected: boolean;
+  onToggleSelect: () => void;
+}) {
   const [showDetail, setShowDetail] = useState(false);
-  const [showNote, setShowNote] = useState<"paid" | "cancelled" | null>(null);
-  const [note, setNote] = useState("");
+  const [showEdit, setShowEdit] = useState(false);
+  const [actionMode, setActionMode] = useState<ActionMode>(null);
+  const [paidNote, setPaidNote] = useState("");
+  const [cancelledNote, setCancelledNote] = useState("");
+  const [revertNote, setRevertNote] = useState("");
+
+  function cancelAction() {
+    setActionMode(null);
+    setPaidNote("");
+    setCancelledNote("");
+    setRevertNote("");
+  }
 
   const handleMarkPaid = (e: React.FormEvent<HTMLFormElement>) => {
-    if (
-      !confirm(
-        `¿Confirmar el pago del folio ${row.folio} por ${formatMxn(row.monto_mxn)}?`,
-      )
-    ) {
+    if (!confirm(`¿Confirmar el pago del folio ${row.folio} por ${formatMxn(row.monto_mxn)}?`)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleMarkCancelled = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm(`¿Cancelar el folio ${row.folio}? Esta acción se registrará en auditoría.`)) {
+      e.preventDefault();
+    }
+  };
+
+  const handleRevert = (e: React.FormEvent<HTMLFormElement>) => {
+    if (!confirm(`¿Revertir el folio ${row.folio} a "pendiente"? Se borrará la información de pago.`)) {
       e.preventDefault();
     }
   };
@@ -61,21 +98,38 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
   return (
     <>
       <tr className="border-t border-slate-800 hover:bg-slate-900/50">
+        {/* Checkbox */}
+        <td className="px-3 py-2">
+          <button
+            type="button"
+            onClick={onToggleSelect}
+            className="text-slate-500 hover:text-slate-300"
+          >
+            {selected ? (
+              <CheckSquare className="w-3.5 h-3.5 text-blue-400" />
+            ) : (
+              <Square className="w-3.5 h-3.5" />
+            )}
+          </button>
+        </td>
+
         <td className="px-3 py-2 font-mono text-[11px]">{row.folio}</td>
+
+        {/* Nombre */}
         <td className="px-3 py-2">
           {row.nombre} {row.apellido}
         </td>
-        <td className="px-3 py-2 text-slate-300">
-          <a className="hover:text-blue-300" href={`mailto:${row.email}`}>
-            {row.email}
-          </a>
-        </td>
+
+        {/* Empresa */}
         <td className="px-3 py-2 text-slate-300">
           <div>{row.empresa}</div>
           <div className="text-[10px] text-slate-500">{row.cargo}</div>
         </td>
-        <td className="px-3 py-2">{TIER_LABEL[row.tipo_acceso]}</td>
+
+        {/* Monto */}
         <td className="px-3 py-2 text-right tabular-nums">{formatMxn(row.monto_mxn)}</td>
+
+        {/* Estado */}
         <td className="px-3 py-2">
           <span
             className={`inline-block px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider border rounded ${ESTADO_TONE[row.estado_pago]}`}
@@ -83,13 +137,32 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
             {row.estado_pago}
           </span>
         </td>
+
+        {/* Pagado en */}
+        <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDateShort(row.pagado_en)}</td>
+
+        {/* Creado */}
+        <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
+
+        {/* Email */}
+        <td className="px-3 py-2 text-slate-300">
+          <a className="hover:text-blue-300" href={`mailto:${row.email}`}>
+            {row.email}
+          </a>
+        </td>
+
+        {/* Tier */}
+        <td className="px-3 py-2">{TIER_LABEL[row.tipo_acceso]}</td>
+
+        {/* CFDI */}
         <td className="px-3 py-2 text-slate-300">
           {row.requiere_cfdi ? <span title={row.rfc ?? ""}>Sí · {row.rfc ?? "—"}</span> : "—"}
         </td>
-        <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDate(row.created_at)}</td>
-        <td className="px-3 py-2 text-slate-400 text-[11px]">{formatDateShort(row.pagado_en)}</td>
+
+        {/* Actions */}
         <td className="px-3 py-2">
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-wrap">
+            {/* View detail */}
             <button
               type="button"
               onClick={() => setShowDetail(true)}
@@ -99,17 +172,29 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
               <Eye className="w-3.5 h-3.5" aria-label="Ver detalle" />
             </button>
 
+            {/* Edit */}
+            <button
+              type="button"
+              onClick={() => setShowEdit(true)}
+              title="Editar"
+              className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-800 hover:bg-slate-700 text-slate-300"
+            >
+              <Pencil className="w-3.5 h-3.5" aria-label="Editar" />
+            </button>
+
+            {/* Mark paid — only for pendiente */}
             {row.estado_pago === "pendiente" && (
               <>
-                {showNote === "paid" ? (
+                {actionMode === "paid" ? (
                   <form action={markRegistroPaid} onSubmit={handleMarkPaid} className="flex items-center gap-1">
                     <input type="hidden" name="folio" value={row.folio} />
-                    <input type="hidden" name="note" value={note} />
+                    <input type="hidden" name="note" value={paidNote} />
                     <input
                       type="text"
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
+                      value={paidNote}
+                      onChange={(e) => setPaidNote(e.target.value)}
                       placeholder="Nota (opcional)"
+                      maxLength={500}
                       className="w-24 px-2 py-1 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
                       autoFocus
                     />
@@ -120,56 +205,50 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => { setShowNote(null); setNote(""); }}
-                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
-                    >
+                    <button type="button" onClick={cancelAction} className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </form>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setShowNote("paid")}
+                    onClick={() => setActionMode("paid")}
                     title="Marcar pagado"
                     className="inline-flex items-center justify-center w-7 h-7 rounded bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-300"
                   >
                     <Check className="w-3.5 h-3.5" aria-label="Marcar pagado" />
                   </button>
                 )}
+              </>
+            )}
 
-                {showNote === "cancelled" ? (
-                  <form action={markRegistroCancelled} className="flex items-center gap-1">
+            {/* Cancel — for pendiente AND pagado */}
+            {(row.estado_pago === "pendiente" || row.estado_pago === "pagado") && (
+              <>
+                {actionMode === "cancelled" ? (
+                  <form action={markRegistroCancelled} onSubmit={handleMarkCancelled} className="flex items-center gap-1">
                     <input type="hidden" name="folio" value={row.folio} />
-                    <input type="hidden" name="note" value={note} />
+                    <input type="hidden" name="note" value={cancelledNote} />
                     <input
                       type="text"
-                      value={note}
-                      onChange={(e) => setNote(e.target.value)}
+                      value={cancelledNote}
+                      onChange={(e) => setCancelledNote(e.target.value)}
                       placeholder="Nota (opcional)"
+                      maxLength={500}
                       className="w-24 px-2 py-1 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
                       autoFocus
                     />
-                    <button
-                      type="submit"
-                      title="Confirmar cancelar"
-                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-red-600/20 hover:bg-red-600/40 text-red-300"
-                    >
+                    <button type="submit" title="Confirmar cancelar" className="inline-flex items-center justify-center w-7 h-7 rounded bg-red-600/20 hover:bg-red-600/40 text-red-300">
                       <Check className="w-3.5 h-3.5" />
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => { setShowNote(null); setNote(""); }}
-                      className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
-                    >
+                    <button type="button" onClick={cancelAction} className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300">
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </form>
                 ) : (
                   <button
                     type="button"
-                    onClick={() => setShowNote("cancelled")}
+                    onClick={() => setActionMode("cancelled")}
                     title="Cancelar"
                     className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300"
                   >
@@ -178,11 +257,52 @@ export default function RegistroRow({ row }: { row: RegistroRowData }) {
                 )}
               </>
             )}
+
+            {/* Revert paid → pendiente */}
+            {row.estado_pago === "pagado" && (
+              <>
+                {actionMode === "revert" ? (
+                  <form action={revertRegistroPendiente} onSubmit={handleRevert} className="flex items-center gap-1">
+                    <input type="hidden" name="folio" value={row.folio} />
+                    <input type="hidden" name="note" value={revertNote} />
+                    <input
+                      type="text"
+                      value={revertNote}
+                      onChange={(e) => setRevertNote(e.target.value)}
+                      placeholder="Motivo (opcional)"
+                      maxLength={500}
+                      className="w-24 px-2 py-1 text-[10px] bg-slate-900 border border-slate-700 rounded text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
+                      autoFocus
+                    />
+                    <button type="submit" title="Confirmar revertir" className="inline-flex items-center justify-center w-7 h-7 rounded bg-amber-600/20 hover:bg-amber-600/40 text-amber-300">
+                      <Check className="w-3.5 h-3.5" />
+                    </button>
+                    <button type="button" onClick={cancelAction} className="inline-flex items-center justify-center w-7 h-7 rounded bg-slate-700/40 hover:bg-slate-700 text-slate-300">
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </form>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setActionMode("revert")}
+                    title="Revertir a pendiente"
+                    className="inline-flex items-center justify-center w-7 h-7 rounded bg-amber-600/20 hover:bg-amber-600/40 text-amber-300"
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" aria-label="Revertir a pendiente" />
+                  </button>
+                )}
+              </>
+            )}
           </div>
         </td>
       </tr>
 
-      {showDetail && <RegistroDetail row={row} onClose={() => setShowDetail(false)} />}
+      {showDetail && (
+        <RegistroDetail row={row} onClose={() => setShowDetail(false)} />
+      )}
+      {showEdit && (
+        <EditRegistroModal row={row} onClose={() => setShowEdit(false)} />
+      )}
     </>
   );
 }
