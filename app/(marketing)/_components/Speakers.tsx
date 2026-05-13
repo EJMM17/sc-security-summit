@@ -25,39 +25,45 @@ export default function Speakers({ language }: { language: Language }) {
             </div>
           </ScrollReveal>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
             {speakers.map((speaker, index) => (
-              <ScrollReveal key={index} delay={index * 150} direction="scale">
-                <div className="speaker-card group">
+              <ScrollReveal key={index} delay={index * 120} direction="scale">
+                <article className="speaker-card group">
                   <div className="speaker-photo-wrap">
                     <Image
                       src={speaker.image}
                       alt={speaker.name}
                       fill
-                      sizes="(max-width:640px) 80vw, (max-width:1024px) 45vw, 22vw"
+                      sizes="(max-width:640px) 50vw, (max-width:1024px) 45vw, 25vw"
                       className="speaker-avatar object-cover object-top"
                     />
+
+                    {/* Bottom gradient for text readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/25 to-transparent z-[1] pointer-events-none" />
+
+                    {/* Topic badge — top-left, reveals on scroll */}
                     <span className="speaker-tag absolute top-3 left-3 z-10">
                       {speaker.topic}
                     </span>
-                    <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-slate-900/55 to-transparent pointer-events-none z-[1]" />
+
+                    {/* Decorative index number */}
                     <span className="speaker-number">
                       {String(index + 1).padStart(2, "0")}
                     </span>
-                  </div>
 
-                  <div className="speaker-info p-5 pb-4">
-                    <h3 className="font-oswald text-base font-bold text-slate-900 leading-tight">
-                      {speaker.name}
-                    </h3>
-                    <p className="text-[0.76rem] text-slate-500 mt-1.5 leading-snug flex items-center">
-                      <span className="speaker-role-dot" />
-                      {speaker.role}
-                    </p>
+                    {/* Name + role always visible at the bottom */}
+                    <div className="absolute bottom-0 inset-x-0 z-10 px-3 sm:px-4 pb-4 pt-10">
+                      <h3 className="font-oswald text-[0.9rem] sm:text-[1rem] font-bold text-white leading-tight tracking-wide">
+                        {speaker.name}
+                      </h3>
+                      <p className="mt-1 text-[0.62rem] sm:text-[0.68rem] text-blue-300 leading-snug font-semibold tracking-wider uppercase">
+                        {speaker.role}
+                      </p>
+                    </div>
                   </div>
 
                   <div className="speaker-accent-line" />
-                </div>
+                </article>
               </ScrollReveal>
             ))}
           </div>

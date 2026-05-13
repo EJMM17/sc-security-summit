@@ -473,6 +473,12 @@ export const PILARES = {
 export const SPEAKERS = {
   es: [
     {
+      name: "Fidel Guerrero",
+      role: "Subdirector del Comité Nacional de Comercio Exterior y Aduanas de INDEX Nacional",
+      topic: "Panorama Industrial",
+      image: "/images/speaker-fidel.webp",
+    },
+    {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       topic: "Aduanas & Compliance",
@@ -492,6 +498,12 @@ export const SPEAKERS = {
     },
   ],
   en: [
+    {
+      name: "Fidel Guerrero",
+      role: "Deputy Director, National Committee on Foreign Trade & Customs — INDEX Nacional",
+      topic: "Industrial Overview",
+      image: "/images/speaker-fidel.webp",
+    },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
