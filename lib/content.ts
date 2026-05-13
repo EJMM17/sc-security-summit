@@ -191,8 +191,8 @@ export const UI_TEXT = {
     locationTitle: "Centro de Convenciones de Reynosa",
     addressLabel: "Dirección",
     addressName: "Centro de Convenciones de Reynosa",
-    addressLine1: "Blvd. Morelos 190, Col. Longoria",
-    addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
+    addressLine1: "Libramiento Ote S/N, Azteca",
+    addressLine2: "Reynosa, Tamaulipas, C.P. 88680",
     viewOnMaps: "Ver en Google Maps",
     datesLabel: "Fechas",
     datesValue: "24 de septiembre, 2026",
@@ -346,8 +346,8 @@ export const UI_TEXT = {
     locationTitle: "Reynosa Convention Center",
     addressLabel: "Address",
     addressName: "Reynosa Convention Center",
-    addressLine1: "Blvd. Morelos 190, Col. Longoria",
-    addressLine2: "Reynosa, Tamaulipas, C.P. 88630",
+    addressLine1: "Libramiento Ote S/N, Azteca",
+    addressLine2: "Reynosa, Tamaulipas, C.P. 88680",
     viewOnMaps: "View on Google Maps",
     datesLabel: "Dates",
     datesValue: "September 24, 2026",
@@ -387,12 +387,12 @@ export const UI_TEXT = {
 export const HERO_STATS = {
   es: [
     { number: 10, suffix: "", label: "Horas de Capacitación" },
-    { number: 3, suffix: "+", label: "Conferencistas Confirmados" },
+    { number: 4, suffix: "", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
   ],
   en: [
     { number: 10, suffix: "", label: "Training Hours" },
-    { number: 3, suffix: "+", label: "Confirmed Speakers" },
+    { number: 4, suffix: "", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
   ],
 } as const;
@@ -606,7 +606,7 @@ export const PRICING = {
       label: "Acceso Estudiante",
       price: "$850",
       featured: false,
-      desc: "Perfil académico con credencial vigente / Cupo limitado",
+      desc: "Perfil de estudiante con credencial vigente / Cupo limitado",
       features: [
         "Acceso a conferencias especializadas",
         "Kit básico de bienvenida",
@@ -655,7 +655,7 @@ export const PRICING = {
       label: "Student Pass",
       price: "$850",
       featured: false,
-      desc: "Academic profile with valid ID / Limited spots",
+      desc: "Student profile with valid ID / Limited spots",
       features: [
         "Access to specialized conferences",
         "Basic welcome kit",
@@ -959,7 +959,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿El acceso estudiantil requiere credencial?",
     answer:
-      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
+      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura.",
   },
 ] as const;
 
@@ -992,7 +992,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Does the student pass require an ID?",
     answer:
-      "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate or graduate students.",
+      "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate students.",
   },
 ] as const;
 

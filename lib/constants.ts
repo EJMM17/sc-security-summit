@@ -120,7 +120,7 @@ export const ACCESO_OPTIONS = [
     label: "ESTUDIANTE",
     price: "$850",
     currency: "MXN",
-    note: "Perfil académico con credencial vigente / Cupo limitado",
+    note: "Perfil de estudiante con credencial vigente / Cupo limitado",
     perks: ["Acceso a conferencias especializadas", "Kit básico de bienvenida", "Gafete de acceso", "Constancia de participación con costo preferencial"],
   },
 ] as const;

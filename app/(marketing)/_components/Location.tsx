@@ -22,7 +22,7 @@ export default function Location({ language }: { language: Language }) {
           <div className="grid md:grid-cols-5 gap-8 items-start">
             <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
               <iframe
-                src="https://www.google.com/maps?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico&output=embed"
+                src="https://www.google.com/maps?q=Libramiento+Ote+S/N,+Azteca,+88680+Reynosa,+Tamaulipas,+Mexico&output=embed"
                 className="w-full h-[280px] sm:h-[350px]"
                 style={{ border: 0 }}
                 allowFullScreen
@@ -44,7 +44,7 @@ export default function Location({ language }: { language: Language }) {
                     <p className="text-sm text-slate-500 mt-0.5">{ui.addressLine1}</p>
                     <p className="text-sm text-slate-500">{ui.addressLine2}</p>
                     <a
-                      href="https://maps.google.com/?q=Blvd.+Morelos+190,+Col.+Longoria,+88630+Reynosa,+Tamaulipas,+Mexico"
+                      href="https://maps.google.com/?q=Libramiento+Ote+S/N,+Azteca,+88680+Reynosa,+Tamaulipas,+Mexico"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
