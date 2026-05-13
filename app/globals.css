@@ -614,17 +614,17 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
               border-color 320ms ease;
 }
 .speaker-card:hover {
-  box-shadow: 0 28px 60px -12px rgba(37, 99, 235, 0.28),
-              0 4px 18px rgba(15, 23, 42, 0.07),
+  box-shadow: 0 32px 72px -12px rgba(37, 99, 235, 0.32),
+              0 4px 20px rgba(15, 23, 42, 0.08),
               0 1px 0 rgba(255, 255, 255, 0.7) inset;
-  border-color: rgba(99, 153, 247, 0.55);
-  transform: translateY(-10px) scale(1.015);
+  border-color: rgba(99, 153, 247, 0.6);
+  transform: translateY(-12px) scale(1.02);
 }
 
 /* Photo wrap */
 .speaker-photo-wrap {
   position: relative;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;
   width: 100%;
   overflow: hidden;
 }

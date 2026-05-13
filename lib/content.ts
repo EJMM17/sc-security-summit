@@ -473,6 +473,12 @@ export const PILARES = {
 export const SPEAKERS = {
   es: [
     {
+      name: "Fidel Guerrero",
+      role: "Director General",
+      topic: "Panorama Industrial",
+      image: "/images/speaker-fidel.webp",
+    },
+    {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       topic: "Aduanas & Compliance",
@@ -492,6 +498,12 @@ export const SPEAKERS = {
     },
   ],
   en: [
+    {
+      name: "Fidel Guerrero",
+      role: "General Director",
+      topic: "Industrial Overview",
+      image: "/images/speaker-fidel.webp",
+    },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
