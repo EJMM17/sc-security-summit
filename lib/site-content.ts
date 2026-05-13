@@ -28,7 +28,7 @@ export const FAQ_SCHEMA_ITEMS = [
   {
     question: "¿El acceso estudiantil requiere credencial?",
     answer:
-      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura o posgrado.",
+      "Sí, es necesario presentar credencial vigente de la institución educativa al momento del check-in el día del evento. Este acceso es exclusivo para estudiantes activos de nivel licenciatura.",
   },
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
