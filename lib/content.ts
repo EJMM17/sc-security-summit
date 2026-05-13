@@ -474,7 +474,7 @@ export const SPEAKERS = {
   es: [
     {
       name: "Fidel Guerrero",
-      role: "Director General",
+      role: "Subdirector del Comité Nacional de Comercio Exterior y Aduanas de INDEX Nacional",
       topic: "Panorama Industrial",
       image: "/images/speaker-fidel.webp",
     },
@@ -500,7 +500,7 @@ export const SPEAKERS = {
   en: [
     {
       name: "Fidel Guerrero",
-      role: "General Director",
+      role: "Deputy Director, National Committee on Foreign Trade & Customs — INDEX Nacional",
       topic: "Industrial Overview",
       image: "/images/speaker-fidel.webp",
     },
