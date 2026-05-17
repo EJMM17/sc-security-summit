@@ -12,7 +12,7 @@ describe("content SSOT", () => {
   });
 
   it("preserves the live speaker copy from app/page.tsx", () => {
-    expect(CONTENT.es.speakers[0]).toMatchObject({
+    expect(CONTENT.es.speakers.find(s => s.name === "Isidoro Juárez")).toMatchObject({
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       topic: "Aduanas & Compliance",
