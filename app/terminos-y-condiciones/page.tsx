@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Shield, ArrowLeft } from "lucide-react";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 86400; // 24 hours — static content, revalidate daily
 
@@ -31,8 +32,10 @@ export default function TerminosCondiciones() {
         </div>
       </header>
 
+      <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Términos y Condiciones" }]} />
+
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "var(--font-oswald)" }}>
           Términos y Condiciones
         </h1>
@@ -46,7 +49,7 @@ export default function TerminosCondiciones() {
               El <strong>1er Summit de Seguridad en la Cadena de Suministros 2026</strong> (en adelante, "el Evento") es
               organizado por <strong>Lanz Logistics</strong>, con sede en Reynosa, Tamaulipas, México, en colaboración
               con Thynk Unlimited. El Evento se celebrará los días 24 y 25 de septiembre de 2026 en el
-              Centro de Convenciones de Reynosa, Blvd. Morelos 190, Col. Longoria, Reynosa, Tamaulipas.
+              Centro de Convenciones de Reynosa, Libramiento Ote S/N, Azteca, Reynosa, Tamaulipas.
             </p>
           </section>
 

@@ -23,12 +23,12 @@ export async function middleware(request: NextRequest) {
   // style-src retains 'unsafe-inline' because Tailwind + inline style props require it.
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com`,
+    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://connect.facebook.net https://snap.licdn.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
-    "img-src 'self' data: blob:",
+    "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://www.facebook.com https://px.ads.linkedin.com",
     "frame-src https://www.google.com https://maps.google.com https://challenges.cloudflare.com",
-    "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com",
+    "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com https://www.google-analytics.com https://analytics.google.com https://www.facebook.com https://px.ads.linkedin.com",
     "form-action 'self'",
     "base-uri 'self'",
     "frame-ancestors 'self'",

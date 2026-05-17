@@ -24,7 +24,7 @@ export default function Gallery({ language }: { language: Language }) {
           <div className="gallery-bento">
             <div className="gallery-photo gallery-p1">
               <Image
-                src="/images/gallery-hall.jpg"
+                src="/images/gallery-hall.webp"
                 alt={ui.galleryTag1}
                 fill
                 className="object-cover"
@@ -43,7 +43,7 @@ export default function Gallery({ language }: { language: Language }) {
 
             <div className="gallery-photo gallery-p2">
               <Image
-                src="/images/gallery-registro.jpg"
+                src="/images/gallery-registro.webp"
                 alt={ui.galleryTag2}
                 fill
                 className="object-cover object-top"
@@ -60,7 +60,7 @@ export default function Gallery({ language }: { language: Language }) {
 
             <div className="gallery-photo gallery-p3">
               <Image
-                src="/images/gallery-keynote.jpg"
+                src="/images/gallery-keynote.webp"
                 alt={ui.galleryTag3}
                 fill
                 className="object-cover"
@@ -76,7 +76,7 @@ export default function Gallery({ language }: { language: Language }) {
 
             <div className="gallery-photo gallery-p4">
               <Image
-                src="/images/gallery-hub.jpg"
+                src="/images/gallery-hub.webp"
                 alt={ui.galleryTag4}
                 fill
                 className="object-cover"

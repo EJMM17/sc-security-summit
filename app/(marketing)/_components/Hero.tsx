@@ -11,15 +11,19 @@ export default function Hero({ language }: { language: Language }) {
 
   return (
     <section className="relative w-full min-h-[92vh] sm:min-h-[94vh] flex items-center justify-center overflow-hidden">
-      <Image
-        src="/images/hero-bg.webp"
-        alt={ui.heroAlt}
-        fill
-        className="object-cover object-center"
-        sizes="100vw"
-        priority
-        quality={82}
-      />
+      <picture>
+        <source srcSet="/images/hero-bg-800.webp" media="(max-width: 768px)" />
+        <source srcSet="/images/hero-bg-1200.webp" media="(max-width: 1200px)" />
+        <Image
+          src="/images/hero-bg.webp"
+          alt={ui.heroAlt}
+          fill
+          className="object-cover object-center"
+          sizes="100vw"
+          priority
+          quality={82}
+        />
+      </picture>
       <div className="hero-image-overlay" />
 
       <div className="absolute inset-0 z-[2] pointer-events-none overflow-hidden">

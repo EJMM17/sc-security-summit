@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { ArrowRight, Calendar, MapPin, MessageCircle } from "lucide-react";
 
 import CopyButton from "@/components/CopyButton";
+import ConversionTracker from "@/components/ConversionTracker";
 
 export const metadata: Metadata = {
   title: "Registro confirmado · SC Security Summit 2026",
@@ -279,6 +280,9 @@ export default async function RegistroExitosoPage({
           </div>
         </div>
       </section>
+      {folio && tipo && monto ? (
+        <ConversionTracker tipo={tipo} monto={Number(monto)} folio={folio} />
+      ) : null}
     </main>
   );
 }

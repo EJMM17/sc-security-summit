@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Shield, ArrowLeft } from "lucide-react";
+import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 86400; // 24 hours — static content, revalidate daily
 
@@ -31,8 +32,10 @@ export default function AvisoPrivacidad() {
         </div>
       </header>
 
+      <Breadcrumbs items={[{ label: "Inicio", href: "/" }, { label: "Aviso de Privacidad" }]} />
+
       {/* Content */}
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-16">
+      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-8">
         <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "var(--font-oswald)" }}>
           Aviso de Privacidad
         </h1>
