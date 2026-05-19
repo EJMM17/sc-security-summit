@@ -169,10 +169,10 @@ export default function Pricing({ language }: { language: Language }) {
                 <p className="text-xs text-slate-400 mt-4">
                   {ui.paymentQuestionsPrefix}{" "}
                   <a
-                    href="mailto:hola@scsecuritysummit.com.mx"
+                    href="mailto:hola@scsecuritysummit.com"
                     className="text-blue-600 hover:underline font-medium"
                   >
-                    hola@scsecuritysummit.com.mx
+                    hola@scsecuritysummit.com
                   </a>{" "}
                   {ui.paymentOr}{" "}
                   <a

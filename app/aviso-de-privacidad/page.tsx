@@ -54,7 +54,7 @@ export default function AvisoPrivacidad() {
               Para cualquier consulta relacionada con el presente Aviso de Privacidad, puede contactarnos en:
             </p>
             <ul className="list-none mt-2 space-y-1 pl-0">
-              <li><span className="font-semibold">Correo electrónico:</span> hola@scsecuritysummit.com.mx</li>
+              <li><span className="font-semibold">Correo electrónico:</span> hola@scsecuritysummit.com</li>
               <li><span className="font-semibold">Teléfono:</span> +1 (956) 515-8070</li>
             </ul>
           </section>
@@ -92,7 +92,7 @@ export default function AvisoPrivacidad() {
             </ul>
             <p className="mt-3">
               Si no desea que sus datos sean tratados para las finalidades secundarias, puede manifestarlo enviando un correo a{" "}
-              <a href="mailto:hola@scsecuritysummit.com.mx" className="text-blue-600 hover:underline">hola@scsecuritysummit.com.mx</a>{" "}
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>{" "}
               con el asunto "Oposición finalidades secundarias".
             </p>
           </section>
@@ -116,7 +116,7 @@ export default function AvisoPrivacidad() {
               De conformidad con la LFPDPPP, el titular de los datos personales tiene derecho a <strong>Acceder</strong>,{" "}
               <strong>Rectificar</strong>, <strong>Cancelar</strong> u <strong>Oponerse</strong> (derechos ARCO) al
               tratamiento de sus datos personales. Para ejercer estos derechos, deberá enviar una solicitud al correo{" "}
-              <a href="mailto:hola@scsecuritysummit.com.mx" className="text-blue-600 hover:underline">hola@scsecuritysummit.com.mx</a>{" "}
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>{" "}
               con los siguientes datos:
             </p>
             <ul className="list-disc pl-6 mt-2 space-y-1">

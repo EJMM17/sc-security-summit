@@ -86,8 +86,8 @@ export default function TerminosCondiciones() {
             <h2 className="text-lg font-bold text-slate-900 mb-3">4. Política de Cancelación y Reembolso</h2>
             <p>
               Las cancelaciones deberán notificarse por escrito a{" "}
-              <a href="mailto:hola@scsecuritysummit.com.mx" className="text-blue-600 hover:underline">
-                hola@scsecuritysummit.com.mx
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
+                hola@scsecuritysummit.com
               </a>{" "}
               con al menos <strong>15 días naturales de anticipación</strong> a la fecha del Evento para ser
               elegibles a un reembolso del 80% del monto pagado. Cancelaciones con menos de 15 días de
@@ -171,8 +171,8 @@ export default function TerminosCondiciones() {
             <h2 className="text-lg font-bold text-slate-900 mb-3">12. Contacto</h2>
             <p>
               Para cualquier consulta relacionada con estos Términos, puede contactarnos en:{" "}
-              <a href="mailto:hola@scsecuritysummit.com.mx" className="text-blue-600 hover:underline">
-                hola@scsecuritysummit.com.mx
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
+                hola@scsecuritysummit.com
               </a>{" "}
               o al <a href="tel:+19565158070" className="text-blue-600 hover:underline">+1 (956) 515-8070</a>.
             </p>

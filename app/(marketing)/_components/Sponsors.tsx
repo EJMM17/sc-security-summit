@@ -87,7 +87,7 @@ export default function Sponsors({ language }: { language: Language }) {
                         </div>
 
                         <a
-                          href={`mailto:hola@scsecuritysummit.com.mx?subject=${encodeURIComponent(
+                          href={`mailto:hola@scsecuritysummit.com?subject=${encodeURIComponent(
                             `Patrocinio ${sponsor.tier} – Summit 2026`,
                           )}`}
                           className={`sponsor-cta inline-flex items-center justify-center gap-2 w-full py-3 rounded-xl text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 ${ctaClass}`}

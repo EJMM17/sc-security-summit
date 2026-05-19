@@ -196,7 +196,7 @@ export const UI_TEXT = {
     viewOnMaps: "Ver en Google Maps",
     datesLabel: "Fechas",
     datesValue: "24 de septiembre, 2026",
-    datesHours: "8:00 AM — 5:30 PM",
+    datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contacto",
     faqLabel: "PREGUNTAS FRECUENTES",
     faqTitle: "¿Tienes Dudas?",
@@ -211,7 +211,6 @@ export const UI_TEXT = {
     contactOrg: "CONTACTAR ORGANIZADOR",
     footerDesc:
       "1er Summit de Seguridad en la Cadena de Suministros. 24 de septiembre, 2026. Centro de Convenciones de Reynosa, Tamaulipas, México.",
-    footerPresentedBy: "Presentado por",
     footerEvent: "Evento",
     footerContact: "Contacto",
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
@@ -351,7 +350,7 @@ export const UI_TEXT = {
     viewOnMaps: "View on Google Maps",
     datesLabel: "Dates",
     datesValue: "September 24, 2026",
-    datesHours: "8:00 AM — 5:30 PM",
+    datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contact",
     faqLabel: "FREQUENTLY ASKED QUESTIONS",
     faqTitle: "Have Questions?",
@@ -366,7 +365,6 @@ export const UI_TEXT = {
     contactOrg: "CONTACT ORGANIZER",
     footerDesc:
       "1st Supply Chain Security Summit. September 24, 2026. Reynosa Convention Center, Tamaulipas, Mexico.",
-    footerPresentedBy: "Presented by",
     footerEvent: "Event",
     footerContact: "Contact",
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
@@ -934,7 +932,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Dónde y cuándo se llevará a cabo el Summit?",
     answer:
-      "El Summit se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 5:30 PM.",
+      "El Summit se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 7:00 PM.",
   },
   {
     question: "¿A quién está dirigido este evento?",
@@ -944,7 +942,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
     answer:
-      "Contáctanos directamente a hola@scsecuritysummit.com.mx o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Participante de Soluciones de Seguridad) y los beneficios detallados de cada uno.",
+      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Participante de Soluciones de Seguridad) y los beneficios detallados de cada uno.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -967,7 +965,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Where and when will the Summit take place?",
     answer:
-      "The Summit will be held on September 24, 2026, at the Reynosa Convention Center in Reynosa, Tamaulipas, Mexico. Activities begin at 8:00 AM and run through 5:30 PM.",
+      "The Summit will be held on September 24, 2026, at the Reynosa Convention Center in Reynosa, Tamaulipas, Mexico. Activities begin at 8:00 AM and run through 7:00 PM.",
   },
   {
     question: "Who is this event designed for?",
@@ -977,7 +975,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How can I become a sponsor?",
     answer:
-      "Contact us at hola@scsecuritysummit.com.mx or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Participating Security Solutions Provider) and the benefits for each tier.",
+      "Contact us at hola@scsecuritysummit.com or +1 (956) 515-8070. We will send the sponsorship kit with participation levels (Platinum, Gold, Silver, and Participating Security Solutions Provider) and the benefits for each tier.",
   },
   {
     question: "What is included with each access type?",
