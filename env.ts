@@ -23,6 +23,10 @@ const schema = z.object({
   ADMIN_SESSION_SECRET: z.string().min(32).optional(),
   BCRYPT_ROUNDS: z.coerce.number().min(4).max(20).default(12),
 
+  // Upstash Redis — required in production for distributed rate limiting
+  UPSTASH_REDIS_REST_URL: z.string().url().optional(),
+  UPSTASH_REDIS_REST_TOKEN: nonEmpty.optional(),
+
   // Sentry — optional
   SENTRY_DSN: z.string().url().optional().or(z.literal("")),
 });

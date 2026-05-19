@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"e:\\\\GitHubProyectos\\\\sc-security-summit\" -Recurse -Include \"middleware.ts\", \"next.config.ts\", \"package.json\")",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(identify public/images/*.webp)",
+      "Bash(powershell.exe -Command \"ls -Force 'e:\\\\GitHubProyectos\\\\sc-security-summit\\\\public\\\\images\\\\og*' | Select-Object Name, Length | Format-Table -AutoSize\")",
+      "Bash(npm install *)",
+      "Bash(node -e \"const s = require\\('sharp'\\); console.log\\('sharp available:', s.versions.sharp\\)\")",
+      "Bash(node -e ' *)",
+      "Bash(npm run *)",
+      "Bash(npm test *)",
+      "Bash(SKIP_ENV_VALIDATION=1 npm run build)",
+      "Bash(Test-Path \"e:\\\\GitHubProyectos\\\\sc-security-summit\\\\.env.local\")"
+    ]
+  }
+}

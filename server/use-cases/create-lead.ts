@@ -134,6 +134,18 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
         };
       }
 
+      // DB-level capacity trigger (migration 007)
+      if (error.hint === "CAPACITY_EXCEEDED" || error.message?.includes("capacity_exceeded")) {
+        return {
+          ok: false,
+          status: 409,
+          message:
+            data.language === "en"
+              ? "We're sorry — all seats for the event are sold out."
+              : "Lo sentimos, los cupos para este evento se han agotado.",
+        };
+      }
+
       throw new Error(`supabase_insert_failed:${error.code}:${error.message}`);
     }
 

@@ -33,6 +33,7 @@ export async function middleware(request: NextRequest) {
     "base-uri 'self'",
     "frame-ancestors 'self'",
     "object-src 'none'",
+    "upgrade-insecure-requests",
   ].join("; ");
 
   const response = NextResponse.next();

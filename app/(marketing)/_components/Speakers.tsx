@@ -36,6 +36,8 @@ export default function Speakers({ language }: { language: Language }) {
                       fill
                       sizes="(max-width:640px) 50vw, (max-width:1024px) 45vw, 25vw"
                       className="speaker-avatar object-cover object-top"
+                      placeholder="blur"
+                      blurDataURL="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0IiBoZWlnaHQ9IjQiPjxyZWN0IHdpZHRoPSI0IiBoZWlnaHQ9IjQiIGZpbGw9IiMxZTI5M2IiLz48L3N2Zz4="
                     />
 
                     {/* Bottom gradient for text readability */}

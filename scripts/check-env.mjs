@@ -46,13 +46,43 @@ const REQUIRED = [
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
 
-const missing = REQUIRED.filter((name) => !process.env[name] || process.env[name].trim().length === 0);
+// Additional vars required in production (Vercel sets NODE_ENV=production or VERCEL=1)
+const isProd = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
+const PROD_REQUIRED = [
+  "ADMIN_SESSION_SECRET",
+  "TURNSTILE_SECRET_KEY",
+  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
+  "UPSTASH_REDIS_REST_URL",
+  "UPSTASH_REDIS_REST_TOKEN",
+  "RESEND_API_KEY",
+  "CONTACT_EMAIL",
+];
+
+const allRequired = isProd ? [...REQUIRED, ...PROD_REQUIRED] : REQUIRED;
+const missing = allRequired.filter(
+  (name) => !process.env[name] || process.env[name].trim().length === 0,
+);
+
+// Validate ADMIN_SESSION_SECRET length
+if (
+  isProd &&
+  process.env.ADMIN_SESSION_SECRET &&
+  process.env.ADMIN_SESSION_SECRET.length < 32
+) {
+  console.error("✖ [check-env] ADMIN_SESSION_SECRET must be at least 32 characters");
+  process.exit(1);
+}
 
 if (missing.length > 0) {
   console.error("\n✖ [check-env] Build aborted. Missing required env vars:");
   for (const name of missing) console.error(`  • ${name}`);
+  if (!isProd) {
+    console.error(
+      "\nNote: Production-only vars are only validated when NODE_ENV=production or VERCEL=1",
+    );
+  }
   console.error("\nBypass for emergency builds: SKIP_ENV_VALIDATION=1 npm run build\n");
   process.exit(1);
 }
 
-console.log("✓ [check-env] All required environment variables present");
+console.log(`✓ [check-env] All required${isProd ? " (production)" : ""} environment variables present`);

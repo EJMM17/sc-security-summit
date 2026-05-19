@@ -11,8 +11,6 @@ const nextConfig: NextConfig = {
         "scsecuritysummit.com",
         "www.scsecuritysummit.com",
         "sc-security-summit.vercel.app",
-        "sc-security-summit-git-main-wemmanuel2-8516s-projects.vercel.app",
-        "sc-security-summit-wemmanuel2-8516s-projects.vercel.app",
       ],
     },
   },

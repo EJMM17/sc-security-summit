@@ -12,6 +12,7 @@ import {
   setSessionCookie,
   verifyAdminCredentials,
 } from "@/lib/admin-auth";
+import { checkRateLimit, RateLimitError } from "@/lib/rate-limit";
 import { createAdminClient } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import {
@@ -39,7 +40,20 @@ const NEUTRAL_LOGIN_MESSAGE = "Credenciales incorrectas";
 export async function loginAdmin(_prev: LoginState, formData: FormData): Promise<LoginState> {
   const h = await headers();
   const ip =
-    h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
+    h.get("cf-connecting-ip") ??
+    h.get("x-forwarded-for")?.split(",")[0].trim() ??
+    h.get("x-real-ip") ??
+    "unknown";
+
+  try {
+    await checkRateLimit(`admin:login:${ip}`);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      auditLog("admin_login_rate_limited", { ip });
+      return { ok: false, message: "Demasiados intentos. Intenta en unos minutos." };
+    }
+    throw err;
+  }
 
   const parsed = LoginSchema.safeParse({
     email: formData.get("email"),
@@ -443,7 +457,10 @@ export async function bulkMarkCancelled(
 // =============================================================
 
 const AdminEmailSchema = z.string().email().max(255);
-const AdminPasswordSchema = z.string().min(6).max(255);
+const AdminPasswordSchema = z
+  .string()
+  .min(12, "La contraseña debe tener al menos 12 caracteres")
+  .max(255);
 const AdminNameSchema = z.string().trim().min(1).max(255);
 
 export type AdminCrudState = { ok: boolean; message: string };

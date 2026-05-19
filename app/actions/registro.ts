@@ -58,15 +58,20 @@ type ProcessResult =
   | { ok: false; state: RegistroState; language: Language };
 
 async function processRegistro(formData: FormData): Promise<ProcessResult> {
-  const [{ verifyTurnstile }, { RegistroSchema }, { createLead }] = await Promise.all([
-    import("@/lib/turnstile"),
-    import("@/lib/schemas"),
-    import("@/server/use-cases/create-lead"),
-  ]);
+  const [{ verifyTurnstile }, { RegistroSchema }, { createLead }, { checkRateLimit, RateLimitError }] =
+    await Promise.all([
+      import("@/lib/turnstile"),
+      import("@/lib/schemas"),
+      import("@/server/use-cases/create-lead"),
+      import("@/lib/rate-limit"),
+    ]);
 
   const h = await headers();
   const ip =
-    h.get("x-forwarded-for")?.split(",")[0].trim() ?? h.get("x-real-ip") ?? "unknown";
+    h.get("cf-connecting-ip") ??
+    h.get("x-forwarded-for")?.split(",")[0].trim() ??
+    h.get("x-real-ip") ??
+    "unknown";
   const userAgent = h.get("user-agent") ?? "unknown";
   const referer = h.get("referer") ?? null;
   const acceptLanguage = h.get("accept-language");
@@ -86,7 +91,30 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     };
   }
 
-  // 2. Turnstile — verifyTurnstile fails open when the secret is not configured.
+  // 2. Rate limiting — sliding window 5 req / 15 min per IP.
+  try {
+    await checkRateLimit(`registro:${ip}`);
+  } catch (err) {
+    if (err instanceof RateLimitError) {
+      auditLog("rate_limited", { ip, retryAfter: err.retryAfter });
+      return {
+        ok: false,
+        language,
+        state: {
+          success: false,
+          message:
+            language === "en"
+              ? `Too many requests. Please try again in ${err.retryAfter} seconds.`
+              : `Demasiadas solicitudes. Intenta de nuevo en ${err.retryAfter} segundos.`,
+          errors: {},
+          values,
+        },
+      };
+    }
+    throw err;
+  }
+
+  // 3. Turnstile — verifyTurnstile fails open when the secret is not configured.
   const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
   const turnstileOk = await verifyTurnstile(turnstileToken, ip);
   if (!turnstileOk) {

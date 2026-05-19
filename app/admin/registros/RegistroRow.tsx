@@ -104,6 +104,7 @@ export default function RegistroRow({
             type="button"
             onClick={onToggleSelect}
             className="text-slate-500 hover:text-slate-300"
+            aria-label={`${selected ? "Deseleccionar" : "Seleccionar"} registro de ${row.nombre} ${row.apellido}`}
           >
             {selected ? (
               <CheckSquare className="w-3.5 h-3.5 text-blue-400" />

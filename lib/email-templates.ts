@@ -103,3 +103,34 @@ export function confirmationEmailSubject(language: "es" | "en", folio: string): 
     ? `Registration Confirmed — ${folio} · SC Security Summit 2026`
     : `Registro Confirmado — ${folio} · SC Security Summit 2026`;
 }
+
+export function folioRecoveryEmailHtml(params: {
+  nombre: string;
+  folio: string;
+  tipo_acceso: string;
+}): string {
+  const { nombre, folio, tipo_acceso } = params;
+  const tier = TIER_LABEL[tipo_acceso] ?? tipo_acceso;
+  const body = `
+    <p style="margin:0 0 16px;color:#1e293b;font-size:16px;font-weight:600;">Recuperación de folio de registro</p>
+    <p style="margin:0 0 24px;color:#475569;font-size:14px;line-height:1.6;">Hola <strong>${nombre}</strong>, aquí está tu folio de confirmación para el SC Security Summit 2026:</p>
+    <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;padding:20px;text-align:center;margin:0 0 24px;">
+      <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Folio de Confirmación</p>
+      <p style="margin:0;color:#0f172a;font-size:22px;font-weight:700;font-family:monospace;letter-spacing:1px;">${folio}</p>
+    </div>
+    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:#f8fafc;border-radius:6px;overflow:hidden;">
+      <tr style="background:#e2e8f0;">
+        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Detalle</td>
+        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Valor</td>
+      </tr>
+      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Evento</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
+      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24–25 de Septiembre, 2026</td></tr>
+      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Tipo de Acceso</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
+    </table>
+    <p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">Si no solicitaste esta recuperación, puedes ignorar este correo.</p>`;
+  return base("Tu Folio de Registro — SC Security Summit 2026", body);
+}
+
+export function folioRecoveryEmailSubject(): string {
+  return "Tu folio de registro — SC Security Summit 2026";
+}

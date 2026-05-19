@@ -13,10 +13,12 @@ function warnDisabledOnce() {
 
 export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   if (!features.turnstile) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "[turnstile] TURNSTILE_SECRET_KEY requerido en producción — configurar en variables de entorno",
+      );
+    }
     warnDisabledOnce();
-    // Fail-open: con honeypot + rate-limit todavía activos, dejamos pasar
-    // en vez de bloquear el formulario por completo. Cuando se configure
-    // la clave esto vuelve a ser fail-closed automáticamente.
     return true;
   }
 

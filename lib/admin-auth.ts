@@ -45,14 +45,14 @@ export async function setSessionCookie(admin: AdminSession): Promise<void> {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",
-    path: "/",
+    path: "/admin",
     maxAge: SESSION_TTL_S,
   });
 }
 
 export async function clearSessionCookie(): Promise<void> {
   const jar = await cookies();
-  jar.delete(ADMIN_COOKIE_NAME);
+  jar.delete({ name: ADMIN_COOKIE_NAME, path: "/admin" });
 }
 
 export async function hashPassword(password: string): Promise<string> {

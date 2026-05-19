@@ -13,7 +13,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
     <section className="bg-gradient-to-br from-blue-900 via-blue-900 to-blue-950 py-20 sm:py-28 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/gallery-hub.jpg"
+          src="/images/gallery-hub.webp"
           alt=""
           fill
           className="object-cover opacity-[0.18]"

@@ -169,11 +169,12 @@ export default function RegistrosTableClient({
           <thead className="bg-slate-900 text-slate-400">
             <tr>
               {/* Select-all checkbox */}
-              <th className="px-3 py-2 w-8">
+              <th scope="col" className="px-3 py-2 w-8">
                 <button
                   type="button"
                   onClick={toggleAll}
                   className="text-slate-400 hover:text-slate-200"
+                  aria-label={allSelected ? "Deseleccionar todos los registros" : "Seleccionar todos los registros"}
                   title={allSelected ? "Deseleccionar todos" : "Seleccionar todos"}
                 >
                   {allSelected ? (
@@ -183,10 +184,11 @@ export default function RegistrosTableClient({
                   )}
                 </button>
               </th>
-              <th className="text-left px-3 py-2 font-medium">Folio</th>
+              <th scope="col" className="text-left px-3 py-2 font-medium">Folio</th>
               {COLS.map((col) => (
                 <th
                   key={col.key}
+                  scope="col"
                   className={`px-3 py-2 font-medium ${col.align === "right" ? "text-right" : "text-left"}`}
                 >
                   <a
@@ -206,10 +208,10 @@ export default function RegistrosTableClient({
                   </a>
                 </th>
               ))}
-              <th className="text-left px-3 py-2 font-medium">Email</th>
-              <th className="text-left px-3 py-2 font-medium">Tier</th>
-              <th className="text-left px-3 py-2 font-medium">CFDI</th>
-              <th className="text-left px-3 py-2 font-medium">Acciones</th>
+              <th scope="col" className="text-left px-3 py-2 font-medium">Email</th>
+              <th scope="col" className="text-left px-3 py-2 font-medium">Tier</th>
+              <th scope="col" className="text-left px-3 py-2 font-medium">CFDI</th>
+              <th scope="col" className="text-left px-3 py-2 font-medium">Acciones</th>
             </tr>
           </thead>
           <tbody>

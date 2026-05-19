@@ -16,7 +16,7 @@ if (dsn) {
     // Privacy: we do not record sessions. Only send replays for sessions
     // that crash, and even then with a hard mask on inputs.
     replaysSessionSampleRate: 0,
-    replaysOnErrorSampleRate: 1.0,
+    replaysOnErrorSampleRate: 0.1,
     integrations: [
       Sentry.replayIntegration({
         maskAllText: true,

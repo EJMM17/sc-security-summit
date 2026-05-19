@@ -64,6 +64,9 @@ const COPY = {
       `Me registré al SC Security Summit 2026 — 24 de septiembre en Reynosa. Mi folio: ${folio}`,
     eventLabel: "SC Security Summit 2026",
     calendarDetails: (folio: string) => `Folio: ${folio}`,
+    emailNotice: "Revisa tu correo electrónico — te enviamos los datos de tu registro y las instrucciones de pago.",
+    recoveryText: "¿No encuentras el correo?",
+    recoveryLink: "Recupera tu folio aquí",
   },
   en: {
     eyebrow: "REGISTRATION COMPLETE",
@@ -102,6 +105,9 @@ const COPY = {
       `I just registered for the SC Security Summit 2026 — September 24 in Reynosa. My code: ${folio}`,
     eventLabel: "SC Security Summit 2026",
     calendarDetails: (folio: string) => `Confirmation: ${folio}`,
+    emailNotice: "Check your inbox — we sent your registration details and payment instructions.",
+    recoveryText: "Can't find the email?",
+    recoveryLink: "Recover your code here",
   },
 } satisfies Record<Language, unknown>;
 
@@ -187,6 +193,23 @@ export default async function RegistroExitosoPage({
                 </span>
               )}
             </div>
+          </div>
+
+          {/* ── Email notice ────────────────────────────────────────────── */}
+          <div className="mt-4 flex items-start gap-3 rounded-lg border border-blue-100 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+            <svg className="w-4 h-4 mt-0.5 flex-shrink-0 text-blue-500" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+            </svg>
+            <p>
+              {t.emailNotice}{" "}
+              <span className="text-blue-700">
+                {t.recoveryText}{" "}
+                <Link href="/recuperar-folio" className="font-medium underline hover:text-blue-900">
+                  {t.recoveryLink}
+                </Link>
+              </span>
+            </p>
           </div>
 
           {/* ── Next steps card (mirrors landing's payment-steps pattern) */}

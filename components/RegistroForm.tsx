@@ -59,6 +59,10 @@ const formText = {
       n === 1
         ? "Corrige el campo marcado debajo para continuar."
         : `Corrige los ${n} campos marcados debajo para continuar.`,
+    legendPersonal: "Datos personales",
+    legendAccess: "Tipo de acceso",
+    legendBilling: "Datos de facturación (CFDI)",
+    legendTerms: "Términos y condiciones",
   },
   en: {
     successTitle: "Registration Successful!",
@@ -104,6 +108,10 @@ const formText = {
       n === 1
         ? "Fix the highlighted field below to continue."
         : `Fix the ${n} highlighted fields below to continue.`,
+    legendPersonal: "Personal information",
+    legendAccess: "Access type",
+    legendBilling: "Billing information (CFDI)",
+    legendTerms: "Terms and conditions",
   },
 } as const;
 
@@ -290,65 +298,68 @@ export default function RegistroForm({
         />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <TextField
-          id="reg-nombre"
-          name="nombre"
-          label={text.firstName}
-          required
-          autoComplete="given-name"
-          placeholder={text.firstNamePlaceholder}
-          errors={errors?.nombre}
-          defaultValue={getValue(values, "nombre")}
-        />
-        <TextField
-          id="reg-apellido"
-          name="apellido"
-          label={text.lastName}
-          required
-          autoComplete="family-name"
-          placeholder={text.lastNamePlaceholder}
-          errors={errors?.apellido}
-          defaultValue={getValue(values, "apellido")}
-        />
-      </div>
+      {/* Personal information */}
+      <fieldset className="border-0 p-0 m-0 space-y-5">
+        <legend className="sr-only">{text.legendPersonal}</legend>
 
-      <TextField
-        id="reg-email"
-        name="email"
-        label={text.email}
-        type="email"
-        required
-        autoComplete="email"
-        placeholder={text.emailPlaceholder}
-        errors={errors?.email}
-        defaultValue={getValue(values, "email")}
-      />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <TextField
+            id="reg-nombre"
+            name="nombre"
+            label={text.firstName}
+            required
+            autoComplete="given-name"
+            placeholder={text.firstNamePlaceholder}
+            errors={errors?.nombre}
+            defaultValue={getValue(values, "nombre")}
+          />
+          <TextField
+            id="reg-apellido"
+            name="apellido"
+            label={text.lastName}
+            required
+            autoComplete="family-name"
+            placeholder={text.lastNamePlaceholder}
+            errors={errors?.apellido}
+            defaultValue={getValue(values, "apellido")}
+          />
+        </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <TextField
-          id="reg-empresa"
-          name="empresa"
-          label={text.company}
+          id="reg-email"
+          name="email"
+          label={text.email}
+          type="email"
           required
-          autoComplete="organization"
-          placeholder={text.companyPlaceholder}
-          errors={errors?.empresa}
-          defaultValue={getValue(values, "empresa")}
+          autoComplete="email"
+          placeholder={text.emailPlaceholder}
+          errors={errors?.email}
+          defaultValue={getValue(values, "email")}
         />
-        <TextField
-          id="reg-cargo"
-          name="cargo"
-          label={text.role}
-          required
-          autoComplete="organization-title"
-          placeholder={text.rolePlaceholder}
-          errors={errors?.cargo}
-          defaultValue={getValue(values, "cargo")}
-        />
-      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <TextField
+            id="reg-empresa"
+            name="empresa"
+            label={text.company}
+            required
+            autoComplete="organization"
+            placeholder={text.companyPlaceholder}
+            errors={errors?.empresa}
+            defaultValue={getValue(values, "empresa")}
+          />
+          <TextField
+            id="reg-cargo"
+            name="cargo"
+            label={text.role}
+            required
+            autoComplete="organization-title"
+            placeholder={text.rolePlaceholder}
+            errors={errors?.cargo}
+            defaultValue={getValue(values, "cargo")}
+          />
+        </div>
+
         <TextField
           id="reg-telefono"
           name="telefono"
@@ -359,6 +370,12 @@ export default function RegistroForm({
           errors={errors?.telefono}
           defaultValue={getValue(values, "telefono")}
         />
+      </fieldset>
+
+      {/* Access type */}
+      <fieldset className="border-0 p-0 m-0 space-y-5">
+        <legend className="sr-only">{text.legendAccess}</legend>
+
         <div>
           <label htmlFor="reg-tipo" className={labelClass}>
             {text.accessType}
@@ -381,132 +398,142 @@ export default function RegistroForm({
             </p>
           )}
         </div>
-      </div>
 
-      <div>
-        <label className="flex items-start gap-3 cursor-pointer p-4 bg-blue-50 border border-blue-100 rounded-lg">
-          <input
-            id="reg-credencial"
-            type="checkbox"
-            name="credencial_estudiantil"
-            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
-            aria-describedby={errors?.credencial_estudiantil ? "err-credencial" : undefined}
-            aria-invalid={errors?.credencial_estudiantil ? true : undefined}
-            defaultChecked={getChecked(values, "credencial_estudiantil")}
-          />
-          <span className="text-sm text-blue-900 leading-snug">{text.studentNotice}</span>
-        </label>
-        {errors?.credencial_estudiantil && (
-          <p id="err-credencial" role="alert" className={errorClass}>
-            {errors.credencial_estudiantil[0]}
-          </p>
-        )}
-      </div>
+        <div>
+          <label className="flex items-start gap-3 cursor-pointer p-4 bg-blue-50 border border-blue-100 rounded-lg">
+            <input
+              id="reg-credencial"
+              type="checkbox"
+              name="credencial_estudiantil"
+              className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500"
+              aria-describedby={errors?.credencial_estudiantil ? "err-credencial" : undefined}
+              aria-invalid={errors?.credencial_estudiantil ? true : undefined}
+              defaultChecked={getChecked(values, "credencial_estudiantil")}
+            />
+            <span className="text-sm text-blue-900 leading-snug">{text.studentNotice}</span>
+          </label>
+          {errors?.credencial_estudiantil && (
+            <p id="err-credencial" role="alert" className={errorClass}>
+              {errors.credencial_estudiantil[0]}
+            </p>
+          )}
+        </div>
+      </fieldset>
 
       <hr className="border-slate-200" />
 
-      <div>
-        <input
-          id="reg-cfdi-toggle"
-          type="checkbox"
-          name="requiere_cfdi"
-          value="true"
-          defaultChecked={requiresCFDI}
-          className="cfdi-toggle-peer sr-only peer"
-          aria-expanded={requiresCFDI}
-          aria-controls="cfdi-panel"
-        />
-        <label htmlFor="reg-cfdi-toggle" className="flex items-center gap-3 cursor-pointer select-none">
-          <span className="relative">
-            <span className="block w-12 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
-            <span className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-6 transition-transform shadow-sm" />
-          </span>
-          <span className="flex items-center gap-2">
-            <FileText className="w-4 h-4 text-slate-400" aria-hidden="true" />
-            <span className="text-sm font-semibold text-slate-700">{text.requiresInvoice}</span>
-          </span>
-        </label>
-      </div>
+      {/* Billing / CFDI */}
+      <fieldset className="border-0 p-0 m-0 space-y-5">
+        <legend className="sr-only">{text.legendBilling}</legend>
 
-      {/* CFDI panel — CSS grid height animation (0fr → 1fr) avoids JS measurement.
-          aria-live="polite" announces the panel state change to screen readers
-          when the user toggles the CFDI switch. */}
-      <div
-        id="cfdi-panel"
-        className="cfdi-panel"
-        aria-live="polite"
-      >
-        <div className="cfdi-panel-inner">
-          <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4">
-            <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
-            <TextField
-              id="reg-rfc"
-              name="rfc"
-              label={text.rfc}
-              placeholder={text.rfcPlaceholder}
-              maxLength={13}
-              ariaRequired={requiresCFDI}
-              errors={errors?.rfc}
-              defaultValue={getValue(values, "rfc")}
-            />
-            <TextField
-              id="reg-razon"
-              name="razon_social"
-              label={text.legalName}
-              placeholder={text.legalNamePlaceholder}
-              ariaRequired={requiresCFDI}
-              errors={errors?.razon_social}
-              defaultValue={getValue(values, "razon_social")}
-            />
-            <TextField
-              id="reg-cp"
-              name="codigo_postal_fiscal"
-              label={text.zip}
-              placeholder={text.zipPlaceholder}
-              maxLength={5}
-              inputMode="numeric"
-              ariaRequired={requiresCFDI}
-              errors={errors?.codigo_postal_fiscal}
-              defaultValue={getValue(values, "codigo_postal_fiscal")}
-            />
+        <div>
+          <input
+            id="reg-cfdi-toggle"
+            type="checkbox"
+            name="requiere_cfdi"
+            value="true"
+            defaultChecked={requiresCFDI}
+            className="cfdi-toggle-peer sr-only peer"
+            aria-expanded={requiresCFDI}
+            aria-controls="cfdi-panel"
+          />
+          <label htmlFor="reg-cfdi-toggle" className="flex items-center gap-3 cursor-pointer select-none">
+            <span className="relative">
+              <span className="block w-12 h-6 bg-slate-200 peer-checked:bg-blue-600 rounded-full transition-colors" />
+              <span className="absolute top-1 left-1 w-4 h-4 bg-white rounded-full peer-checked:translate-x-6 transition-transform shadow-sm" />
+            </span>
+            <span className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-slate-400" aria-hidden="true" />
+              <span className="text-sm font-semibold text-slate-700">{text.requiresInvoice}</span>
+            </span>
+          </label>
+        </div>
+
+        {/* CFDI panel — CSS grid height animation (0fr → 1fr) avoids JS measurement.
+            aria-live="polite" announces the panel state change to screen readers
+            when the user toggles the CFDI switch. */}
+        <div
+          id="cfdi-panel"
+          className="cfdi-panel"
+          aria-live="polite"
+        >
+          <div className="cfdi-panel-inner">
+            <div className="space-y-5 p-6 bg-slate-50 border border-slate-200 rounded-xl mt-4">
+              <p className="text-sm font-bold text-slate-800 border-b border-slate-200 pb-2 mb-4">{text.invoiceData}</p>
+              <TextField
+                id="reg-rfc"
+                name="rfc"
+                label={text.rfc}
+                placeholder={text.rfcPlaceholder}
+                maxLength={13}
+                ariaRequired={requiresCFDI}
+                errors={errors?.rfc}
+                defaultValue={getValue(values, "rfc")}
+              />
+              <TextField
+                id="reg-razon"
+                name="razon_social"
+                label={text.legalName}
+                placeholder={text.legalNamePlaceholder}
+                ariaRequired={requiresCFDI}
+                errors={errors?.razon_social}
+                defaultValue={getValue(values, "razon_social")}
+              />
+              <TextField
+                id="reg-cp"
+                name="codigo_postal_fiscal"
+                label={text.zip}
+                placeholder={text.zipPlaceholder}
+                maxLength={5}
+                inputMode="numeric"
+                ariaRequired={requiresCFDI}
+                errors={errors?.codigo_postal_fiscal}
+                defaultValue={getValue(values, "codigo_postal_fiscal")}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </fieldset>
 
-      <div className="pt-2">
-        <label
-          className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 ${
-            errors?.acepta_terminos ? "border border-red-300 bg-red-50" : ""
-          }`}
-        >
-          <input
-            id="reg-terminos"
-            type="checkbox"
-            name="acepta_terminos"
-            required
-            className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500 focus-visible:ring-2"
-            aria-describedby={errors?.acepta_terminos ? "err-terminos" : undefined}
-            aria-invalid={errors?.acepta_terminos ? true : undefined}
-            defaultChecked={getChecked(values, "acepta_terminos")}
-          />
-          <span className="text-sm text-slate-600 leading-snug">
-            {text.termsPrefix}{" "}
-            <a href="/terminos-y-condiciones" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
-              {text.terms}
-            </a>{" "}
-            {text.termsMiddle}{" "}
-            <a href="/aviso-de-privacidad" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
-              {text.privacy}
-            </a>{" "}
-            {text.termsSuffix}
-          </span>
-        </label>
-        {errors?.acepta_terminos && (
-          <p id="err-terminos" role="alert" className={errorClass}>
-            {errors.acepta_terminos[0]}
-          </p>
-        )}
-      </div>
+      {/* Terms and conditions */}
+      <fieldset className="border-0 p-0 m-0 pt-2">
+        <legend className="sr-only">{text.legendTerms}</legend>
+
+        <div>
+          <label
+            className={`flex items-start gap-3 cursor-pointer rounded-md p-2 -m-2 ${
+              errors?.acepta_terminos ? "border border-red-300 bg-red-50" : ""
+            }`}
+          >
+            <input
+              id="reg-terminos"
+              type="checkbox"
+              name="acepta_terminos"
+              required
+              className="w-5 h-5 mt-0.5 border-slate-300 rounded text-blue-600 focus:ring-blue-500 focus-visible:ring-2"
+              aria-describedby={errors?.acepta_terminos ? "err-terminos" : undefined}
+              aria-invalid={errors?.acepta_terminos ? true : undefined}
+              defaultChecked={getChecked(values, "acepta_terminos")}
+            />
+            <span className="text-sm text-slate-600 leading-snug">
+              {text.termsPrefix}{" "}
+              <a href="/terminos-y-condiciones" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
+                {text.terms}
+              </a>{" "}
+              {text.termsMiddle}{" "}
+              <a href="/aviso-de-privacidad" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-medium">
+                {text.privacy}
+              </a>{" "}
+              {text.termsSuffix}
+            </span>
+          </label>
+          {errors?.acepta_terminos && (
+            <p id="err-terminos" role="alert" className={errorClass}>
+              {errors.acepta_terminos[0]}
+            </p>
+          )}
+        </div>
+      </fieldset>
 
       {turnstileSiteKey && (
         <div

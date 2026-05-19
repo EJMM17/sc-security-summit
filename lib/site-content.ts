@@ -94,7 +94,7 @@ export const PRICING = [
   {
     id: "estudiante",
     label: "Estudiante",
-    price: 1200,
+    price: 850,
     currency: "MXN",
     note: "Requiere credencial vigente",
     featured: false,
@@ -108,7 +108,7 @@ export const PRICING = [
   {
     id: "general",
     label: "General",
-    price: 5800,
+    price: 2500,
     currency: "MXN",
     note: "Acceso completo",
     featured: true,
@@ -123,7 +123,7 @@ export const PRICING = [
   {
     id: "vip",
     label: "VIP",
-    price: 7200,
+    price: 4800,
     currency: "MXN",
     note: "Experiencia premium",
     featured: false,

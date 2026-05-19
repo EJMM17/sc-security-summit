@@ -17,6 +17,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     },
     {
+      url: `${BASE_URL}/recuperar-folio`,
+      lastModified: new Date("2026-05-19"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
       url: `${BASE_URL}/aviso-de-privacidad`,
       lastModified: new Date("2026-04-01"),
       changeFrequency: "yearly",

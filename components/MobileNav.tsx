@@ -1,7 +1,9 @@
 "use client";
 
+import type React from "react";
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 type Language = "es" | "en";
 
@@ -28,6 +30,7 @@ const linksByLanguage: Record<Language, { href: string; label: string }[]> = {
 
 export default function MobileNav({ language = "es" }: { language?: Language }) {
   const [open, setOpen] = useState(false);
+  const navRef = useFocusTrap(open);
   const links = linksByLanguage[language];
   const menuAriaLabel = language === "en" ? (open ? "Close menu" : "Open menu") : (open ? "Cerrar menú" : "Abrir menú");
   const registerLabel = language === "en" ? "Register now" : "Registrarme Ahora";
@@ -65,6 +68,10 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
 
       {/* Slide-down panel */}
       <div
+        ref={navRef as React.RefObject<HTMLDivElement>}
+        role="dialog"
+        aria-modal="true"
+        aria-label={language === "en" ? "Navigation menu" : "Menú de navegación"}
         className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
           open
             ? "opacity-100 translate-y-0 scale-100"
