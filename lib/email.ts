@@ -11,7 +11,7 @@ function getResend(): Resend | null {
   return _resend;
 }
 
-const DEFAULT_FROM = "SC Security Summit <hola@scsecuritysummit.com.mx>";
+const DEFAULT_FROM = "SC Security Summit <hola@scsecuritysummit.com>";
 
 export type SendEmailResult = { ok: true } | { ok: false; error: string };
 

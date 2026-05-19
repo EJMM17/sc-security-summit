@@ -55,7 +55,7 @@ const COPY = {
     contactPrefix: "Escríbenos a",
     contactOr: "o al",
     eventDay: "El día del evento",
-    eventDate: "24 de septiembre, 2026 · 8:00 AM — 5:30 PM",
+    eventDate: "24 de septiembre, 2026 · 8:00 AM — 7:00 PM",
     eventVenue: "Centro de Convenciones de Reynosa · Blvd. Morelos 190, Tamaulipas",
     addToCalendar: "Agregar al calendario",
     shareWhatsApp: "Compartir por WhatsApp",
@@ -93,7 +93,7 @@ const COPY = {
     contactPrefix: "Email us at",
     contactOr: "or call",
     eventDay: "On event day",
-    eventDate: "September 24, 2026 · 8:00 AM — 5:30 PM",
+    eventDate: "September 24, 2026 · 8:00 AM — 7:00 PM",
     eventVenue: "Reynosa Convention Center · Blvd. Morelos 190, Tamaulipas",
     addToCalendar: "Add to calendar",
     shareWhatsApp: "Share on WhatsApp",
@@ -238,10 +238,10 @@ export default async function RegistroExitosoPage({
             <p className="text-sm text-slate-600 mt-2">
               {t.contactPrefix}{" "}
               <a
-                href="mailto:hola@scsecuritysummit.com.mx"
+                href="mailto:hola@scsecuritysummit.com"
                 className="text-blue-600 hover:underline font-medium"
               >
-                hola@scsecuritysummit.com.mx
+                hola@scsecuritysummit.com
               </a>{" "}
               {t.contactOr}{" "}
               <a href="tel:+19565158070" className="text-blue-600 hover:underline font-medium">

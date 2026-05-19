@@ -182,7 +182,7 @@ function buildStructuredData(lang: "es" | "en") {
         url: "https://www.lanzlogistics.com",
         contactPoint: {
           "@type": "ContactPoint",
-          email: "hola@scsecuritysummit.com.mx",
+          email: "hola@scsecuritysummit.com",
           telephone: "+1-956-515-8070",
           contactType: "customer service",
           availableLanguage: ["Spanish", "English"],

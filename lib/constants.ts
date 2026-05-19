@@ -9,9 +9,9 @@ export const EVENT = {
   venue: "Centro de Convenciones Reynosa",
   venueDetail: "A 10 min de la frontera",
   city: "Reynosa, Tamaulipas",
-  schedule: "08:00 – 18:00 hrs",
+  schedule: "08:00 – 19:00 hrs",
   edition: "1RA EDICIÓN",
-  contact: "hola@scsecuritysummit.com.mx",
+  contact: "hola@scsecuritysummit.com",
 } as const;
 
 // ─── SPONSOR CONSTANTS ───────────────────────────────────────────────────────

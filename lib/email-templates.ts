@@ -21,7 +21,7 @@ function base(title: string, body: string): string {
   <tr><td style="background:#f1f5f9;padding:16px 32px;border-top:1px solid #e2e8f0;">
     <p style="margin:0;color:#64748b;font-size:11px;text-align:center;">
       SC Security Summit 2026 · Reynosa, Tamaulipas, México<br/>
-      ¿Preguntas? Escríbenos a <a href="mailto:hola@scsecuritysummit.com.mx" style="color:${ACCENT_COLOR};">hola@scsecuritysummit.com.mx</a>
+      ¿Preguntas? Escríbenos a <a href="mailto:hola@scsecuritysummit.com" style="color:${ACCENT_COLOR};">hola@scsecuritysummit.com</a>
     </p>
   </td></tr>
 </table>
