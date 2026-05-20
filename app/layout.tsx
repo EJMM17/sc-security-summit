@@ -21,7 +21,7 @@ const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.scsecuritysummit.com"),
+  metadataBase: new URL("https://scsecuritysummit.com"),
   title: {
     default: "SC Security Summit 2026 | Reynosa",
     template: "%s | SC Security Summit 2026",

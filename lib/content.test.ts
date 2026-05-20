@@ -3,7 +3,7 @@ import { BASE_URL, CONTENT, PRECIOS } from "./content";
 
 describe("content SSOT", () => {
   it("exports the canonical base URL and pricing", () => {
-    expect(BASE_URL).toBe("https://www.scsecuritysummit.com");
+    expect(BASE_URL).toBe("https://scsecuritysummit.com");
     expect(PRECIOS).toStrictEqual({
       estudiante: 850,
       general: 2500,
