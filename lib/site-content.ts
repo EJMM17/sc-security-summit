@@ -1,7 +1,7 @@
 // ─── Site-wide content constants ─────────────────────────────────────────────
 // Single source of truth for all copy, names, and data.
 
-export const BASE_URL = "https://www.scsecuritysummit.com" as const;
+export const BASE_URL = "https://scsecuritysummit.com" as const;
 
 // FAQ items exported for FAQPage JSON-LD schema in layout.tsx
 export const FAQ_SCHEMA_ITEMS = [

@@ -9,7 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/admin/", "/api/", "/_next/", "/pago", "/registro-exitoso"],
       },
     ],
-    sitemap: "https://www.scsecuritysummit.com/sitemap.xml",
-    host: "https://www.scsecuritysummit.com",
+    sitemap: "https://scsecuritysummit.com/sitemap.xml",
+    host: "https://scsecuritysummit.com",
   };
 }

@@ -74,13 +74,7 @@ export async function generateMetadata({
       locale: lang === "en" ? "en_US" : "es_MX",
       type: "website",
       images: [
-        {
-          url: "/images/og-image.webp",
-          width: 1200,
-          height: 630,
-          alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
-          type: "image/webp",
-        },
+        // PNG first — WhatsApp and LinkedIn previews do not render .webp.
         {
           url: "/images/og-image.png",
           width: 1200,
@@ -88,13 +82,20 @@ export async function generateMetadata({
           alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
           type: "image/png",
         },
+        {
+          url: "/images/og-image.webp",
+          width: 1200,
+          height: 630,
+          alt: "SC Security Summit 2026 - Reynosa, Tamaulipas",
+          type: "image/webp",
+        },
       ],
     },
     twitter: {
       card: "summary_large_image",
       title: m.ogTitle,
       description: m.twitterDescription,
-      images: ["/images/og-image.webp"],
+      images: ["/images/og-image.png"],
     },
   };
 }

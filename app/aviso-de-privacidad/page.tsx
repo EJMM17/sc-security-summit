@@ -152,8 +152,8 @@ export default function AvisoPrivacidad() {
             <p>
               El Responsable se reserva el derecho de modificar el presente Aviso de Privacidad. Cualquier modificación
               será publicada en el sitio web{" "}
-              <a href="https://www.scsecuritysummit.com/aviso-de-privacidad" className="text-blue-600 hover:underline">
-                www.scsecuritysummit.com/aviso-de-privacidad
+              <a href="https://scsecuritysummit.com/aviso-de-privacidad" className="text-blue-600 hover:underline">
+                scsecuritysummit.com/aviso-de-privacidad
               </a>.
               Se recomienda consultar esta página periódicamente.
             </p>

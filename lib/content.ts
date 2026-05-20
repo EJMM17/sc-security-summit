@@ -1,4 +1,4 @@
-export const BASE_URL = "https://www.scsecuritysummit.com" as const;
+export const BASE_URL = "https://scsecuritysummit.com" as const;
 
 export const PRECIOS = {
   estudiante: 850,
