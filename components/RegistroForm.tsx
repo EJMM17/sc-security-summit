@@ -18,7 +18,6 @@ const formText = {
   es: {
     successTitle: "¡Registro Exitoso!",
     accessFolio: "Tu Folio de Acceso",
-    websiteLabel: "Website (no llenar)",
     firstName: "Nombre(s)",
     firstNamePlaceholder: "Ej. María",
     lastName: "Apellidos",
@@ -67,7 +66,6 @@ const formText = {
   en: {
     successTitle: "Registration Successful!",
     accessFolio: "Your Access Code",
-    websiteLabel: "Website (leave blank)",
     firstName: "First name(s)",
     firstNamePlaceholder: "e.g., Maria",
     lastName: "Last name(s)",
@@ -122,7 +120,6 @@ const inputClass =
 const labelClass = "block text-sm font-semibold text-slate-700 mb-1.5";
 
 const errorClass = "text-xs text-red-500 mt-1.5 flex items-center gap-1";
-const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 type PersistedValues = NonNullable<RegistroFlashState["values"]>;
 
 type TextFieldProps = {
@@ -276,27 +273,6 @@ export default function RegistroForm({
           </div>
         </div>
       )}
-
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          left: "-9999px",
-          top: "auto",
-          width: "1px",
-          height: "1px",
-          overflow: "hidden",
-        }}
-      >
-        <label htmlFor="reg-confirm-email">{text.websiteLabel}</label>
-        <input
-          id="reg-confirm-email"
-          name="confirm_email"
-          type="text"
-          tabIndex={-1}
-          autoComplete="new-password"
-        />
-      </div>
 
       {/* Personal information */}
       <fieldset className="border-0 p-0 m-0 space-y-5">
@@ -534,18 +510,6 @@ export default function RegistroForm({
           )}
         </div>
       </fieldset>
-
-      {turnstileSiteKey && (
-        <div
-          className="cf-turnstile"
-          data-sitekey={turnstileSiteKey}
-          data-theme="light"
-          data-size="flexible"
-          data-retry="auto"
-          data-refresh-expired="auto"
-          data-refresh-timeout="auto"
-        />
-      )}
 
       <RegistroSubmitButton pendingLabel={text.pending} idleLabel={text.submit} />
     </form>

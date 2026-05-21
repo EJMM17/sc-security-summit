@@ -1,7 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import { Inter, Oswald } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -103,11 +102,6 @@ export default async function RootLayout({
         <Analytics nonce={nonce} />
         <MetaPixel nonce={nonce} />
         <LinkedInInsight nonce={nonce} />
-        {/* Turnstile loaded here so the browser has it ready before the form hydrates */}
-        <Script
-          src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-          strategy="afterInteractive"
-        />
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}
       </body>
     </html>
