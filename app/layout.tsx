@@ -106,7 +106,7 @@ export default async function RootLayout({
         {/* Turnstile loaded here so the browser has it ready before the form hydrates */}
         <Script
           src="https://challenges.cloudflare.com/turnstile/v0/api.js"
-          strategy="lazyOnload"
+          strategy="afterInteractive"
         />
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}
       </body>
