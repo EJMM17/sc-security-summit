@@ -18,6 +18,7 @@ const schema = z.object({
   // Turnstile — optional (graceful degradation when unset)
   NEXT_PUBLIC_TURNSTILE_SITE_KEY: nonEmpty.optional(),
   TURNSTILE_SECRET_KEY: nonEmpty.optional(),
+  TURNSTILE_ENFORCEMENT: z.enum(["strict", "report"]).default("report"),
 
   // Admin auth
   ADMIN_SESSION_SECRET: z.string().min(32).optional(),

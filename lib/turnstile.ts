@@ -17,7 +17,9 @@ function isProductionRuntime(): boolean {
   );
 }
 
-export async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+export type TurnstileDecision = { success: boolean; reason?: string };
+
+export async function verifyTurnstile(token: string, ip: string): Promise<TurnstileDecision> {
   // Read directly from process.env at call-time. The previous implementation
   // depended on the `features.turnstile` singleton in env.ts, which is
   // evaluated once at module load. If the secret was empty after trim() at
@@ -34,7 +36,7 @@ export async function verifyTurnstile(token: string, ip: string): Promise<boolea
       );
     }
     warnDisabledOnce();
-    return true;
+    return { success: true, reason: "disabled" };
   }
 
   const body = new FormData();
@@ -53,9 +55,10 @@ export async function verifyTurnstile(token: string, ip: string): Promise<boolea
     }
 
     const data = (await res.json()) as { success?: boolean };
-    return data.success === true;
+    if (data.success === true) return { success: true };
+    return { success: false, reason: "challenge_failed" };
   } catch (err) {
     console.error("[turnstile] verification error", err);
-    return false;
+    return { success: false, reason: "verification_error" };
   }
 }
