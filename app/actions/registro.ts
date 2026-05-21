@@ -79,8 +79,8 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   const values = getPersistedValues(formData);
 
   // 1. Honeypot — pretend success so bots don't get a useful signal.
-  const honeypot = formData.get("website");
-  if (honeypot && String(honeypot).length > 0) {
+  const honeypot = String(formData.get("confirm_email") ?? "").trim();
+  if (honeypot.length > 0) {
     auditLog("honeypot_triggered", { ip });
     return {
       ok: true,
@@ -115,7 +115,29 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   }
 
   // 3. Turnstile — verifyTurnstile fails open when the secret is not configured.
-  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "");
+  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "").trim();
+  if (!turnstileToken) {
+    return {
+      ok: false,
+      language,
+      state: {
+        success: false,
+        message:
+          language === "en"
+            ? "Please complete the anti-bot verification and try again."
+            : "Por favor completa la verificación anti-bot e intenta de nuevo.",
+        errors: {
+          _form: [
+            language === "en"
+              ? "Security verification is required."
+              : "La verificación de seguridad es obligatoria.",
+          ],
+        },
+        values,
+      },
+    };
+  }
+
   const turnstileOk = await verifyTurnstile(turnstileToken, ip);
   if (!turnstileOk) {
     return {
@@ -123,8 +145,17 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
       language,
       state: {
         success: false,
-        message: "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
-        errors: { _form: ["Verificación de seguridad fallida."] },
+        message:
+          language === "en"
+            ? "We couldn't verify your anti-bot challenge. Please refresh and try again."
+            : "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
+        errors: {
+          _form: [
+            language === "en"
+              ? "Security verification failed."
+              : "Verificación de seguridad fallida.",
+          ],
+        },
         values,
       },
     };

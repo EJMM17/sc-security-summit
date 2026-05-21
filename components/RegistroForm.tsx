@@ -288,13 +288,13 @@ export default function RegistroForm({
           overflow: "hidden",
         }}
       >
-        <label htmlFor="reg-website">{text.websiteLabel}</label>
+        <label htmlFor="reg-confirm-email">{text.websiteLabel}</label>
         <input
-          id="reg-website"
-          name="website"
+          id="reg-confirm-email"
+          name="confirm_email"
           type="text"
           tabIndex={-1}
-          autoComplete="off"
+          autoComplete="new-password"
         />
       </div>
 
