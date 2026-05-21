@@ -70,19 +70,42 @@ bot. If a real human reports this:
 
 ### Confirmation email doesn't arrive
 
-**Causes (most common first):**
-1. Spam filter — check Junk / Spam.
-2. Resend API key invalid or rate-limited — Sentry will have a
-   `email_confirmation_failed` warning.
-3. SPF/DKIM not configured for the sender domain — DMARC reports flag
-   the message. Run `dig TXT scsecuritysummit.com` and confirm both
-   `v=spf1 ...` and `_dmarc.` records exist.
-4. Recipient email server is rejecting (look at Resend dashboard →
-   Bounces).
+Every confirmation attempt is audited in the `email_events` table. Start
+there — it tells you whether we even tried to send.
 
-**Fix:** Always direct the user to `/recuperar-folio` first; that
-re-sends. If a corporate inbox keeps rejecting, ask for a personal
-backup address.
+```sql
+select status, provider_message_id, error, created_at
+from public.email_events
+where folio = 'SCSS2026-XXXXX-XXXX'
+order by created_at desc;
+```
+
+**Read the `status`:**
+- `sent` → we handed it to Resend. The problem is downstream (spam,
+  bounce, recipient server). Check Resend Dashboard → Logs using
+  `provider_message_id`, then Spam/Promotions in the inbox.
+- `skipped_no_api_key` → **`RESEND_API_KEY` is missing or still the
+  `re_PLACEHOLDER` value in this environment.** Set a real key in Vercel
+  (Production **and** Preview) and **redeploy** — env changes don't take
+  effect until the next deploy. Registration still succeeded; the folio
+  is shown on screen and stored in `registros`.
+- `failed` → Resend rejected the send. The `error` column has the reason
+  (invalid `from`, unverified domain, rate limit). A matching warning is
+  in Sentry (`registration_confirmation_email_failed`).
+- _no row at all_ → the send code never ran (older registration before
+  this feature, or an exception before the email step — check Sentry).
+
+**Other causes (when status is `sent`):**
+1. Spam filter — check Junk / Spam / Promotions.
+2. `EMAIL_FROM` domain not verified in Resend (SPF/DKIM). Run
+   `dig TXT scsecuritysummit.com` and confirm `v=spf1 ...` and
+   `_dmarc.` records exist (see `docs/DNS.md`).
+3. Recipient mail server bouncing — Resend Dashboard → Bounces.
+
+**Fix:** Direct the user to `/recuperar-folio` to re-send, or use the
+"Reenviar correo" button in `/admin/registros` (logged in `email_events`
+as `registration_confirmation_resend`). If a corporate inbox keeps
+rejecting, ask for a personal backup address.
 
 ### Organizer notification not received
 
@@ -183,6 +206,9 @@ the policy.
 | `unexpected_error`               | Server action threw an unhandled exception                             | Triage the stack trace; usually a missing env var or DB schema mismatch |
 | `db_error`                       | Supabase returned an error from the insert                             | Check `code` extra; `23505` = duplicate (expected), other = real bug    |
 | `email_confirmation_failed`      | Resend send failed for the attendee                                    | Manual follow-up via `/admin/registros` lookup            |
+| `registration_confirmation_email_failed` | Confirmation email send failed (registration NOT affected)    | Inspect `email_events.error`; resend from `/admin/registros` |
+| `registration_confirmation_email_skipped_no_api_key` | `RESEND_API_KEY` missing/placeholder              | Set the key in Vercel (Prod + Preview) and redeploy       |
+| `create_lead.confirmation_email_not_delivered` | Email failed/skipped right after a successful insert      | Same as the two above — registration itself is fine       |
 | `email_organizer_failed`         | Resend send failed for the organizer                                   | Confirm CONTACT_EMAIL is correct                          |
 | `admin_login_email_failed`       | Magic-link email send failed                                           | Check Resend; user can retry                              |
 | `recuperar_folio_email_failed`   | Folio reissue email send failed                                        | Same as above                                             |

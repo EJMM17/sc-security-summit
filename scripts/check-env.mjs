@@ -57,10 +57,16 @@ const RECOMMENDED = [
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "RESEND_API_KEY",
+  "EMAIL_FROM",
   "CONTACT_EMAIL",
 ];
 
 const isMissing = (name) => !process.env[name] || process.env[name].trim().length === 0;
+
+const RESEND_PLACEHOLDERS = new Set(["re_PLACEHOLDER", "re_xxxxxxxxxxxxxxxxx"]);
+const resendKey = (process.env.RESEND_API_KEY ?? "").trim();
+// "unusable" = absent OR still a placeholder. Confirmation emails won't send.
+const resendUnusable = resendKey.length === 0 || RESEND_PLACEHOLDERS.has(resendKey);
 
 const missingRequired = REQUIRED.filter(isMissing);
 const missingRecommended = RECOMMENDED.filter(isMissing);
@@ -95,6 +101,24 @@ if (missingRecommended.length > 0) {
 
 if (!strictValidation && shortSecret) {
   console.warn("\n⚠ [check-env] ADMIN_SESSION_SECRET is set but shorter than 32 characters");
+}
+
+if (resendUnusable) {
+  const detail = resendKey.length === 0 ? "not set" : "still a placeholder";
+  if (strictValidation) {
+    console.error(
+      `\n✖ [check-env] RESEND_API_KEY is ${detail}. Registration confirmation emails will NOT be sent.`,
+    );
+    console.error("  Set a real Resend API key (Vercel: Production + Preview) and redeploy.");
+    console.error("  Bypass for emergency builds: SKIP_ENV_VALIDATION=1 npm run build\n");
+    process.exit(1);
+  }
+  console.warn(
+    `\n⚠ [check-env] RESEND_API_KEY is ${detail} → registration confirmation emails will NOT be sent`,
+  );
+  console.warn(
+    "  Registrations still succeed and are audited as skipped_no_api_key in email_events.",
+  );
 }
 
 console.log(
