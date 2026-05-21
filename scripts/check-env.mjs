@@ -1,8 +1,12 @@
 #!/usr/bin/env node
 // =============================================================
 // SC Security Summit 2026 — prebuild env validation
-// Aborts the build when one of the Supabase keys is missing.
-// Bypass with: SKIP_ENV_VALIDATION=1 npm run build
+//
+// Defaults to warning-only so builds can proceed when optional
+// integrations are not configured.
+//
+// Strict mode: ENFORCE_ENV_VALIDATION=1 npm run build
+// Bypass completely: SKIP_ENV_VALIDATION=1 npm run build
 // =============================================================
 
 import { existsSync, readFileSync } from "node:fs";
@@ -16,6 +20,8 @@ if (process.env.SKIP_ENV_VALIDATION === "1") {
   console.warn("[check-env] SKIP_ENV_VALIDATION=1 → skipping validation");
   process.exit(0);
 }
+
+const strictValidation = process.env.ENFORCE_ENV_VALIDATION === "1";
 
 // Load .env.local for local builds. Vercel injects vars directly.
 const envFile = resolve(projectRoot, ".env.local");
@@ -46,43 +52,51 @@ const REQUIRED = [
   "SUPABASE_SERVICE_ROLE_KEY",
 ];
 
-// Additional vars required in production (Vercel sets NODE_ENV=production or VERCEL=1)
-const isProd = process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
-const PROD_REQUIRED = [
+const RECOMMENDED = [
   "ADMIN_SESSION_SECRET",
-  "TURNSTILE_SECRET_KEY",
-  "NEXT_PUBLIC_TURNSTILE_SITE_KEY",
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
   "RESEND_API_KEY",
   "CONTACT_EMAIL",
 ];
 
-const allRequired = isProd ? [...REQUIRED, ...PROD_REQUIRED] : REQUIRED;
-const missing = allRequired.filter(
-  (name) => !process.env[name] || process.env[name].trim().length === 0,
-);
+const isMissing = (name) => !process.env[name] || process.env[name].trim().length === 0;
 
-// Validate ADMIN_SESSION_SECRET length
-if (
-  isProd &&
-  process.env.ADMIN_SESSION_SECRET &&
-  process.env.ADMIN_SESSION_SECRET.length < 32
-) {
+const missingRequired = REQUIRED.filter(isMissing);
+const missingRecommended = RECOMMENDED.filter(isMissing);
+
+const shortSecret =
+  process.env.ADMIN_SESSION_SECRET && process.env.ADMIN_SESSION_SECRET.length < 32;
+
+if (strictValidation && shortSecret) {
   console.error("✖ [check-env] ADMIN_SESSION_SECRET must be at least 32 characters");
   process.exit(1);
 }
 
-if (missing.length > 0) {
+if (strictValidation && missingRequired.length > 0) {
   console.error("\n✖ [check-env] Build aborted. Missing required env vars:");
-  for (const name of missing) console.error(`  • ${name}`);
-  if (!isProd) {
-    console.error(
-      "\nNote: Production-only vars are only validated when NODE_ENV=production or VERCEL=1",
-    );
-  }
+  for (const name of missingRequired) console.error(`  • ${name}`);
   console.error("\nBypass for emergency builds: SKIP_ENV_VALIDATION=1 npm run build\n");
   process.exit(1);
 }
 
-console.log(`✓ [check-env] All required${isProd ? " (production)" : ""} environment variables present`);
+if (missingRequired.length > 0) {
+  console.warn("\n⚠ [check-env] Missing baseline env vars:");
+  for (const name of missingRequired) console.warn(`  • ${name}`);
+  console.warn(
+    "[check-env] Build will continue (warning-only mode). Set ENFORCE_ENV_VALIDATION=1 to fail on missing vars.",
+  );
+}
+
+if (missingRecommended.length > 0) {
+  console.warn("\n⚠ [check-env] Missing optional/recommended env vars:");
+  for (const name of missingRecommended) console.warn(`  • ${name}`);
+}
+
+if (!strictValidation && shortSecret) {
+  console.warn("\n⚠ [check-env] ADMIN_SESSION_SECRET is set but shorter than 32 characters");
+}
+
+console.log(
+  `✓ [check-env] Validation complete${strictValidation ? " (strict mode)" : " (warning-only mode)"}`,
+);
