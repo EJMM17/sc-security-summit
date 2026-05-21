@@ -58,13 +58,11 @@ type ProcessResult =
   | { ok: false; state: RegistroState; language: Language };
 
 async function processRegistro(formData: FormData): Promise<ProcessResult> {
-  const [{ verifyTurnstile }, { RegistroSchema }, { createLead }, { checkRateLimit, RateLimitError }] =
-    await Promise.all([
-      import("@/lib/turnstile"),
-      import("@/lib/schemas"),
-      import("@/server/use-cases/create-lead"),
-      import("@/lib/rate-limit"),
-    ]);
+  const [{ verifyTurnstile }, { RegistroSchema }, { createLead }] = await Promise.all([
+    import("@/lib/turnstile"),
+    import("@/lib/schemas"),
+    import("@/server/use-cases/create-lead"),
+  ]);
 
   const h = await headers();
   const ip =
@@ -81,92 +79,64 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     (process.env.TURNSTILE_SECRET_KEY?.trim().length ?? 0) > 0 &&
     (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim().length ?? 0) > 0;
 
-  // 1. Honeypot — pretend success so bots don't get a useful signal.
-  const honeypot = String(formData.get("confirm_email") ?? "").trim();
-  if (honeypot.length > 0) {
-    auditLog("honeypot_triggered", { ip });
-    return {
-      ok: true,
-      folio: `SCSS2026-BOT-${Date.now().toString(36).toUpperCase()}`,
-      tipo: "general",
-      monto: 0,
-      language,
-    };
-  }
-
-  // 2. Rate limiting — sliding window 5 req / 15 min per IP.
-  try {
-    await checkRateLimit(`registro:${ip}`);
-  } catch (err) {
-    if (err instanceof RateLimitError) {
-      auditLog("rate_limited", { ip, retryAfter: err.retryAfter });
-      return {
-        ok: false,
-        language,
-        state: {
-          success: false,
-          message:
-            language === "en"
-              ? `Too many requests. Please try again in ${err.retryAfter} seconds.`
-              : `Demasiadas solicitudes. Intenta de nuevo en ${err.retryAfter} segundos.`,
-          errors: {},
-          values,
-        },
-      };
-    }
-    throw err;
-  }
-
-  // 3. Turnstile — verifyTurnstile fails open when the secret is not configured.
+  // 1. Turnstile — non-blocking by default (report mode) to protect conversion in production.
   if (turnstileConfigured) {
+    const enforcement = process.env.TURNSTILE_ENFORCEMENT === "strict" ? "strict" : "report";
     const turnstileToken = String(formData.get("cf-turnstile-response") ?? "").trim();
     if (!turnstileToken) {
-      return {
-        ok: false,
-        language,
-        state: {
-          success: false,
-          message:
-            language === "en"
-              ? "Please complete the anti-bot verification and try again."
-              : "Por favor completa la verificación anti-bot e intenta de nuevo.",
-          errors: {
-            _form: [
+      if (enforcement === "strict") {
+        return {
+          ok: false,
+          language,
+          state: {
+            success: false,
+            message:
               language === "en"
-                ? "Security verification is required."
-                : "La verificación de seguridad es obligatoria.",
-            ],
+                ? "Please complete the anti-bot verification and try again."
+                : "Por favor completa la verificación anti-bot e intenta de nuevo.",
+            errors: {
+              _form: [
+                language === "en"
+                  ? "Security verification is required."
+                  : "La verificación de seguridad es obligatoria.",
+              ],
+            },
+            values,
           },
-          values,
-        },
-      };
-    }
+        };
+      }
+      auditLog("turnstile_missing_token_allowed", { ip, enforcement });
+    } else {
+      const turnstile = await verifyTurnstile(turnstileToken, ip);
+      if (!turnstile.success) {
+        auditLog("turnstile_verification_failed", { ip, enforcement, reason: turnstile.reason ?? "unknown" });
 
-    const turnstileOk = await verifyTurnstile(turnstileToken, ip);
-    if (!turnstileOk) {
-      return {
-        ok: false,
-        language,
-        state: {
-          success: false,
-          message:
-            language === "en"
-              ? "We couldn't verify your anti-bot challenge. Please refresh and try again."
-              : "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
-          errors: {
-            _form: [
-              language === "en"
-                ? "Security verification failed."
-                : "Verificación de seguridad fallida.",
-            ],
-          },
-          values,
-        },
-      };
+        if (enforcement === "strict") {
+          return {
+            ok: false,
+            language,
+            state: {
+              success: false,
+              message:
+                language === "en"
+                  ? "We couldn't verify your anti-bot challenge. Please refresh and try again."
+                  : "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
+              errors: {
+                _form: [
+                  language === "en"
+                    ? "Security verification failed."
+                    : "Verificación de seguridad fallida.",
+                ],
+              },
+              values,
+            },
+          };
+        }
+      }
     }
   }
 
-  // 3. Zod validation
+  // 2. Zod validation
   const requiresCFDI = formData.get("requiere_cfdi") === "true";
   const rawData = {
     nombre: formData.get("nombre"),
@@ -203,7 +173,7 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     };
   }
 
-  // 4. Insert via use-case
+  // 3. Insert via use-case
   const result = await createLead({
     ...parsed.data,
     language,
