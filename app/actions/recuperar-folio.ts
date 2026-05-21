@@ -1,7 +1,6 @@
 "use server";
 
 import { z } from "zod";
-import { checkRateLimit, getClientIp, RateLimitError } from "@/lib/rate-limit";
 import { supabaseAdmin } from "@/lib/supabase";
 import { sendEmail } from "@/lib/email";
 import {
@@ -23,20 +22,6 @@ export async function recuperarFolioAction(
   _prev: RecuperarFolioState,
   formData: FormData,
 ): Promise<RecuperarFolioState> {
-  const ip = await getClientIp();
-
-  try {
-    await checkRateLimit(`recuperar-folio:${ip}`);
-  } catch (err) {
-    if (err instanceof RateLimitError) {
-      return {
-        submitted: true,
-        errors: { _form: ["Demasiadas solicitudes. Intenta en unos minutos."] },
-      };
-    }
-    throw err;
-  }
-
   const parsed = Schema.safeParse({
     email: formData.get("email"),
     nombre: formData.get("nombre"),
