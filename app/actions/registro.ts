@@ -77,6 +77,9 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   const acceptLanguage = h.get("accept-language");
   const language = pickLanguage(formData, acceptLanguage);
   const values = getPersistedValues(formData);
+  const turnstileConfigured =
+    (process.env.TURNSTILE_SECRET_KEY?.trim().length ?? 0) > 0 &&
+    (process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim().length ?? 0) > 0;
 
   // 1. Honeypot — pretend success so bots don't get a useful signal.
   const honeypot = String(formData.get("confirm_email") ?? "").trim();
@@ -115,50 +118,52 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   }
 
   // 3. Turnstile — verifyTurnstile fails open when the secret is not configured.
-  const turnstileToken = String(formData.get("cf-turnstile-response") ?? "").trim();
-  if (!turnstileToken) {
-    return {
-      ok: false,
-      language,
-      state: {
-        success: false,
-        message:
-          language === "en"
-            ? "Please complete the anti-bot verification and try again."
-            : "Por favor completa la verificación anti-bot e intenta de nuevo.",
-        errors: {
-          _form: [
+  if (turnstileConfigured) {
+    const turnstileToken = String(formData.get("cf-turnstile-response") ?? "").trim();
+    if (!turnstileToken) {
+      return {
+        ok: false,
+        language,
+        state: {
+          success: false,
+          message:
             language === "en"
-              ? "Security verification is required."
-              : "La verificación de seguridad es obligatoria.",
-          ],
+              ? "Please complete the anti-bot verification and try again."
+              : "Por favor completa la verificación anti-bot e intenta de nuevo.",
+          errors: {
+            _form: [
+              language === "en"
+                ? "Security verification is required."
+                : "La verificación de seguridad es obligatoria.",
+            ],
+          },
+          values,
         },
-        values,
-      },
-    };
-  }
+      };
+    }
 
-  const turnstileOk = await verifyTurnstile(turnstileToken, ip);
-  if (!turnstileOk) {
-    return {
-      ok: false,
-      language,
-      state: {
-        success: false,
-        message:
-          language === "en"
-            ? "We couldn't verify your anti-bot challenge. Please refresh and try again."
-            : "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
-        errors: {
-          _form: [
+    const turnstileOk = await verifyTurnstile(turnstileToken, ip);
+    if (!turnstileOk) {
+      return {
+        ok: false,
+        language,
+        state: {
+          success: false,
+          message:
             language === "en"
-              ? "Security verification failed."
-              : "Verificación de seguridad fallida.",
-          ],
+              ? "We couldn't verify your anti-bot challenge. Please refresh and try again."
+              : "No pudimos verificar que no eres un bot. Por favor recarga e intenta de nuevo.",
+          errors: {
+            _form: [
+              language === "en"
+                ? "Security verification failed."
+                : "Verificación de seguridad fallida.",
+            ],
+          },
+          values,
         },
-        values,
-      },
-    };
+      };
+    }
   }
 
   // 3. Zod validation

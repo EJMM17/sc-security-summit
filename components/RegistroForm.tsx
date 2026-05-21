@@ -541,6 +541,9 @@ export default function RegistroForm({
           data-sitekey={turnstileSiteKey}
           data-theme="light"
           data-size="flexible"
+          data-retry="auto"
+          data-refresh-expired="auto"
+          data-refresh-timeout="auto"
         />
       )}
 
