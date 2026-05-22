@@ -253,6 +253,23 @@ export async function resendConfirmationEmail(
     html,
   });
 
+  // Audit every resend attempt in email_events (separate type so it never
+  // collides with the original confirmation idempotency guard).
+  await supabase.from("email_events").insert({
+    folio: registro.folio,
+    email: registro.email,
+    type: "registration_confirmation_resend",
+    provider: "resend",
+    status: result.ok ? "sent" : "failed",
+    provider_message_id: result.ok ? (result.id ?? null) : null,
+    error: result.ok ? null : result.error,
+    metadata: {
+      tipo_acceso: registro.tipo_acceso,
+      monto_mxn: registro.monto_mxn,
+      resent_by: admin.email,
+    },
+  });
+
   if (!result.ok) {
     auditLog("admin_resend_email_failed", { folio: folio.data, error: result.error });
     Sentry.captureException(new Error(`resend_email: ${result.error}`), {

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { generateFolio } from "@/lib/folio";
 import { PRECIOS } from "@/lib/schemas";
 import { supabaseAdmin } from "@/lib/supabase";
+import { sendRegistrationConfirmation } from "@/server/use-cases/send-registration-confirmation";
 
 const createLeadInputSchema = z.object({
   nombre: z.string().trim().min(2),
@@ -147,6 +148,27 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       }
 
       throw new Error(`supabase_insert_failed:${error.code}:${error.message}`);
+    }
+
+    // Send the confirmation email. A failure here MUST NOT fail the
+    // registration — the row is already persisted and the folio is shown
+    // on screen as a fallback. The sender audits every outcome and reports
+    // problems to Sentry as warnings.
+    const emailResult = await sendRegistrationConfirmation({
+      folio,
+      email: data.email,
+      nombre: data.nombre,
+      tipo_acceso: data.tipo_acceso,
+      monto_mxn: monto,
+      language: data.language,
+    });
+
+    if (emailResult.status === "failed" || emailResult.status === "skipped_no_api_key") {
+      Sentry.captureMessage("create_lead.confirmation_email_not_delivered", {
+        level: "warning",
+        tags: { use_case: "create_lead" },
+        extra: { folio, status: emailResult.status, error: emailResult.error },
+      });
     }
 
     const message =

@@ -3,17 +3,30 @@ import "server-only";
 import { Resend } from "resend";
 
 let _resend: Resend | null = null;
+let _resendKey: string | null = null;
+
+const PLACEHOLDER_KEYS = new Set(["re_PLACEHOLDER", "re_xxxxxxxxxxxxxxxxx"]);
+
+function isUsableApiKey(apiKey: string | undefined): apiKey is string {
+  return Boolean(apiKey && apiKey.trim().length > 0 && !PLACEHOLDER_KEYS.has(apiKey.trim()));
+}
 
 function getResend(): Resend | null {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey || apiKey === "re_PLACEHOLDER") return null;
-  if (!_resend) _resend = new Resend(apiKey);
+  if (!isUsableApiKey(apiKey)) return null;
+  // Re-create the client if the key changed (relevant for tests).
+  if (!_resend || _resendKey !== apiKey) {
+    _resend = new Resend(apiKey);
+    _resendKey = apiKey;
+  }
   return _resend;
 }
 
-const DEFAULT_FROM = "SC Security Summit <hola@scsecuritysummit.com>";
+export const DEFAULT_FROM = "SC Security Summit <hola@scsecuritysummit.com>";
 
-export type SendEmailResult = { ok: true } | { ok: false; error: string };
+export type SendEmailResult =
+  | { ok: true; id?: string }
+  | { ok: false; error: string; code?: string };
 
 export async function sendEmail(params: {
   to: string;
@@ -31,13 +44,17 @@ export async function sendEmail(params: {
         subject: params.subject,
       }),
     );
-    return { ok: true };
+    return {
+      ok: false,
+      error: "RESEND_API_KEY missing or placeholder",
+      code: "missing_api_key",
+    };
   }
 
   const from = params.from ?? process.env.EMAIL_FROM ?? DEFAULT_FROM;
 
   try {
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from,
       to: params.to,
       subject: params.subject,
@@ -45,10 +62,14 @@ export async function sendEmail(params: {
     });
 
     if (error) {
-      return { ok: false, error: error.message };
+      return { ok: false, error: error.message, code: error.name };
     }
-    return { ok: true };
+    return { ok: true, id: data?.id };
   } catch (err) {
-    return { ok: false, error: err instanceof Error ? err.message : String(err) };
+    return {
+      ok: false,
+      error: err instanceof Error ? err.message : String(err),
+      code: "send_exception",
+    };
   }
 }

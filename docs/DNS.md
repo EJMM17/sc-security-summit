@@ -16,6 +16,11 @@ The sender domain in `EMAIL_FROM` must be verified in Resend. Steps:
    verbatim into DNS.
 3. Wait for "Verified" — usually <30 min on most registrars.
 
+> If `EMAIL_FROM` uses an **unverified** domain, the registration
+> confirmation email send returns an error that is logged as a `failed`
+> event in `email_events` and surfaced in Sentry — it is never silently
+> dropped. The registration itself still succeeds.
+
 ### SPF (sender policy framework)
 
 | Type | Name | Value                          | TTL   |

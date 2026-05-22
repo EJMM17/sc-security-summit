@@ -118,11 +118,38 @@ canonical source. Summary:
 | -------------------------- | ------------------------------------------------------ |
 | `UPSTASH_REDIS_REST_URL`   | Distributed rate limiting (fail-closed in production)  |
 | `UPSTASH_REDIS_REST_TOKEN` | "                                                      |
-| `RESEND_API_KEY`           | Transactional email                                    |
+| `RESEND_API_KEY`           | Transactional email — **required to send the registration confirmation email** |
 
 **Optional (set if used):**
 `EMAIL_FROM`, `ADMIN_EMAILS`, `ADMIN_SESSION_SECRET`, `SENTRY_DSN`,
 `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
+
+### Transactional email (Resend) — confirmation on registration
+
+The registration flow sends a bilingual confirmation email after every
+successful registration. It is resilient: **if email fails, the
+registration still succeeds** (the folio is shown on screen and stored).
+Every attempt is audited in the `email_events` Supabase table.
+
+To make confirmation emails actually send:
+
+1. **`RESEND_API_KEY`** — set a real key (not the `re_PLACEHOLDER` value)
+   in Vercel for **both Production and Preview**. If it's missing or a
+   placeholder, registrations succeed but emails are skipped and logged
+   as `skipped_no_api_key`.
+2. **`EMAIL_FROM`** — must use a domain **verified in Resend** (SPF +
+   DKIM). Defaults to `SC Security Summit <hola@scsecuritysummit.com>`.
+   An unverified domain causes `failed` events (visible in Sentry/logs);
+   the failure is never silently swallowed. See `docs/DNS.md`.
+3. **Redeploy after changing env vars** — Vercel only picks up new values
+   on the next build/deploy.
+4. **Verify delivery:** Resend Dashboard → Logs (match on
+   `provider_message_id` from `email_events`); also check
+   Spam/Promotions; and confirm SPF/DKIM/DMARC DNS records.
+
+The `email_events` table is created by migration
+`supabase/migrations/009_email_events.sql` (RLS-locked to `service_role`).
+Apply pending migrations to the Supabase project before/with the deploy.
 
 ---
 
