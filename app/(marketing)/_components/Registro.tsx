@@ -8,11 +8,9 @@ import WaveSeparator from "./_primitives/WaveSeparator";
 export default function Registro({
   language,
   state,
-  utms,
 }: {
   language: Language;
   state?: RegistroFlashState | null;
-  utms?: { source?: string; medium?: string; campaign?: string };
 }) {
   const { ui } = CONTENT[language];
 
@@ -30,7 +28,7 @@ export default function Registro({
           </ScrollReveal>
           <ScrollReveal delay={200}>
             <div className="card-elevated p-6 sm:p-10">
-              <RegistroForm language={language} state={state} utms={utms} />
+              <RegistroForm language={language} state={state} />
             </div>
           </ScrollReveal>
         </div>

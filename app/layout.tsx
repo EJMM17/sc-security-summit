@@ -14,6 +14,8 @@ import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import LinkedInInsight from "@/components/LinkedInInsight";
 import LeadCapture from "@/components/LeadCapture";
+import AttributionCapture from "@/components/AttributionCapture";
+import InteractionTracker from "@/components/InteractionTracker";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -102,6 +104,9 @@ export default async function RootLayout({
         <Analytics nonce={nonce} />
         <MetaPixel nonce={nonce} />
         <LinkedInInsight nonce={nonce} />
+        {/* Persist first/last-touch attribution + emit interaction events */}
+        <AttributionCapture />
+        <InteractionTracker />
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}
       </body>
     </html>

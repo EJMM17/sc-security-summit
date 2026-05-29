@@ -6,7 +6,14 @@ export default function robots(): MetadataRoute.Robots {
       {
         userAgent: "*",
         allow: "/",
-        disallow: ["/admin/", "/api/", "/_next/", "/pago", "/registro-exitoso"],
+        disallow: [
+          "/admin/",
+          "/api/",
+          "/_next/",
+          "/monitoring", // Sentry tunnel route (next.config tunnelRoute)
+          "/pago",
+          "/registro-exitoso",
+        ],
       },
     ],
     sitemap: "https://scsecuritysummit.com/sitemap.xml",

@@ -27,8 +27,17 @@ function FacebookIcon() {
   );
 }
 
-export default function Footer({ language }: { language: Language }) {
+export default function Footer({
+  language,
+  hrefBase = "",
+}: {
+  language: Language;
+  /** Prefix for in-page (#hash) links so they resolve from sub-pages, e.g. "/". */
+  hrefBase?: string;
+}) {
   const { ui, footerLinks } = CONTENT[language];
+  const sectionHref = (href: string) =>
+    href.startsWith("#") ? `${hrefBase}${href}` : href;
 
   return (
     <footer className="bg-slate-900 pt-16 pb-8">
@@ -90,7 +99,7 @@ export default function Footer({ language }: { language: Language }) {
               {footerLinks.map((link) => (
                 <a
                   key={link.href}
-                  href={link.href}
+                  href={sectionHref(link.href)}
                   className="text-sm text-slate-400 hover:text-blue-400 transition-colors"
                 >
                   {link.label}
