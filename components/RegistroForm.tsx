@@ -3,6 +3,7 @@ import { submitRegistroForm } from "@/app/actions/registro";
 import type { RegistroFlashState } from "@/lib/registro-form-state";
 import RegistroFormEnhancer from "./RegistroFormEnhancer";
 import RegistroSubmitButton from "./RegistroSubmitButton";
+import AttributionCapture from "./AttributionCapture";
 import { ACCESO_OPTIONS } from "@/lib/constants";
 
 type Language = "es" | "en";
@@ -195,11 +196,9 @@ function getChecked(values: PersistedValues | undefined, key: keyof PersistedVal
 export default function RegistroForm({
   language = "es",
   state = null,
-  utms,
 }: {
   language?: Language;
   state?: RegistroFlashState | null;
-  utms?: { source?: string; medium?: string; campaign?: string };
 }) {
   const text = formText[language];
   const values = state?.values;
@@ -250,11 +249,11 @@ export default function RegistroForm({
   }
 
   return (
-    <form action={submitRegistroForm} className="space-y-6" noValidate>
+    <form id="registro-form" action={submitRegistroForm} className="space-y-6" noValidate>
       <RegistroFormEnhancer state={state} language={language} />
-      <input type="hidden" name="utm_source" value={utms?.source ?? ""} />
-      <input type="hidden" name="utm_medium" value={utms?.medium ?? ""} />
-      <input type="hidden" name="utm_campaign" value={utms?.campaign ?? ""} />
+      {/* Marketing attribution: UTMs + ad click IDs + landing/referrer +
+          first/last touch timestamps as hidden inputs (no visual change). */}
+      <AttributionCapture asInputs />
       <input type="hidden" name="language" value={language} />
 
       {errorCount > 0 && (

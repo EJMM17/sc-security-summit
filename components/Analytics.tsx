@@ -7,12 +7,19 @@ import Script from "next/script";
  * Required env vars (all NEXT_PUBLIC_ so they're available at build time):
  *   - NEXT_PUBLIC_GTM_ID        → GTM-XXXXXXX
  *   - NEXT_PUBLIC_GA_MEASUREMENT_ID → G-XXXXXXXXXX  (optional if using GTM)
+ *
+ * Single-entrypoint rule: GTM is the source of truth. When GTM is present
+ * we DO NOT load gtag.js directly — GA4 must be configured *inside* GTM.
+ * Loading both would double-count every pageview/event. Direct GA4 is only
+ * a fallback for when GTM is not configured.
  */
 export default function Analytics({ nonce }: { nonce?: string }) {
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
   if (!gtmId && !gaId) return null;
+
+  const useDirectGa4 = !gtmId && Boolean(gaId);
 
   return (
     <>
@@ -45,8 +52,8 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         </>
       )}
 
-      {/* ── Google Analytics 4 ──────────────────────────────────────── */}
-      {gaId && (
+      {/* ── Google Analytics 4 (direct — only when GTM is absent) ───── */}
+      {useDirectGa4 && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}

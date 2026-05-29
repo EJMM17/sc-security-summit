@@ -210,11 +210,6 @@ export default async function Home({
   const params = searchParams ? await searchParams : undefined;
   const language = await getRequestLanguage(params?.lang ?? null);
   const registroState = deserializeRegistroFlashState(params?.registro);
-  const utms = {
-    source: params?.utm_source,
-    medium: params?.utm_medium,
-    campaign: params?.utm_campaign,
-  };
 
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
@@ -237,7 +232,7 @@ export default async function Home({
         <Pricing language={language} />
         <Sponsors language={language} />
         <FinalCTA language={language} />
-        <Registro language={language} state={registroState} utms={utms} />
+        <Registro language={language} state={registroState} />
         <Location language={language} />
         <Faq language={language} />
         <Footer language={language} />

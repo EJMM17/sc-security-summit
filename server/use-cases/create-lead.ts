@@ -27,7 +27,32 @@ const createLeadInputSchema = z.object({
   utm_source: z.string().nullable().optional(),
   utm_medium: z.string().nullable().optional(),
   utm_campaign: z.string().nullable().optional(),
+  // Extended attribution (persisted only if the DB columns exist — see
+  // migration 010_attribution_columns.sql; insert falls back gracefully).
+  utm_term: z.string().nullable().optional(),
+  utm_content: z.string().nullable().optional(),
+  gclid: z.string().nullable().optional(),
+  gbraid: z.string().nullable().optional(),
+  wbraid: z.string().nullable().optional(),
+  fbclid: z.string().nullable().optional(),
+  li_fat_id: z.string().nullable().optional(),
+  msclkid: z.string().nullable().optional(),
+  landing_page: z.string().nullable().optional(),
+  referrer: z.string().nullable().optional(),
+  first_touch_timestamp: z.string().nullable().optional(),
+  last_touch_timestamp: z.string().nullable().optional(),
 });
+
+/** True when a Supabase error means a column is not in the schema cache. */
+function isMissingColumnError(error: {
+  code?: string;
+  message?: string;
+}): boolean {
+  if (error.code === "PGRST204" || error.code === "42703") return true;
+  return /column .* does not exist|could not find the .* column/i.test(
+    error.message ?? "",
+  );
+}
 
 export type CreateLeadInput = z.input<typeof createLeadInputSchema>;
 
@@ -123,7 +148,38 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       insertPayload.codigo_postal_fiscal = data.codigo_postal_fiscal ?? null;
     }
 
-    const { error } = await supabaseAdmin.from("registros").insert(insertPayload);
+    // Extended attribution columns. Kept separate so we can retry without
+    // them if the migration hasn't been applied yet (no broken registrations).
+    const attributionPayload: Record<string, unknown> = {
+      utm_term: data.utm_term ?? null,
+      utm_content: data.utm_content ?? null,
+      gclid: data.gclid ?? null,
+      gbraid: data.gbraid ?? null,
+      wbraid: data.wbraid ?? null,
+      fbclid: data.fbclid ?? null,
+      li_fat_id: data.li_fat_id ?? null,
+      msclkid: data.msclkid ?? null,
+      landing_page: data.landing_page ?? null,
+      referrer: data.referrer ?? null,
+      first_touch_timestamp: data.first_touch_timestamp || null,
+      last_touch_timestamp: data.last_touch_timestamp || null,
+    };
+
+    const insert = (payload: Record<string, unknown>) =>
+      supabaseAdmin.from("registros").insert(payload);
+
+    let { error } = await insert({ ...insertPayload, ...attributionPayload });
+
+    // Migration not applied yet → retry with only the base columns so the
+    // registration still succeeds. Attribution is logged for visibility.
+    if (error && isMissingColumnError(error)) {
+      Sentry.captureMessage("create_lead.attribution_columns_missing", {
+        level: "warning",
+        tags: { use_case: "create_lead" },
+        extra: { code: error.code, message: error.message },
+      });
+      ({ error } = await insert(insertPayload));
+    }
 
     if (error) {
       if (error.code === "23505") {

@@ -16,6 +16,37 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
       },
     },
+    // ── Acquisition / SEO landing pages ──────────────────────────────
+    {
+      url: `${BASE_URL}/sponsors`,
+      lastModified: new Date("2026-05-29"),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/media-kit`,
+      lastModified: new Date("2026-05-29"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ctpat-oea`,
+      lastModified: new Date("2026-05-29"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/seguridad-cadena-suministro`,
+      lastModified: new Date("2026-05-29"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/evento-logistica-reynosa`,
+      lastModified: new Date("2026-05-29"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     {
       url: `${BASE_URL}/recuperar-folio`,
       lastModified: new Date("2026-05-19"),

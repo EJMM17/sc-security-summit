@@ -12,14 +12,14 @@ type Language = "es" | "en";
 const text = {
   es: {
     title: "Privacidad y cookies",
-    body: "Utilizamos cookies esenciales para el funcionamiento del sitio y analíticas para mejorar tu experiencia. Al continuar, aceptas nuestra política de privacidad.",
+    body: "Usamos cookies esenciales para que el sitio funcione y, con tu permiso, cookies de analítica y marketing para mejorar tu experiencia y medir nuestras campañas. Elige cómo quieres continuar. Más información en el",
     acceptAll: "Aceptar todas",
     essential: "Solo esenciales",
     privacyLabel: "Aviso de Privacidad",
   },
   en: {
     title: "Privacy & cookies",
-    body: "We use essential cookies for site functionality and analytics to improve your experience. By continuing you accept our privacy policy.",
+    body: "We use essential cookies to run the site and, with your permission, analytics and marketing cookies to improve your experience and measure our campaigns. Choose how you'd like to continue. Learn more in our",
     acceptAll: "Accept all",
     essential: "Essential only",
     privacyLabel: "Privacy Notice",
@@ -47,6 +47,31 @@ export default function CookieConsent({ language = "es" }: { language?: Language
         JSON.stringify({ decision, ts: Date.now() }),
       );
     } catch {}
+
+    // Google Consent Mode v2 — flip storage based on the choice. GTM requires
+    // the real gtag `arguments` object (not a plain array), so we reuse the
+    // global gtag defined by ConsentMode, with a safe fallback.
+    try {
+      const w = window as unknown as {
+        dataLayer?: unknown[];
+        gtag?: (...args: unknown[]) => void;
+      };
+      w.dataLayer = w.dataLayer || [];
+      const gtag =
+        w.gtag ||
+        function gtag(...args: unknown[]) {
+          w.dataLayer!.push(args);
+        };
+      const value = decision === "all" ? "granted" : "denied";
+      gtag("consent", "update", {
+        ad_storage: value,
+        ad_user_data: value,
+        ad_personalization: value,
+        analytics_storage: value,
+      });
+      w.dataLayer.push({ event: "consent_update", consent_decision: decision });
+    } catch {}
+
     setVisible(false);
   }
 

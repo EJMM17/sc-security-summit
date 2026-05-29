@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { popHashedUserData } from "@/lib/enhanced-conversions";
 
 type Props = {
   /** e.g. "estudiante" | "general" | "vip" */
@@ -12,9 +13,15 @@ type Props = {
 };
 
 /**
- * Fires conversion events to GA4, Meta Pixel, and LinkedIn on mount.
- * Renders nothing — purely a side-effect component.
- * Safe to render even when analytics scripts are not loaded (no-ops).
+ * Fires the registration conversion exactly once per folio.
+ *
+ * Measurement strategy: Google Tag Manager is the single entrypoint, so
+ * GA4 + Google Ads conversions are driven from the dataLayer `generate_lead`
+ * event (configure both inside GTM). Meta Pixel and LinkedIn are loaded
+ * directly (not via GTM), so we still call fbq/lintrk here.
+ *
+ * De-duplication: an in-component ref guards Strict-Mode double mount, and
+ * a per-folio sessionStorage flag guards page refreshes / back-forward.
  */
 export default function ConversionTracker({ tipo, monto, folio }: Props) {
   const hasFired = useRef(false);
@@ -23,52 +30,66 @@ export default function ConversionTracker({ tipo, monto, folio }: Props) {
     if (hasFired.current) return;
     hasFired.current = true;
 
-    // ── GA4 / GTM ──────────────────────────────────────────────────
-    if (typeof window !== "undefined" && "gtag" in window) {
-      const gtag = (window as Record<string, unknown>).gtag as (
-        ...args: unknown[]
-      ) => void;
-      gtag("event", "generate_lead", {
-        currency: "MXN",
-        value: monto ?? 0,
-        event_category: "registration",
-        event_label: tipo,
-        transaction_id: folio,
-      });
+    const dedupeKey = `scss:lead_fired:${folio}`;
+    try {
+      if (window.sessionStorage.getItem(dedupeKey)) return;
+      window.sessionStorage.setItem(dedupeKey, "1");
+    } catch {
+      /* storage blocked — fall through and fire once for this mount */
     }
 
-    // Also push to dataLayer for GTM triggers
-    if (typeof window !== "undefined" && "dataLayer" in window) {
-      const dataLayer = (window as Record<string, unknown>)
-        .dataLayer as unknown[];
-      dataLayer.push({
+    let cancelled = false;
+
+    (async () => {
+      const value = monto ?? 0;
+      const userData = await popHashedUserData().catch(() => undefined);
+      if (cancelled) return;
+
+      const w = window as unknown as {
+        dataLayer?: unknown[];
+        fbq?: (...args: unknown[]) => void;
+        lintrk?: (...args: unknown[]) => void;
+      };
+      w.dataLayer = w.dataLayer || [];
+
+      // ── GA4 standard lead event (+ Google Ads conversion via GTM) ──
+      w.dataLayer.push({
+        event: "generate_lead",
+        lead_type: "event_registration",
+        tipo_acceso: tipo,
+        value,
+        currency: "MXN",
+        transaction_id: folio,
+        ...(userData ? { user_data: userData } : {}),
+      });
+
+      // ── Legacy event (kept for existing GTM triggers) ──────────────
+      w.dataLayer.push({
         event: "registro_completo",
         tipo_acceso: tipo,
-        monto_mxn: monto ?? 0,
+        monto_mxn: value,
         folio,
       });
-    }
 
-    // ── Meta Pixel ─────────────────────────────────────────────────
-    if (typeof window !== "undefined" && "fbq" in window) {
-      const fbq = (window as Record<string, unknown>).fbq as (
-        ...args: unknown[]
-      ) => void;
-      fbq("track", "CompleteRegistration", {
-        content_name: `SC Summit 2026 — ${tipo}`,
-        currency: "MXN",
-        value: monto ?? 0,
-        status: "registered",
-      });
-    }
+      // ── Meta Pixel (loaded directly, not via GTM) ──────────────────
+      if (typeof w.fbq === "function") {
+        w.fbq("track", "CompleteRegistration", {
+          content_name: `SC Summit 2026 — ${tipo}`,
+          currency: "MXN",
+          value,
+          status: "registered",
+        });
+      }
 
-    // ── LinkedIn ───────────────────────────────────────────────────
-    if (typeof window !== "undefined" && "lintrk" in window) {
-      const lintrk = (window as Record<string, unknown>).lintrk as (
-        ...args: unknown[]
-      ) => void;
-      lintrk("track", { conversion_id: "registration" });
-    }
+      // ── LinkedIn (loaded directly) ─────────────────────────────────
+      if (typeof w.lintrk === "function") {
+        w.lintrk("track", { conversion_id: "registration" });
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [tipo, monto, folio]);
 
   return null;

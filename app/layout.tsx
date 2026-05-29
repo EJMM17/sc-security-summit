@@ -14,6 +14,9 @@ import Analytics from "@/components/Analytics";
 import MetaPixel from "@/components/MetaPixel";
 import LinkedInInsight from "@/components/LinkedInInsight";
 import LeadCapture from "@/components/LeadCapture";
+import AttributionCapture from "@/components/AttributionCapture";
+import InteractionTracker from "@/components/InteractionTracker";
+import ConsentMode from "@/components/ConsentMode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
@@ -90,6 +93,8 @@ export default async function RootLayout({
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
+        {/* Consent Mode v2 defaults — must run before GTM / GA / pixels */}
+        <ConsentMode nonce={nonce} />
         <AmbientCanvasLazy />
         {children}
         <WhatsAppButton />
@@ -102,6 +107,9 @@ export default async function RootLayout({
         <Analytics nonce={nonce} />
         <MetaPixel nonce={nonce} />
         <LinkedInInsight nonce={nonce} />
+        {/* Persist first/last-touch attribution + emit interaction events */}
+        <AttributionCapture />
+        <InteractionTracker />
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}
       </body>
     </html>

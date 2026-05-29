@@ -112,15 +112,32 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   }
 
   // 2. Insert via use-case
+  const field = (key: string): string | null => {
+    const value = formData.get(key);
+    return typeof value === "string" && value.trim() ? value : null;
+  };
+
   const result = await createLead({
     ...parsed.data,
     language,
     ip,
     userAgent,
     referer,
-    utm_source: (formData.get("utm_source") as string | null) || null,
-    utm_medium: (formData.get("utm_medium") as string | null) || null,
-    utm_campaign: (formData.get("utm_campaign") as string | null) || null,
+    utm_source: field("utm_source"),
+    utm_medium: field("utm_medium"),
+    utm_campaign: field("utm_campaign"),
+    utm_term: field("utm_term"),
+    utm_content: field("utm_content"),
+    gclid: field("gclid"),
+    gbraid: field("gbraid"),
+    wbraid: field("wbraid"),
+    fbclid: field("fbclid"),
+    li_fat_id: field("li_fat_id"),
+    msclkid: field("msclkid"),
+    landing_page: field("landing_page"),
+    referrer: field("referrer"),
+    first_touch_timestamp: field("first_touch_timestamp"),
+    last_touch_timestamp: field("last_touch_timestamp"),
   });
 
   if (!result.ok) {
