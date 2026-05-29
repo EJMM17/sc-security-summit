@@ -45,8 +45,8 @@ n&&j.setAttribute('nonce',n.nonce||n.getAttribute('nonce'));f.parentNode.insertB
         </>
       )}
 
-      {/* ── Google Analytics 4 (standalone, when not using GTM) ───── */}
-      {gaId && !gtmId && (
+      {/* ── Google Analytics 4 ──────────────────────────────────────── */}
+      {gaId && (
         <>
           <Script
             src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
