@@ -223,13 +223,40 @@ named is the one to extend.
 
 ---
 
-## 8. Pending external tasks (not code)
+## 8. Consent Mode v2
+
+Implemented and wired to the cookie banner:
+
+- `components/ConsentMode.tsx` sets the **default** consent state before GTM /
+  GA / Ads / pixels load (`strategy="beforeInteractive"`, nonce for CSP).
+  Defaults are **denied** (`ad_storage`, `ad_user_data`, `ad_personalization`,
+  `analytics_storage`), with `functionality_storage` / `security_storage`
+  granted. Returning visitors who previously accepted get `granted` applied as
+  the default immediately (read from `localStorage`).
+- `url_passthrough` is on and `ads_data_redaction` is enabled while consent is
+  denied (better modeling, no ad cookies).
+- `components/CookieConsent.tsx` calls `gtag('consent','update', …)` on the
+  user's choice: **Aceptar todas → granted**, **Solo esenciales → denied**, and
+  pushes a `consent_update` dataLayer event.
+
+> Default-denied is the privacy-first / compliant choice: with Consent Mode,
+> GTM still sends cookieless pings so GA4/Ads can model conversions. If the
+> client prefers analytics-on-by-default, change the defaults in
+> `ConsentMode.tsx` (and review legal copy in the banner).
+
+**GTM setup required (external):** In GTM → Container Settings, enable
+**Consent Overview / "Require additional consent for tags"**, then set each
+tag's **Consent Settings** to require the right consent type (GA4 →
+`analytics_storage`; Ads/remarketing → `ad_storage`, `ad_user_data`,
+`ad_personalization`). The Conversion Linker should be set to fire regardless
+(it respects consent automatically). Optionally configure consent **regions**.
+
+## 9. Pending external tasks (not code)
 
 - [ ] Create / confirm the GTM container and set `NEXT_PUBLIC_GTM_ID`.
 - [ ] Configure GA4, Google Ads Conversion + Remarketing, Conversion Linker,
       Enhanced Conversions inside GTM (section 5).
-- [ ] Apply Supabase migration `010_attribution_columns.sql`.
+- [ ] Set per-tag **Consent Settings** in GTM (section 8).
+- [x] Apply Supabase migration `010_attribution_columns.sql` — **applied to
+      project `Summit` (fydurateumklukehituw)**, 12 columns + 2 indexes verified.
 - [ ] (Optional) Set `NEXT_PUBLIC_META_PIXEL_ID` / `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`.
-- [ ] (Recommended) Implement Google **Consent Mode v2** in GTM and wire it to
-      the existing cookie banner (`components/CookieConsent.tsx`) — the banner
-      currently records a choice but does not yet gate tags.

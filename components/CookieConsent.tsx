@@ -47,6 +47,31 @@ export default function CookieConsent({ language = "es" }: { language?: Language
         JSON.stringify({ decision, ts: Date.now() }),
       );
     } catch {}
+
+    // Google Consent Mode v2 — flip storage based on the choice. GTM requires
+    // the real gtag `arguments` object (not a plain array), so we reuse the
+    // global gtag defined by ConsentMode, with a safe fallback.
+    try {
+      const w = window as unknown as {
+        dataLayer?: unknown[];
+        gtag?: (...args: unknown[]) => void;
+      };
+      w.dataLayer = w.dataLayer || [];
+      const gtag =
+        w.gtag ||
+        function gtag(...args: unknown[]) {
+          w.dataLayer!.push(args);
+        };
+      const value = decision === "all" ? "granted" : "denied";
+      gtag("consent", "update", {
+        ad_storage: value,
+        ad_user_data: value,
+        ad_personalization: value,
+        analytics_storage: value,
+      });
+      w.dataLayer.push({ event: "consent_update", consent_decision: decision });
+    } catch {}
+
     setVisible(false);
   }
 
