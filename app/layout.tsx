@@ -7,6 +7,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import { BASE_URL } from "@/lib/content";
 import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
 import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 import CookieConsent from "@/components/CookieConsent";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
@@ -103,6 +104,7 @@ export default async function RootLayout({
         <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
         {enableSpeedInsights && <SpeedInsights />}
+        {enableSpeedInsights && <VercelAnalytics />}
         {/* ── Analytics & Marketing ── */}
         <Analytics nonce={nonce} />
         <MetaPixel nonce={nonce} />
