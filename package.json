@@ -37,7 +37,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "bcryptjs": "^3.0.3",
-    "lucide-react": "^0.441.0",
+    "lucide-react": "^1.17.0",
     "next": "^15.5.15",
     "react": "18.3.1",
     "react-dom": "18.3.1",
