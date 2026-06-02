@@ -131,16 +131,16 @@ En lugar de pegar valores uno por uno en el dashboard:
 ```bash
 npm i -g vercel
 vercel link                  # una sola vez
-npm run vercel:env:push      # sube todo .env.local a production + preview
+vercel env add VARIABLE    # agrega/rota variables en production y preview
 ```
 
 Para traer los valores actuales de Vercel a tu `.env.local`:
 
 ```bash
-npm run vercel:env:pull
+vercel env pull .env.local
 ```
 
-Lista canónica de variables y reglas de validación: `scripts/env-spec.mjs`.
+Validación de build: `scripts/check-env.mjs`; validación runtime de Supabase: `env.ts`.
 Guía completa de deploy y troubleshooting: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
 ---
@@ -165,7 +165,7 @@ Form submit
    │
    ▼
 Server Action: registrar
-   │  rate-limit + Turnstile + Zod + capacity
+   │  honeypot + rate-limit + Zod + capacity
    │  insert into registros (idempotency_key UNIQUE)
    │  send registration_confirmation email
    ▼

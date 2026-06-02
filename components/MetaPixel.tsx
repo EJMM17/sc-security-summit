@@ -31,6 +31,7 @@ fbq('track','PageView');`,
         }}
       />
       <noscript>
+        {/* eslint-disable-next-line @next/next/no-img-element -- tracking pixel fallback requires a raw img beacon inside noscript. */}
         <img
           height="1"
           width="1"

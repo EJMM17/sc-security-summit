@@ -15,11 +15,6 @@ const schema = z.object({
   // Site
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
 
-  // Turnstile — optional (graceful degradation when unset)
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: nonEmpty.optional(),
-  TURNSTILE_SECRET_KEY: nonEmpty.optional(),
-  TURNSTILE_ENFORCEMENT: z.enum(["strict", "report"]).default("report"),
-
   // Admin auth
   ADMIN_SESSION_SECRET: z.string().min(32).optional(),
   BCRYPT_ROUNDS: z.coerce.number().min(4).max(20).default(12),
@@ -43,7 +38,3 @@ if (!parsed.success) {
 
 export const env = parsed.data;
 export type Env = typeof env;
-
-export const features = {
-  turnstile: Boolean(env.TURNSTILE_SECRET_KEY && env.NEXT_PUBLIC_TURNSTILE_SITE_KEY),
-} as const;

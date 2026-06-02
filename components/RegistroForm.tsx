@@ -249,12 +249,29 @@ export default function RegistroForm({
   }
 
   return (
-    <form id="registro-form" action={submitRegistroForm} className="space-y-6" noValidate>
+    <form
+      id="registro-form"
+      action={submitRegistroForm}
+      className="space-y-6"
+      noValidate
+      autoComplete="on"
+    >
       <RegistroFormEnhancer state={state} language={language} />
       {/* Marketing attribution: UTMs + ad click IDs + landing/referrer +
           first/last touch timestamps as hidden inputs (no visual change). */}
       <AttributionCapture asInputs />
       <input type="hidden" name="language" value={language} />
+      <div className="absolute left-[-9999px] top-auto h-px w-px overflow-hidden" aria-hidden="true">
+        <label htmlFor="reg-website">Website</label>
+        <input
+          id="reg-website"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          inputMode="text"
+        />
+      </div>
 
       {errorCount > 0 && (
         <div

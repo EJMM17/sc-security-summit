@@ -46,6 +46,10 @@ function fieldValue(id: string): string {
   return (document.getElementById(id) as HTMLInputElement | null)?.value ?? "";
 }
 
+function fieldChecked(id: string): boolean {
+  return (document.getElementById(id) as HTMLInputElement | null)?.checked ?? false;
+}
+
 export default function RegistroFormEnhancer({
   state,
   language,
@@ -131,18 +135,32 @@ export default function RegistroFormEnhancer({
     const form = document.getElementById(FORM_ID);
     if (!form) return;
 
-    const onSubmit = () => {
+    const onSubmit = (event: SubmitEvent) => {
+      if (form.dataset.submitting === "true") {
+        event.preventDefault();
+        return;
+      }
+      form.dataset.submitting = "true";
+
       stashUserData({
         email: fieldValue("reg-email"),
         phone_number: fieldValue("reg-telefono"),
         first_name: fieldValue("reg-nombre"),
         last_name: fieldValue("reg-apellido"),
       });
+
+      pushEvent("form_submit", {
+        cta_location: "registro",
+        page_path: window.location.pathname,
+        language,
+        tipo_acceso: fieldValue("reg-tipo") || "general",
+        cfdi_required: fieldChecked("reg-cfdi-toggle"),
+      });
     };
 
     form.addEventListener("submit", onSubmit);
     return () => form.removeEventListener("submit", onSubmit);
-  }, []);
+  }, [language]);
 
   return null;
 }

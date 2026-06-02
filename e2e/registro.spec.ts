@@ -29,7 +29,6 @@ test.describe("Registro", () => {
 
     await page.getByLabel(/términos|terms/i).check();
 
-    // Skip Turnstile in test mode — test sitekey 1x000... auto-passes.
     await page.getByRole("button", { name: /completar|complete registration/i }).click();
 
     // Successful registration redirects to /registro-exitoso.

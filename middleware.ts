@@ -29,12 +29,12 @@ export async function middleware(request: NextRequest) {
   // Keep this in sync with docs/TRACKING.md. Validate at csp-evaluator.withgoogle.com.
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://challenges.cloudflare.com https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://snap.licdn.com`,
+    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://snap.licdn.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.com.mx https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com",
-    "frame-src https://www.google.com https://maps.google.com https://challenges.cloudflare.com https://www.googletagmanager.com https://td.doubleclick.net https://bid.g.doubleclick.net",
-    "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://challenges.cloudflare.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://stats.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com",
+    "frame-src https://www.google.com https://maps.google.com https://www.googletagmanager.com https://td.doubleclick.net https://bid.g.doubleclick.net",
+    "connect-src 'self' https://*.supabase.co https://vitals.vercel-insights.com https://www.google-analytics.com https://*.google-analytics.com https://analytics.google.com https://*.analytics.google.com https://www.googletagmanager.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://stats.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com",
     "form-action 'self'",
     "base-uri 'self'",
     "frame-ancestors 'self'",

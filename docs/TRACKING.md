@@ -85,11 +85,14 @@ button markup changed) and `components/RegistroFormEnhancer.tsx`.
 | --- | --- | --- |
 | `form_start` | First interaction with the registration form | `cta_location`, `page_path`, `language` |
 | `form_error` | Server-side validation returned errors | `error_fields`, `error_count`, `page_path`, `language` |
+| `form_submit` | Valid submit attempt leaves the browser for the Server Action | `cta_location`, `page_path`, `language`, `tipo_acceso`, `cfdi_required` |
 | `click_register` | Click any link to `#registro` | `cta_location`, `page_path`, `language` |
 | `click_sponsor` | Sponsorship mailto / `/sponsors` / `#patrocinadores` | `cta_location`, `page_path`, `language` |
 | `click_whatsapp` | WhatsApp link click (off success page) | `cta_location`, `page_path`, `language` |
 | `click_calendar` | "Add to calendar" on `/registro-exitoso` | `cta_location`, `page_path`, `language` |
 | `share_whatsapp` | WhatsApp share on `/registro-exitoso` | `cta_location`, `page_path`, `language` |
+| `section_view` | First meaningful view of each landing section | `section_id`, `page_path`, `language` |
+| `scroll_depth` | Visitor reaches 25/50/75/90/100% page-depth milestones | `percent_scrolled`, `page_path`, `language` |
 
 `cta_location` is the nearest section `id` (e.g. `patrocinadores`, `registro`).
 
@@ -164,7 +167,8 @@ page we hash them, attach to the `generate_lead` push, then clear storage.
 ### Recommended Data Layer Variables
 
 `value`, `currency`, `transaction_id`, `tipo_acceso`, `lead_type`,
-`user_data`, `cta_location`, `page_path`, `language`, `error_count`.
+`user_data`, `cta_location`, `page_path`, `language`, `error_count`,
+`cfdi_required`, `section_id`, `percent_scrolled`.
 
 ---
 

@@ -2,13 +2,13 @@
 
 ## Objetivo
 
-Definir la operación mínima para continuidad del registro cuando fallen servicios críticos (Supabase, Upstash, Turnstile o despliegue web).
+Definir la operación mínima para continuidad del registro cuando fallen servicios críticos (Supabase, Upstash, correo transaccional o despliegue web).
 
 ## Servicios críticos
 
 - Frontend/App: Next.js (Vercel)
 - Base de datos: Supabase
-- Anti-bot: Cloudflare Turnstile
+- Anti-bot: honeypot + rate limiting distribuido + validación server-side
 - Rate limiting: Upstash Redis
 
 ## Señales de incidente
@@ -28,9 +28,9 @@ Definir la operación mínima para continuidad del registro cuando fallen servic
 
 1. **Confirmar el alcance (5 min):**
    - Revisar logs de despliegue y errores de Server Action.
-   - Verificar estado de Supabase, Upstash y Cloudflare.
+   - Verificar estado de Supabase, Upstash, Vercel y DNS.
 2. **Mitigar (10 min):**
-   - Si falla Turnstile por outage externo, comunicar y activar plan temporal de registro manual.
+   - Si el rate limiting o validaciones anti-spam bloquean tráfico legítimo, comunicar y activar plan temporal de registro manual.
    - Si falla DB, habilitar captura temporal offline (formulario alterno).
 3. **Comunicar (inmediato):**
    - Publicar aviso interno al equipo operativo/comercial.

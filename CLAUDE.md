@@ -30,7 +30,7 @@ Tests live next to source files (`lib/foo.test.ts` next to `lib/foo.ts`). The CI
 
 The registration flow is:
 1. `RegistroForm.tsx` (client) collects data and submits
-2. `app/actions/registro.ts` (Server Action) runs: honeypot check → rate limit → Cloudflare Turnstile verification → Zod validation → Supabase insert → bilingual confirmation + organizer notification emails (Resend, awaited via `Promise.allSettled` so a send failure cannot break the persisted registration)
+2. `app/actions/registro.ts` (Server Action) runs: honeypot check → rate limit → Zod validation → Supabase insert → bilingual confirmation + organizer notification emails (Resend, awaited via `Promise.allSettled` so a send failure cannot break the persisted registration)
 3. On success, a `folio` number (format: `SCSS2026-XXXXX-XXXX`) is returned with confetti/toast feedback
 
 **Key files:**
@@ -38,7 +38,6 @@ The registration flow is:
 - `lib/folio.ts` — folio generator (`SCSS2026-{base36 ts}-{6 hex}`); covered by 12 unit tests including a 10k no-collision sweep
 - `lib/supabase.ts` — Two clients: public anon (limited) and admin service_role (server-only, full insert/read)
 - `lib/rate-limit.ts` — Distributed Upstash Redis sliding window (5 req / 15 min per IP). Fail-closed in production — throws if `UPSTASH_REDIS_REST_*` env vars are missing. Falls back to allow-all in dev.
-- `lib/turnstile.ts` — Cloudflare Turnstile bot verification
 - `lib/email.ts` + `lib/email-templates.ts` — Resend transactional emails (attendee confirmation bilingual ES/EN, organizer notification ES, admin login magic-link). Fail-safe: send errors are logged but do not surface to the user once the registration is persisted.
 - `lib/admin-auth.ts` — HMAC-signed magic-link auth for `/admin/*`. Uses `ADMIN_EMAILS` allow-list and `ADMIN_SESSION_SECRET`. Throws in production if the secret is unset or <32 chars; safe dev fallback otherwise.
 - `lib/language.ts` — server-side language detection (`?lang` → `NEXT_LOCALE` cookie → `Accept-Language` → "es"). Mirrored client-side via `setLanguageCookie` server action so SSR `<html lang>` and the React state agree.
@@ -61,14 +60,12 @@ Public (browser-safe, `NEXT_PUBLIC_` prefix):
 ```
 NEXT_PUBLIC_SUPABASE_URL
 NEXT_PUBLIC_SUPABASE_ANON_KEY
-NEXT_PUBLIC_TURNSTILE_SITE_KEY
 NEXT_PUBLIC_SITE_URL
 ```
 
 Server-only (never expose to client):
 ```
 SUPABASE_SERVICE_ROLE_KEY
-TURNSTILE_SECRET_KEY
 CONTACT_EMAIL
 RESEND_API_KEY
 EMAIL_FROM                  # optional override; default "SC Security Summit <hola@scsecuritysummit.com.mx>"
@@ -98,7 +95,7 @@ Key business rules enforced at the DB level:
 
 ## Security Conventions
 
-The form uses layered bot/spam protection: honeypot field (`name="website"` hidden from real users), distributed Upstash rate limiting, and Cloudflare Turnstile. Do not remove any of these layers without adding an equivalent.
+The form uses layered bot/spam protection without external CAPTCHA: honeypot field (`name="website"` hidden from real users), distributed Upstash rate limiting, required terms acceptance, server-side Zod validation, and database uniqueness constraints. Do not weaken these layers without adding an equivalent.
 
 Security headers are split between `next.config.ts` (HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Permitted-Cross-Origin-Policies) and `middleware.ts` (nonce-based CSP per-request, including `form-action`, `base-uri`, `frame-ancestors`, `object-src`). If adding new external script or font sources, update the CSP allowlist in `middleware.ts`. Validate any CSP change at https://csp-evaluator.withgoogle.com.
 

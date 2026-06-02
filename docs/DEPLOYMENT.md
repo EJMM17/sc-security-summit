@@ -34,7 +34,6 @@ Local `.env.local` drives both local builds and what we push to Vercel.
 cp .env.local.example .env.local
 # Edit .env.local with real values from:
 #   - Supabase Dashboard → Settings → API
-#   - Cloudflare Dashboard → Turnstile
 #   - Resend → API Keys
 #   - Upstash → Redis instance → REST tab
 #   - Sentry → Project → Client Keys (DSN)
@@ -50,28 +49,12 @@ npm run check-env   # green ✓ before you push to Vercel
 
 ## 3. Push env vars to Vercel
 
-Two options; **prefer the CLI helper** so a typo in the dashboard can't bite us.
+Two options; **prefer the Vercel CLI** so a typo in the dashboard can't bite us.
 
-### Option A — `npm run vercel:env:push` (recommended)
+### Option A — Vercel CLI (recommended)
 
-```bash
-npm run vercel:env:push
-```
-
-What it does:
-
-- Reads `.env.local`, skips placeholders and unset values.
-- For each known var, calls `vercel env rm` then `vercel env add` for both
-  `production` and `preview` targets.
-- Prints what was pushed and what was skipped.
-
-Flags:
-
-```bash
-npm run vercel:env:push -- --dry-run                 # see what would happen
-npm run vercel:env:push -- --target=production       # only one target
-npm run vercel:env:push -- --only=RESEND_API_KEY     # rotate a single key
-```
+Use `vercel env add <NAME>` for both `production` and `preview`, or use
+`vercel env pull .env.local` to inspect existing values before rotating a key.
 
 ### Option B — Vercel Dashboard
 
@@ -87,18 +70,18 @@ When you join the project from a new laptop, or someone rotated a secret in
 the dashboard:
 
 ```bash
-npm run vercel:env:pull
+vercel env pull .env.local
 ```
 
-This wraps `vercel env pull .env.local` and overwrites your local file with
-the values currently set in Vercel for the linked environment.
+This overwrites your local file with the values currently set in Vercel for
+the linked environment.
 
 ---
 
 ## 5. Required vars at a glance
 
-The full list and validation rules live in `scripts/env-spec.mjs` — that's the
-canonical source. Summary:
+The build-time validator lives in `scripts/check-env.mjs` and the runtime
+Supabase env schema lives in `env.ts`. Summary:
 
 **Required for every build (local and Vercel):**
 
@@ -107,8 +90,6 @@ canonical source. Summary:
 | `NEXT_PUBLIC_SUPABASE_URL`        | `https://<ref>.supabase.co`                           |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY`   | JWT, ≥40 chars                                        |
 | `SUPABASE_SERVICE_ROLE_KEY`       | JWT, ≥40 chars (server-only)                          |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY`  | Cloudflare Turnstile site key                         |
-| `TURNSTILE_SECRET_KEY`            | Cloudflare Turnstile secret                           |
 | `CONTACT_EMAIL`                   | `name@domain.tld`                                     |
 | `NEXT_PUBLIC_SITE_URL`            | `https://www.scsecuritysummit.com` (no trailing `/`)  |
 
@@ -164,8 +145,8 @@ npm test                # unit tests green
 npm run build           # full prod build succeeds locally
 ```
 
-If `check-env` is red, fix `.env.local` first; then `npm run vercel:env:push`
-to mirror those values onto the project before the next Vercel deploy.
+If `check-env` is red, fix `.env.local` first; then mirror those values onto
+the Vercel project via CLI/dashboard before the next deploy.
 
 ---
 
@@ -175,7 +156,6 @@ If you enable strict validation:
 
 ```
 ✖ [check-env] Build aborted. Fix these env vars:
-  • TURNSTILE_SECRET_KEY: missing
   ...
 ```
 
@@ -185,8 +165,7 @@ Recommended workflow:
 # 1. Make sure your local .env.local has the right values.
 npm run check-env
 
-# 2. Push them to Vercel.
-npm run vercel:env:push
+# 2. Push them to Vercel via CLI/dashboard.
 
 # 3. Re-trigger the deploy: Vercel Dashboard → Deployments → ⋯ → Redeploy.
 #    (Or just push a new commit.)
@@ -208,10 +187,10 @@ SKIP_ENV_VALIDATION=1 npm run build
 
 ## 8. Adding a new env var
 
-1. Add it to `scripts/env-spec.mjs` (`ALWAYS_REQUIRED`, `PROD_REQUIRED`, or
-   `OPTIONAL`).
-2. Add it to `.env.local.example` with a placeholder + comment explaining
+1. Add it to `.env.local.example` with a placeholder + comment explaining
    where to source the value.
-3. Reference it in code via `process.env.<NAME>`.
+2. Reference it in code via `process.env.<NAME>`, or add it to `env.ts` when
+   it must be runtime-validated before creating Supabase clients.
+3. Add it to `scripts/check-env.mjs` when it should be checked during builds.
 4. If sensitive, document in `CLAUDE.md` under "Environment Variables".
-5. Update your local `.env.local`, then `npm run vercel:env:push`.
+5. Update your local `.env.local`, then mirror the value in Vercel via CLI/dashboard.
