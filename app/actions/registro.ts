@@ -7,9 +7,16 @@ import { serializeRegistroFlashState } from "@/lib/registro-form-state";
 
 type Language = "es" | "en";
 
-function auditLog(event: string, data: Record<string, unknown>) {
-  console.log(JSON.stringify({ timestamp: new Date().toISOString(), event, ...data }));
-}
+const actionText = {
+  es: {
+    validation: "Por favor corrige los errores en el formulario.",
+    rateLimited: "Demasiados intentos. Espera 15 minutos antes de volver a intentar.",
+  },
+  en: {
+    validation: "Please correct the errors in the form.",
+    rateLimited: "Too many attempts. Please wait 15 minutes before trying again.",
+  },
+} as const;
 
 function pickLanguage(formData: FormData, acceptLanguage: string | null): Language {
   const explicit = String(formData.get("language") ?? "").toLowerCase();
@@ -58,11 +65,6 @@ type ProcessResult =
   | { ok: false; state: RegistroState; language: Language };
 
 async function processRegistro(formData: FormData): Promise<ProcessResult> {
-  const [{ RegistroSchema }, { createLead }] = await Promise.all([
-    import("@/lib/schemas"),
-    import("@/server/use-cases/create-lead"),
-  ]);
-
   const h = await headers();
   const ip =
     h.get("cf-connecting-ip") ??
@@ -74,7 +76,27 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
   const acceptLanguage = h.get("accept-language");
   const language = pickLanguage(formData, acceptLanguage);
   const values = getPersistedValues(formData);
-  // 1. Zod validation
+  const text = actionText[language];
+
+  // 1. Honeypot: real users never see/fill this field. Do not touch DB,
+  // email, or conversion paths when it trips.
+  const website = String(formData.get("website") ?? "").trim();
+  if (website) {
+    return {
+      ok: false,
+      language,
+      state: {
+        success: false,
+        message: text.validation,
+        errors: { _form: [text.validation] },
+        values,
+      },
+    };
+  }
+
+  const { RegistroSchema } = await import("@/lib/schemas");
+
+  // 2. Zod validation
   const requiresCFDI = formData.get("requiere_cfdi") === "true";
   const rawData = {
     nombre: formData.get("nombre"),
@@ -101,7 +123,7 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
       language,
       state: {
         success: false,
-        message: "Por favor corrige los errores en el formulario.",
+        message: text.validation,
         errors: {
           ...(fieldErrors as RegistroState["errors"]),
           ...(formErrors.length > 0 ? { _form: formErrors } : {}),
@@ -111,7 +133,31 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     };
   }
 
-  // 2. Insert via use-case
+  // 3. Distributed rate limiting (Upstash in production, no-op in dev when
+  // unset). Run it after validation so legitimate field corrections do not
+  // consume the submission budget, but before expensive DB/email work.
+  const { checkRateLimit, RateLimitError } = await import("@/lib/rate-limit");
+  try {
+    await checkRateLimit(`registro:${ip}`);
+  } catch (error) {
+    if (error instanceof RateLimitError) {
+      return {
+        ok: false,
+        language,
+        state: {
+          success: false,
+          message: text.rateLimited,
+          errors: { _form: [text.rateLimited] },
+          values,
+        },
+      };
+    }
+    throw error;
+  }
+
+  const { createLead } = await import("@/server/use-cases/create-lead");
+
+  // 4. Insert via use-case
   const field = (key: string): string | null => {
     const value = formData.get(key);
     return typeof value === "string" && value.trim() ? value : null;

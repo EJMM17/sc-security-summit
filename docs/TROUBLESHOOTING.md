@@ -7,18 +7,16 @@ not listed here, add a row before forgetting how you fixed it.
 
 ## Registration form
 
-### "We couldn't verify you're not a bot" on every submit
+### Legitimate users are blocked by anti-spam controls
 
-**Cause:** Cloudflare Turnstile widget didn't load, or the keys are wrong.
+**Cause:** The current registration flow intentionally does not use an external CAPTCHA. Bot/spam protection is handled by the hidden honeypot field, Upstash
+rate limiting, required terms acceptance, Zod server validation, and database
+uniqueness constraints.
 
 **Fix:**
-1. Browser DevTools → Network → filter `challenges.cloudflare.com`. If the
-   request is blocked, the page CSP is missing `https://challenges.cloudflare.com`.
-   Check `middleware.ts` `script-src` and `frame-src` directives.
-2. If the widget loads but verification fails, the secret is wrong: confirm
-   `TURNSTILE_SECRET_KEY` matches the site key in Cloudflare's dashboard.
-3. The site key (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`) and secret must come
-   from the same Turnstile widget.
+1. Check whether the user hit the rate limiter (see the next section).
+2. Confirm browser autofill did not populate the hidden `website` honeypot.
+3. If both are clean, inspect Sentry/logs for validation or Supabase errors.
 
 ### "Demasiados intentos. Espera 15 minutos."
 

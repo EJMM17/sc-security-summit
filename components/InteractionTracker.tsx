@@ -14,6 +14,8 @@ import { useEffect } from "react";
  *   click_whatsapp   → wa.me links (off the success page)
  *   click_calendar   → "add to calendar" on /registro-exitoso
  *   share_whatsapp   → WhatsApp share on /registro-exitoso
+ *   section_view     → first meaningful view of each landing section
+ *   scroll_depth     → 25/50/75/90/100% page-depth milestones
  *
  * Each event includes: cta_location (nearest section id), page_path, language.
  */
@@ -32,6 +34,13 @@ function safeDecode(value: string): string {
   }
 }
 
+function pageContext() {
+  return {
+    page_path: window.location.pathname,
+    language: document.documentElement.lang || "es",
+  };
+}
+
 export default function InteractionTracker() {
   useEffect(() => {
     function onClick(e: MouseEvent) {
@@ -42,8 +51,7 @@ export default function InteractionTracker() {
       const href = anchor.getAttribute("href") || "";
       if (!href) return;
 
-      const path = window.location.pathname;
-      const language = document.documentElement.lang || "es";
+      const { page_path: path, language } = pageContext();
       const ctaLocation =
         anchor.closest("section")?.id || anchor.closest("[id]")?.id || "";
       const base = { cta_location: ctaLocation, page_path: path, language };
@@ -82,6 +90,64 @@ export default function InteractionTracker() {
 
     document.addEventListener("click", onClick, true);
     return () => document.removeEventListener("click", onClick, true);
+  }, []);
+
+  useEffect(() => {
+    const milestones = [25, 50, 75, 90, 100] as const;
+    const fired = new Set<number>();
+    let ticking = false;
+
+    function onScrollDepth() {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        ticking = false;
+        const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+        if (scrollable <= 0) return;
+
+        const depth = Math.min(100, Math.round((window.scrollY / scrollable) * 100));
+        for (const milestone of milestones) {
+          if (depth < milestone || fired.has(milestone)) continue;
+          fired.add(milestone);
+          pushEvent("scroll_depth", { ...pageContext(), percent_scrolled: milestone });
+        }
+      });
+    }
+
+    onScrollDepth();
+    window.addEventListener("scroll", onScrollDepth, { passive: true });
+    window.addEventListener("resize", onScrollDepth);
+    return () => {
+      window.removeEventListener("scroll", onScrollDepth);
+      window.removeEventListener("resize", onScrollDepth);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!("IntersectionObserver" in window)) return;
+
+    const seen = new Set<string>();
+    const sections = Array.from(document.querySelectorAll<HTMLElement>("section[id]"));
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          const section = entry.target as HTMLElement;
+          if (!entry.isIntersecting || seen.has(section.id)) continue;
+          seen.add(section.id);
+          pushEvent("section_view", {
+            ...pageContext(),
+            section_id: section.id,
+          });
+          observer.unobserve(section);
+        }
+      },
+      { rootMargin: "0px 0px -35% 0px", threshold: 0.35 },
+    );
+
+    sections.forEach((section) => observer.observe(section));
+    return () => observer.disconnect();
   }, []);
 
   return null;

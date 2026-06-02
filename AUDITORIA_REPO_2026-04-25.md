@@ -4,7 +4,7 @@ Fecha: 2026-04-25 (UTC)
 
 ## Resumen ejecutivo
 
-El proyecto está bien encaminado para un landing + registro productivo (Next.js 15, validación con Zod, Server Actions, Turnstile, rate limiting con Upstash, headers de seguridad y hardening de DB). Aun así, para acercarlo a un estado “casi perfecto” en contexto de evento con captura de datos personales, faltan varios componentes de excelencia operativa.
+El proyecto está bien encaminado para un landing + registro productivo (Next.js 15, validación con Zod, Server Actions, honeypot, rate limiting con Upstash, headers de seguridad y hardening de DB). Aun así, para acercarlo a un estado “casi perfecto” en contexto de evento con captura de datos personales, faltan varios componentes de excelencia operativa.
 
 ## Hallazgos priorizados
 
@@ -35,7 +35,7 @@ El proyecto está bien encaminado para un landing + registro productivo (Next.js
    - Impacto: calidad y seguridad dependen de ejecución manual.
 
 6. **Documentación de respuesta a incidentes y continuidad**
-   - No hay playbook versionado para incidentes (caídas de Supabase/Upstash/Turnstile, fallback de registro, backups/export de registros).
+   - No hay playbook versionado para incidentes (caídas de Supabase/Upstash/correo transaccional, fallback de registro, backups/export de registros).
    - Impacto: riesgo operativo durante campaña y días cercanos al evento.
 
 7. **Gobernanza de datos personales incompleta**
@@ -49,7 +49,7 @@ El proyecto está bien encaminado para un landing + registro productivo (Next.js
    - Recomendación: centralizar por variables de entorno y automatizar dominio canónico + preview pattern controlado.
 
 9. **Observabilidad y métricas de negocio/técnicas**
-   - Hay logs estructurados vía `console.log`, pero falta trazabilidad centralizada (errores por etapa del flujo, tasa de rechazo Turnstile, saturación rate limit, conversión por UTM).
+   - Hay logs estructurados vía `console.log`, pero falta trazabilidad centralizada (errores por etapa del flujo, saturación rate limit, conversión por UTM).
 
 10. **Validaciones de accesibilidad y performance con presupuesto formal**
     - Recomendado incorporar auditorías automatizadas (Lighthouse CI / axe) con umbrales mínimos.
@@ -65,7 +65,7 @@ El proyecto está bien encaminado para un landing + registro productivo (Next.js
 ### Semana 2
 - Implementar pruebas mínimas:
   - unitarias para `lib/schemas.ts`
-  - integración para `app/actions/registro.ts` (casos: honeypot, RL, Turnstile fail, email duplicado, CFDI)
+  - integración para `app/actions/registro.ts` (casos: honeypot, RL, email duplicado, CFDI)
 - Agregar dashboard de observabilidad (errores por etapa + métricas de registro).
 - Formalizar runbook de operación para ventana del evento.
 

@@ -24,7 +24,7 @@ The site is deployed on **Vercel** and serves public pages (`/`, `/recuperar-fol
 | ORM / Client | `@supabase/supabase-js` |
 | Validation | Zod |
 | Rate Limiting | Upstash Redis (`@upstash/ratelimit`, `@upstash/redis`) |
-| Bot Protection | Cloudflare Turnstile |
+| Bot Protection | Honeypot + Upstash Redis rate limiting + server-side validation |
 | Email | Resend |
 | Error Tracking | Sentry (`@sentry/nextjs`) |
 | Analytics | Vercel Speed Insights |
@@ -38,7 +38,7 @@ The site is deployed on **Vercel** and serves public pages (`/`, `/recuperar-fol
 
 ```
 app/                          # Next.js App Router
-  layout.tsx                  # Root layout: SEO metadata, JSON-LD schemas, Google Fonts, nonce CSP, Turnstile script
+  layout.tsx                  # Root layout: SEO metadata, JSON-LD schemas, Google Fonts, nonce CSP
   page.tsx                    # Landing page (marketing + registration form)
   globals.css                 # Tailwind v4 import + extensive custom design system (CSS variables, animations, component classes)
   loading.tsx                 # Global loading UI
@@ -91,7 +91,6 @@ lib/                          # Shared utilities and business logic
   folio.ts                    # Folio generator (SCSS2026-{base36 ts}-{6 hex})
   folio.test.ts               # Folio unit tests (including 10k collision sweep)
   rate-limit.ts / ratelimit.ts # Upstash Redis sliding-window rate limiter
-  turnstile.ts                # Cloudflare Turnstile verification
   email.ts                    # Resend email sender (lazy singleton)
   email-templates.ts          # Bilingual HTML/text email builders
   admin-auth.ts               # Password-based sessions for /admin (bcrypt + HMAC cookies)
@@ -166,19 +165,15 @@ Env validation lives in `env.ts` (Zod schema). Variables are split into **strict
 | `EMAIL_FROM` | Sender address (default: `SC Security Summit <hola@scsecuritysummit.com.mx>`) |
 | `CONTACT_EMAIL` | Organizer contact email (used for notifications) |
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | Distributed rate limiting |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile bot protection |
 | `NEXT_PUBLIC_APP_URL` / `NEXT_PUBLIC_SITE_URL` | Canonical site URLs |
 | `SENTRY_DSN` | Sentry DSN (SDK no-ops when unset) |
 | `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Sentry source-map upload (Vercel only) |
 | `ADMIN_SESSION_SECRET` | HMAC secret for admin session cookies (≥32 chars, required in production) |
 | `BCRYPT_ROUNDS` | bcrypt cost factor (default 12) |
 
-Feature flags are derived in `env.ts` via the `features` object:
-- `features.ratelimit` — requires Upstash Redis vars
-- `features.email` — requires Resend key + `EMAIL_FROM`
-- `features.turnstile` — requires both Turnstile keys
+Runtime env validation for Supabase lives in `env.ts`; build-time warnings live in `scripts/check-env.mjs`.
 
-Copy `.env.local.example` to `.env.local` to get started. Use `npm run vercel:env:push` to sync local env vars to Vercel (production + preview).
+Copy `.env.local.example` to `.env.local` to get started. Sync env vars to Vercel with the Vercel CLI or dashboard (production + preview).
 
 ---
 
@@ -207,9 +202,9 @@ Migrations are in `/supabase/migrations/` and must be applied via Supabase Dashb
 The registration form uses **layered bot/spam protection**:
 1. **Honeypot field** (`name="website"`, hidden from real users)
 2. **Distributed rate limiting** (Upstash Redis, 5 req / 15 min per IP)
-3. **Cloudflare Turnstile** challenge
+3. **Server-side validation and database uniqueness constraints**
 
-Do not remove any of these layers without adding an equivalent replacement.
+Do not weaken any of these layers without adding an equivalent replacement.
 
 Security headers are split:
 - `next.config.ts` sets: HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Permitted-Cross-Origin-Policies
@@ -279,11 +274,10 @@ npm run build           # full prod build succeeds locally
 # 1. Ensure local .env.local is correct
 npm run check-env
 
-# 2. Push to Vercel (production + preview)
-npm run vercel:env:push
+# 2. Push to Vercel (production + preview) via CLI/dashboard
 
 # 3. Pull from Vercel (when joining from a new machine)
-npm run vercel:env:pull
+vercel env pull .env.local
 ```
 
 ### Build-time env validation
