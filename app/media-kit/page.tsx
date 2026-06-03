@@ -77,13 +77,13 @@ export async function generateMetadata({
       siteName: "SC Security Summit 2026",
       locale: lang === "en" ? "en_US" : "es_MX",
       type: "website",
-      images: [{ url: "/images/og-image.png", width: 1200, height: 630 }],
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, type: "image/png" }],
     },
     twitter: {
       card: "summary_large_image",
       title: c.title,
       description: c.description,
-      images: ["/images/og-image.png"],
+      images: ["/opengraph-image"],
     },
   };
 }
