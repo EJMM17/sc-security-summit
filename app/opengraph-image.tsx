@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
-import { readFile } from "fs/promises";
 import path from "path";
+import sharp from "sharp";
 
 export const runtime = "nodejs";
 export const alt = "SC Security Summit 2026 - Reynosa, Tamaulipas";
@@ -8,10 +8,12 @@ export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
 export default async function OgImage() {
-  const imageBuffer = await readFile(
+  const jpegBuffer = await sharp(
     path.join(process.cwd(), "public/images/gallery-keynote.webp")
-  );
-  const base64 = `data:image/webp;base64,${imageBuffer.toString("base64")}`;
+  )
+    .jpeg({ quality: 85 })
+    .toBuffer();
+  const base64 = `data:image/jpeg;base64,${jpegBuffer.toString("base64")}`;
 
   return new ImageResponse(
     <div
@@ -24,15 +26,19 @@ export default async function OgImage() {
       }}
     >
       {/* Background photo */}
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
+        alt=""
         src={base64}
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
           width: "100%",
           height: "100%",
           objectFit: "cover",
-          objectPosition: "center top",
         }}
       />
 
@@ -40,7 +46,10 @@ export default async function OgImage() {
       <div
         style={{
           position: "absolute",
-          inset: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
           background:
             "linear-gradient(105deg, rgba(10,16,35,0.92) 0%, rgba(10,16,35,0.82) 55%, rgba(10,16,35,0.55) 100%)",
           display: "flex",
@@ -51,9 +60,9 @@ export default async function OgImage() {
       <div
         style={{
           position: "absolute",
-          left: 0,
           top: 0,
           bottom: 0,
+          left: 0,
           width: 6,
           background: "linear-gradient(to bottom, #22d3ee, #0e7490)",
           display: "flex",
