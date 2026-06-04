@@ -10,7 +10,7 @@ const COPY = {
   es: {
     title: "Media Kit y Paquetes de Patrocinio | SC Security Summit 2026",
     description:
-      "Descarga el media kit del SC Security Summit 2026: audiencia, alcance y paquetes de patrocinio Platino, Oro, Plata y Proveedor de Soluciones de Seguridad.",
+      "Descarga el media kit del SC Security Summit 2026: audiencia, alcance y patrocinio Platino para posicionar tu marca.",
     eyebrow: "MEDIA KIT",
     h1: "Paquetes de patrocinio y media kit",
     lead: "Todo lo que tu equipo de marketing necesita para evaluar el evento: perfil de audiencia, alcance estimado y beneficios por nivel. Solicita el documento completo en PDF.",
@@ -22,7 +22,7 @@ const COPY = {
       "Industria maquiladora, transporte, aduanas y comercio exterior",
       "Frontera norte: Reynosa, Tamaulipas y región binacional",
     ],
-    tiersTitle: "Niveles de patrocinio",
+    tiersTitle: "Patrocinio Platino",
     standLabel: "Stand",
     slotsLabel: "cupos",
     benefitsMore: (n: number) => `+${n} beneficios adicionales`,
@@ -30,7 +30,7 @@ const COPY = {
   en: {
     title: "Media Kit & Sponsorship Packages | SC Security Summit 2026",
     description:
-      "Download the SC Security Summit 2026 media kit: audience, reach and Platinum, Gold, Silver and Security Solutions Provider sponsorship packages.",
+      "Download the SC Security Summit 2026 media kit: audience, reach and Platinum sponsorship to position your brand.",
     eyebrow: "MEDIA KIT",
     h1: "Sponsorship packages & media kit",
     lead: "Everything your marketing team needs to evaluate the event: audience profile, estimated reach and benefits per tier. Request the full PDF document.",
@@ -42,7 +42,7 @@ const COPY = {
       "Maquiladora industry, transport, customs and foreign trade",
       "Northern border: Reynosa, Tamaulipas and binational region",
     ],
-    tiersTitle: "Sponsorship tiers",
+    tiersTitle: "Platinum Sponsorship",
     standLabel: "Booth",
     slotsLabel: "slots",
     benefitsMore: (n: number) => `+${n} additional benefits`,
@@ -141,36 +141,29 @@ export default async function MediaKitPage({
           <h2 className="font-oswald text-2xl font-bold text-slate-900 mb-6">
             {c.tiersTitle}
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="max-w-2xl">
             {sponsors.map((sponsor, index) => {
               const meta = sponsorTierMeta[index];
-              const preview = sponsor.benefits.slice(0, 3);
-              const remaining = sponsor.benefits.length - preview.length;
               return (
                 <div
                   key={sponsor.tier}
-                  className="rounded-2xl border border-slate-200 bg-white p-5 flex flex-col"
+                  className="rounded-2xl border border-slate-200 bg-white p-6 flex flex-col"
                 >
-                  <div className={`h-1.5 -mx-5 -mt-5 mb-4 rounded-t-2xl ${meta.stripe}`} aria-hidden="true" />
+                  <div className={`h-1.5 -mx-6 -mt-6 mb-5 rounded-t-2xl ${meta.stripe}`} aria-hidden="true" />
                   <h3 className="font-oswald text-lg font-bold text-slate-900 leading-tight">
                     {sponsor.tier}
                   </h3>
                   <p className="text-xs text-slate-500 mt-1">
                     {c.standLabel}: {meta.stand} · {meta.slotsTotal} {c.slotsLabel}
                   </p>
-                  <ul className="mt-4 space-y-2 flex-1">
-                    {preview.map((b) => (
+                  <ul className="mt-4 grid sm:grid-cols-2 gap-2">
+                    {sponsor.benefits.map((b) => (
                       <li key={b} className="flex items-start gap-2 text-[13px] text-slate-600 leading-snug">
                         <Check className="w-3.5 h-3.5 mt-0.5 text-blue-600 flex-shrink-0" aria-hidden="true" />
                         <span>{b}</span>
                       </li>
                     ))}
                   </ul>
-                  {remaining > 0 && (
-                    <p className="mt-3 text-xs font-semibold text-blue-600">
-                      {c.benefitsMore(remaining)}
-                    </p>
-                  )}
                 </div>
               );
             })}

@@ -33,7 +33,7 @@ export const FAQ_SCHEMA_ITEMS = [
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
     answer:
-      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos el kit de patrocinio con los diferentes niveles de participación (Platino, Oro, Plata y Proveedor Aliado Estratégico) y los beneficios detallados de cada uno.",
+      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos toda la información sobre nuestro patrocinio Platino y los beneficios detallados para posicionar tu marca en el evento.",
   },
 ] as const;
 

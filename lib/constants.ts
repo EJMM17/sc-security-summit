@@ -18,8 +18,6 @@ export const EVENT = {
 
 export const SPONSORS = {
   presented_by: "Lanz Logistics",
-  gold: ["Grupo TM", "Customs Pro MX"],
-  silver: ["Aduana Digital", "LogiSec Solutions"],
 } as const;
 
 // ─── STATS ───────────────────────────────────────────────────────────────────
