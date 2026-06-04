@@ -176,7 +176,7 @@ export const UI_TEXT = {
     ],
     paymentQuestionsPrefix: "¿Preguntas sobre el pago? Escríbenos a",
     paymentOr: "o al",
-    sponsorsLabel: "PATROCINIO PLATINO",
+    sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
     sponsorsTitle: "Lleva Tu Marca al Siguiente Nivel",
     sponsorsDesc:
       "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con más de 300 tomadores de decisión y maximiza tu visibilidad ante la audiencia que importa.",
@@ -330,7 +330,7 @@ export const UI_TEXT = {
     ],
     paymentQuestionsPrefix: "Questions about payment? Email us at",
     paymentOr: "or call",
-    sponsorsLabel: "PLATINUM SPONSORSHIP",
+    sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
     sponsorsTitle: "Take Your Brand to the Next Level",
     sponsorsDesc:
       "Position your company as a leader in supply chain security. Connect directly with over 300 decision makers and maximize your visibility before the audience that matters.",
@@ -707,7 +707,7 @@ export const SPONSOR_TIER_META: readonly SponsorTierMeta[] = [
 export const SPONSORS = {
   es: [
     {
-      tier: "Patrocinador Platino",
+      tier: "Patrocinio Exclusivo",
       benefits: [
         "Acceso al Business Hub para generación de relaciones comerciales y networking estratégico con tomadores de decisión",
         "Acceso a directorio de contactos potenciales autorizados del evento para seguimiento comercial posterior",
@@ -727,7 +727,7 @@ export const SPONSORS = {
   ],
   en: [
     {
-      tier: "Platinum Sponsor",
+      tier: "Exclusive Sponsorship",
       benefits: [
         "Business Hub access for commercial relationship building and strategic networking with decision makers",
         "Access to the event's authorized directory of potential contacts for post-event commercial follow-up",
@@ -831,7 +831,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
     answer:
-      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos toda la información sobre nuestro patrocinio Platino y los beneficios detallados para posicionar tu marca en el evento.",
+      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos toda la información sobre nuestras oportunidades de patrocinio y los beneficios detallados para posicionar tu marca en el evento.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -864,7 +864,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How can I become a sponsor?",
     answer:
-      "Contact us at hola@scsecuritysummit.com or +1 (956) 515-8070. We will send you all the information about our Platinum sponsorship and the detailed benefits to position your brand at the event.",
+      "Contact us at hola@scsecuritysummit.com or +1 (956) 515-8070. We will send you all the information about our sponsorship opportunities and the detailed benefits to position your brand at the event.",
   },
   {
     question: "What is included with each access type?",

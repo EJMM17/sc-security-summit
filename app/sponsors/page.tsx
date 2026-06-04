@@ -11,7 +11,7 @@ const COPY = {
   es: {
     title: "Patrocinios | SC Security Summit 2026 Reynosa",
     description:
-      "Posiciona tu marca ante más de 300 profesionales de la cadena de suministro, comercio exterior y logística en el norte de México. Patrocinio Platino exclusivo.",
+      "Posiciona tu marca ante más de 300 profesionales de la cadena de suministro, comercio exterior y logística en el norte de México. Patrocinio exclusivo.",
     eyebrow: "PATROCINADORES",
     h1: "Conecta tu marca con la cadena de suministro del norte de México",
     lead: "El 1er Summit de Seguridad en la Cadena de Suministros reúne a tomadores de decisión de la industria maquiladora, transporte, aduanas y compliance. Patrocinar es la vía más directa para generar negocio cualificado.",
@@ -19,12 +19,12 @@ const COPY = {
     ctaSecondary: "Hablar con un asesor",
     closingTitle: "¿Listo para ser parte?",
     closingText:
-      "Cuéntanos tus objetivos comerciales y te mostramos cómo el patrocinio Platino puede impulsar tu marca.",
+      "Cuéntanos tus objetivos comerciales y te mostramos cómo el patrocinio puede impulsar tu marca.",
   },
   en: {
     title: "Sponsorships | SC Security Summit 2026 Reynosa",
     description:
-      "Put your brand in front of 300+ supply chain, foreign trade and logistics professionals in northern Mexico. Exclusive Platinum sponsorship.",
+      "Put your brand in front of 300+ supply chain, foreign trade and logistics professionals in northern Mexico. Exclusive sponsorship opportunity.",
     eyebrow: "SPONSORS",
     h1: "Connect your brand with northern Mexico's supply chain",
     lead: "The 1st Supply Chain Security Summit gathers decision makers from the maquiladora industry, transport, customs and compliance. Sponsoring is the most direct path to qualified business.",
@@ -32,7 +32,7 @@ const COPY = {
     ctaSecondary: "Talk to an advisor",
     closingTitle: "Ready to take part?",
     closingText:
-      "Tell us your commercial goals and we'll show you how Platinum sponsorship can boost your brand.",
+      "Tell us your commercial goals and we'll show you how sponsorship can boost your brand.",
   },
 } as const;
 
