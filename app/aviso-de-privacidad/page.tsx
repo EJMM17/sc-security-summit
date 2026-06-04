@@ -55,7 +55,7 @@ export default function AvisoPrivacidad() {
             </p>
             <ul className="list-none mt-2 space-y-1 pl-0">
               <li><span className="font-semibold">Correo electrónico:</span> hola@scsecuritysummit.com</li>
-              <li><span className="font-semibold">Teléfono:</span> +1 (956) 515-8070</li>
+              <li><span className="font-semibold">Teléfono:</span> +52 899 112 8755</li>
             </ul>
           </section>
 

@@ -831,7 +831,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo puedo convertirme en patrocinador?",
     answer:
-      "Contáctanos directamente a hola@scsecuritysummit.com o al +1 (956) 515-8070. Te enviaremos toda la información sobre nuestras oportunidades de patrocinio y los beneficios detallados para posicionar tu marca en el evento.",
+      "Contáctanos directamente a hola@scsecuritysummit.com o al +52 899 112 8755. Te enviaremos toda la información sobre nuestras oportunidades de patrocinio y los beneficios detallados para posicionar tu marca en el evento.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -864,7 +864,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How can I become a sponsor?",
     answer:
-      "Contact us at hola@scsecuritysummit.com or +1 (956) 515-8070. We will send you all the information about our sponsorship opportunities and the detailed benefits to position your brand at the event.",
+      "Contact us at hola@scsecuritysummit.com or +52 899 112 8755. We will send you all the information about our sponsorship opportunities and the detailed benefits to position your brand at the event.",
   },
   {
     question: "What is included with each access type?",
