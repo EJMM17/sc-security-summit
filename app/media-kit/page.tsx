@@ -10,7 +10,7 @@ const COPY = {
   es: {
     title: "Media Kit y Paquetes de Patrocinio | SC Security Summit 2026",
     description:
-      "Descarga el media kit del SC Security Summit 2026: audiencia, alcance y patrocinio Platino para posicionar tu marca.",
+      "Descarga el media kit del SC Security Summit 2026: audiencia, alcance y oportunidades de patrocinio para posicionar tu marca.",
     eyebrow: "MEDIA KIT",
     h1: "Paquetes de patrocinio y media kit",
     lead: "Todo lo que tu equipo de marketing necesita para evaluar el evento: perfil de audiencia, alcance estimado y beneficios por nivel. Solicita el documento completo en PDF.",
@@ -22,7 +22,7 @@ const COPY = {
       "Industria maquiladora, transporte, aduanas y comercio exterior",
       "Frontera norte: Reynosa, Tamaulipas y región binacional",
     ],
-    tiersTitle: "Patrocinio Platino",
+    tiersTitle: "Patrocinio Exclusivo",
     standLabel: "Stand",
     slotsLabel: "cupos",
     benefitsMore: (n: number) => `+${n} beneficios adicionales`,
@@ -30,7 +30,7 @@ const COPY = {
   en: {
     title: "Media Kit & Sponsorship Packages | SC Security Summit 2026",
     description:
-      "Download the SC Security Summit 2026 media kit: audience, reach and Platinum sponsorship to position your brand.",
+      "Download the SC Security Summit 2026 media kit: audience, reach and sponsorship opportunities to position your brand.",
     eyebrow: "MEDIA KIT",
     h1: "Sponsorship packages & media kit",
     lead: "Everything your marketing team needs to evaluate the event: audience profile, estimated reach and benefits per tier. Request the full PDF document.",
@@ -42,7 +42,7 @@ const COPY = {
       "Maquiladora industry, transport, customs and foreign trade",
       "Northern border: Reynosa, Tamaulipas and binational region",
     ],
-    tiersTitle: "Platinum Sponsorship",
+    tiersTitle: "Exclusive Sponsorship",
     standLabel: "Booth",
     slotsLabel: "slots",
     benefitsMore: (n: number) => `+${n} additional benefits`,
