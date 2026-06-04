@@ -135,10 +135,15 @@ function groupBenefits(benefits: readonly string[], language: Language): Benefit
       ? { visibility: "Visibilidad", experience: "Experiencia", training: "Capacitación" }
       : { visibility: "Visibility", experience: "Experience", training: "Training" };
 
-  const third = Math.ceil(benefits.length / 3);
+  const visibilityCount = 6;
+  const experienceCount = 5;
+
   return [
-    { label: labels.visibility, items: benefits.slice(0, third) as unknown as string[] },
-    { label: labels.experience, items: benefits.slice(third, third * 2) as unknown as string[] },
-    { label: labels.training, items: benefits.slice(third * 2) as unknown as string[] },
+    { label: labels.visibility, items: [...benefits.slice(0, visibilityCount)] },
+    {
+      label: labels.experience,
+      items: [...benefits.slice(visibilityCount, visibilityCount + experienceCount)],
+    },
+    { label: labels.training, items: [...benefits.slice(visibilityCount + experienceCount)] },
   ];
 }
