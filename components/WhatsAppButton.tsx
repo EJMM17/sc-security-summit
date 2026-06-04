@@ -2,7 +2,7 @@
 
 import { MessageCircle } from "lucide-react";
 
-const WHATSAPP_NUMBER = "19565158070";
+const WHATSAPP_NUMBER = "528991128755";
 const MESSAGE = encodeURIComponent(
   "Hola, me interesa obtener información sobre el Summit de Seguridad en la Cadena de Suministros 2026."
 );

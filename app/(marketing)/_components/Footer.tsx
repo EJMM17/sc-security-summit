@@ -120,10 +120,10 @@ export default function Footer({
                 <Mail className="w-4 h-4" /> hola@scsecuritysummit.com
               </a>
               <a
-                href="tel:+19565158070"
+                href="tel:+528991128755"
                 className="flex items-center gap-2 text-sm text-slate-400 hover:text-blue-400 transition-colors"
               >
-                <Phone className="w-4 h-4" /> +1 (956) 515-8070
+                <Phone className="w-4 h-4" /> +52 899 112 8755
               </a>
               <a
                 href="https://scsecuritysummit.com"

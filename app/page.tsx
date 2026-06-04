@@ -166,7 +166,7 @@ function buildStructuredData(lang: "es" | "en") {
         contactPoint: {
           "@type": "ContactPoint",
           email: "hola@scsecuritysummit.com",
-          telephone: "+1-956-515-8070",
+          telephone: "+52-899-112-8755",
           contactType: "customer service",
           availableLanguage: ["Spanish", "English"],
         },

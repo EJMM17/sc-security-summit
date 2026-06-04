@@ -78,7 +78,7 @@ const formText = {
     role: "Job Title",
     rolePlaceholder: "e.g., Logistics Director",
     phone: "Mobile Phone",
-    phonePlaceholder: "+1 956 123 4567",
+    phonePlaceholder: "+52 899 112 8755",
     accessType: "Access Type",
     accessGeneral: `General Pass — ${_label("general")}`,
     accessVip: `VIP Pass — ${_label("vip")}`,
