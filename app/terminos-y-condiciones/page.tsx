@@ -174,7 +174,7 @@ export default function TerminosCondiciones() {
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
                 hola@scsecuritysummit.com
               </a>{" "}
-              o al <a href="tel:+19565158070" className="text-blue-600 hover:underline">+1 (956) 515-8070</a>.
+              o al <a href="tel:+528991128755" className="text-blue-600 hover:underline">+52 899 112 8755</a>.
             </p>
           </section>
 

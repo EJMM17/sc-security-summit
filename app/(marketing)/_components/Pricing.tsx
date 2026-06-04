@@ -176,10 +176,10 @@ export default function Pricing({ language }: { language: Language }) {
                   </a>{" "}
                   {ui.paymentOr}{" "}
                   <a
-                    href="tel:+19565158070"
+                    href="tel:+528991128755"
                     className="text-blue-600 hover:underline font-medium"
                   >
-                    +1 (956) 515-8070
+                    +52 899 112 8755
                   </a>
                 </p>
               </div>
