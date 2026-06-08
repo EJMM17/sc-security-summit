@@ -29,7 +29,7 @@
     "*.{json,md,yml,yaml}": []
   },
   "dependencies": {
-    "@sentry/nextjs": "^10.50.0",
+    "@sentry/nextjs": "^10.56.0",
     "@supabase/supabase-js": "^2.106.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@upstash/ratelimit": "^2.0.8",
