@@ -97,7 +97,8 @@ function AdminListRow({
             <input
               name="password"
               type="password"
-              placeholder="Nueva contraseña (opcional)"
+              minLength={12}
+              placeholder="Nueva contraseña (opcional, mín. 12)"
               className="w-full px-2 py-1.5 bg-slate-950 border border-slate-700 rounded text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
             />
             <div className="flex items-center gap-2">

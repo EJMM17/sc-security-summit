@@ -47,23 +47,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    {
-      url: `${BASE_URL}/recuperar-folio`,
-      lastModified: new Date("2026-05-19"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/aviso-de-privacidad`,
-      lastModified: new Date("2026-04-01"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: `${BASE_URL}/terminos-y-condiciones`,
-      lastModified: new Date("2026-04-01"),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
+    // /recuperar-folio, /aviso-de-privacidad and /terminos-y-condiciones are
+    // intentionally omitted: they're noindex, and a sitemap must only list
+    // indexable URLs (Search Console flags "submitted URL marked noindex").
   ];
 }

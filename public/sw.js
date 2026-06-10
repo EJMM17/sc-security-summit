@@ -87,9 +87,12 @@ self.addEventListener("fetch", (event) => {
       (async () => {
         try {
           const res = await fetch(event.request);
-          const cache = await caches.open(PAGES_CACHE);
-          cache.put(event.request, res.clone());
-          trimCache(PAGES_CACHE, MAX_PAGES_ENTRIES);
+          // Only cache successful pages — never error responses.
+          if (res.ok) {
+            const cache = await caches.open(PAGES_CACHE);
+            cache.put(event.request, res.clone());
+            trimCache(PAGES_CACHE, MAX_PAGES_ENTRIES);
+          }
           return res;
         } catch {
           const cache = await caches.open(PAGES_CACHE);

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-SC Security Summit 2026 is a Next.js 15 event registration platform for a supply chain security conference in Reynosa, Mexico (Sept 24–25, 2026). It serves as a bilingual (Spanish/English) landing page with integrated registration backed by Supabase.
+SC Security Summit 2026 is a Next.js 15 event registration platform for a supply chain security conference in Reynosa, Mexico (Sept 24, 2026). It serves as a bilingual (Spanish/English) landing page with integrated registration backed by Supabase.
 
 ## Commands
 
@@ -68,7 +68,7 @@ Server-only (never expose to client):
 SUPABASE_SERVICE_ROLE_KEY
 CONTACT_EMAIL
 RESEND_API_KEY
-EMAIL_FROM                  # optional override; default "SC Security Summit <hola@scsecuritysummit.com.mx>"
+EMAIL_FROM                  # optional override; default "SC Security Summit <hola@scsecuritysummit.com>"
 UPSTASH_REDIS_REST_URL      # required in production for distributed rate limiting
 UPSTASH_REDIS_REST_TOKEN
 SENTRY_DSN                  # optional; SDK no-ops when unset

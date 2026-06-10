@@ -8,7 +8,7 @@ export const FAQ_SCHEMA_ITEMS = [
   {
     question: "¿Dónde y cuándo se llevará a cabo el Summit?",
     answer:
-      "El Summit se realizará los días 24 y 25 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 7:00 PM cada día.",
+      "El Summit se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México. Las actividades comienzan a las 8:00 AM y se extienden hasta las 7:00 PM.",
   },
   {
     question: "¿A quién está dirigido este evento?",
@@ -18,7 +18,7 @@ export const FAQ_SCHEMA_ITEMS = [
   {
     question: "¿Qué incluye cada tipo de acceso?",
     answer:
-      "El acceso Estudiante incluye capacitación de 2 días, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+      "El acceso Estudiante incluye un día completo de capacitación, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
   },
   {
     question: "¿Puedo obtener factura (CFDI)?",
@@ -42,8 +42,8 @@ export const EVENT = {
   year: "2026",
   edition: "Primera Edición",
   tagline: "Cumplimiento Internacional · Estándares Globales · Seguridad Operativa",
-  dates: "24 y 25 de Septiembre, 2026",
-  datesShort: "SEP 24–25, 2026",
+  dates: "24 de Septiembre, 2026",
+  datesShort: "SEP 24, 2026",
   venue: "Centro de Convenciones Reynosa",
   venueCity: "Reynosa, Tamaulipas",
   venueDetail: "A 10 minutos de la frontera",

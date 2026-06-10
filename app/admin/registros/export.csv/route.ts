@@ -57,7 +57,10 @@ const HEADERS: (keyof Row)[] = [
 
 function csvEscape(value: unknown): string {
   if (value === null || value === undefined) return "";
-  const str = String(value);
+  let str = String(value);
+  // Formula-injection hardening: Excel/Sheets execute cells starting with
+  // = + - @ or tab even when quoted, so neutralize with a leading apostrophe.
+  if (/^[=+\-@\t\r]/.test(str)) str = `'${str}`;
   // RFC 4180: quote when the field contains comma, quote, or newline; double inner quotes.
   if (/[",\r\n]/.test(str)) return `"${str.replaceAll('"', '""')}"`;
   return str;
@@ -90,9 +93,12 @@ export async function GET(req: NextRequest) {
   if (toDate && /^\d{4}-\d{2}-\d{2}$/.test(toDate)) {
     query = query.lte("created_at", `${toDate}T23:59:59-06:00`);
   }
-  if (q && q.length > 0) {
+  // Strip PostgREST filter delimiters so `q` cannot inject extra conditions
+  // into the .or() expression below.
+  const safeQ = q?.replace(/[,()]/g, " ").trim();
+  if (safeQ && safeQ.length > 0) {
     query = query.or(
-      `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,
+      `folio.ilike.%${safeQ}%,email.ilike.%${safeQ}%,nombre.ilike.%${safeQ}%,apellido.ilike.%${safeQ}%,empresa.ilike.%${safeQ}%`,
     );
   }
 

@@ -114,7 +114,9 @@ export default async function RegistrosPage({
     if (toIso) rowsQuery = rowsQuery.lte("created_at", toIso);
   }
   if (params.q) {
-    const q = params.q.trim();
+    // Strip PostgREST filter delimiters so `q` cannot inject extra conditions
+    // into the .or() expression below.
+    const q = params.q.replace(/[,()]/g, " ").trim();
     if (q.length > 0) {
       rowsQuery = rowsQuery.or(
         `folio.ilike.%${q}%,email.ilike.%${q}%,nombre.ilike.%${q}%,apellido.ilike.%${q}%,empresa.ilike.%${q}%`,

@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect } from "react";
 import { X } from "lucide-react";
 import { updateRegistro, type UpdateRegistroState } from "@/app/actions/admin";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import type { RegistroRow } from "./page";
 
 const init: UpdateRegistroState = { ok: false, message: "" };
@@ -15,12 +16,31 @@ export default function EditRegistroModal({
   onClose: () => void;
 }) {
   const [state, action, pending] = useActionState(updateRegistro, init);
+  const trapRef = useFocusTrap(true);
+
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        ref={trapRef as React.RefObject<HTMLDivElement>}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="edit-registro-title"
+        onClick={(e) => e.stopPropagation()}
+        className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-lg shadow-xl overflow-hidden"
+      >
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-          <h2 className="text-sm font-semibold">Editar registro</h2>
+          <h2 id="edit-registro-title" className="text-sm font-semibold">Editar registro</h2>
           <button
             onClick={onClose}
             className="inline-flex items-center justify-center w-7 h-7 rounded hover:bg-slate-800 text-slate-400"
@@ -91,12 +111,14 @@ function Field({
   defaultValue: string;
   required?: boolean;
 }) {
+  const id = `edit-registro-${name}`;
   return (
     <div>
-      <label className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">
+      <label htmlFor={id} className="block text-[10px] uppercase tracking-wider text-slate-500 mb-1">
         {label}
       </label>
       <input
+        id={id}
         name={name}
         defaultValue={defaultValue}
         required={required}

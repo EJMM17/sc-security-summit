@@ -8,7 +8,7 @@ type FAQItem = {
 const FALLBACK_FAQ: FAQItem[] = [
   {
     question: "¿Dónde y cuándo se llevará a cabo el Summit?",
-    answer: "El 1er Summit de Seguridad en la Cadena de Suministros se realizará los días 24 y 25 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México — a solo 10 minutos de la frontera con Texas.",
+    answer: "El 1er Summit de Seguridad en la Cadena de Suministros se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México — a solo 10 minutos de la frontera con Texas.",
   },
   {
     question: "¿A quién está dirigido este evento?",

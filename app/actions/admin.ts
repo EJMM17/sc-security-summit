@@ -473,7 +473,7 @@ export async function bulkMarkCancelled(
 // Admin management
 // =============================================================
 
-const AdminEmailSchema = z.string().email().max(255);
+const AdminEmailSchema = z.string().trim().email().max(255);
 const AdminPasswordSchema = z
   .string()
   .min(12, "La contraseña debe tener al menos 12 caracteres")
@@ -540,7 +540,7 @@ export async function updateAdmin(_prev: AdminCrudState, formData: FormData): Pr
       id: z.string().uuid(),
       nombre: AdminNameSchema,
       active: z.enum(["true", "false"]),
-      password: z.string().max(255).optional().or(z.literal("")),
+      password: AdminPasswordSchema.optional().or(z.literal("")),
     })
     .safeParse({
       id: formData.get("id"),
@@ -562,7 +562,7 @@ export async function updateAdmin(_prev: AdminCrudState, formData: FormData): Pr
     updated_at: new Date().toISOString(),
   };
 
-  if (password && password.length >= 6) {
+  if (password) {
     updateData.password_hash = await hashPassword(password);
   }
 
