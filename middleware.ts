@@ -44,6 +44,13 @@ export async function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   response.headers.set("x-nonce", nonce);
+  // Layouts can't read searchParams, so forward ?lang= as a header — keeps
+  // SSR <html lang> in sync with the content language on first visit
+  // (hreflang/social-share traffic arrives with ?lang=en and no cookie).
+  const langParam = request.nextUrl.searchParams.get("lang");
+  if (langParam === "es" || langParam === "en") {
+    response.headers.set("x-lang", langParam);
+  }
   response.headers.set("Content-Security-Policy", csp);
   return response;
 }

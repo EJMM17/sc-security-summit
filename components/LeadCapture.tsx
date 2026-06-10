@@ -17,6 +17,7 @@ const text = {
     cta: "Enviar",
     success: "¡Listo! Te mantendremos informado.",
     privacy: "Sin spam. Puedes darte de baja en cualquier momento.",
+    close: "Cerrar",
   },
   en: {
     title: "Get the full program",
@@ -25,6 +26,7 @@ const text = {
     cta: "Submit",
     success: "Done! We'll keep you informed.",
     privacy: "No spam. Unsubscribe anytime.",
+    close: "Close",
   },
 } as const;
 
@@ -122,7 +124,7 @@ export default function LeadCapture({ language = "es" }: { language?: Language }
           type="button"
           onClick={dismiss}
           className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
-          aria-label="Cerrar"
+          aria-label={t.close}
         >
           <X className="w-5 h-5" />
         </button>

@@ -66,6 +66,9 @@ export async function generateMetadata({
   return {
     title: m.title,
     description: m.description,
+    alternates: {
+      canonical: BASE_URL,
+    },
     openGraph: {
       title: m.ogTitle,
       description: m.ogDescription,
@@ -100,11 +103,14 @@ function buildStructuredData(lang: "es" | "en") {
           lang === "es"
             ? "Actualización normativa CTPAT/OEA, vinculación B2B y soluciones tecnológicas para la industria maquiladora del norte de México."
             : "CTPAT/AEO regulatory updates, B2B networking, and technology solutions for northern Mexico's maquiladora industry.",
-        startDate: "2026-09-24",
-        endDate: "2026-09-24",
+        // Reynosa (America/Matamoros) observes US DST: UTC-5 in September.
+        startDate: "2026-09-24T08:00:00-05:00",
+        endDate: "2026-09-24T19:00:00-05:00",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
         eventStatus: "https://schema.org/EventScheduled",
         inLanguage: lang === "es" ? "es" : "en",
+        image: [`${BASE_URL}/opengraph-image`],
+        url: BASE_URL,
         location: {
           "@type": "Place",
           name: "Centro de Convenciones de Reynosa",
@@ -199,6 +205,11 @@ export default async function Home({
 
   return (
     <>
+      {/* hreflang rendered manually (React hoists <link> to <head>): Next's
+          metadata resolver drops ?lang= from root-path alternates. */}
+      <link rel="alternate" hrefLang="es-MX" href={`${BASE_URL}/?lang=es`} />
+      <link rel="alternate" hrefLang="en-US" href={`${BASE_URL}/?lang=en`} />
+      <link rel="alternate" hrefLang="x-default" href={BASE_URL} />
       <ScrollProgress />
       <ScrollRevealObserver />
       <Header language={language} />

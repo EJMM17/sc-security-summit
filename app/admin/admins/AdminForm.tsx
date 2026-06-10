@@ -54,8 +54,8 @@ export default function AdminForm() {
             name="password"
             type="password"
             required
-            minLength={6}
-            placeholder="Mínimo 6 caracteres"
+            minLength={12}
+            placeholder="Mínimo 12 caracteres"
             className="w-full px-3 py-2 bg-slate-950 border border-slate-700 rounded-md text-xs text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500"
           />
         </div>

@@ -2,7 +2,7 @@ const BRAND_COLOR = "#0f172a";
 const ACCENT_COLOR = "#3b82f6";
 const CONTACT_EMAIL = "hola@scsecuritysummit.com";
 const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://www.scsecuritysummit.com";
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://scsecuritysummit.com";
 
 /**
  * Escape user-controlled text before interpolating it into email HTML.
@@ -31,7 +31,7 @@ function base(title: string, body: string): string {
 <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #e2e8f0;max-width:560px;width:100%;">
   <tr><td style="background:${BRAND_COLOR};padding:24px 32px;">
     <p style="margin:0;color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">SC Security Summit 2026</p>
-    <p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Reynosa, México · 24–25 Septiembre 2026</p>
+    <p style="margin:4px 0 0;color:#94a3b8;font-size:13px;">Reynosa, México · 24 de Septiembre 2026</p>
   </td></tr>
   <tr><td style="padding:32px;">${body}</td></tr>
   <tr><td style="background:#f1f5f9;padding:16px 32px;border-top:1px solid #e2e8f0;">
@@ -86,7 +86,7 @@ export function confirmationEmailHtml(params: {
           <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Value</td>
         </tr>
         <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Event</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Date</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">September 24–25, 2026</td></tr>
+        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Date</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">September 24, 2026</td></tr>
         <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Access Tier</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
         <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Amount</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${mxn(monto_mxn)} MXN</td></tr>
       </table>
@@ -109,7 +109,7 @@ export function confirmationEmailHtml(params: {
         <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Valor</td>
       </tr>
       <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Evento</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24–25 de Septiembre, 2026</td></tr>
+      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24 de Septiembre, 2026</td></tr>
       <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Tipo de Acceso</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
       <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Monto</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${mxn(monto_mxn)} MXN</td></tr>
     </table>
@@ -145,7 +145,7 @@ export function folioRecoveryEmailHtml(params: {
         <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Valor</td>
       </tr>
       <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Evento</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24–25 de Septiembre, 2026</td></tr>
+      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24 de Septiembre, 2026</td></tr>
       <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Tipo de Acceso</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
     </table>
     <p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">Si no solicitaste esta recuperación, puedes ignorar este correo.</p>`;

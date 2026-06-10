@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Cookie } from "lucide-react";
+import { CONSENT_EVENT } from "@/components/MarketingConsentGate";
 
 const STORAGE_KEY = "scss2026:cookie-consent";
 
@@ -70,6 +71,11 @@ export default function CookieConsent({ language = "es" }: { language?: Language
         analytics_storage: value,
       });
       w.dataLayer.push({ event: "consent_update", consent_decision: decision });
+    } catch {}
+
+    // Notify consent-gated pixels (Meta, LinkedIn) without a page reload.
+    try {
+      window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: decision }));
     } catch {}
 
     setVisible(false);

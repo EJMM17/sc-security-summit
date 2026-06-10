@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "SC Security Summit 2026",
     short_name: "SC Summit",
     description:
-      "1er Summit de Seguridad en la Cadena de Suministros — Reynosa, Tamaulipas, 24-25 Sep 2026",
+      "1er Summit de Seguridad en la Cadena de Suministros — Reynosa, Tamaulipas, 24 Sep 2026",
     start_url: "/",
     display: "standalone",
     background_color: "#0F172A",

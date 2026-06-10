@@ -48,7 +48,7 @@ export default function TerminosCondiciones() {
             <p>
               El <strong>1er Summit de Seguridad en la Cadena de Suministros 2026</strong> (en adelante, "el Evento") es
               organizado por <strong>Lanz Logistics</strong>, con sede en Reynosa, Tamaulipas, México, en colaboración
-              con Thynk Unlimited. El Evento se celebrará los días 24 y 25 de septiembre de 2026 en el
+              con Thynk Unlimited. El Evento se celebrará el día 24 de septiembre de 2026 en el
               Centro de Convenciones de Reynosa, Libramiento Ote S/N, Azteca, Reynosa, Tamaulipas.
             </p>
           </section>

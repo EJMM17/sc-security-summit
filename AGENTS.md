@@ -6,7 +6,7 @@
 
 ## Project Overview
 
-SC Security Summit 2026 is a **Next.js 15** event registration platform for a supply-chain security conference in Reynosa, Mexico (Sept 24–25, 2026). It is a bilingual (Spanish/English) marketing landing page with an integrated registration flow backed by **Supabase PostgreSQL**.
+SC Security Summit 2026 is a **Next.js 15** event registration platform for a supply-chain security conference in Reynosa, Mexico (Sept 24, 2026). It is a bilingual (Spanish/English) marketing landing page with an integrated registration flow backed by **Supabase PostgreSQL**.
 
 The site is deployed on **Vercel** and serves public pages (`/`, `/recuperar-folio`, `/terminos-y-condiciones`, `/aviso-de-privacidad`) plus an admin dashboard (`/admin/*`) for organizers to manage registrations and export CSVs.
 

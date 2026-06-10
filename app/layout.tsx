@@ -12,6 +12,7 @@ import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 import CookieConsent from "@/components/CookieConsent";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import Analytics from "@/components/Analytics";
+import MarketingConsentGate from "@/components/MarketingConsentGate";
 import MetaPixel from "@/components/MetaPixel";
 import LinkedInInsight from "@/components/LinkedInInsight";
 import LeadCapture from "@/components/LeadCapture";
@@ -24,7 +25,7 @@ const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
 const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://scsecuritysummit.com"),
+  metadataBase: new URL(BASE_URL),
   title: {
     default: "SC Security Summit 2026 | Reynosa",
     template: "%s | SC Security Summit 2026",
@@ -48,14 +49,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: BASE_URL,
-    languages: {
-      "es-MX": `${BASE_URL}/?lang=es`,
-      "en-US": `${BASE_URL}/?lang=en`,
-      "x-default": BASE_URL,
-    },
-  },
+  // Canonical/hreflang live on each page (app/page.tsx renders the homepage
+  // set manually — Next's metadata resolver strips search params from
+  // root-path alternates). Declaring them here would leak the homepage
+  // canonical onto every page without its own alternates.
   other: {
     "geo.region": "MX-TAM",
     "geo.placename": "Reynosa",
@@ -107,8 +104,11 @@ export default async function RootLayout({
         {enableSpeedInsights && <VercelAnalytics />}
         {/* ── Analytics & Marketing ── */}
         <Analytics nonce={nonce} />
-        <MetaPixel nonce={nonce} />
-        <LinkedInInsight nonce={nonce} />
+        {/* Meta/LinkedIn don't support Consent Mode — load only after opt-in */}
+        <MarketingConsentGate>
+          <MetaPixel nonce={nonce} />
+          <LinkedInInsight nonce={nonce} />
+        </MarketingConsentGate>
         {/* Persist first/last-touch attribution + emit interaction events */}
         <AttributionCapture />
         <InteractionTracker />

@@ -40,5 +40,8 @@ export async function getRequestLanguage(searchParam?: string | null): Promise<L
   const cookieValue = cookieStore.get(LANGUAGE_COOKIE)?.value;
 
   const h = await headers();
-  return resolveRequestLanguage(searchParam, cookieValue, h.get("accept-language"));
+  // Layouts can't access searchParams — the middleware forwards ?lang= as
+  // the x-lang header so <html lang> matches the rendered language.
+  const param = searchParam ?? h.get("x-lang");
+  return resolveRequestLanguage(param, cookieValue, h.get("accept-language"));
 }
