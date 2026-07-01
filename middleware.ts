@@ -58,7 +58,12 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: "/((?!_next/static|_next/image|favicon.ico|images/).*)",
+      // Static, non-HTML assets never execute inline scripts, so they don't
+      // need a per-request CSP nonce — skipping them avoids needless
+      // middleware invocations (and Edge cold-start overhead) on every icon/
+      // manifest/service-worker request a browser makes alongside each page.
+      source:
+        "/((?!_next/static|_next/image|favicon\\.ico|favicon-.*\\.png|apple-touch-icon\\.png|android-chrome-.*\\.png|sw\\.js|manifest\\.webmanifest|llms\\.txt|images/).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

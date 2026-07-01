@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    // Source files are content-hashed by filename convention (rename to bust
+    // cache — see the /images/(.*) header rule below), so the Vercel Image
+    // Optimization CDN can hold resized variants for a year instead of the
+    // 60s default, avoiding repeat re-encodes for the same visitor/breakpoint.
+    minimumCacheTTL: 31536000,
   },
   webpack: (config) => {
     // @sentry/node bundles @opentelemetry/instrumentation, which uses dynamic

@@ -85,12 +85,23 @@ export default async function RootLayout({
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
   const language = await getRequestLanguage();
+  const hasGoogleTag = Boolean(
+    process.env.NEXT_PUBLIC_GTM_ID || process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID,
+  );
 
   return (
     <html lang={language} className="scroll-smooth">
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
+        {/* Warm the connection ahead of Analytics' afterInteractive script tag —
+            both origins are already allowlisted in middleware.ts's connect-src. */}
+        {hasGoogleTag && (
+          <>
+            <link rel="preconnect" href="https://www.googletagmanager.com" />
+            <link rel="preconnect" href="https://www.google-analytics.com" crossOrigin="anonymous" />
+          </>
+        )}
         {/* Consent Mode v2 defaults — must run before GTM / GA / pixels */}
         <ConsentMode nonce={nonce} />
         <AmbientCanvasLazy />
