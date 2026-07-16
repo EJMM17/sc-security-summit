@@ -353,7 +353,7 @@ Se agregan a `env.ts` (Zod, opcionales para no romper dev) y a la lista `RECOMME
 | Fase | Entregable | Depende de |
 |---|---|---|
 | **0. Prerrequisitos (usuario)** | Cuenta Openpay/BBVA. ✅ Decisiones ya tomadas: métodos = tarjeta + SPEI; precios con IVA incluido. **Pendiente solo la cuenta**, en dos pasos: (a) el registro **sandbox es gratuito e inmediato** en https://sandbox-dashboard.openpay.mx/register — da `MERCHANT_ID` + llaves de prueba y desbloquea las Fases 2–3 completas; (b) el alta comercial con BBVA (contrato, validación del negocio, cuenta CLABE de liquidación) toma días/semanas y solo bloquea la Fase 4 (producción) | — |
-| **1. Descuentos** | Migración 011 (parte descuentos), `lib/descuentos`, campo en formulario, redención en `create-lead`, `/admin/codigos`, tests | Nada externo — **puede salir antes que los pagos** |
+| **1. Descuentos** ✅ **implementada en esta rama** | Migración `011_codigos_descuento.sql`, `lib/descuentos` (+tests), campo con preview en el formulario, redención atómica en `create-lead` (con compensación), cortesía 100 % → `pagado/cortesia`, `/admin/codigos`, CSV con columnas nuevas | Aplicar la migración 011 en Supabase **antes** del deploy |
 | **2. Núcleo de pagos** | `lib/openpay.ts`, migración (parte pagos), acciones de pago, `/pago` + `/pago/confirmacion`, CTA en `/registro-exitoso` | Llaves sandbox |
 | **3. Confirmación automática** | Webhook + `confirm-payment` + correos de pago + `payment_events` | Fase 2 |
 | **4. Salida a producción** | Alta de webhook prod, llaves prod en Vercel, `OPENPAY_SANDBOX=0`, actualización de copys ("¿Cómo funciona el pago?"), RUNBOOK | Fases 2–3 probadas en sandbox |

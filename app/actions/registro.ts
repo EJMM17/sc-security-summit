@@ -45,6 +45,7 @@ function getPersistedValues(formData: FormData) {
     cargo: String(formData.get("cargo") ?? ""),
     tipo_acceso:
       tipoAcceso === "vip" || tipoAcceso === "estudiante" ? tipoAcceso : "general",
+    codigo_descuento: String(formData.get("codigo_descuento") ?? ""),
     credencial_estudiantil: formData.get("credencial_estudiantil") === "on",
     acepta_terminos: formData.get("acepta_terminos") === "on",
     requiere_cfdi: formData.get("requiere_cfdi") === "true",
@@ -60,6 +61,7 @@ type ProcessResult =
       folio: string;
       tipo: "estudiante" | "general" | "vip";
       monto: number;
+      descuento: number;
       language: Language;
     }
   | { ok: false; state: RegistroState; language: Language };
@@ -106,6 +108,7 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     empresa: formData.get("empresa"),
     cargo: formData.get("cargo"),
     tipo_acceso: formData.get("tipo_acceso"),
+    codigo_descuento: formData.get("codigo_descuento") ?? "",
     credencial_estudiantil: formData.get("credencial_estudiantil") === "on",
     acepta_terminos: formData.get("acepta_terminos") === "on",
     requiere_cfdi: requiresCFDI,
@@ -207,6 +210,7 @@ async function processRegistro(formData: FormData): Promise<ProcessResult> {
     folio: result.folio,
     tipo: result.tipo,
     monto: result.monto,
+    descuento: result.descuento,
     language,
   };
 }
@@ -220,6 +224,7 @@ export async function submitRegistroForm(formData: FormData): Promise<void> {
       tipo: result.tipo,
       monto: String(result.monto),
     });
+    if (result.descuento > 0) params.set("descuento", String(result.descuento));
     if (result.language === "en") params.set("lang", "en");
     redirect(`/registro-exitoso?${params.toString()}`);
   }

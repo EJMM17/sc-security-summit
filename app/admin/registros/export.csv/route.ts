@@ -15,6 +15,8 @@ type Row = {
   telefono: string | null;
   tipo_acceso: string;
   monto_mxn: number;
+  codigo_descuento: string | null;
+  descuento_mxn: number | null;
   estado_pago: string;
   metodo_pago: string | null;
   requiere_cfdi: boolean;
@@ -40,6 +42,8 @@ const HEADERS: (keyof Row)[] = [
   "telefono",
   "tipo_acceso",
   "monto_mxn",
+  "codigo_descuento",
+  "descuento_mxn",
   "estado_pago",
   "metodo_pago",
   "requiere_cfdi",

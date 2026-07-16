@@ -2,6 +2,7 @@ import "server-only";
 
 import * as Sentry from "@sentry/nextjs";
 import { z } from "zod";
+import { aplicarDescuento, normalizarCodigo, type TipoDescuento } from "@/lib/descuentos";
 import { generateFolio } from "@/lib/folio";
 import { PRECIOS } from "@/lib/schemas";
 import { supabaseAdmin } from "@/lib/supabase";
@@ -15,6 +16,7 @@ const createLeadInputSchema = z.object({
   empresa: z.string().trim().min(2),
   cargo: z.string().trim().min(2),
   tipo_acceso: z.enum(["estudiante", "general", "vip"]),
+  codigo_descuento: z.string().trim().optional(),
   credencial_estudiantil: z.boolean().default(false),
   requiere_cfdi: z.boolean().default(false),
   rfc: z.string().trim().optional(),
@@ -57,7 +59,14 @@ function isMissingColumnError(error: {
 export type CreateLeadInput = z.input<typeof createLeadInputSchema>;
 
 export type CreateLeadResult =
-  | { ok: true; folio: string; tipo: "estudiante" | "general" | "vip"; monto: number; message: string }
+  | {
+      ok: true;
+      folio: string;
+      tipo: "estudiante" | "general" | "vip";
+      monto: number;
+      descuento: number;
+      message: string;
+    }
   | {
       ok: false;
       status: 400 | 409 | 429 | 500;
@@ -65,7 +74,64 @@ export type CreateLeadResult =
       fieldErrors?: Record<string, string[]>;
     };
 
+const CODIGO_INVALIDO_MSG = {
+  es: "Código no válido o vencido.",
+  en: "Invalid or expired code.",
+} as const;
+
+/**
+ * Redime el código de forma atómica (función SQL redimir_codigo, migración
+ * 011) y calcula el descuento sobre el precio de lista. Un código que no
+ * redime — inexistente, vencido, agotado o de otro tier — responde con el
+ * mismo mensaje neutro para no permitir enumeración.
+ */
+async function redimirCodigoDescuento(
+  codigo: string,
+  tipoAcceso: "estudiante" | "general" | "vip",
+): Promise<
+  | { ok: true; descuento: number; monto: number }
+  | { ok: false; reason: "invalid" | "error" }
+> {
+  const { data, error } = await supabaseAdmin.rpc("redimir_codigo", {
+    p_codigo: codigo,
+    p_tipo_acceso: tipoAcceso,
+  });
+
+  if (error) {
+    Sentry.captureMessage("create_lead.redimir_codigo_failed", {
+      level: "error",
+      extra: { code: error.code, message: error.message },
+    });
+    return { ok: false, reason: "error" };
+  }
+
+  const row = Array.isArray(data) ? data[0] : data;
+  if (!row) return { ok: false, reason: "invalid" };
+
+  const { descuento, montoFinal } = aplicarDescuento(
+    PRECIOS[tipoAcceso],
+    row.tipo_descuento as TipoDescuento,
+    Number(row.valor),
+  );
+  return { ok: true, descuento, monto: montoFinal };
+}
+
+/** Compensación best-effort si el INSERT falla después de redimir. */
+async function liberarCodigoDescuento(codigo: string): Promise<void> {
+  const { error } = await supabaseAdmin.rpc("liberar_codigo", { p_codigo: codigo });
+  if (error) {
+    Sentry.captureMessage("create_lead.liberar_codigo_failed", {
+      level: "warning",
+      extra: { code: error.code, message: error.message },
+    });
+  }
+}
+
 export async function createLead(input: CreateLeadInput): Promise<CreateLeadResult> {
+  // Código redimido cuyo uso aún no está respaldado por un registro
+  // persistido — cualquier salida de error debe liberarlo.
+  let codigoRedimido: string | null = null;
+
   try {
     const parsed = createLeadInputSchema.safeParse(input);
 
@@ -116,8 +182,42 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       }
     }
 
+    // Código de descuento: la redención es atómica y consume un uso. A
+    // partir de aquí, cualquier salida fallida debe liberar el código.
+    const codigo = data.codigo_descuento ? normalizarCodigo(data.codigo_descuento) : null;
+    if (data.codigo_descuento && !codigo) {
+      return {
+        ok: false,
+        status: 400,
+        message: CODIGO_INVALIDO_MSG[data.language],
+        fieldErrors: { codigo_descuento: [CODIGO_INVALIDO_MSG[data.language]] },
+      };
+    }
+
+    let descuento = 0;
+    let monto: number = PRECIOS[data.tipo_acceso];
+    if (codigo) {
+      const redencion = await redimirCodigoDescuento(codigo, data.tipo_acceso);
+      if (!redencion.ok) {
+        return {
+          ok: false,
+          status: redencion.reason === "error" ? 500 : 400,
+          message:
+            redencion.reason === "error"
+              ? "Error interno procesando el registro. Intenta nuevamente."
+              : CODIGO_INVALIDO_MSG[data.language],
+          ...(redencion.reason === "invalid"
+            ? { fieldErrors: { codigo_descuento: [CODIGO_INVALIDO_MSG[data.language]] } }
+            : {}),
+        };
+      }
+      descuento = redencion.descuento;
+      monto = redencion.monto;
+      codigoRedimido = codigo;
+    }
+
+    const esCortesia = codigo !== null && monto === 0;
     const folio = generateFolio();
-    const monto = PRECIOS[data.tipo_acceso];
 
     const insertPayload: Record<string, unknown> = {
       folio,
@@ -129,8 +229,8 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       cargo: data.cargo,
       tipo_acceso: data.tipo_acceso,
       monto_mxn: monto,
-      estado_pago: "pendiente",
-      metodo_pago: "transferencia_manual",
+      estado_pago: esCortesia ? "pagado" : "pendiente",
+      metodo_pago: esCortesia ? "cortesia" : "transferencia_manual",
       credencial_estudiantil: data.credencial_estudiantil,
       requiere_cfdi: data.requiere_cfdi,
       created_at: new Date().toISOString(),
@@ -141,6 +241,17 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
       utm_medium: data.utm_medium ?? null,
       utm_campaign: data.utm_campaign ?? null,
     };
+
+    // Solo con código: si la migración 011 no está aplicada estas columnas no
+    // existen, y un registro SIN código debe seguir funcionando igual que hoy.
+    if (codigo) {
+      insertPayload.codigo_descuento = codigo;
+      insertPayload.descuento_mxn = descuento;
+      if (esCortesia) {
+        insertPayload.pagado_en = new Date().toISOString();
+        insertPayload.pagado_por = "sistema:cortesia";
+      }
+    }
 
     if (data.requiere_cfdi) {
       insertPayload.rfc = data.rfc?.toUpperCase() ?? null;
@@ -182,6 +293,13 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
     }
 
     if (error) {
+      // El código ya consumió un uso pero el registro no se persistió:
+      // devolver el uso antes de reportar el error.
+      if (codigoRedimido) {
+        await liberarCodigoDescuento(codigoRedimido);
+        codigoRedimido = null;
+      }
+
       if (error.code === "23505") {
         return {
           ok: false,
@@ -210,6 +328,9 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
     // registration — the row is already persisted and the folio is shown
     // on screen as a fallback. The sender audits every outcome and reports
     // problems to Sentry as warnings.
+    // El registro está persistido: el uso del código queda en firme.
+    codigoRedimido = null;
+
     const emailResult = await sendRegistrationConfirmation({
       folio,
       email: data.email,
@@ -232,8 +353,12 @@ export async function createLead(input: CreateLeadInput): Promise<CreateLeadResu
         ? `Registration complete. Your confirmation folio is ${folio}.`
         : `Registro completado exitosamente. Tu folio de confirmación es ${folio}.`;
 
-    return { ok: true, folio, tipo: data.tipo_acceso, monto, message };
+    return { ok: true, folio, tipo: data.tipo_acceso, monto, descuento, message };
   } catch (error) {
+    if (codigoRedimido) {
+      await liberarCodigoDescuento(codigoRedimido);
+    }
+
     Sentry.captureException(error, {
       tags: { use_case: "create_lead" },
       extra: { inputEmail: input.email, ip: input.ip },

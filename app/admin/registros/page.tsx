@@ -1,4 +1,4 @@
-import { LogOut, Download, Users, Shield, Ticket, ClipboardList } from "lucide-react";
+import { LogOut, Download, Users, Shield, Ticket, ClipboardList, TicketPercent } from "lucide-react";
 import { requireAdmin } from "@/lib/admin-auth";
 import { createAdminClient } from "@/lib/supabase";
 import { adminLogout } from "@/app/actions/admin";
@@ -192,6 +192,12 @@ export default async function RegistrosPage({
             className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
           >
             <Shield className="w-3.5 h-3.5" aria-hidden="true" /> Admins
+          </a>
+          <a
+            href="/admin/codigos"
+            className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-md text-xs"
+          >
+            <TicketPercent className="w-3.5 h-3.5" aria-hidden="true" /> Códigos
           </a>
           <a
             href={exportHref}

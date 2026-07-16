@@ -4,6 +4,7 @@ import type { RegistroFlashState } from "@/lib/registro-form-state";
 import RegistroFormEnhancer from "./RegistroFormEnhancer";
 import RegistroSubmitButton from "./RegistroSubmitButton";
 import AttributionCapture from "./AttributionCapture";
+import DescuentoField from "./DescuentoField";
 import { ACCESO_OPTIONS } from "@/lib/constants";
 
 type Language = "es" | "en";
@@ -407,6 +408,18 @@ export default function RegistroForm({
           {errors?.credencial_estudiantil && (
             <p id="err-credencial" role="alert" className={errorClass}>
               {errors.credencial_estudiantil[0]}
+            </p>
+          )}
+        </div>
+
+        <div>
+          <DescuentoField
+            language={language}
+            defaultValue={getValue(values, "codigo_descuento")}
+          />
+          {errors?.codigo_descuento && (
+            <p id="err-codigo" role="alert" className={errorClass}>
+              {errors.codigo_descuento[0]}
             </p>
           )}
         </div>

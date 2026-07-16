@@ -158,3 +158,30 @@ describe("RegistroSchema — CFDI conditional validation", () => {
     expect(result.success).toBe(true);
   });
 });
+
+describe("RegistroSchema — codigo_descuento", () => {
+  it("acepta el campo ausente o vacío", () => {
+    expect(RegistroSchema.safeParse(validBase).success).toBe(true);
+    expect(
+      RegistroSchema.safeParse({ ...validBase, codigo_descuento: "" }).success,
+    ).toBe(true);
+  });
+
+  it("normaliza a mayúsculas y recorta espacios", () => {
+    const result = RegistroSchema.safeParse({
+      ...validBase,
+      codigo_descuento: "  summit-2026  ",
+    });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.codigo_descuento).toBe("SUMMIT-2026");
+    }
+  });
+
+  it("rechaza formatos inválidos", () => {
+    for (const codigo of ["abc", "CON ESPACIO", "A".repeat(33), "ñoño-10"]) {
+      const result = RegistroSchema.safeParse({ ...validBase, codigo_descuento: codigo });
+      expect(result.success).toBe(false);
+    }
+  });
+});

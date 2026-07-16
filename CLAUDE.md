@@ -34,7 +34,8 @@ The registration flow is:
 3. On success, a `folio` number (format: `SCSS2026-XXXXX-XXXX`) is returned with confetti/toast feedback
 
 **Key files:**
-- `lib/schemas.ts` — Zod schema for the registration form; CFDI (invoice) fields are conditionally required when `requiere_cfdi=true`
+- `lib/schemas.ts` — Zod schema for the registration form; CFDI (invoice) fields are conditionally required when `requiere_cfdi=true`; optional `codigo_descuento` (uppercased, `^[A-Z0-9_-]{4,32}$`)
+- `lib/descuentos.ts` — pure discount-code math (normalize, percentage/fixed calc, caps). Atomic redemption lives in SQL (`redimir_codigo`, migration 011) called from `create-lead`; `app/actions/descuento.ts` is the read-only rate-limited preview with neutral anti-enumeration messages. 100% discounts auto-mark the row `pagado` with `metodo_pago='cortesia'`.
 - `lib/folio.ts` — folio generator (`SCSS2026-{base36 ts}-{6 hex}`); covered by 12 unit tests including a 10k no-collision sweep
 - `lib/supabase.ts` — Two clients: public anon (limited) and admin service_role (server-only, full insert/read)
 - `lib/rate-limit.ts` — Distributed Upstash Redis sliding window (5 req / 15 min per IP). Fail-closed in production — throws if `UPSTASH_REDIS_REST_*` env vars are missing. Falls back to allow-all in dev.
@@ -50,6 +51,7 @@ The registration flow is:
 - `/` — marketing landing + registration form
 - `/recuperar-folio` — passwordless folio reissue (rate-limited, neutral-message anti-enumeration)
 - `/admin/login`, `/admin/auth`, `/admin/registros`, `/admin/registros/export.csv` — operator dashboard (manual mark-paid + RFC 4180 CSV export with UTF-8 BOM)
+- `/admin/codigos` — discount-code CRUD (create/deactivate, usage counters; codes are never deleted to preserve history)
 - `/api/health` — Supabase liveness probe with 3s budget; returns 503 on failure for uptime monitors
 
 **Bilingual support:** All components accept a `language?: "es" | "en"` prop. Text objects are keyed by language throughout.
@@ -86,6 +88,7 @@ Supabase PostgreSQL table `registros`. Row Level Security is enabled — only `s
 - `002_hardening.sql` — revokes all grants from `anon`/`authenticated`, hardens function `search_path`, adds audit columns, enforces price-per-tier and email-format CHECK constraints.
 - `003_rls_explicit_deny.sql` — defense-in-depth deny policy on `anon`/`authenticated` so a future accidental GRANT cannot bypass RLS at row level.
 - `004_admin_columns.sql` — `pagado_*`, `cancelado_*` tracking columns + composite index on `(estado_pago, created_at DESC)` for the admin dashboard's default sort.
+- `011_codigos_descuento.sql` — `codigos_descuento` table (RLS-locked) + atomic `redimir_codigo`/`liberar_codigo` functions (service_role only) + `codigo_descuento`/`descuento_mxn` columns on `registros`. Replaces the exact-price CHECK with `monto_mxn + descuento_mxn = list price` and adds `'cortesia'` to the `metodo_pago` CHECK. **Must be applied before deploying the discount-code feature** (the CSV export and code redemption select the new columns).
 
 Key business rules enforced at the DB level:
 - `email` is UNIQUE (prevents duplicate registrations)

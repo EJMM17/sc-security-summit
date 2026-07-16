@@ -16,6 +16,7 @@ const FIELD_TO_INPUT_ID: Array<{ field: string; id: string }> = [
   { field: "telefono", id: "reg-telefono" },
   { field: "tipo_acceso", id: "reg-tipo" },
   { field: "credencial_estudiantil", id: "reg-credencial" },
+  { field: "codigo_descuento", id: "reg-codigo" },
   { field: "rfc", id: "reg-rfc" },
   { field: "razon_social", id: "reg-razon" },
   { field: "codigo_postal_fiscal", id: "reg-cp" },

@@ -48,6 +48,20 @@ export const RegistroSchema = z
       message: "Debes aceptar los términos y condiciones para continuar",
     }),
 
+    // Código de descuento opcional. Se normaliza a mayúsculas; el formato se
+    // valida aquí y la vigencia/cupo se resuelven en la redención atómica
+    // (create-lead → redimir_codigo). Vacío = sin código.
+    codigo_descuento: z
+      .string()
+      .transform((v) => v.trim().toUpperCase())
+      .pipe(
+        z
+          .string()
+          .regex(/^[A-Z0-9_-]{4,32}$/, "Código no válido o vencido")
+          .or(z.literal(""))
+      )
+      .optional(),
+
     // ── CFDI fields (optional unless requiere_cfdi is true) ──────────────────
     requiere_cfdi: z.boolean().optional().default(false),
 

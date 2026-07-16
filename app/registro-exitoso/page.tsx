@@ -35,6 +35,7 @@ const COPY = {
     copyLabel: "Copiar",
     copiedLabel: "Copiado",
     amountSuffix: "MXN + IVA",
+    discountLabel: (d: string) => `Descuento aplicado: −${d} MXN`,
     nextStepsLabel: "PRÓXIMOS PASOS",
     nextStepsTitle: "¿Qué sigue?",
     steps: [
@@ -76,6 +77,7 @@ const COPY = {
     copyLabel: "Copy",
     copiedLabel: "Copied",
     amountSuffix: "MXN + VAT",
+    discountLabel: (d: string) => `Discount applied: −${d} MXN`,
     nextStepsLabel: "NEXT STEPS",
     nextStepsTitle: "What's next?",
     steps: [
@@ -141,7 +143,13 @@ function isTipo(value: string | undefined): value is Tipo {
 export default async function RegistroExitosoPage({
   searchParams,
 }: {
-  searchParams: Promise<{ folio?: string; tipo?: string; monto?: string; lang?: string }>;
+  searchParams: Promise<{
+    folio?: string;
+    tipo?: string;
+    monto?: string;
+    descuento?: string;
+    lang?: string;
+  }>;
 }) {
   const params = await searchParams;
   if (!params.folio) redirect("/");
@@ -149,6 +157,8 @@ export default async function RegistroExitosoPage({
   const language: Language = params.lang === "en" ? "en" : "es";
   const tipo: Tipo = isTipo(params.tipo) ? params.tipo : "general";
   const monto = params.monto && /^\d+$/.test(params.monto) ? Number(params.monto) : null;
+  const descuento =
+    params.descuento && /^\d+$/.test(params.descuento) ? Number(params.descuento) : 0;
   const folio = params.folio;
   const t = COPY[language];
 
@@ -190,6 +200,11 @@ export default async function RegistroExitosoPage({
                 <span className="text-sm text-slate-600">
                   <span className="font-mono font-semibold text-slate-900">{formatMxn(monto)}</span>{" "}
                   {t.amountSuffix}
+                </span>
+              )}
+              {descuento > 0 && (
+                <span className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">
+                  {t.discountLabel(formatMxn(descuento))}
                 </span>
               )}
             </div>
