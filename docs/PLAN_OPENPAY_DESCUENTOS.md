@@ -1,6 +1,8 @@
 # Plan: Pagos en línea con Openpay (BBVA) + Códigos de descuento
 
-> **Estado:** Plan de implementación — pendiente de aprobación.
+> **Estado:** Plan de implementación — decisiones de negocio confirmadas (2026-07-16):
+> métodos de pago **tarjeta + SPEI**; los precios anunciados **ya incluyen IVA** (se cobra `monto_mxn` tal cual);
+> cuenta Openpay/BBVA aún **por crear** (ver §10, Fase 0).
 > **Fecha:** 2026-07-16
 > **Alcance:** Cobro en línea de los accesos (tarjeta y SPEI) vía Openpay de BBVA, confirmación automática de pago por webhook, y sistema de códigos de descuento con administración desde `/admin`.
 
@@ -106,11 +108,12 @@ La respuesta llega con `status: "charge_pending"` y `payment_method.url`: la URL
 |---|---|---|
 | SDK vs REST | Cliente REST propio (`lib/openpay.ts`) | SDK abandonado (§2.2); tipado; testeable |
 | Tarjeta | Cargo con redirección (hospedado) | Sin datos de tarjeta en nuestro dominio; 3DS incluido; cero cambios de CSP |
-| SPEI | Sí, Fase 1 | Público B2B mexicano paga mucho por transferencia; sustituye la CLABE "manual" actual |
-| Tiendas (paynet) | Fase posterior | Comisión + operación extra; no crítico para B2B |
+| SPEI | Sí, Fase 1 ✅ **confirmado** | Público B2B mexicano paga mucho por transferencia; sustituye la CLABE "manual" actual |
+| Tarjeta | Sí, Fase 1 ✅ **confirmado** | Cargo con redirección (fila anterior) |
+| Tiendas (paynet) | Descartado por ahora (Fase 5 opcional) | Comisión + operación extra; no crítico para B2B |
 | Confirmación | Webhook + re-consulta del cargo | El webhook avisa; el `GET /charges/{id}` con llave privada es la fuente de verdad |
 | Flujo manual actual | Se conserva como respaldo | `metodo_pago = 'transferencia_manual'` sigue funcionando; feature flag para apagar Openpay sin romper nada |
-| IVA | ⚠️ **Decisión de negocio pendiente** | Los precios se anuncian "+ IVA". El cargo en línea debe cobrar el total real. Propuesta: cobrar `monto_mxn × 1.16` y desglosarlo en la página de pago. Confirmar con contabilidad si se cobra IVA a todos o solo con CFDI |
+| IVA | ✅ **Decidido: los precios anunciados YA incluyen IVA** | Se cobra `monto_mxn` tal cual, sin multiplicar por 1.16. **Implica corregir copys existentes que dicen lo contrario:** `taxNote` en `lib/content.ts` ("* Más I.V.A." / "* Plus VAT" → "IVA incluido" / "VAT included") y `amountSuffix` en `/registro-exitoso` ("MXN + IVA" → "MXN · IVA incluido"). Para CFDI, el subtotal se desglosa desde el precio final: `subtotal = monto / 1.16` |
 
 **Compatibilidad con el stack:** todo corre en Server Actions / Route Handlers de Next 15 con runtime Node (el webhook se declara `export const runtime = "nodejs"`). Sin dependencias nuevas de npm.
 
@@ -312,7 +315,8 @@ Al volver de 3DS, la página **consulta el cargo en Openpay del lado servidor** 
 | `lib/email-templates.ts` / `lib/email.ts` | Plantillas nuevas: pago confirmado (ES/EN), instrucciones SPEI (ES/EN); enlace a `/pago` en la confirmación de registro |
 | `app/actions/admin.ts`, `app/admin/registros/*` | Mostrar método de pago/cargo Openpay; CSV con columnas nuevas |
 | `env.ts`, `scripts/check-env.mjs`, `.env.local.example`, `.env.example` | Variables nuevas (§8) |
-| `lib/content.ts` | Copys del paso de pago (los 3 pasos de "¿Cómo funciona el pago?" cambian a pago en línea) |
+| `lib/content.ts` | Copys del paso de pago (los 3 pasos de "¿Cómo funciona el pago?" cambian a pago en línea) + `taxNote` pasa de "* Más I.V.A." a "IVA incluido" (ES/EN) |
+| `app/registro-exitoso/page.tsx` (copys) | `amountSuffix` "MXN + IVA" → "MXN · IVA incluido" (ES/EN) |
 | `CLAUDE.md`, `docs/RUNBOOK.md` | Documentar flujo, webhook y runbook de incidencias de pago |
 
 **Sin cambios:** `middleware.ts` (CSP) — el flujo con redirección no carga scripts de Openpay en nuestro dominio. Solo cambiaría si en Fase 2 se adopta Openpay.js.
@@ -348,7 +352,7 @@ Se agregan a `env.ts` (Zod, opcionales para no romper dev) y a la lista `RECOMME
 
 | Fase | Entregable | Depende de |
 |---|---|---|
-| **0. Prerrequisitos (usuario)** | Cuenta Openpay/BBVA con llaves sandbox y prod; decidir **IVA** (§3); decidir métodos (¿tarjeta+SPEI?, ¿tiendas?) | — |
+| **0. Prerrequisitos (usuario)** | Cuenta Openpay/BBVA. ✅ Decisiones ya tomadas: métodos = tarjeta + SPEI; precios con IVA incluido. **Pendiente solo la cuenta**, en dos pasos: (a) el registro **sandbox es gratuito e inmediato** en https://sandbox-dashboard.openpay.mx/register — da `MERCHANT_ID` + llaves de prueba y desbloquea las Fases 2–3 completas; (b) el alta comercial con BBVA (contrato, validación del negocio, cuenta CLABE de liquidación) toma días/semanas y solo bloquea la Fase 4 (producción) | — |
 | **1. Descuentos** | Migración 011 (parte descuentos), `lib/descuentos`, campo en formulario, redención en `create-lead`, `/admin/codigos`, tests | Nada externo — **puede salir antes que los pagos** |
 | **2. Núcleo de pagos** | `lib/openpay.ts`, migración (parte pagos), acciones de pago, `/pago` + `/pago/confirmacion`, CTA en `/registro-exitoso` | Llaves sandbox |
 | **3. Confirmación automática** | Webhook + `confirm-payment` + correos de pago + `payment_events` | Fase 2 |
@@ -357,8 +361,8 @@ Se agregan a `env.ts` (Zod, opcionales para no romper dev) y a la lista `RECOMME
 
 **Riesgos / puntos abiertos**
 
-1. **IVA** — bloqueante de negocio para Fase 2 (§3).
-2. **Comisiones Openpay** vs precio publicado: definir si se absorben (recomendado; recargos tienen restricciones).
+1. **Cuenta de producción BBVA** — el trámite comercial es el único bloqueante externo; mitigado porque todo se construye y prueba contra sandbox (gratis) y el switch a producción es solo configuración (`OPENPAY_SANDBOX=0` + llaves).
+2. **Comisiones Openpay** vs precio publicado: definir si se absorben (recomendado; recargos tienen restricciones). Con IVA incluido en el precio, la comisión sale del monto final.
 3. La antigüedad del SDK oficial refuerza pero no elimina el riesgo de cambios del API: el cliente REST queda aislado en `lib/openpay.ts` para que cualquier ajuste sea local.
 4. Columnas `conekta_*` existentes quedan deprecadas; limpiar en una migración futura cuando se confirme que no hay datos.
 
