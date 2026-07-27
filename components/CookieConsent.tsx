@@ -92,7 +92,7 @@ export default function CookieConsent({ language = "es" }: { language?: Language
       aria-label={t.title}
       className="fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 sm:px-6 sm:pb-6"
     >
-      <div className="mx-auto max-w-3xl rounded-2xl border border-cyan-500/30 bg-slate-900/95 p-4 sm:p-5 text-slate-100 shadow-2xl backdrop-blur">
+      <div className="mx-auto max-w-3xl rounded-[20px] border border-slate-700 bg-slate-900 p-4 sm:p-5 text-slate-100 shadow-lg">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-300">
             <Cookie className="h-5 w-5" aria-hidden="true" />
@@ -113,14 +113,14 @@ export default function CookieConsent({ language = "es" }: { language?: Language
               <button
                 type="button"
                 onClick={() => decide("all")}
-                className="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                className="rounded-xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
               >
                 {t.acceptAll}
               </button>
               <button
                 type="button"
                 onClick={() => decide("essential")}
-                className="rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
               >
                 {t.essential}
               </button>

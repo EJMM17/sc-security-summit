@@ -23,5 +23,11 @@ gtag('consent','default',{ad_storage:s,ad_user_data:s,ad_personalization:s,analy
 gtag('set','url_passthrough',true);
 gtag('set','ads_data_redaction',s!=='granted');`;
 
-  return <script nonce={nonce} dangerouslySetInnerHTML={{ __html: script }} />;
+  return (
+    <script
+      nonce={nonce}
+      suppressHydrationWarning
+      dangerouslySetInnerHTML={{ __html: script }}
+    />
+  );
 }

@@ -1,8 +1,9 @@
 import { ArrowRight, Sparkles, LayoutGrid, Ruler, CheckCircle2, Star } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
+import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
-import WaveSeparator from "./_primitives/WaveSeparator";
+import SectionIntro from "./_primitives/SectionIntro";
 
 export default function Sponsors({ language }: { language: Language }) {
   const { ui, sponsorTierMeta, sponsors } = CONTENT[language];
@@ -12,21 +13,19 @@ export default function Sponsors({ language }: { language: Language }) {
   const benefitGroups = groupBenefits(sponsor.benefits, language);
 
   return (
-    <>
-      <WaveSeparator color="#F8FAFC" />
       <section id="patrocinadores" className="sponsors-section py-20 sm:py-28 relative overflow-hidden">
-        <div className="sponsors-bg-glow" aria-hidden="true" />
         <div className="relative max-w-5xl mx-auto px-4 sm:px-6">
           <ScrollReveal>
-            <div className="text-center mb-14 sm:mb-16">
-              <span className="section-label justify-center">{ui.sponsorsLabel}</span>
-              <h2 className="section-title mt-3">{ui.sponsorsTitle}</h2>
-              <p className="text-slate-500 max-w-2xl mx-auto mt-4">{ui.sponsorsDesc}</p>
-            </div>
+            <SectionIntro
+              label={ui.sponsorsLabel}
+              title={ui.sponsorsTitle}
+              description={ui.sponsorsDesc}
+              className="mb-14 sm:mb-16"
+            />
           </ScrollReveal>
 
           <ScrollReveal delay={80}>
-            <div className="sponsor-card sponsor-card--featured group relative rounded-3xl bg-white border border-slate-200/80 overflow-hidden hover:ring-2 hover:ring-slate-300 transition-all duration-500">
+            <div className="sponsor-card sponsor-card--featured group relative rounded-[22px] bg-white border border-slate-200 overflow-hidden">
               <div className={`h-1.5 w-full ${meta.stripe}`} aria-hidden="true" />
 
               {/* ── HEADER ── */}
@@ -97,19 +96,15 @@ export default function Sponsors({ language }: { language: Language }) {
 
               {/* ── CTA FOOTER ── */}
               <div className="relative px-6 pb-6 lg:px-8 lg:pb-8">
-                <div className="flex flex-col sm:flex-row items-center gap-4 p-5 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="flex flex-col sm:flex-row items-center gap-4 p-5 rounded-xl bg-slate-50 border border-slate-200">
                   <p className="text-sm text-slate-500 flex-1 text-center sm:text-left">
                     {language === "es"
                       ? "¿Listo para posicionar tu marca? Solicita más información y un asesor te contactará."
                       : "Ready to position your brand? Request more information and an advisor will contact you."}
                   </p>
                   <a
-                    href={`mailto:hola@scsecuritysummit.com?subject=${encodeURIComponent(
-                      language === "es"
-                        ? "Patrocinio – Summit 2026"
-                        : "Sponsorship – Summit 2026",
-                    )}`}
-                    className="sponsor-cta inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-all duration-300 hover:-translate-y-0.5 bg-slate-900 text-white hover:bg-slate-800 shadow-[0_8px_22px_-8px_rgba(15,23,42,0.45)] whitespace-nowrap"
+                    href="#contacto-patrocinio"
+                    className="sponsor-cta inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-bold uppercase tracking-wider transition-colors duration-200 bg-slate-900 text-white hover:bg-slate-800 whitespace-nowrap"
                   >
                     {ui.sponsorRequestInfo}
                     <ArrowRight
@@ -121,9 +116,19 @@ export default function Sponsors({ language }: { language: Language }) {
               </div>
             </div>
           </ScrollReveal>
+
+          <ScrollReveal delay={160}>
+            <div id="contacto-patrocinio" className="sponsor-contact-panel">
+              <div>
+                <span className="section-label">{ui.sponsorFormLabel}</span>
+                <h3>{ui.sponsorFormTitle}</h3>
+                <p>{ui.sponsorFormDesc}</p>
+              </div>
+              <SponsorInquiryForm language={language} />
+            </div>
+          </ScrollReveal>
         </div>
       </section>
-    </>
   );
 }
 

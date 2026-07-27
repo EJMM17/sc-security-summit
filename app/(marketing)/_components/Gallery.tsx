@@ -3,6 +3,7 @@ import { Building2, Mic2, Network, Users } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
+import SectionIntro from "./_primitives/SectionIntro";
 
 export default function Gallery({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
@@ -11,13 +12,13 @@ export default function Gallery({ language }: { language: Language }) {
     <section className="py-16 sm:py-24 bg-slate-50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <ScrollReveal>
-          <div className="text-center mb-10 sm:mb-14">
-            <span className="section-label">{ui.galleryLabel}</span>
-            <h2 className="section-title mt-3">{ui.galleryTitle}</h2>
-            <p className="text-slate-500 max-w-xl mx-auto mt-4 text-base leading-relaxed">
-              {ui.galleryDesc}
-            </p>
-          </div>
+          <SectionIntro
+            label={ui.galleryLabel}
+            title={ui.galleryTitle}
+            description={ui.galleryDesc}
+            align="center"
+            className="mb-10 sm:mb-14"
+          />
         </ScrollReveal>
 
         <ScrollReveal delay={120}>

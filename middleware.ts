@@ -18,6 +18,7 @@ export async function middleware(request: NextRequest) {
   const array = new Uint8Array(16);
   crypto.getRandomValues(array);
   const nonce = btoa(String.fromCharCode(...array));
+  const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
 
   // Nonce-based CSP: script-src no longer needs 'unsafe-inline'.
   // style-src retains 'unsafe-inline' because Tailwind + inline style props require it.
@@ -29,7 +30,7 @@ export async function middleware(request: NextRequest) {
   // Keep this in sync with docs/TRACKING.md. Validate at csp-evaluator.withgoogle.com.
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://snap.licdn.com`,
+    `script-src 'self' 'nonce-${nonce}'${devEval} https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://connect.facebook.net https://snap.licdn.com`,
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com",
     "img-src 'self' data: blob: https://www.google-analytics.com https://www.googletagmanager.com https://www.google.com https://www.google.com.mx https://www.googleadservices.com https://googleads.g.doubleclick.net https://*.g.doubleclick.net https://www.facebook.com https://px.ads.linkedin.com",
@@ -42,15 +43,23 @@ export async function middleware(request: NextRequest) {
     "upgrade-insecure-requests",
   ].join("; ");
 
-  const response = NextResponse.next();
-  response.headers.set("x-nonce", nonce);
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
   // Layouts can't read searchParams, so forward ?lang= as a header — keeps
   // SSR <html lang> in sync with the content language on first visit
   // (hreflang/social-share traffic arrives with ?lang=en and no cookie).
   const langParam = request.nextUrl.searchParams.get("lang");
   if (langParam === "es" || langParam === "en") {
-    response.headers.set("x-lang", langParam);
+    requestHeaders.set("x-lang", langParam);
   }
+
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+  response.headers.set("x-nonce", nonce);
   response.headers.set("Content-Security-Policy", csp);
   return response;
 }

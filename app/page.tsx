@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
-import ScrollProgress from "@/components/ScrollProgress";
 import ScrollRevealObserver from "@/components/ScrollRevealObserver";
 import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
-import { deserializeRegistroFlashState } from "@/lib/registro-form-state";
-import { BASE_URL, CONTENT, PRECIOS } from "@/lib/content";
+import { BASE_URL, CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import Agenda from "./(marketing)/_components/Agenda";
 import Audience from "./(marketing)/_components/Audience";
 import Faq from "./(marketing)/_components/Faq";
 import FinalCTA from "./(marketing)/_components/FinalCTA";
@@ -142,9 +141,9 @@ function buildStructuredData(lang: "es" | "en") {
         offers: content.pricing.map((plan) => ({
           "@type": "Offer",
           name: plan.label,
-          price: String(PRECIOS[plan.id as keyof typeof PRECIOS]),
+          price: String(plan.priceValue),
           priceCurrency: "MXN",
-          url: `${BASE_URL}/#registro`,
+          url: EVENTBRITE_URL,
           availability: "https://schema.org/InStock",
           validFrom: "2026-04-01",
           validThrough: "2026-09-24",
@@ -197,7 +196,6 @@ export default async function Home({
 }) {
   const params = searchParams ? await searchParams : undefined;
   const language = await getRequestLanguage(params?.lang ?? null);
-  const registroState = deserializeRegistroFlashState(params?.registro);
 
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
@@ -210,22 +208,22 @@ export default async function Home({
       <link rel="alternate" hrefLang="es-MX" href={`${BASE_URL}/?lang=es`} />
       <link rel="alternate" hrefLang="en-US" href={`${BASE_URL}/?lang=en`} />
       <link rel="alternate" hrefLang="x-default" href={BASE_URL} />
-      <ScrollProgress />
       <ScrollRevealObserver />
       <Header language={language} />
-      <div className="pt-[62px] sm:pt-[68px]">
+      <div>
         <Hero language={language} />
         <WhyAttend language={language} />
         <Pillars language={language} />
         <NetworkingHub language={language} />
         <Speakers language={language} />
+        <Agenda language={language} />
         <Gallery language={language} />
         <Value language={language} />
         <Audience language={language} />
         <Pricing language={language} />
         <Sponsors language={language} />
         <FinalCTA language={language} />
-        <Registro language={language} state={registroState} />
+        <Registro language={language} />
         <Location language={language} />
         <Faq language={language} />
         <Footer language={language} />
@@ -234,6 +232,7 @@ export default async function Home({
       {/* ── Consolidated Structured Data (JSON-LD @graph) ── */}
       <script
         nonce={nonce}
+        suppressHydrationWarning
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />

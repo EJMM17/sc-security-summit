@@ -4,6 +4,7 @@ import type React from "react";
 import { useState, useEffect } from "react";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
+import { EVENTBRITE_URL } from "@/lib/content";
 
 type Language = "es" | "en";
 
@@ -33,7 +34,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
   const navRef = useFocusTrap(open);
   const links = linksByLanguage[language];
   const menuAriaLabel = language === "en" ? (open ? "Close menu" : "Open menu") : (open ? "Cerrar menú" : "Abrir menú");
-  const registerLabel = language === "en" ? "Register now" : "Registrarme Ahora";
+  const registerLabel = language === "en" ? "Get passes" : "Conseguir accesos";
   const sponsorLabel = language === "en" ? "Sponsor the event" : "Patrocinar el evento";
 
   useEffect(() => {
@@ -49,7 +50,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         onClick={() => setOpen(!open)}
         aria-label={menuAriaLabel}
         aria-expanded={open}
-        className="relative z-50 w-11 h-11 flex items-center justify-center rounded-full border border-[var(--border-light)] hover:bg-[var(--blue-50)] transition-colors touch-manipulation"
+        className="mobile-nav-trigger relative z-50 w-11 h-11 flex items-center justify-center rounded-full border border-[var(--border-light)] hover:bg-[var(--blue-50)] transition-colors touch-manipulation"
       >
         {open ? (
           <X className="w-5 h-5 text-[var(--navy)]" />
@@ -61,7 +62,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
       {/* Overlay */}
       {open && (
         <div
-          className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm"
+          className="fixed inset-0 z-40 bg-black/30"
           onClick={() => setOpen(false)}
         />
       )}
@@ -72,7 +73,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         role="dialog"
         aria-modal="true"
         aria-label={language === "en" ? "Navigation menu" : "Menú de navegación"}
-        className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-2xl shadow-2xl border border-[var(--border-light)] transition-all duration-300 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
+        className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-[20px] shadow-lg border border-[var(--border-light)] transition-all duration-200 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
           open
             ? "opacity-100 translate-y-0 scale-100"
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
@@ -84,14 +85,16 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-all"
+              className="py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-colors"
             >
               {link.label}
             </a>
           ))}
           <hr className="my-2 border-[var(--border-lighter)]" />
           <a
-            href="#registro"
+            href={EVENTBRITE_URL}
+            target="_blank"
+            rel="noreferrer"
             onClick={() => setOpen(false)}
             className="btn-primary mt-1 text-sm"
           >
@@ -101,7 +104,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
           <a
             href="#patrocinadores"
             onClick={() => setOpen(false)}
-            className="mt-2 py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-all"
+            className="mt-2 py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-colors"
           >
             {sponsorLabel}
           </a>

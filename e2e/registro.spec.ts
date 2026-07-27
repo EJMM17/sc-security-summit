@@ -1,49 +1,69 @@
 import { expect, test } from "@playwright/test";
 
-// End-to-end: complete a registration with a unique email, then expect the
-// success page to appear with the generated folio.
-test.describe("Registro", () => {
-  test("happy path — general access without CFDI", async ({ page }) => {
-    await page.goto("/");
+test.describe("Homepage comercial", () => {
+  test("muestra ponentes, agenda, accesos y formularios actualizados", async ({ page }) => {
+    await page.goto("/?lang=es");
 
-    // Anchor down to the form
-    await page.getByRole("link", { name: /registrarme|register/i }).first().click();
+    await expect(
+      page.getByRole("heading", {
+        level: 1,
+        name: /summit de seguridad en la cadena de suministros/i,
+      }),
+    ).toBeVisible();
+    await expect(page.getByRole("img", { name: "Lanz Logistics" })).toBeVisible();
+    await expect(
+      page.getByRole("img", { name: "Instituto Internacional de Estudios Superiores" }),
+    ).toBeVisible();
+    await expect(page.getByRole("img", { name: "Parque Industrial Villa Florida" })).toBeVisible();
 
-    const unique = Date.now();
-    const email = `playwright+${unique}@example.test`;
+    const speakers = page.getByRole("region", { name: /conferencistas confirmados/i });
+    await expect(speakers.getByRole("heading", { name: "Sandra Romero" })).toBeVisible();
+    await expect(speakers.getByRole("img", { name: "Sandra Romero" })).toBeVisible();
 
-    await page.getByLabel(/nombre|first name/i).first().fill("Maria");
-    await page.getByLabel(/apellido|last name/i).first().fill("González Test");
-    await page.getByLabel(/correo|email/i).fill(email);
-    await page.getByLabel(/empresa|company/i).fill("Lanz QA");
-    await page.getByLabel(/cargo|job title/i).fill("QA Engineer");
-    await page
-      .getByLabel(/teléfono|tel|phone/i)
-      .first()
-      .fill("+52 899 123 4567");
+    await speakers.getByRole("button", { name: /siguiente conferencista/i }).click();
+    await expect(speakers.getByRole("heading", { name: "Fidel Guerrero" })).toBeVisible();
 
-    // Tipo de acceso: General (default) — verify the option exists
-    const tipo = page.getByLabel(/tipo de acceso|access type/i);
-    await expect(tipo).toBeVisible();
-    await tipo.selectOption("general");
+    const sectionOrder = await page.evaluate(() =>
+      ["speakers", "agenda", "accesos", "patrocinadores", "registro"].map(
+        (id) => document.getElementById(id)?.offsetTop ?? -1,
+      ),
+    );
+    expect(sectionOrder).toEqual([...sectionOrder].sort((a, b) => a - b));
 
-    await page.getByLabel(/términos|terms/i).check();
+    for (const price of ["$4,800", "$2,500", "$900", "$650"]) {
+      await expect(page.getByText(price, { exact: true })).toBeVisible();
+    }
 
-    await page.getByRole("button", { name: /completar|complete registration/i }).click();
+    const eventbriteLinks = page.locator('a[href*="eventbrite.com"]');
+    const visibleEventbriteLink = page.locator('a[href*="eventbrite.com"]:visible').first();
+    await expect(visibleEventbriteLink).toBeVisible();
+    expect(await eventbriteLinks.count()).toBeGreaterThan(1);
+    await expect(visibleEventbriteLink).toHaveAttribute(
+      "href",
+      "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile",
+    );
 
-    // Successful registration redirects to /registro-exitoso.
-    await page.waitForURL(/\/registro-exitoso/, { timeout: 15_000 });
-    await expect(page.getByText(/SCSS2026-/)).toBeVisible({ timeout: 5_000 });
+    const corporate = page.locator("#registro");
+    await expect(corporate.getByRole("heading", { name: /capacita a tu equipo completo/i })).toBeVisible();
+    await expect(corporate.getByLabel(/nombre/i)).toBeVisible();
+    await expect(corporate.getByLabel(/apellido/i)).toBeVisible();
+    await expect(corporate.getByLabel(/correo/i)).toBeVisible();
+    await expect(corporate.getByLabel(/empresa/i)).toBeVisible();
+    await expect(corporate.getByLabel(/cargo/i)).toBeVisible();
+    await expect(corporate.getByLabel(/teléfono/i)).toBeVisible();
+
+    const sponsor = page.locator("#contacto-patrocinio");
+    await expect(sponsor.getByRole("heading", { name: /hablemos de tu marca/i })).toBeVisible();
+    await expect(sponsor.getByRole("button", { name: /solicitar información/i })).toBeVisible();
   });
 
-  test("validates required fields", async ({ page }) => {
-    await page.goto("/");
-    await page.getByRole("link", { name: /registrarme|register/i }).first().click();
-    await page.getByRole("button", { name: /completar|complete registration/i }).click();
-    // Browser native validation OR our error summary
-    const summary = page.locator("#registro-error-summary");
-    if (await summary.isVisible().catch(() => false)) {
-      await expect(summary).toBeVisible();
-    }
+  test("no produce desbordamiento horizontal", async ({ page }) => {
+    await page.goto("/?lang=es");
+    const dimensions = await page.evaluate(() => ({
+      viewport: window.innerWidth,
+      document: document.documentElement.scrollWidth,
+    }));
+
+    expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport);
   });
 });

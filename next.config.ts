@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
     // All images served locally from /public — no remote domains needed.
     // If you add a CDN later (Cloudinary, Imgix, etc.), add its hostname here.
     formats: ["image/avif", "image/webp"],
+    qualities: [75, 82],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
   },
