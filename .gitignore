@@ -14,3 +14,6 @@ out/
 tsconfig.tsbuildinfo
 .DS_Store
 pnpm-lock.yaml
+/tmp/
+/playwright-report/
+/test-results/

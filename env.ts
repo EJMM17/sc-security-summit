@@ -14,6 +14,7 @@ const schema = z.object({
 
   // Site
   NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
+  NEXT_PUBLIC_EVENTBRITE_URL: z.string().url().optional().or(z.literal("")),
 
   // Admin auth
   ADMIN_SESSION_SECRET: z.string().min(32).optional(),

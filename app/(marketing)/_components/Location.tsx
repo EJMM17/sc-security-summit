@@ -20,7 +20,7 @@ export default function Location({ language }: { language: Language }) {
 
         <ScrollReveal>
           <div className="grid md:grid-cols-5 gap-8 items-start">
-            <div className="md:col-span-3 rounded-2xl overflow-hidden shadow-xl border border-slate-200">
+            <div className="md:col-span-3 rounded-[20px] overflow-hidden border border-slate-200 shadow-sm">
               <iframe
                 src="https://www.google.com/maps?q=Libramiento+Ote+S/N,+Azteca,+88680+Reynosa,+Tamaulipas,+Mexico&output=embed"
                 className="w-full h-[280px] sm:h-[350px]"
@@ -35,7 +35,7 @@ export default function Location({ language }: { language: Language }) {
             <div className="md:col-span-2 space-y-6">
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                   </div>
                   <div>
@@ -56,7 +56,7 @@ export default function Location({ language }: { language: Language }) {
               </div>
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
                     <Calendar className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                   </div>
                   <div>
@@ -68,7 +68,7 @@ export default function Location({ language }: { language: Language }) {
               </div>
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-lg border border-slate-200 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
                     <Phone className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
                   </div>
                   <div>

@@ -1,16 +1,14 @@
-import RegistroForm from "@/components/RegistroForm";
+import { BadgeCheck, UsersRound } from "lucide-react";
+import CorporatePassForm from "@/components/CorporatePassForm";
 import ScrollReveal from "@/components/ScrollReveal";
-import type { RegistroFlashState } from "@/lib/registro-form-state";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import WaveSeparator from "./_primitives/WaveSeparator";
 
 export default function Registro({
   language,
-  state,
 }: {
   language: Language;
-  state?: RegistroFlashState | null;
 }) {
   const { ui } = CONTENT[language];
 
@@ -26,9 +24,19 @@ export default function Registro({
               <p className="text-slate-500 max-w-xl mx-auto mt-4">{ui.regDesc}</p>
             </div>
           </ScrollReveal>
-          <ScrollReveal delay={200}>
-            <div className="card-elevated p-6 sm:p-10">
-              <RegistroForm language={language} state={state} />
+          <ScrollReveal delay={120}>
+            <div className="corporate-pass-panel">
+              <div className="corporate-pass-summary">
+                <UsersRound aria-hidden="true" />
+                <p>{ui.corporateAccessTitle}</p>
+                <span>
+                  <BadgeCheck aria-hidden="true" />
+                  {ui.corporateAccessNote}
+                </span>
+              </div>
+              <div className="corporate-pass-form">
+                <CorporatePassForm language={language} />
+              </div>
             </div>
           </ScrollReveal>
         </div>

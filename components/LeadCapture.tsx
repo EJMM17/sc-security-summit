@@ -109,7 +109,7 @@ export default function LeadCapture({ language = "es" }: { language?: Language }
     <div className="fixed inset-0 z-[90] flex items-end sm:items-center justify-center p-4">
       {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-fade-in"
+        className="absolute inset-0 bg-slate-900/60 animate-fade-in"
         onClick={dismiss}
         aria-hidden="true"
       />
@@ -118,19 +118,19 @@ export default function LeadCapture({ language = "es" }: { language?: Language }
       <div
         role="dialog"
         aria-label={t.title}
-        className="relative w-full max-w-md rounded-2xl border border-slate-200/60 bg-white/95 backdrop-blur-xl shadow-2xl p-6 sm:p-8 animate-slide-up"
+        className="relative w-full max-w-md rounded-[20px] border border-slate-200 bg-white shadow-lg p-6 sm:p-8 animate-slide-up"
       >
         <button
           type="button"
           onClick={dismiss}
-          className="absolute top-3 right-3 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
+          className="absolute top-3 right-3 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors"
           aria-label={t.close}
         >
           <X className="w-5 h-5" />
         </button>
 
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-cyan-500 flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0">
             <Mail className="w-5 h-5 text-white" />
           </div>
           <h3 className="font-oswald text-xl font-bold text-slate-900">{t.title}</h3>
@@ -151,11 +151,11 @@ export default function LeadCapture({ language = "es" }: { language?: Language }
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t.placeholder}
-                className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
+                className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-shadow"
               />
               <button
                 type="submit"
-                className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-500 transition-colors flex items-center gap-1.5 flex-shrink-0"
+                className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white hover:bg-blue-700 transition-colors flex items-center gap-1.5 flex-shrink-0"
               >
                 {t.cta}
                 <ArrowRight className="w-4 h-4" />

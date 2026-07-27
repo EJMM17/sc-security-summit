@@ -19,7 +19,7 @@ export default function LanguageSwitcher({ current }: { current: Language }) {
       onClick={() => {
         void handleToggle();
       }}
-      className="inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-lg border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
+      className="header-language-switcher inline-flex items-center justify-center px-3 py-2 text-xs font-bold rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-100 transition-colors"
       aria-label={current === "es" ? "Cambiar a inglés" : "Switch to Spanish"}
     >
       {current === "es" ? "EN" : "ES"}

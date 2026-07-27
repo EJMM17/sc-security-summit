@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Inter, Oswald } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -8,7 +8,6 @@ import { BASE_URL } from "@/lib/content";
 import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics as VercelAnalytics } from "@vercel/analytics/next";
-import AmbientCanvasLazy from "@/components/AmbientCanvasLazy";
 import CookieConsent from "@/components/CookieConsent";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import Analytics from "@/components/Analytics";
@@ -21,7 +20,7 @@ import InteractionTracker from "@/components/InteractionTracker";
 import ConsentMode from "@/components/ConsentMode";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const oswald = Oswald({ subsets: ["latin"], variable: "--font-oswald" });
+const archivo = Archivo({ subsets: ["latin"], variable: "--font-oswald" });
 const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
@@ -89,11 +88,10 @@ export default async function RootLayout({
   return (
     <html lang={language} className="scroll-smooth">
       <body
-        className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
+        className={`${inter.variable} ${archivo.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
         {/* Consent Mode v2 defaults — must run before GTM / GA / pixels */}
         <ConsentMode nonce={nonce} />
-        <AmbientCanvasLazy />
         {children}
         <WhatsAppButton />
         <LeadCapture language={language} />

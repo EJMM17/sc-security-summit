@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
-import { BASE_URL } from "@/lib/content";
+import { BASE_URL, EVENTBRITE_URL } from "@/lib/content";
 
 const PATH = "/ctpat-oea";
 
@@ -122,8 +122,6 @@ export default async function CtpatOeaPage({
   const params = searchParams ? await searchParams : undefined;
   const language = await getRequestLanguage(params?.lang ?? null);
   const c = COPY[language];
-  const registroHref = language === "en" ? "/?lang=en#registro" : "/#registro";
-
   return (
     <PageShell language={language}>
       <article className="px-4 sm:px-6 pt-16 pb-8 bg-white">
@@ -164,7 +162,12 @@ export default async function CtpatOeaPage({
           </h2>
           <p className="text-slate-600 mt-3">{c.ctaText}</p>
           <div className="mt-6">
-            <a href={registroHref} className="btn-primary px-8 py-4 text-base">
+            <a
+              href={EVENTBRITE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-primary px-8 py-4 text-base"
+            >
               {c.cta} <ArrowRight className="w-4 h-4" />
             </a>
           </div>

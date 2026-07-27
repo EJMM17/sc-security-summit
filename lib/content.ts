@@ -1,4 +1,7 @@
 export const BASE_URL = "https://scsecuritysummit.com" as const;
+export const EVENTBRITE_URL =
+  process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
+  "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
 
 export const PRECIOS = {
   estudiante: 850,
@@ -73,17 +76,20 @@ export const FOOTER_LINKS = {
 
 export const UI_TEXT = {
   es: {
-    skipToForm: "Ir al formulario de registro",
+    skipToForm: "Ir al formulario de pases corporativos",
     switchLangLabel: "Cambiar a inglés",
-    registerBtn: "REGISTRARME",
+    registerBtn: "CONSEGUIR ACCESOS",
     dateLocation: "24 de septiembre, 2026 · Reynosa, Tamaulipas",
+    heroKicker: "EL ENCUENTRO DE SEGURIDAD PARA LA INDUSTRIA",
     heroAlt: "Summit de Seguridad en la Cadena de Suministros",
     heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
     heroTitleHighlight: "CADENA DE SUMINISTROS",
     heroDescription:
       "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
     countdownLabel: "Faltan",
-    registerNowBtn: "REGISTRARME AHORA",
+    heroUrgency: "Cupo limitado · asegura tu acceso antes del cierre de registro",
+    registerNowBtn: "CONSEGUIR ACCESOS",
+    heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
     whyAttendLabel: "POR QUÉ SER PARTE DEL SUMMIT",
@@ -114,12 +120,16 @@ export const UI_TEXT = {
       "Líderes en estándares internacionales, comercio exterior, cumplimiento operativo e innovación estratégica.",
     speakersMorePrefix: "Más conferencistas serán anunciados pronto.",
     speakersMoreCTA: "Regístrate para recibirlos primero →",
+    agendaLabel: "PROGRAMA DEL SUMMIT",
+    agendaTitle: "Una Agenda Para Toda Tu Operación",
+    agendaDesc:
+      "Cuatro bloques para que cada departamento encuentre contenido aplicable, conexiones de valor y una ruta clara de acción.",
     valueLabel: "LO QUE OBTENDRÁS",
     valueTitle: "Valor Real Para Tu Empresa",
     audienceCardTitle: "Perfil de Asistentes",
     audienceCardDesc:
       "Personal de la industria maquiladora, transportistas, agencias aduanales, compliance y seguridad de cadena de suministro.",
-    audienceCardCTA: "Registrarme Ahora",
+    audienceCardCTA: "Conseguir Accesos",
     eventDayLabel: "Día del evento",
     eventDayValue: "24 de septiembre, 2026",
     eventDayVenue: "Centro de Convenciones · Reynosa, Tamaulipas",
@@ -181,6 +191,12 @@ export const UI_TEXT = {
     sponsorsDesc:
       "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con más de 300 tomadores de decisión y maximiza tu visibilidad ante la audiencia que importa.",
     sponsorRequestInfo: "Quiero Ser Patrocinador",
+    sponsorFormLabel: "SOLICITUD DE PATROCINIO",
+    sponsorFormTitle: "Hablemos de Tu Marca",
+    sponsorFormDesc:
+      "Déjanos tus datos y un asesor se pondrá en contacto contigo para compartir disponibilidad y beneficios.",
+    sponsorFormSubmit: "SOLICITAR INFORMACIÓN",
+    sponsorSuccess: "Recibimos tu solicitud. Nuestro equipo se pondrá en contacto contigo.",
     sponsorTierLabel: "Nivel",
     sponsorSlotsLabel: "cupos exclusivos",
     sponsorBenefitsLabel: "beneficios incluidos",
@@ -200,10 +216,19 @@ export const UI_TEXT = {
     contactLabel: "Contacto",
     faqLabel: "PREGUNTAS FRECUENTES",
     faqTitle: "¿Tienes Dudas?",
-    regLabel: "RESERVA TU LUGAR",
-    regTitle: "Formulario de Registro",
+    regLabel: "PASES CORPORATIVOS",
+    regTitle: "Capacita a Tu Equipo Completo",
     regDesc:
-      "Completa los siguientes datos para asegurar tu lugar. Los campos con * son obligatorios.",
+      "Un solo pase, cobertura completa. Acceso para tu equipo a cualquier hora del día: cada departamento asiste al bloque que le corresponde.",
+    corporateAccessTitle: "Hasta 10 Accesos Plus",
+    corporateAccessNote: "DC-3 incluido para cada participante.",
+    corporateSubmit: "SOLICITAR PASE CORPORATIVO",
+    corporateSuccess: "Recibimos tu solicitud de pase corporativo. Te contactaremos muy pronto.",
+    corporatePrivacy:
+      "Al continuar, aceptas que usemos tus datos únicamente para dar seguimiento a esta solicitud.",
+    inquirySending: "ENVIANDO...",
+    inquiryError:
+      "No pudimos enviar tu solicitud en este momento. Escríbenos a hola@scsecuritysummit.com.",
     finalCTATitlePart1: "Cupo Limitado. ¿Listo para",
     finalCTATitlePart2: "Fortalecer Tu Cadena?",
     finalCTADesc:
@@ -227,17 +252,20 @@ export const UI_TEXT = {
     galleryStripAlt: "Sala de exposición — SC Security Summit",
   },
   en: {
-    skipToForm: "Skip to registration form",
+    skipToForm: "Skip to corporate passes form",
     switchLangLabel: "Switch to Spanish",
-    registerBtn: "REGISTER",
+    registerBtn: "GET PASSES",
     dateLocation: "September 24, 2026 · Reynosa, Tamaulipas",
+    heroKicker: "THE INDUSTRY'S SUPPLY CHAIN SECURITY MEETING",
     heroAlt: "Supply Chain Security Summit",
     heroTitlePrefix: "SECURITY SUMMIT FOR THE",
     heroTitleHighlight: "SUPPLY CHAIN",
     heroDescription:
       "Where strategic updates, business networking, and technology solutions come together to strengthen northern Mexico's industrial ecosystem.",
     countdownLabel: "Time left",
-    registerNowBtn: "REGISTER NOW",
+    heroUrgency: "Limited capacity · secure your pass before registration closes",
+    registerNowBtn: "GET PASSES",
+    heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
     presentedBy: "Presented by",
     whyAttendLabel: "WHY JOIN THE SUMMIT",
@@ -268,12 +296,16 @@ export const UI_TEXT = {
       "Leaders in international standards, foreign trade, operational compliance and strategic innovation.",
     speakersMorePrefix: "More speakers will be announced soon.",
     speakersMoreCTA: "Register to hear about them first →",
+    agendaLabel: "SUMMIT PROGRAM",
+    agendaTitle: "One Agenda For Your Entire Operation",
+    agendaDesc:
+      "Four blocks so every department can find practical content, valuable connections and a clear path to action.",
     valueLabel: "WHAT YOU WILL GAIN",
     valueTitle: "Real Value For Your Company",
     audienceCardTitle: "Attendee Profile",
     audienceCardDesc:
       "Professionals from the maquiladora industry, carriers, customs brokers, compliance and supply chain security.",
-    audienceCardCTA: "Register Now",
+    audienceCardCTA: "Get Passes",
     eventDayLabel: "Event day",
     eventDayValue: "September 24, 2026",
     eventDayVenue: "Convention Center · Reynosa, Tamaulipas",
@@ -335,6 +367,12 @@ export const UI_TEXT = {
     sponsorsDesc:
       "Position your company as a leader in supply chain security. Connect directly with over 300 decision makers and maximize your visibility before the audience that matters.",
     sponsorRequestInfo: "Become a Sponsor",
+    sponsorFormLabel: "SPONSORSHIP REQUEST",
+    sponsorFormTitle: "Let's Talk About Your Brand",
+    sponsorFormDesc:
+      "Leave your details and an advisor will contact you with availability and benefit information.",
+    sponsorFormSubmit: "REQUEST INFORMATION",
+    sponsorSuccess: "We received your request. Our team will contact you shortly.",
     sponsorTierLabel: "Tier",
     sponsorSlotsLabel: "exclusive slots",
     sponsorBenefitsLabel: "benefits included",
@@ -354,10 +392,19 @@ export const UI_TEXT = {
     contactLabel: "Contact",
     faqLabel: "FREQUENTLY ASKED QUESTIONS",
     faqTitle: "Have Questions?",
-    regLabel: "RESERVE YOUR SPOT",
-    regTitle: "Registration Form",
+    regLabel: "CORPORATE PASSES",
+    regTitle: "Train Your Entire Team",
     regDesc:
-      "Fill out the information below to secure your spot. Fields marked with * are required.",
+      "One pass, complete coverage. Your team can attend at any time of day, with each department joining the block that fits their role.",
+    corporateAccessTitle: "Up to 10 Plus Passes",
+    corporateAccessNote: "DC-3 training certificate included for each participant.",
+    corporateSubmit: "REQUEST A CORPORATE PASS",
+    corporateSuccess: "We received your corporate pass request. We will contact you shortly.",
+    corporatePrivacy:
+      "By continuing, you agree that we may use your information only to follow up on this request.",
+    inquirySending: "SENDING...",
+    inquiryError:
+      "We could not send your request right now. Email us at hola@scsecuritysummit.com.",
     finalCTATitlePart1: "Limited Seats. Ready to",
     finalCTATitlePart2: "Strengthen Your Chain?",
     finalCTADesc:
@@ -385,12 +432,12 @@ export const UI_TEXT = {
 export const HERO_STATS = {
   es: [
     { number: 10, suffix: "", label: "Horas de Capacitación" },
-    { number: 4, suffix: "", label: "Conferencistas Confirmados" },
+    { number: 5, suffix: "", label: "Conferencistas Confirmados" },
     { number: 500, suffix: "+", label: "Lugares Disponibles" },
   ],
   en: [
     { number: 10, suffix: "", label: "Training Hours" },
-    { number: 4, suffix: "", label: "Confirmed Speakers" },
+    { number: 5, suffix: "", label: "Confirmed Speakers" },
     { number: 500, suffix: "+", label: "Available Seats" },
   ],
 } as const;
@@ -471,54 +518,237 @@ export const PILARES = {
 export const SPEAKERS = {
   es: [
     {
+      name: "Sandra Romero",
+      role: "Directora Lanz Logistics",
+      topic: "Cultura de Seguridad",
+      headline: "Certificado, pero sin capitalizar tu OEA",
+      description:
+        "Monitorear tu cadena de suministro no solo es control, es la ventaja competitiva de tu empresa.",
+      image: "/images/speaker-sandra-4k.webp",
+    },
+    {
       name: "Fidel Guerrero",
       role: "Subdirector del Comité Nacional de Comercio Exterior y Aduanas de INDEX Nacional",
       topic: "Panorama Industrial",
-      image: "/images/speaker-fidel.webp",
+      headline: "Certificado, pero sin capitalizar tu OEA",
+      description:
+        "Certificarse y no capitalizarlo es dejar dinero sobre la mesa. El reto no es solo contar con OEA, sino usar esa certificación como argumento de venta activo frente a clientes y socios.",
+      image: "/images/speaker-fidel-4k.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Mandatario Aduanal Certificado",
       topic: "Aduanas & Compliance",
-      image: "/images/speaker-isidoro.webp",
+      headline: "El error de un socio, tu responsabilidad",
+      description:
+        "Un socio aduanal no validado es una responsabilidad que hereda tu empresa, aunque el error nunca haya sido tuyo.",
+      image: "/images/speaker-isidoro-4k.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Líder en Trade Compliance e Innovación",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.webp",
+      headline: "Apagar incendios en vez de prevenir",
+      description:
+        "¿Tu empresa está preparada para el riesgo, o solo lista para reaccionar cuando ya ocurrió?",
+      image: "/images/speaker-julio-4k.webp",
     },
     {
       name: "Eduardo Luna",
       role: "Organización Operativa y Expansión Comercial",
       topic: "Organización & Expansión",
-      image: "/images/speaker-eduardo.webp",
+      headline: "Visión que nunca baja a operación, o viceversa",
+      description:
+        "Cuando la visión de dirección y la operación diaria no hablan el mismo idioma, cada decisión estratégica se pierde en la ejecución.",
+      image: "/images/speaker-eduardo-4k.webp",
     },
   ],
   en: [
     {
+      name: "Sandra Romero",
+      role: "Director, Lanz Logistics",
+      topic: "Security Culture",
+      headline: "Certified, but not capitalizing on your AEO",
+      description:
+        "Monitoring your supply chain is more than control; it is a competitive advantage for your company.",
+      image: "/images/speaker-sandra-4k.webp",
+    },
+    {
       name: "Fidel Guerrero",
       role: "Deputy Director, National Committee on Foreign Trade & Customs — INDEX Nacional",
       topic: "Industrial Overview",
-      image: "/images/speaker-fidel.webp",
+      headline: "Certified, but not capitalizing on your AEO",
+      description:
+        "Getting certified and failing to capitalize on it leaves money on the table. The challenge is not merely having AEO status, but using it as an active sales argument with clients and partners.",
+      image: "/images/speaker-fidel-4k.webp",
     },
     {
       name: "Isidoro Juárez",
       role: "Certified Customs Broker",
       topic: "Customs & Compliance",
-      image: "/images/speaker-isidoro.webp",
+      headline: "A partner's mistake, your responsibility",
+      description:
+        "An unvalidated customs partner becomes a liability your company inherits, even when the original mistake was not yours.",
+      image: "/images/speaker-isidoro-4k.webp",
     },
     {
       name: "Julio César Suárez",
       role: "Trade Compliance & Innovation Leader",
       topic: "Trade Compliance",
-      image: "/images/speaker-julio.webp",
+      headline: "Putting out fires instead of preventing them",
+      description:
+        "Is your company prepared for risk, or only ready to react after it has already happened?",
+      image: "/images/speaker-julio-4k.webp",
     },
     {
       name: "Eduardo Luna",
       role: "Operational Organization & Commercial Expansion",
       topic: "Organization & Expansion",
-      image: "/images/speaker-eduardo.webp",
+      headline: "A vision that never reaches operations, or vice versa",
+      description:
+        "When leadership's vision and daily operations do not speak the same language, every strategic decision gets lost in execution.",
+      image: "/images/speaker-eduardo-4k.webp",
+    },
+  ],
+} as const;
+
+export const AGENDA = {
+  es: [
+    {
+      title: "Bloque 1 — Visión Estratégica",
+      time: "08:00 — 11:00",
+      audience: "Gerencia y mandos medios de RH, entrenamiento, sistemas y seguridad",
+      sessions: [
+        { time: "08:00–08:30", title: "Registro y bienvenida" },
+        { time: "08:30–09:00", title: "Stands y networking: Stands & Business Hub" },
+        {
+          time: "09:00–09:50",
+          title: "De la visión a la acción: liderazgo y formación como pilares de seguridad",
+          speaker: "Eduardo Luna",
+        },
+        {
+          time: "10:00–11:00",
+          title:
+            "Ciberseguridad en la cadena de suministros: IA, protección de información y nuevos riesgos de cumplimiento",
+        },
+      ],
+    },
+    {
+      title: "Bloque 2 — Riesgo y Cumplimiento",
+      time: "11:00 — 14:30",
+      audience: "Compliance, aduanas, logística, seguridad patrimonial y mantenimiento",
+      sessions: [
+        {
+          time: "11:00–12:00",
+          title:
+            "Seguridad en el transporte de mercancías: controles operativos, inspección y prevención de vulnerabilidades en la cadena de suministro",
+        },
+        {
+          time: "12:00–13:30",
+          title:
+            "Evaluación de riesgos en la cadena de suministro: identificación, análisis y mitigación de amenazas",
+          speaker: "Julio César Suárez",
+        },
+        { time: "13:30–14:30", title: "Comida y networking: Stands & Business Hub" },
+      ],
+    },
+    {
+      title: "Bloque 3 — Cumplimiento Aduanal y OEA",
+      time: "14:30 — 17:30",
+      audience: "Gerencia, import/export, agentes aduanales, mandos medios y supervisores",
+      sessions: [
+        {
+          time: "14:30–15:45",
+          title: "Agencias aduanales como OEA: cumplimiento operativo y fiscal ante el SAT",
+          speaker: "Isidoro Juárez",
+        },
+        { time: "15:45–16:15", title: "Networking: Stands & Business Hub" },
+        {
+          time: "16:15–17:30",
+          title:
+            "OEA como ventaja estratégica: seguridad, cumplimiento y competitividad en la cadena de suministro",
+          speaker: "Fidel Guerrero",
+        },
+      ],
+    },
+    {
+      title: "Bloque 4 — Cierre y Conclusiones",
+      time: "17:30 — 19:00",
+      audience: "Todos los departamentos",
+      sessions: [
+        { time: "17:30–18:00", title: "Panel de conferencistas" },
+        { time: "18:00–18:15", title: "Clausura" },
+        { time: "18:15–19:00", title: "Networking: Stands & Business Hub" },
+      ],
+    },
+  ],
+  en: [
+    {
+      title: "Block 1 — Strategic Vision",
+      time: "08:00 — 11:00",
+      audience: "Management and mid-level leaders in HR, training, systems and security",
+      sessions: [
+        { time: "08:00–08:30", title: "Registration and welcome" },
+        { time: "08:30–09:00", title: "Booths and networking: Stands & Business Hub" },
+        {
+          time: "09:00–09:50",
+          title: "From vision to action: leadership and training as pillars of security",
+          speaker: "Eduardo Luna",
+        },
+        {
+          time: "10:00–11:00",
+          title:
+            "Supply chain cybersecurity: AI, information protection and new compliance risks",
+        },
+      ],
+    },
+    {
+      title: "Block 2 — Risk and Compliance",
+      time: "11:00 — 14:30",
+      audience: "Compliance, customs, logistics, asset security and maintenance",
+      sessions: [
+        {
+          time: "11:00–12:00",
+          title:
+            "Freight security: operational controls, inspection and prevention of supply chain vulnerabilities",
+        },
+        {
+          time: "12:00–13:30",
+          title:
+            "Supply chain risk assessment: identifying, analyzing and mitigating threats",
+          speaker: "Julio César Suárez",
+        },
+        { time: "13:30–14:30", title: "Lunch and networking: Stands & Business Hub" },
+      ],
+    },
+    {
+      title: "Block 3 — Customs Compliance and AEO",
+      time: "14:30 — 17:30",
+      audience: "Management, import/export, customs brokers, mid-level leaders and supervisors",
+      sessions: [
+        {
+          time: "14:30–15:45",
+          title: "Customs agencies as AEOs: operational and tax compliance before SAT",
+          speaker: "Isidoro Juárez",
+        },
+        { time: "15:45–16:15", title: "Networking: Stands & Business Hub" },
+        {
+          time: "16:15–17:30",
+          title:
+            "AEO as a strategic advantage: security, compliance and competitiveness across the supply chain",
+          speaker: "Fidel Guerrero",
+        },
+      ],
+    },
+    {
+      title: "Block 4 — Closing and Conclusions",
+      time: "17:30 — 19:00",
+      audience: "All departments",
+      sessions: [
+        { time: "17:30–18:00", title: "Speaker panel" },
+        { time: "18:00–18:15", title: "Closing remarks" },
+        { time: "18:15–19:00", title: "Networking: Stands & Business Hub" },
+      ],
     },
   ],
 } as const;
@@ -569,6 +799,7 @@ export const PRICING = {
       id: "vip",
       label: "Acceso VIP",
       price: "$4,800",
+      priceValue: 4800,
       featured: true,
       desc: "Ejecutivos y tomadores de decisión",
       features: [
@@ -586,28 +817,48 @@ export const PRICING = {
       ],
     },
     {
-      id: "general",
-      label: "Acceso General",
+      id: "plus",
+      label: "Acceso Plus",
       price: "$2,500",
+      priceValue: 2500,
       featured: false,
-      desc: "Profesionales y operación",
+      desc: "Líderes de certificación y puntos de contacto",
+      recommended: "Especialista CTPAT / OEA",
       features: [
         "Acceso a conferencias especializadas",
         "Acceso a paneles con expertos de la industria",
         "Constancia de participación",
-        "Kit de bienvenida",
+        "Kit de bienvenida ejecutivo",
+        "Gafete de acceso",
+        "Material descargable, recursos y plantillas de trabajo",
+      ],
+    },
+    {
+      id: "general",
+      label: "Acceso General",
+      price: "$900",
+      priceValue: 900,
+      featured: false,
+      desc: "Para los que sostienen la seguridad en la operación",
+      recommended: "Operativo de Seguridad CTPAT / OEA",
+      features: [
+        "Acceso a conferencias especializadas",
+        "Acceso a paneles con expertos de la industria",
+        "Constancia digital de participación",
+        "Kit básico de bienvenida profesional",
         "Gafete de acceso",
       ],
     },
     {
       id: "estudiante",
       label: "Acceso Estudiante",
-      price: "$850",
+      price: "$650",
+      priceValue: 650,
       featured: false,
       desc: "Perfil de estudiante con credencial vigente / Cupo limitado",
       features: [
         "Acceso a conferencias especializadas",
-        "Kit básico de bienvenida",
+        "Kit Futuros Líderes",
         "Gafete de acceso",
         "Constancia de participación disponible con costo preferencial",
       ],
@@ -618,6 +869,7 @@ export const PRICING = {
       id: "vip",
       label: "VIP Pass",
       price: "$4,800",
+      priceValue: 4800,
       featured: true,
       desc: "Executives and decision makers",
       features: [
@@ -635,28 +887,48 @@ export const PRICING = {
       ],
     },
     {
-      id: "general",
-      label: "General Pass",
+      id: "plus",
+      label: "Plus Pass",
       price: "$2,500",
+      priceValue: 2500,
       featured: false,
-      desc: "Professionals and operations",
+      desc: "Certification leaders and key points of contact",
+      recommended: "CTPAT / AEO Specialist",
       features: [
         "Access to specialized conferences",
         "Access to industry expert panels",
         "Certificate of participation",
-        "Welcome kit",
+        "Executive welcome kit",
+        "Access badge",
+        "Downloadable materials, resources and work templates",
+      ],
+    },
+    {
+      id: "general",
+      label: "General Pass",
+      price: "$900",
+      priceValue: 900,
+      featured: false,
+      desc: "For those who sustain security in daily operations",
+      recommended: "CTPAT / AEO Security Operator",
+      features: [
+        "Access to specialized conferences",
+        "Access to industry expert panels",
+        "Digital certificate of participation",
+        "Professional basic welcome kit",
         "Access badge",
       ],
     },
     {
       id: "estudiante",
       label: "Student Pass",
-      price: "$850",
+      price: "$650",
+      priceValue: 650,
       featured: false,
       desc: "Student profile with valid ID / Limited spots",
       features: [
         "Access to specialized conferences",
-        "Basic welcome kit",
+        "Future Leaders kit",
         "Access badge",
         "Certificate of participation available at preferential cost",
       ],
@@ -667,7 +939,71 @@ export const PRICING = {
 export const PRICING_STRIPE = {
   general: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
   vip: "bg-gradient-to-r from-blue-800 via-cyan-400 to-blue-800",
+  plus: "bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500",
   estudiante: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
+} as const;
+
+export const INQUIRY_FORMS = {
+  es: {
+    corporate: {
+      firstName: "Nombre(s)",
+      lastName: "Apellidos",
+      email: "Correo corporativo",
+      company: "Empresa",
+      role: "Cargo",
+      phone: "Teléfono móvil",
+      firstNamePlaceholder: "Ej. María",
+      lastNamePlaceholder: "Ej. González López",
+      emailPlaceholder: "nombre@empresa.com",
+      companyPlaceholder: "Nombre de la empresa",
+      rolePlaceholder: "Ej. Directora de Logística",
+      phonePlaceholder: "+52 899 123 4567",
+      subject: "Solicitud de pase corporativo — Summit 2026",
+    },
+    sponsor: {
+      name: "Nombre completo",
+      company: "Empresa",
+      email: "Correo corporativo",
+      phone: "Teléfono móvil",
+      interest: "¿Qué te interesa conocer?",
+      namePlaceholder: "Tu nombre",
+      companyPlaceholder: "Nombre de la empresa",
+      emailPlaceholder: "nombre@empresa.com",
+      phonePlaceholder: "+52 899 123 4567",
+      interestPlaceholder: "Cuéntanos brevemente qué busca tu marca",
+      subject: "Solicitud de patrocinio — Summit 2026",
+    },
+  },
+  en: {
+    corporate: {
+      firstName: "First name",
+      lastName: "Last name",
+      email: "Corporate email",
+      company: "Company",
+      role: "Job title",
+      phone: "Mobile phone",
+      firstNamePlaceholder: "e.g. Maria",
+      lastNamePlaceholder: "e.g. Gonzalez Lopez",
+      emailPlaceholder: "name@company.com",
+      companyPlaceholder: "Company name",
+      rolePlaceholder: "e.g. Logistics Director",
+      phonePlaceholder: "+1 956 123 4567",
+      subject: "Corporate pass request — Summit 2026",
+    },
+    sponsor: {
+      name: "Full name",
+      company: "Company",
+      email: "Corporate email",
+      phone: "Mobile phone",
+      interest: "What would you like to know?",
+      namePlaceholder: "Your name",
+      companyPlaceholder: "Company name",
+      emailPlaceholder: "name@company.com",
+      phonePlaceholder: "+1 956 123 4567",
+      interestPlaceholder: "Briefly tell us what your brand is looking for",
+      subject: "Sponsorship request — Summit 2026",
+    },
+  },
 } as const;
 
 export type SponsorTierMeta = {
@@ -891,9 +1227,11 @@ export const CONTENT = {
     heroStats: HERO_STATS.es,
     pillars: PILARES.es,
     speakers: SPEAKERS.es,
+    agenda: AGENDA.es,
     attendees: ASISTENTES.es,
     providers: PROVEEDORES.es,
     pricing: PRICING.es,
+    forms: INQUIRY_FORMS.es,
     sponsorTierMeta: SPONSOR_TIER_META,
     sponsors: SPONSORS.es,
     valueHighlights: VALUE_HIGHLIGHTS.es,
@@ -907,9 +1245,11 @@ export const CONTENT = {
     heroStats: HERO_STATS.en,
     pillars: PILARES.en,
     speakers: SPEAKERS.en,
+    agenda: AGENDA.en,
     attendees: ASISTENTES.en,
     providers: PROVEEDORES.en,
     pricing: PRICING.en,
+    forms: INQUIRY_FORMS.en,
     sponsorTierMeta: SPONSOR_TIER_META,
     sponsors: SPONSORS.en,
     valueHighlights: VALUE_HIGHLIGHTS.en,

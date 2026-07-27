@@ -65,7 +65,7 @@ export default function InteractionTracker() {
       }
 
       // ── Registration intent ───────────────────────────────────────
-      if (href.includes("#registro")) {
+      if (href.includes("#registro") || href.includes("eventbrite.")) {
         pushEvent("click_register", base);
         return;
       }
