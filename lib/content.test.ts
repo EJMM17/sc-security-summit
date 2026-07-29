@@ -37,4 +37,24 @@ describe("content SSOT", () => {
     ]);
     expect(CONTENT.es.agenda).toHaveLength(4);
   });
+
+  it("keeps the FAQ free of the retired registration flow", () => {
+    // Ticketing lives in Eventbrite: no on-site form, no folio, no bank transfer.
+    const retired = /folio|formulario de registro|transferencia bancaria|confirmation code|bank transfer/i;
+    for (const language of ["es", "en"] as const) {
+      for (const { question, answer } of CONTENT[language].faq) {
+        expect(`${question} ${answer}`).not.toMatch(retired);
+      }
+    }
+  });
+
+  it("describes all four access tiers in the FAQ", () => {
+    const accessAnswer = CONTENT.es.faq.find((item) =>
+      item.question.includes("¿Qué incluye cada tipo de acceso?"),
+    )?.answer;
+    expect(accessAnswer).toBeDefined();
+    for (const tier of ["Estudiante", "General", "Plus", "VIP"]) {
+      expect(accessAnswer).toContain(tier);
+    }
+  });
 });
