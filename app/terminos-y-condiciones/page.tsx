@@ -39,7 +39,7 @@ export default function TerminosCondiciones() {
         <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "var(--font-oswald)" }}>
           Términos y Condiciones
         </h1>
-        <p className="text-sm text-slate-400 mb-10">Última actualización: abril de 2026</p>
+        <p className="text-sm text-slate-400 mb-10">Última actualización: julio de 2026</p>
 
         <div className="space-y-8 text-sm text-slate-700 leading-relaxed">
 
@@ -54,16 +54,16 @@ export default function TerminosCondiciones() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-3">2. Registro y Confirmación</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">2. Compra de Accesos</h2>
             <p>
-              El registro al Evento se realiza a través del formulario oficial en línea. Al completar el
-              formulario, el participante recibirá un <strong>folio de confirmación</strong> que acredita su
-              solicitud de registro. Dicho folio no garantiza por sí mismo la reserva del lugar; la reserva
-              queda confirmada únicamente al realizarse el pago correspondiente y recibir la confirmación por
-              correo electrónico por parte de Lanz Logistics.
+              La compra de accesos individuales se realiza a través de <strong>Eventbrite</strong>, la
+              plataforma de boletaje del Evento, a la que se llega desde cualquier botón de acceso del sitio.
+              Al completar la compra, Eventbrite envía al participante su <strong>boleto</strong> y el
+              comprobante correspondiente por correo electrónico. Dicho boleto es el documento que acredita
+              el acceso al Evento y deberá presentarse el día de su celebración.
             </p>
             <p className="mt-3">
-              Lanz Logistics se reserva el derecho de rechazar o cancelar registros en caso de datos
+              Lanz Logistics se reserva el derecho de rechazar o cancelar accesos en caso de datos
               incompletos, incorrectos o fraudulentos.
             </p>
           </section>
@@ -71,14 +71,19 @@ export default function TerminosCondiciones() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">3. Proceso de Pago</h2>
             <p>
-              Una vez recibido el registro, un representante de Lanz Logistics contactará al participante en
-              un plazo de <strong>24 a 48 horas hábiles</strong> con las instrucciones de pago. Los precios
-              indicados no incluyen I.V.A. El pago puede realizarse mediante transferencia bancaria, depósito
-              o los métodos indicados por el organizador.
+              El pago de los accesos individuales se procesa <strong>directamente en Eventbrite</strong> al
+              momento de la compra, con los métodos de pago que dicha plataforma habilite. Los precios
+              indicados en el sitio no incluyen I.V.A.
             </p>
             <p className="mt-3">
-              El lugar en el Evento queda reservado únicamente al momento en que el pago sea confirmado por
-              el organizador. El cupo es limitado y se asigna en orden de confirmación de pago.
+              Los <strong>pases corporativos</strong> son la excepción: se solicitan a través del formulario
+              del sitio y un representante de Lanz Logistics contacta a la empresa en un plazo de{" "}
+              <strong>24 a 48 horas hábiles</strong> con la cotización y las instrucciones de pago
+              correspondientes.
+            </p>
+            <p className="mt-3">
+              El lugar en el Evento queda reservado al confirmarse el pago. El cupo es limitado y se asigna
+              en orden de confirmación de pago.
             </p>
           </section>
 
@@ -89,10 +94,16 @@ export default function TerminosCondiciones() {
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
                 hola@scsecuritysummit.com
               </a>{" "}
-              con al menos <strong>15 días naturales de anticipación</strong> a la fecha del Evento para ser
+              indicando el <strong>número de orden de Eventbrite</strong>, con al menos{" "}
+              <strong>15 días naturales de anticipación</strong> a la fecha del Evento para ser
               elegibles a un reembolso del 80% del monto pagado. Cancelaciones con menos de 15 días de
               anticipación no son elegibles para reembolso; sin embargo, el participante podrá designar a
               un sustituto previo aviso al organizador.
+            </p>
+            <p className="mt-3">
+              El reembolso se procesa a través de Eventbrite, por el mismo medio de pago utilizado en la
+              compra. La transacción se rige adicionalmente por los términos y condiciones de dicha
+              plataforma.
             </p>
             <p className="mt-3">
               Lanz Logistics se reserva el derecho de cancelar o reprogramar el Evento por causas de fuerza
@@ -114,9 +125,14 @@ export default function TerminosCondiciones() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">6. Facturación (CFDI)</h2>
             <p>
-              La factura CFDI se emitirá dentro de las <strong>72 horas hábiles</strong> posteriores a la
-              confirmación del pago, con los datos fiscales proporcionados en el formulario de registro. No
-              se emitirán facturas con datos distintos a los proporcionados al momento del registro.
+              Para solicitar factura, el participante deberá enviar sus datos fiscales y su número de orden
+              de Eventbrite a{" "}
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
+                hola@scsecuritysummit.com
+              </a>
+              . La factura CFDI se emitirá dentro de las <strong>72 horas hábiles</strong> posteriores a la
+              confirmación del pago, con los datos fiscales así proporcionados. No se emitirán facturas con
+              datos distintos a los recibidos por esa vía.
             </p>
           </section>
 

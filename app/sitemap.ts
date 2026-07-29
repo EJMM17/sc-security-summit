@@ -47,8 +47,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
-    // /recuperar-folio, /aviso-de-privacidad and /terminos-y-condiciones are
-    // intentionally omitted: they're noindex, and a sitemap must only list
-    // indexable URLs (Search Console flags "submitted URL marked noindex").
+    // /aviso-de-privacidad and /terminos-y-condiciones are intentionally
+    // omitted: they're noindex, and a sitemap must only list indexable URLs
+    // (Search Console flags "submitted URL marked noindex").
   ];
 }

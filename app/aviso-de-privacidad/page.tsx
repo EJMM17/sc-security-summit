@@ -39,7 +39,7 @@ export default function AvisoPrivacidad() {
         <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "var(--font-oswald)" }}>
           Aviso de Privacidad
         </h1>
-        <p className="text-sm text-slate-400 mb-10">Última actualización: abril de 2026</p>
+        <p className="text-sm text-slate-400 mb-10">Última actualización: julio de 2026</p>
 
         <div className="prose prose-slate max-w-none space-y-8 text-sm text-slate-700 leading-relaxed">
 
@@ -61,15 +61,23 @@ export default function AvisoPrivacidad() {
 
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">2. Datos Personales que se Recaban</h2>
-            <p>Para llevar a cabo las finalidades descritas en el presente Aviso de Privacidad, el Responsable recabará los siguientes datos personales:</p>
+            <p>
+              A través de los formularios de este sitio —solicitud de pase corporativo y solicitud de
+              patrocinio— el Responsable recaba los siguientes datos personales:
+            </p>
             <ul className="list-disc pl-6 mt-3 space-y-1">
               <li>Nombre(s) y apellidos</li>
-              <li>Correo electrónico</li>
+              <li>Correo electrónico corporativo</li>
               <li>Número de teléfono móvil</li>
               <li>Empresa y cargo</li>
-              <li>Tipo de acceso al evento</li>
-              <li>Datos fiscales para facturación (RFC, razón social y código postal fiscal), únicamente si el titular los proporciona voluntariamente al solicitar una factura CFDI</li>
+              <li>El mensaje o interés que el titular decida incluir en la solicitud de patrocinio</li>
+              <li>Datos fiscales para facturación (RFC, razón social y código postal fiscal), únicamente si el titular los envía voluntariamente por correo electrónico al solicitar una factura CFDI</li>
             </ul>
+            <p className="mt-3">
+              La <strong>compra de accesos individuales se realiza en Eventbrite</strong>. Los datos de compra
+              y de pago se proporcionan directamente a esa plataforma, que los trata bajo su propio aviso de
+              privacidad; este sitio no los recaba ni los almacena.
+            </p>
             <p className="mt-3">
               El Responsable <strong>no recaba datos personales sensibles</strong> en el sentido del artículo 3, fracción VI de la LFPDPPP.
             </p>
@@ -79,11 +87,10 @@ export default function AvisoPrivacidad() {
             <h2 className="text-lg font-bold text-slate-900 mb-3">3. Finalidades del Tratamiento</h2>
             <p><strong>Finalidades primarias</strong> (necesarias para la relación jurídica entre el Responsable y el titular):</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Procesar y confirmar el registro al 1er Summit de Seguridad en la Cadena de Suministros 2026.</li>
-              <li>Generar y enviar el folio de confirmación de registro.</li>
-              <li>Enviar instrucciones de pago y confirmación de asistencia.</li>
+              <li>Atender las solicitudes de pase corporativo y de patrocinio recibidas a través del sitio.</li>
+              <li>Contactar al titular para dar seguimiento a su solicitud, compartir cotizaciones, disponibilidad y beneficios.</li>
               <li>Emitir la factura CFDI cuando sea solicitada por el titular.</li>
-              <li>Gestionar el acceso al evento el día de su celebración.</li>
+              <li>Atender consultas relacionadas con el 1er Summit de Seguridad en la Cadena de Suministros 2026.</li>
             </ul>
             <p className="mt-4"><strong>Finalidades secundarias</strong> (no necesarias para la relación jurídica; puede oponerse a ellas):</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
@@ -108,6 +115,16 @@ export default function AvisoPrivacidad() {
               <li>Cuando sea preciso para el mantenimiento o cumplimiento de una relación jurídica entre el Responsable y el titular.</li>
               <li>Cuando la transferencia sea efectuada a encargados del Responsable (ej. proveedores de tecnología) que traten los datos conforme a instrucciones del Responsable y con las mismas medidas de seguridad.</li>
             </ul>
+            <p className="mt-3">
+              Los encargados que intervienen en la operación del sitio son <strong>Vercel</strong> (hospedaje
+              del sitio web) y <strong>Resend</strong> (entrega de los correos generados por los formularios).
+            </p>
+            <p className="mt-3">
+              Adicionalmente, <strong>Eventbrite</strong> opera la venta de accesos al Evento. Cuando el
+              titular compra un acceso, proporciona sus datos directamente a esa plataforma, la cual actúa
+              como responsable independiente del tratamiento conforme a su propio aviso de privacidad. Lanz
+              Logistics recibe de Eventbrite la información necesaria para gestionar la asistencia al Evento.
+            </p>
           </section>
 
           <section>
@@ -132,9 +149,22 @@ export default function AvisoPrivacidad() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">6. Uso de Cookies y Tecnologías de Seguimiento</h2>
             <p>
-              El sitio web del Summit puede utilizar cookies técnicas estrictamente necesarias para el funcionamiento
-              del mismo. No se utilizan cookies de seguimiento publicitario ni se comparte información de navegación
-              con redes publicitarias de terceros.
+              El sitio web del Summit utiliza <strong>cookies técnicas estrictamente necesarias</strong> para su
+              funcionamiento, que no requieren consentimiento.
+            </p>
+            <p className="mt-3">
+              Adicionalmente, y <strong>únicamente previo consentimiento del titular</strong> otorgado en el
+              banner de cookies, el sitio utiliza cookies y tecnologías de:
+            </p>
+            <ul className="list-disc pl-6 mt-2 space-y-1">
+              <li><strong>Analítica</strong>: Google Analytics 4, a través de Google Tag Manager, para medir el uso del sitio.</li>
+              <li><strong>Marketing</strong>: Google Ads y, cuando estén configurados, Meta Pixel y LinkedIn Insight Tag, para medir el resultado de nuestras campañas y mostrar publicidad relevante.</li>
+            </ul>
+            <p className="mt-3">
+              Mientras no se otorgue el consentimiento, dichas tecnologías permanecen deshabilitadas mediante
+              el Consent Mode de Google. El titular puede otorgar, rechazar o cambiar su elección en cualquier
+              momento desde el banner de cookies del sitio, o escribiendo a{" "}
+              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>.
             </p>
           </section>
 
@@ -143,7 +173,13 @@ export default function AvisoPrivacidad() {
             <p>
               El Responsable ha implementado medidas de seguridad técnicas, administrativas y físicas para proteger
               sus datos personales contra daño, pérdida, alteración, destrucción o el uso, acceso o tratamiento no
-              autorizado. Los datos son almacenados en infraestructura en la nube con cifrado en reposo y en tránsito.
+              autorizado.
+            </p>
+            <p className="mt-3">
+              El sitio web <strong>no almacena los datos en base de datos alguna</strong>: la información de los
+              formularios se transmite cifrada y se entrega por correo electrónico a las cuentas corporativas del
+              Responsable, donde se conserva únicamente durante el tiempo necesario para atender la solicitud y
+              cumplir las obligaciones legales aplicables.
             </p>
           </section>
 

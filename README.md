@@ -1,6 +1,10 @@
 # SC Security Summit 2026 — Next.js App
 
-**Stack:** Next.js 15 · TypeScript · Zod · Supabase · Lucide React
+**Stack:** Next.js 15 (App Router) · TypeScript · Zod · Resend · Upstash · Lucide React
+
+Sitio de marketing bilingüe (ES/EN) del summit. La venta de accesos individuales ocurre
+**fuera del sitio, en Eventbrite**; el sitio solo captura solicitudes de **pase corporativo**
+y de **patrocinio**, que se entregan por correo vía Resend. No hay base de datos en runtime.
 
 ---
 
@@ -18,23 +22,20 @@ npm install
 cp .env.local.example .env.local
 ```
 
-Edita `.env.local` con tus credenciales de Supabase:
+Lo mínimo para que los formularios funcionen:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://TU_PROJECT_REF.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJ...
+RESEND_API_KEY=re_...                  # https://resend.com → API Keys
+CONTACT_EMAIL=hola@scsecuritysummit.com
 NEXT_PUBLIC_SITE_URL=https://www.scsecuritysummit.com
+NEXT_PUBLIC_EVENTBRITE_URL=https://www.eventbrite.com.mx/e/...
 ```
 
-> **Dónde obtener las keys:** Supabase Dashboard → Settings → API  
-> Usa `service_role` (no `anon`). Esta key NUNCA llega al browser.
+Sin `RESEND_API_KEY` el formulario acepta el envío pero el correo no sale.
+`UPSTASH_REDIS_REST_URL` / `_TOKEN` son obligatorias en producción: el rate limiting
+falla cerrado si no están.
 
-### 3. Crear tabla en Supabase
-
-1. Ve a Supabase Dashboard → SQL Editor
-2. Copia y ejecuta el contenido de `supabase-migration.sql`
-
-### 4. Dev server
+### 3. Dev server
 
 ```bash
 npm run dev
@@ -47,24 +48,25 @@ npm run dev
 
 ```
 app/
-  layout.tsx              ← Metadata SEO global + Google Fonts
-  page.tsx                ← Landing page completa
-  globals.css             ← CSS variables + tipografía
+  layout.tsx                  ← Metadata SEO global + fuentes
+  page.tsx                    ← Landing (compone las secciones de _components)
+  globals.css                 ← CSS variables + tipografía
+  (marketing)/_components/    ← Hero, Speakers, Agenda, Pricing, Sponsors, Registro…
   actions/
-    registro.ts           ← Server Action (Zod + Supabase)
-  registro/
-    page.tsx              ← Página de registro con formulario
+    inquiries.ts              ← Server Action: pase corporativo + patrocinio → Resend
+    language.ts               ← Cookie de idioma
+  api/health/route.ts         ← Liveness probe (sin dependencias externas)
 
 components/
-  Navbar.tsx              ← Nav sticky responsive
-  RegistroForm.tsx        ← Form cliente con useFormState
+  SpeakersCarousel.tsx        ← Carrusel de conferencistas
+  CorporatePassForm.tsx       ← Solicitud de pase corporativo
+  SponsorInquiryForm.tsx      ← Solicitud de patrocinio
 
 lib/
-  supabase.ts             ← Cliente admin (service_role)
-  schemas.ts              ← Zod schema + precios
-
-supabase-migration.sql    ← DDL para crear tabla registros
-.env.local.example        ← Template de variables de entorno
+  content.ts                  ← SSOT de TODO el copy (ES/EN), precios y agenda
+  email.ts / email-templates.ts ← Envío Resend + chrome de marca y escaping
+  rate-limit.ts               ← Sliding window en Upstash Redis
+  language.ts                 ← Detección de idioma en servidor
 ```
 
 ---
@@ -73,13 +75,16 @@ supabase-migration.sql    ← DDL para crear tabla registros
 
 | Sección | ID | Descripción |
 |---|---|---|
-| Hero | — | Título, fecha, sede, CTAs |
-| Tres Pilares | `#acerca` | CTPAT/OEA · Networking · Tecnología |
-| Bento Grid | `#perfiles` | Asistentes + Proveedores (cuadrícula modular) |
-| Conferencistas | `#conferencistas` | 4 cards con perfil verificado |
-| Pricing | `#accesos` | Estudiante · General (recomendado) · VIP |
-| Patrocinadores | `#patrocinadores` | Platino · Oro · Plata · Aliado Estratégico |
-| Registro | `/registro` | Form con Server Action + Zod + Supabase |
+| Hero | — | Título, logos de presentadores, fecha y sede, countdown |
+| Por qué asistir / Pilares | `#acerca` | CTPAT/OEA · Networking · Tecnología |
+| Conferencistas | `#speakers` | Carrusel con headline y descripción por ponente |
+| Agenda | `#agenda` | 4 bloques del día |
+| Accesos | `#accesos` | VIP · Plus · General · Estudiante → CTA a Eventbrite |
+| Patrocinadores | `#patrocinadores` | Paquete + formulario en `#contacto-patrocinio` |
+| Pase corporativo | `#registro` | Hasta 10 accesos Plus; el envío llega a `CONTACT_EMAIL` |
+
+Todo el texto vive en `lib/content.ts`, con entradas paralelas `es` / `en`.
+No se escribe copy directamente en los componentes.
 
 ---
 
@@ -87,31 +92,21 @@ supabase-migration.sql    ← DDL para crear tabla registros
 
 - `metadata.title` con template
 - `metadata.description`
-- `metadata.alternates.canonical`
+- `metadata.alternates.canonical` + hreflang
 - `openGraph` (og:title, og:description, og:image, og:url)
 - `twitter:card` summary_large_image
+- JSON-LD del evento, incluidas las `offers` derivadas de `lib/content.ts`
 - `robots` con directivas googleBot
-
-> Agrega el archivo `/public/og-image.jpg` (1200×630px) para completar el OG.
 
 ---
 
-## Supabase — tabla `registros`
+## Datos y persistencia
 
-| Campo | Tipo | Descripción |
-|---|---|---|
-| folio | TEXT UNIQUE | `SCSS2026-XXXXX-XXXX` |
-| email | TEXT UNIQUE | Previene registros duplicados |
-| tipo_acceso | ENUM | `estudiante \| general \| vip` |
-| monto_mxn | INTEGER | Precio al momento del registro |
-| estado_pago | ENUM | `pendiente \| pagado \| cancelado` |
-
-### Seguridad
-
-- RLS habilitado — acceso público bloqueado
-- Solo `service_role` puede insertar/leer
-- Validación de negocio en Server Action (Zod) antes de tocar DB
-- `SUPABASE_SERVICE_ROLE_KEY` nunca expuesta al cliente
+El sitio **no escribe en ninguna base de datos**. El flujo de registro individual
+(tabla `registros` en Supabase, folios, dashboard `/admin`) se retiró cuando la
+venta se movió a Eventbrite. `supabase/migrations/` se conserva únicamente como
+registro histórico; los datos capturados antes del corte siguen en el proyecto de
+Supabase y se consultan desde su consola.
 
 ---
 
@@ -121,68 +116,20 @@ supabase-migration.sql    ← DDL para crear tabla registros
 npm run build
 ```
 
-Compatible con Vercel (recomendado). El `prebuild` corre `scripts/check-env.mjs`
-y aborta el build si faltan env vars o siguen siendo placeholders.
+Compatible con Vercel (recomendado). El `prebuild` corre `scripts/check-env.mjs`,
+que avisa si faltan variables y aborta en modo estricto
+(`ENFORCE_ENV_VALIDATION=1`). Bypass de emergencia: `SKIP_ENV_VALIDATION=1 npm run build`.
 
 ### Sincronizar env vars locales → Vercel
-
-En lugar de pegar valores uno por uno en el dashboard:
 
 ```bash
 npm i -g vercel
 vercel link                  # una sola vez
-vercel env add VARIABLE    # agrega/rota variables en production y preview
+vercel env add VARIABLE      # agrega/rota variables en production y preview
+vercel env pull .env.local   # trae los valores actuales
 ```
 
-Para traer los valores actuales de Vercel a tu `.env.local`:
-
-```bash
-vercel env pull .env.local
-```
-
-Validación de build: `scripts/check-env.mjs`; validación runtime de Supabase: `env.ts`.
 Guía completa de deploy y troubleshooting: [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
-
----
-
-## Pagos (Conekta v2)
-
-El flujo completo de pago vive en:
-
-- `lib/conekta.ts` — wrapper REST (auth Basic con secret key, sin SDK).
-- `app/actions/crear-orden-pago.ts` — Server Action con rate-limit
-  (`checkOrdenRateLimit`), capacity check, idempotency por `(folio, método)`.
-- `app/api/webhooks/conekta/route.ts` — recibe `order.paid` / `order.expired` /
-  `order.canceled`. Always 200 (Sentry registra fallos). Opcional:
-  `CONEKTA_WEBHOOK_SECRET` para validar header.
-- `app/pago/page.tsx` — UI por método (SPEI clabe, OXXO barcode, tarjeta).
-- `app/registro-exitoso/page.tsx` — confirmación con calendario y WhatsApp.
-
-### Diagrama del flujo
-
-```
-Form submit
-   │
-   ▼
-Server Action: registrar
-   │  honeypot + rate-limit + Zod + capacity
-   │  insert into registros (idempotency_key UNIQUE)
-   │  send registration_confirmation email
-   ▼
-/pago?folio=...
-   │  user picks método
-   ▼
-Server Action: crearOrdenPago
-   │  Conekta.createOrder (Idempotency-Key per folio+método)
-   │  persist conekta_order_id + spei_clabe / oxxo_barcode / checkout_url
-   ▼
-Conekta hosted checkout / SPEI deposit / OXXO cash
-   │
-   ▼
-Webhook: order.paid
-   │  registros.estado_pago = 'pagado'
-   │  audit_log row + sendPaymentConfirmation()
-```
 
 ---
 
@@ -209,6 +156,7 @@ npm run check-env       # valida .env.local sin construir
 - [`docs/RUNBOOK.md`](docs/RUNBOOK.md) — procedimientos de oncall y emergencias.
 - [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) — diagnósticos comunes.
 - [`docs/DNS.md`](docs/DNS.md) — SPF / DKIM / DMARC / Vercel apex.
+- [`docs/TRACKING.md`](docs/TRACKING.md) — GTM/GA4 y eventos de medición.
 
 ---
 

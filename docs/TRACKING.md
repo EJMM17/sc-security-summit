@@ -46,51 +46,23 @@ The app pushes the following events. Everything else (GA4 events, Google Ads
 conversions, Meta CompleteRegistration, LinkedIn conversion) is mapped from
 these inside GTM.
 
-### Conversion (success page `/registro-exitoso`)
+### Conversion
 
-Fired **once per folio** (`useRef` + per-folio `sessionStorage` guard).
-
-```js
-// GA4 standard lead event — map to GA4 "generate_lead" + Google Ads conversion
-{
-  event: "generate_lead",
-  lead_type: "event_registration",
-  tipo_acceso: "general" | "vip" | "estudiante",
-  value: 2500,                 // MXN, before tax
-  currency: "MXN",
-  transaction_id: "SCSS2026-XXXXX-XXXX",  // folio — use for dedup in Ads
-  user_data: {                 // present only when available (Enhanced Conversions)
-    sha256_email_address: "…",
-    sha256_phone_number: "…",
-    sha256_first_name: "…",
-    sha256_last_name: "…"
-  }
-}
-
-// Legacy event (kept for any existing GTM triggers)
-{
-  event: "registro_completo",
-  tipo_acceso: "general",
-  monto_mxn: 2500,
-  folio: "SCSS2026-XXXXX-XXXX"
-}
-```
+Ticket purchases complete on Eventbrite, so the site cannot observe them. The
+closest on-site conversion signal is `click_register` (any click on an
+Eventbrite CTA or a link to `#registro`) — map that to the Google Ads / Meta
+conversion, and reconcile actual sales in the Eventbrite dashboard.
 
 ### Engagement / micro-conversions (site-wide)
 
 Emitted by `components/InteractionTracker.tsx` (delegated click listener — no
-button markup changed) and `components/RegistroFormEnhancer.tsx`.
+button markup changed).
 
 | Event | When | Parameters |
 | --- | --- | --- |
-| `form_start` | First interaction with the registration form | `cta_location`, `page_path`, `language` |
-| `form_error` | Server-side validation returned errors | `error_fields`, `error_count`, `page_path`, `language` |
-| `form_submit` | Valid submit attempt leaves the browser for the Server Action | `cta_location`, `page_path`, `language`, `tipo_acceso`, `cfdi_required` |
-| `click_register` | Click any link to `#registro` | `cta_location`, `page_path`, `language` |
+| `click_register` | Click any link to `#registro` or to Eventbrite | `cta_location`, `page_path`, `language` |
 | `click_sponsor` | Sponsorship mailto / `/sponsors` / `#patrocinadores` | `cta_location`, `page_path`, `language` |
-| `click_whatsapp` | WhatsApp link click (off success page) | `cta_location`, `page_path`, `language` |
-| `click_calendar` | "Add to calendar" on `/registro-exitoso` | `cta_location`, `page_path`, `language` |
-| `share_whatsapp` | WhatsApp share on `/registro-exitoso` | `cta_location`, `page_path`, `language` |
+| `click_whatsapp` | WhatsApp link click | `cta_location`, `page_path`, `language` |
 | `section_view` | First meaningful view of each landing section | `section_id`, `page_path`, `language` |
 | `scroll_depth` | Visitor reaches 25/50/75/90/100% page-depth milestones | `percent_scrolled`, `page_path`, `language` |
 
@@ -110,29 +82,16 @@ Ad → browse → register journey keeps its attribution.
 plus `landing_page`, `referrer`, `first_touch_timestamp`,
 `last_touch_timestamp`.
 
-These ride along as **hidden inputs** in the registration form (UTMs/click IDs
-from last touch; landing page/referrer from first touch) and are persisted to
-the `registros` table by the server action.
-
-### Database
-
-Apply `supabase/migrations/010_attribution_columns.sql` (Supabase Dashboard →
-SQL Editor, or `supabase db push`). The columns are nullable `TEXT`/`TIMESTAMPTZ`.
-
-> Forward-compatible: if the migration hasn't run yet, `createLead` retries the
-> insert **without** the attribution columns, so registrations never break — a
-> Sentry warning (`create_lead.attribution_columns_missing`) flags it.
+The values stay client-side (cookie + `localStorage`) and are read from GTM.
+Nothing is persisted server-side: the site has no database.
 
 ---
 
 ## 4. Enhanced Conversions (Google Ads)
 
-The conversion `user_data` is **SHA-256 hashed in the browser**
-(`lib/enhanced-conversions.ts`) with Google's normalization (trim, lowercase
-email/names, strip phone formatting). Raw PII is never pushed to the dataLayer.
-
-Flow: on submit we stash normalized values in `sessionStorage`; on the success
-page we hash them, attach to the `generate_lead` push, then clear storage.
+Not applicable while checkout lives on Eventbrite: the site never sees an
+attendee's identity, so there is no user data to hash or attach. If Enhanced
+Conversions are needed, configure them on the Eventbrite side.
 
 **GTM/Google Ads setup required (external):**
 
@@ -152,13 +111,10 @@ page we hash them, attach to the `generate_lead` push, then clear storage.
 1. **Conversion Linker** tag → trigger **All Pages**. (Required for gclid/
    gbraid/wbraid/Ads cookies.)
 2. **GA4 Configuration** tag (Measurement ID `G-…`) → All Pages.
-3. **GA4 Event** tag → event name `generate_lead`, trigger = Custom Event
-   `generate_lead`. Map `value`, `currency`, `transaction_id`, `tipo_acceso`.
-4. **GA4 Event** tags for the micro-events (`form_start`, `click_register`,
-   etc.) as desired.
-5. **Google Ads Conversion** tag → trigger Custom Event `generate_lead`; set
-   value `{{DLV - value}}`, currency `MXN`, transaction ID `{{DLV - transaction_id}}`
-   (for dedup); attach User-Provided Data for Enhanced Conversions.
+3. **GA4 Event** tags for the micro-events (`click_register`, `click_sponsor`,
+   `section_view`, `scroll_depth`) as desired.
+4. **Google Ads Conversion** tag → trigger Custom Event `click_register`, the
+   outbound-to-Eventbrite signal. Reconcile against real sales in Eventbrite.
 6. **Google Ads Remarketing** tag → All Pages.
 7. (Optional) Meta & LinkedIn — **only if you remove the direct pixels** in
    `components/MetaPixel.tsx` / `components/LinkedInInsight.tsx`. By default
@@ -166,9 +122,7 @@ page we hash them, attach to the `generate_lead` push, then clear storage.
 
 ### Recommended Data Layer Variables
 
-`value`, `currency`, `transaction_id`, `tipo_acceso`, `lead_type`,
-`user_data`, `cta_location`, `page_path`, `language`, `error_count`,
-`cfdi_required`, `section_id`, `percent_scrolled`.
+`cta_location`, `page_path`, `language`, `section_id`, `percent_scrolled`.
 
 ---
 
@@ -176,9 +130,9 @@ page we hash them, attach to the `generate_lead` push, then clear storage.
 
 | Tool | Checks |
 | --- | --- |
-| **GTM Preview / Tag Assistant** | Tags fire on the right events; `generate_lead` fires once. |
-| **GA4 DebugView** | `generate_lead` + micro-events arrive with parameters. |
-| **Meta Pixel Helper** | `PageView` + `CompleteRegistration` fire once. |
+| **GTM Preview / Tag Assistant** | Tags fire on the right events. |
+| **GA4 DebugView** | Micro-events arrive with their parameters. |
+| **Meta Pixel Helper** | `PageView` fires once. |
 | **LinkedIn Insight Tag** (browser extension / Campaign Manager) | Insight tag active; conversion fires. |
 | **Browser console** | No CSP violations (see below). |
 | **Network tab** | `collect?...` (GA4), `google.com/ads`, `fbevents`, `px.ads.linkedin.com` requests succeed. |
@@ -186,18 +140,16 @@ page we hash them, attach to the `generate_lead` push, then clear storage.
 ### Manual smoke test
 
 1. Visit `/?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=ABC123`.
-2. Navigate around, then register.
-3. On `/registro-exitoso`, confirm `generate_lead` fires **once** (refresh →
-   does not fire again).
-4. Inspect the `registros` row: UTMs, `gclid`, `landing_page`, touch timestamps
-   are populated.
+2. Navigate around, then click an access CTA.
+3. Confirm `click_register` reaches the dataLayer with `cta_location`.
+4. Inspect the `scss_attr` cookie: UTMs, `gclid`, `landing_page` and the touch
+   timestamps are populated.
 5. Confirm no console CSP errors.
 
 ### Avoiding double counting — recap
 
 - Only one GA4 path: GTM (direct gtag is disabled when GTM is set).
 - Meta/LinkedIn fire **directly**, not in GTM.
-- `generate_lead` is de-duplicated per folio via `sessionStorage`.
 
 ---
 
@@ -261,6 +213,4 @@ tag's **Consent Settings** to require the right consent type (GA4 →
 - [ ] Configure GA4, Google Ads Conversion + Remarketing, Conversion Linker,
       Enhanced Conversions inside GTM (section 5).
 - [ ] Set per-tag **Consent Settings** in GTM (section 8).
-- [x] Apply Supabase migration `010_attribution_columns.sql` — **applied to
-      project `Summit` (fydurateumklukehituw)**, 12 columns + 2 indexes verified.
 - [ ] (Optional) Set `NEXT_PUBLIC_META_PIXEL_ID` / `NEXT_PUBLIC_LINKEDIN_PARTNER_ID`.

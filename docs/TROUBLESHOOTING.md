@@ -3,20 +3,23 @@
 Symptom → likely cause → fix. Pair with `RUNBOOK.md`. If you've hit something
 not listed here, add a row before forgetting how you fixed it.
 
+Scope: the site sells nothing and stores nothing. Ticket problems (orders,
+refunds, missing tickets) are Eventbrite's — see `docs/RUNBOOK.md` §3. What can
+break here is an inquiry form failing to deliver.
+
 ---
 
-## Registration form
+## Inquiry forms (corporate pass / sponsorship)
 
 ### Legitimate users are blocked by anti-spam controls
 
-**Cause:** The current registration flow intentionally does not use an external CAPTCHA. Bot/spam protection is handled by the hidden honeypot field, Upstash
-rate limiting, required terms acceptance, Zod server validation, and database
-uniqueness constraints.
+**Cause:** The forms intentionally use no external CAPTCHA. Bot/spam protection
+is the hidden honeypot field, Upstash rate limiting and Zod server validation.
 
 **Fix:**
 1. Check whether the user hit the rate limiter (see the next section).
 2. Confirm browser autofill did not populate the hidden `website` honeypot.
-3. If both are clean, inspect Sentry/logs for validation or Supabase errors.
+3. If both are clean, inspect Sentry for `submitInquiry` errors.
 
 ### "Demasiados intentos. Espera 15 minutos."
 
@@ -28,136 +31,58 @@ uniqueness constraints.
 3. If this happens often, raise the limit in `lib/rate-limit.ts` — but
    investigate the abuse pattern first.
 
-### "Este correo ya está registrado para el evento"
+### Form "succeeds" but nothing arrives in the inbox
 
-**Cause:** Postgres UNIQUE constraint on `registros.email` (intentional —
-prevents duplicate paid registrations).
+**Cause 1 — the honeypot fired.** The action returns a fake success to fool the
+bot. If a real human reports this, confirm they don't have an autofill
+extension filling `<input name="website">`, then have them retry with it off.
 
-**Fix:**
-1. Look up the existing registro from `/admin/registros?q=<email>`.
-2. If it's an honest mistake (user forgot they registered), point them to
-   `/recuperar-folio`.
-3. If they need a different ticket type, mark the old one `cancelado` from
-   the dashboard before they re-register.
+**Cause 2 — the send failed.** The form surfaces `email_unavailable` when Resend
+rejects the message; check Resend → Emails and Sentry for the window in
+question. There is no database fallback, so a failed send means the lead is
+lost — follow up manually if you can identify the sender.
 
-### Form "succeeds" but no row in DB and no email
+### Submit button stuck on "Enviando..."
 
-**Cause:** The honeypot fired. The action returns a fake success to fool the
-bot. If a real human reports this:
-1. Confirm they didn't have a browser autofill extension that filled the
-   `website` field. Inspect element on `<input name="website">` and check
-   if it has a value.
-2. Have them disable suspicious autofill / password manager extensions
-   and try again.
+**Cause:** The server action failed silently (network, Resend, Sentry).
 
-### Submit button stuck on "Procesando..."
-
-**Cause:** Server action failed silently (network, Supabase, Sentry).
-
-**Fix:**
-1. DevTools → Network → look for the POST to `/?_rsc=...`. Status code:
-   - 5xx → check Sentry for the exception.
-   - 200 with `{ success: false, message: "..." }` → the message should
-     also have rendered as a toast; check the Toaster wasn't blocked.
-2. If Sentry shows `db_error` with code `PGRST301`, RLS is blocking the
-   insert. Confirm migrations 002–003 are applied in production.
+**Fix:** DevTools → Network → look for the POST to `/?_rsc=...`:
+- 5xx → check Sentry for the exception.
+- 200 with `{ ok: false, reason: "..." }` → the reason maps to the message the
+  form renders; `invalid` means Zod rejected a field.
 
 ---
 
 ## Email delivery
 
-### Confirmation email doesn't arrive
+### The inquiry email doesn't arrive at `CONTACT_EMAIL`
 
-Every confirmation attempt is audited in the `email_events` table. Start
-there — it tells you whether we even tried to send.
-
-```sql
-select status, provider_message_id, error, created_at
-from public.email_events
-where folio = 'SCSS2026-XXXXX-XXXX'
-order by created_at desc;
-```
-
-**Read the `status`:**
-- `sent` → we handed it to Resend. The problem is downstream (spam,
-  bounce, recipient server). Check Resend Dashboard → Logs using
-  `provider_message_id`, then Spam/Promotions in the inbox.
-- `skipped_no_api_key` → **`RESEND_API_KEY` is missing or still the
-  `re_PLACEHOLDER` value in this environment.** Set a real key in Vercel
-  (Production **and** Preview) and **redeploy** — env changes don't take
-  effect until the next deploy. Registration still succeeded; the folio
-  is shown on screen and stored in `registros`.
-- `failed` → Resend rejected the send. The `error` column has the reason
-  (invalid `from`, unverified domain, rate limit). A matching warning is
-  in Sentry (`registration_confirmation_email_failed`).
-- _no row at all_ → the send code never ran (older registration before
-  this feature, or an exception before the email step — check Sentry).
-
-**Other causes (when status is `sent`):**
-1. Spam filter — check Junk / Spam / Promotions.
-2. `EMAIL_FROM` domain not verified in Resend (SPF/DKIM). Run
-   `dig TXT scsecuritysummit.com` and confirm `v=spf1 ...` and
-   `_dmarc.` records exist (see `docs/DNS.md`).
-3. Recipient mail server bouncing — Resend Dashboard → Bounces.
-
-**Fix:** Direct the user to `/recuperar-folio` to re-send, or use the
-"Reenviar correo" button in `/admin/registros` (logged in `email_events`
-as `registration_confirmation_resend`). If a corporate inbox keeps
-rejecting, ask for a personal backup address.
-
-### Organizer notification not received
-
-Similar to above. Confirm `CONTACT_EMAIL` is set on Vercel and matches
-an inbox someone monitors. If `Sentry → email_organizer_failed` shows
-"CONTACT_EMAIL not configured", the env var is missing or empty.
-
----
-
-## Admin dashboard
-
-### "Ingresa el correo del operador" — link never arrives
-
-1. Confirm the operator's email is in `ADMIN_EMAILS` (csv) on Vercel.
-   The login form returns the same neutral message whether the email is
-   allowed or not, by design.
-2. Check Resend dashboard for a `tag = admin_login` entry in the last
-   15 minutes. If absent, the action failed before sending — check
-   Sentry.
-3. The token TTL is 15 minutes; if too much time passed, request a new
-   one.
-
-### "Invalid token" loop after clicking the magic link
-
-**Cause:** Either the token expired (>15 min from request) or
-`ADMIN_SESSION_SECRET` rotated between mint and verify (e.g., re-deploy
-with a new secret).
-
-**Fix:** Request a new link. If the issue persists, confirm the secret
-hasn't changed in Vercel.
-
-### Admin marks paid but UI still says pending
-
-**Cause:** Page is server-rendered without revalidation; the click
-re-renders but Next caches.
-
-**Fix:** Add `revalidatePath("/admin/registros")` after the update in
-`app/actions/admin.ts`. (TODO — file an issue if this surfaces.)
+1. **Is the key real?** If `RESEND_API_KEY` is missing or still
+   `re_PLACEHOLDER` in this environment, nothing is ever sent. Set a real key
+   in Vercel (Production **and** Preview) and **redeploy** — env changes don't
+   take effect until the next deploy.
+2. **Did Resend accept it?** Resend Dashboard → Emails, filter the last hour.
+   A `failed` entry carries the reason (invalid `from`, unverified domain, rate
+   limit); a matching warning is in Sentry.
+3. **Did it get filtered?** Check Junk / Spam / Promotions on the receiving
+   inbox.
+4. **Is the sender domain verified?** `EMAIL_FROM` must use a domain with SPF +
+   DKIM in Resend. Run `dig TXT scsecuritysummit.com` and confirm `v=spf1 ...`
+   and `_dmarc.` records exist (see `docs/DNS.md`).
+5. **Is `CONTACT_EMAIL` right?** Confirm it is set on Vercel and points at an
+   inbox someone actually monitors.
 
 ---
 
 ## Health and infrastructure
 
-### `/api/health` returns 503
+### `/api/health` is unreachable or non-200
 
-**Cause:** Supabase isn't responding to a count query within 3 seconds.
+**Cause:** The probe has no external dependency — it answers 200 whenever the
+app is serving. A failure means the deployment itself is down.
 
-**Fix:**
-1. Check https://status.supabase.com.
-2. If healthy upstream, your project may be paused (Free tier auto-pauses
-   after 7 days inactivity). Open the Supabase dashboard and unpause.
-3. If it's a connection-pool exhaustion, scale the pool from the
-   Supabase project settings, or kill long-running queries via
-   `pg_stat_activity`.
+**Fix:** Check Vercel → Deployments for a failed build or a broken promotion,
+and roll back to the last green deployment if needed.
 
 ### Build fails locally with `[check-env]` errors
 
@@ -197,16 +122,11 @@ the policy.
 
 ---
 
-## Common Sentry events
+## Signals to look for
 
-| Sentry event                     | What it means                                                          | Action                                                    |
-| -------------------------------- | ---------------------------------------------------------------------- | --------------------------------------------------------- |
-| `unexpected_error`               | Server action threw an unhandled exception                             | Triage the stack trace; usually a missing env var or DB schema mismatch |
-| `db_error`                       | Supabase returned an error from the insert                             | Check `code` extra; `23505` = duplicate (expected), other = real bug    |
-| `email_confirmation_failed`      | Resend send failed for the attendee                                    | Manual follow-up via `/admin/registros` lookup            |
-| `registration_confirmation_email_failed` | Confirmation email send failed (registration NOT affected)    | Inspect `email_events.error`; resend from `/admin/registros` |
-| `registration_confirmation_email_skipped_no_api_key` | `RESEND_API_KEY` missing/placeholder              | Set the key in Vercel (Prod + Preview) and redeploy       |
-| `create_lead.confirmation_email_not_delivered` | Email failed/skipped right after a successful insert      | Same as the two above — registration itself is fine       |
-| `email_organizer_failed`         | Resend send failed for the organizer                                   | Confirm CONTACT_EMAIL is correct                          |
-| `admin_login_email_failed`       | Magic-link email send failed                                           | Check Resend; user can retry                              |
-| `recuperar_folio_email_failed`   | Folio reissue email send failed                                        | Same as above                                             |
+| Where | Signal | What it means | Action |
+| --- | --- | --- | --- |
+| Sentry | Unhandled exception captured by `app/error.tsx` | A page or server action threw | Triage the stack trace; usually a missing env var |
+| Vercel logs | `{"event":"email_skipped_no_api_key"}` | `RESEND_API_KEY` missing or a placeholder — the inquiry was never sent | Set a real key in Vercel (Prod + Preview) and redeploy |
+| Form response | `reason: "email_unavailable"` | Resend rejected the send | Check Resend → Emails for the reason; the lead is lost, follow up manually |
+| Form response | `reason: "rate_limited"` | The IP hit the sliding window | Expected under abuse; investigate if a real user reports it |

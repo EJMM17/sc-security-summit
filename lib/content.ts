@@ -3,12 +3,6 @@ export const EVENTBRITE_URL =
   process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
   "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
 
-export const PRECIOS = {
-  estudiante: 850,
-  general: 2500,
-  vip: 4800,
-} as const;
-
 export type IconKey =
   | "shield-check"
   | "network"
@@ -167,25 +161,6 @@ export const UI_TEXT = {
     taxNote: "* Más I.V.A.",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
-    paymentTitle: "¿Cómo funciona el proceso de pago?",
-    paymentIntro: {
-      parts: [
-        { text: "Al completar el formulario de registro recibirás un " },
-        { text: "folio de confirmación", strong: true },
-        { text: " en pantalla. Un representante de Lanz Logistics te contactará en un plazo de " },
-        { text: "24–48 horas hábiles", strong: true },
-        {
-          text: " con las instrucciones de pago (transferencia bancaria o depósito). Tu lugar queda reservado una vez confirmado el pago.",
-        },
-      ],
-    },
-    paymentSteps: [
-      { step: "1", title: "Regístrate", desc: "Llena el formulario y recibe tu folio en pantalla" },
-      { step: "2", title: "Recibe instrucciones", desc: "Te contactamos en 24-48 hrs hábiles" },
-      { step: "3", title: "Confirma tu lugar", desc: "Realiza el pago y recibes tu confirmación" },
-    ],
-    paymentQuestionsPrefix: "¿Preguntas sobre el pago? Escríbenos a",
-    paymentOr: "o al",
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
     sponsorsTitle: "Lleva Tu Marca al Siguiente Nivel",
     sponsorsDesc:
@@ -343,25 +318,6 @@ export const UI_TEXT = {
     taxNote: "* Plus VAT",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
-    paymentTitle: "How does the payment process work?",
-    paymentIntro: {
-      parts: [
-        { text: "After completing the registration form you will receive a " },
-        { text: "confirmation code", strong: true },
-        { text: " on screen. A Lanz Logistics representative will contact you within " },
-        { text: "24–48 business hours", strong: true },
-        {
-          text: " with payment instructions (bank transfer or deposit). Your spot is reserved once payment is confirmed.",
-        },
-      ],
-    },
-    paymentSteps: [
-      { step: "1", title: "Register", desc: "Fill out the form and receive your code on screen" },
-      { step: "2", title: "Get instructions", desc: "We contact you within 24-48 business hours" },
-      { step: "3", title: "Confirm your spot", desc: "Complete the payment and receive confirmation" },
-    ],
-    paymentQuestionsPrefix: "Questions about payment? Email us at",
-    paymentOr: "or call",
     sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
     sponsorsTitle: "Take Your Brand to the Next Level",
     sponsorsDesc:
@@ -1170,14 +1126,24 @@ export const FAQ_ITEMS = [
       "Contáctanos directamente a hola@scsecuritysummit.com o al +52 899 112 8755. Te enviaremos toda la información sobre nuestras oportunidades de patrocinio y los beneficios detallados para posicionar tu marca en el evento.",
   },
   {
+    question: "¿Cómo compro mi acceso?",
+    answer:
+      "Desde cualquier botón de acceso del sitio llegas a Eventbrite, donde eliges tu tipo de acceso y realizas el pago. Eventbrite te envía por correo tu boleto y el comprobante de compra; ese boleto es el que presentas el día del evento.",
+  },
+  {
     question: "¿Qué incluye cada tipo de acceso?",
     answer:
-      "El acceso Estudiante incluye capacitación de 1 día, acceso a paneles y constancia digital. El acceso General agrega Business Hub B2B, kit estándar y coffee break. El acceso VIP incluye todo lo anterior más asientos prioritarios, constancia física, kit completo y plantillas descargables.",
+      "El acceso Estudiante incluye conferencias especializadas, kit Futuros Líderes y gafete. El acceso General agrega paneles con expertos de la industria, constancia digital de participación y kit básico. El acceso Plus suma constancia de participación, kit de bienvenida ejecutivo y material descargable con plantillas de trabajo. El acceso VIP incluye todo lo anterior más workshops estratégicos y sesiones especiales en el Business Hub, participación prioritaria en Q&A, asesoría CTPAT/OEA durante el evento, asiento preferente, coffee break y kit de bienvenida premium.",
+  },
+  {
+    question: "¿Puedo comprar accesos para mi equipo?",
+    answer:
+      "Sí. El pase corporativo cubre hasta 10 accesos Plus con DC-3 incluido para cada participante, para que cada departamento asista al bloque que le corresponde. Solicítalo desde la sección de pases corporativos del sitio y un asesor te responde por correo con la cotización.",
   },
   {
     question: "¿Puedo obtener factura (CFDI)?",
     answer:
-      "Sí. Al momento de tu registro puedes indicar que requieres factura y proporcionar tus datos fiscales. El CFDI se emitirá dentro de las 72 horas posteriores a la confirmación de tu pago.",
+      "Sí. Una vez completada tu compra en Eventbrite, escríbenos a hola@scsecuritysummit.com con tu número de orden y tus datos fiscales. El CFDI se emite dentro de las 72 horas posteriores a la confirmación de tu pago.",
   },
   {
     question: "¿El acceso estudiantil requiere credencial?",
@@ -1203,14 +1169,24 @@ export const FAQ_ITEMS_EN = [
       "Contact us at hola@scsecuritysummit.com or +52 899 112 8755. We will send you all the information about our sponsorship opportunities and the detailed benefits to position your brand at the event.",
   },
   {
+    question: "How do I buy my pass?",
+    answer:
+      "Any access button on the site takes you to Eventbrite, where you pick your access type and pay. Eventbrite emails you the ticket and the receipt; that ticket is what you present on the day of the event.",
+  },
+  {
     question: "What is included with each access type?",
     answer:
-      "Student access includes 1-day training, panel access, and a digital certificate. General access adds Business Hub B2B, a standard kit, and coffee break. VIP includes all of the above plus priority seating, printed certificate, full kit, and downloadable templates.",
+      "Student access includes the specialized conferences, the Future Leaders kit, and a badge. General access adds panels with industry experts, a digital certificate of participation, and a basic kit. Plus access adds a printed certificate of participation, an executive welcome kit, and downloadable materials with work templates. VIP includes all of the above plus strategic workshops and special Business Hub sessions, priority Q&A participation, CTPAT/AEO advisory during the event, preferred seating, coffee break, and a premium welcome kit.",
+  },
+  {
+    question: "Can I buy passes for my team?",
+    answer:
+      "Yes. The corporate pass covers up to 10 Plus passes with a DC-3 certificate for each participant, so every department attends the block that matches its role. Request it from the corporate passes section of the site and an advisor will reply by email with a quote.",
   },
   {
     question: "Can I request an invoice (CFDI)?",
     answer:
-      "Yes. During registration you can indicate that you need an invoice and submit your tax details. The CFDI will be issued within 72 hours after payment confirmation.",
+      "Yes. Once your purchase is complete on Eventbrite, email us at hola@scsecuritysummit.com with your order number and tax details. The CFDI is issued within 72 hours after payment confirmation.",
   },
   {
     question: "Does the student pass require an ID?",

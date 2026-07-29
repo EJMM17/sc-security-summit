@@ -1,14 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { BASE_URL, CONTENT, PRECIOS } from "./content";
+import { BASE_URL, CONTENT } from "./content";
 
 describe("content SSOT", () => {
-  it("exports the canonical base URL and pricing", () => {
+  it("exports the canonical base URL", () => {
     expect(BASE_URL).toBe("https://scsecuritysummit.com");
-    expect(PRECIOS).toStrictEqual({
-      estudiante: 850,
-      general: 2500,
-      vip: 4800,
-    });
   });
 
   it("preserves the live speaker copy from app/page.tsx", () => {
@@ -41,5 +36,25 @@ describe("content SSOT", () => {
       { id: "estudiante", priceValue: 650 },
     ]);
     expect(CONTENT.es.agenda).toHaveLength(4);
+  });
+
+  it("keeps the FAQ free of the retired registration flow", () => {
+    // Ticketing lives in Eventbrite: no on-site form, no folio, no bank transfer.
+    const retired = /folio|formulario de registro|transferencia bancaria|confirmation code|bank transfer/i;
+    for (const language of ["es", "en"] as const) {
+      for (const { question, answer } of CONTENT[language].faq) {
+        expect(`${question} ${answer}`).not.toMatch(retired);
+      }
+    }
+  });
+
+  it("describes all four access tiers in the FAQ", () => {
+    const accessAnswer = CONTENT.es.faq.find((item) =>
+      item.question.includes("¿Qué incluye cada tipo de acceso?"),
+    )?.answer;
+    expect(accessAnswer).toBeDefined();
+    for (const tier of ["Estudiante", "General", "Plus", "VIP"]) {
+      expect(accessAnswer).toContain(tier);
+    }
   });
 });

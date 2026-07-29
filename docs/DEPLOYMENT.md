@@ -33,7 +33,6 @@ Local `.env.local` drives both local builds and what we push to Vercel.
 ```bash
 cp .env.local.example .env.local
 # Edit .env.local with real values from:
-#   - Supabase Dashboard → Settings → API
 #   - Resend → API Keys
 #   - Upstash → Redis instance → REST tab
 #   - Sentry → Project → Client Keys (DSN)
@@ -80,18 +79,16 @@ the linked environment.
 
 ## 5. Required vars at a glance
 
-The build-time validator lives in `scripts/check-env.mjs` and the runtime
-Supabase env schema lives in `env.ts`. Summary:
+The build-time validator lives in `scripts/check-env.mjs`. Summary:
 
 **Required for every build (local and Vercel):**
 
 | Name                              | Format                                                |
 | --------------------------------- | ----------------------------------------------------- |
-| `NEXT_PUBLIC_SUPABASE_URL`        | `https://<ref>.supabase.co`                           |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY`   | JWT, ≥40 chars                                        |
-| `SUPABASE_SERVICE_ROLE_KEY`       | JWT, ≥40 chars (server-only)                          |
-| `CONTACT_EMAIL`                   | `name@domain.tld`                                     |
+| `RESEND_API_KEY`                  | `re_...` — without it no inquiry ever reaches the team |
+| `CONTACT_EMAIL`                   | `name@domain.tld` — inbox for corporate/sponsor inquiries |
 | `NEXT_PUBLIC_SITE_URL`            | `https://www.scsecuritysummit.com` (no trailing `/`)  |
+| `NEXT_PUBLIC_EVENTBRITE_URL`      | Public event URL; falls back to the value in `lib/content.ts` |
 
 **Recommended additionally on Vercel builds (especially production):**
 
@@ -99,38 +96,30 @@ Supabase env schema lives in `env.ts`. Summary:
 | -------------------------- | ------------------------------------------------------ |
 | `UPSTASH_REDIS_REST_URL`   | Distributed rate limiting (fail-closed in production)  |
 | `UPSTASH_REDIS_REST_TOKEN` | "                                                      |
-| `RESEND_API_KEY`           | Transactional email — **required to send the registration confirmation email** |
 
 **Optional (set if used):**
-`EMAIL_FROM`, `ADMIN_EMAILS`, `ADMIN_SESSION_SECRET`, `SENTRY_DSN`,
-`NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
+`EMAIL_FROM`, `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`,
+`SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
 
-### Transactional email (Resend) — confirmation on registration
+### Transactional email (Resend) — inquiry delivery
 
-The registration flow sends a bilingual confirmation email after every
-successful registration. It is resilient: **if email fails, the
-registration still succeeds** (the folio is shown on screen and stored).
-Every attempt is audited in the `email_events` Supabase table.
+Resend is the **only** channel by which a corporate-pass or sponsorship
+request reaches the team: there is no database fallback. If the send fails,
+the form reports `email_unavailable` and the lead is lost.
 
-To make confirmation emails actually send:
+To make inquiry emails actually send:
 
 1. **`RESEND_API_KEY`** — set a real key (not the `re_PLACEHOLDER` value)
-   in Vercel for **both Production and Preview**. If it's missing or a
-   placeholder, registrations succeed but emails are skipped and logged
-   as `skipped_no_api_key`.
+   in Vercel for **both Production and Preview**.
 2. **`EMAIL_FROM`** — must use a domain **verified in Resend** (SPF +
    DKIM). Defaults to `SC Security Summit <hola@scsecuritysummit.com>`.
    An unverified domain causes `failed` events (visible in Sentry/logs);
    the failure is never silently swallowed. See `docs/DNS.md`.
 3. **Redeploy after changing env vars** — Vercel only picks up new values
    on the next build/deploy.
-4. **Verify delivery:** Resend Dashboard → Logs (match on
-   `provider_message_id` from `email_events`); also check
+4. **Verify delivery:** submit one test corporate-pass form and confirm the
+   message in Resend Dashboard → Logs and in `CONTACT_EMAIL`; also check
    Spam/Promotions; and confirm SPF/DKIM/DMARC DNS records.
-
-The `email_events` table is created by migration
-`supabase/migrations/009_email_events.sql` (RLS-locked to `service_role`).
-Apply pending migrations to the Supabase project before/with the deploy.
 
 ---
 
@@ -189,8 +178,7 @@ SKIP_ENV_VALIDATION=1 npm run build
 
 1. Add it to `.env.local.example` with a placeholder + comment explaining
    where to source the value.
-2. Reference it in code via `process.env.<NAME>`, or add it to `env.ts` when
-   it must be runtime-validated before creating Supabase clients.
+2. Reference it in code via `process.env.<NAME>`.
 3. Add it to `scripts/check-env.mjs` when it should be checked during builds.
 4. If sensitive, document in `CLAUDE.md` under "Environment Variables".
 5. Update your local `.env.local`, then mirror the value in Vercel via CLI/dashboard.

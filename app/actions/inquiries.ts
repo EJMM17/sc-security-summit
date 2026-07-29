@@ -2,6 +2,7 @@
 
 import { z } from "zod";
 import { sendEmail } from "@/lib/email";
+import { emailShell, escapeHtml } from "@/lib/email-templates";
 import { checkRateLimit, getClientIp, RateLimitError } from "@/lib/rate-limit";
 
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? "hola@scsecuritysummit.com";
@@ -92,19 +93,8 @@ function inquiryEmailHtml(title: string, rows: string[][]) {
     )
     .join("");
 
-  return `<div style="font-family:Arial,sans-serif;max-width:680px;margin:auto"><h1 style="font-size:24px;color:#0f172a">${escapeHtml(title)}</h1><table style="width:100%;border-collapse:collapse;background:#f8fafc">${details}</table></div>`;
-}
-
-function escapeHtml(value: string) {
-  return value.replace(
-    /[&<>"']/g,
-    (character) =>
-      ({
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#039;",
-      })[character] ?? character,
+  return emailShell(
+    title,
+    `<h1 style="margin:0 0 16px;font-size:20px;color:#0f172a">${escapeHtml(title)}</h1><table style="width:100%;border-collapse:collapse;background:#f8fafc">${details}</table>`,
   );
 }
