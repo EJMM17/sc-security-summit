@@ -7,12 +7,9 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: "*",
         allow: "/",
         disallow: [
-          "/admin/",
           "/api/",
           "/_next/",
           "/monitoring", // Sentry tunnel route (next.config tunnelRoute)
-          "/pago",
-          "/registro-exitoso",
         ],
       },
     ],

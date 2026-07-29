@@ -17,7 +17,7 @@ export default defineConfig({
       provider: "v8",
       reporter: ["text", "html"],
       include: ["lib/**/*.ts"],
-      exclude: ["lib/**/*.test.ts", "lib/site-content.ts", "lib/constants.ts"],
+      exclude: ["lib/**/*.test.ts"],
     },
   },
 });

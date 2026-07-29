@@ -66,8 +66,8 @@ WebP responses to avoid double-compressing the hero asset.
 Add an external uptime check (UptimeRobot / Better Stack) on
 `https://www.scsecuritysummit.com/api/health`. Expect:
 
-- 200 with body `{"ok":true}` when Supabase is reachable
-- 503 within 3s when Supabase is degraded
+- 200 with body `{"ok":true}` while the app is serving requests
+  (the probe has no external dependency)
 
 Alert threshold: 2 consecutive failures = page on-call.
 

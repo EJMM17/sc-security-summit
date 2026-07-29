@@ -1,8 +1,5 @@
 const BRAND_COLOR = "#0f172a";
 const ACCENT_COLOR = "#3b82f6";
-const CONTACT_EMAIL = "hola@scsecuritysummit.com";
-const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "https://scsecuritysummit.com";
 
 /**
  * Escape user-controlled text before interpolating it into email HTML.
@@ -17,7 +14,11 @@ export function escapeHtml(value: string): string {
     .replace(/'/g, "&#39;");
 }
 
-function base(title: string, body: string): string {
+/**
+ * Branded email shell. Wraps a body fragment in the summit's header/footer
+ * chrome so every transactional email looks the same.
+ */
+export function emailShell(title: string, body: string): string {
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -45,113 +46,4 @@ function base(title: string, body: string): string {
 </table>
 </body>
 </html>`;
-}
-
-const TIER_LABEL: Record<string, string> = {
-  estudiante: "Estudiante",
-  general: "General",
-  vip: "VIP",
-};
-
-function mxn(amount: number): string {
-  return new Intl.NumberFormat("es-MX", {
-    style: "currency",
-    currency: "MXN",
-    minimumFractionDigits: 0,
-  }).format(amount);
-}
-
-export function confirmationEmailHtml(params: {
-  nombre: string;
-  folio: string;
-  tipo_acceso: string;
-  monto_mxn: number;
-  language: "es" | "en";
-}): string {
-  const { nombre, folio, tipo_acceso, monto_mxn, language } = params;
-  const tier = TIER_LABEL[tipo_acceso] ?? tipo_acceso;
-  const safeNombre = escapeHtml(nombre);
-
-  if (language === "en") {
-    const body = `
-      <p style="margin:0 0 16px;color:#1e293b;font-size:16px;font-weight:600;">Your registration is confirmed!</p>
-      <p style="margin:0 0 24px;color:#475569;font-size:14px;line-height:1.6;">Hi <strong>${safeNombre}</strong>, thank you for registering for SC Security Summit 2026. Your confirmation folio is:</p>
-      <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;padding:20px;text-align:center;margin:0 0 24px;">
-        <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Confirmation Folio</p>
-        <p style="margin:0;color:#0f172a;font-size:22px;font-weight:700;font-family:monospace;letter-spacing:1px;">${folio}</p>
-      </div>
-      <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:#f8fafc;border-radius:6px;overflow:hidden;">
-        <tr style="background:#e2e8f0;">
-          <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Detail</td>
-          <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Value</td>
-        </tr>
-        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Event</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Date</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">September 24, 2026</td></tr>
-        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Access Tier</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
-        <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Amount</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${mxn(monto_mxn)} MXN</td></tr>
-      </table>
-      <p style="margin:0 0 16px;color:#475569;font-size:13px;line-height:1.6;">Payment is via manual bank transfer. Once your payment is confirmed, you'll receive a follow-up email. <strong>Keep this folio for your records</strong> — you'll need it to check in at the event.</p>
-      <p style="margin:0 0 16px;color:#475569;font-size:13px;line-height:1.6;">Questions about your registration or payment? Email us at <a href="mailto:${CONTACT_EMAIL}" style="color:${ACCENT_COLOR};">${CONTACT_EMAIL}</a> or visit <a href="${SITE_URL}" style="color:${ACCENT_COLOR};">${SITE_URL}</a>.</p>
-      <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6;">If you did not register for SC Security Summit 2026, please ignore this email or contact us at <a href="mailto:${CONTACT_EMAIL}" style="color:${ACCENT_COLOR};">${CONTACT_EMAIL}</a>.</p>`;
-    return base("Registration Confirmed — SC Security Summit 2026", body);
-  }
-
-  const body = `
-    <p style="margin:0 0 16px;color:#1e293b;font-size:16px;font-weight:600;">¡Tu registro ha sido confirmado!</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:14px;line-height:1.6;">Hola <strong>${safeNombre}</strong>, gracias por registrarte al SC Security Summit 2026. Tu folio de confirmación es:</p>
-    <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;padding:20px;text-align:center;margin:0 0 24px;">
-      <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Folio de Confirmación</p>
-      <p style="margin:0;color:#0f172a;font-size:22px;font-weight:700;font-family:monospace;letter-spacing:1px;">${folio}</p>
-    </div>
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:#f8fafc;border-radius:6px;overflow:hidden;">
-      <tr style="background:#e2e8f0;">
-        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Detalle</td>
-        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Valor</td>
-      </tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Evento</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24 de Septiembre, 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Tipo de Acceso</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Monto</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${mxn(monto_mxn)} MXN</td></tr>
-    </table>
-    <p style="margin:0 0 16px;color:#475569;font-size:13px;line-height:1.6;">El pago es mediante transferencia bancaria manual. Una vez confirmado tu pago recibirás un correo de seguimiento. <strong>Guarda este folio</strong> — lo necesitarás para registrarte el día del evento.</p>
-    <p style="margin:0 0 16px;color:#475569;font-size:13px;line-height:1.6;">¿Dudas sobre tu registro o pago? Escríbenos a <a href="mailto:${CONTACT_EMAIL}" style="color:${ACCENT_COLOR};">${CONTACT_EMAIL}</a> o visita <a href="${SITE_URL}" style="color:${ACCENT_COLOR};">${SITE_URL}</a>.</p>
-    <p style="margin:0;color:#94a3b8;font-size:12px;line-height:1.6;">Si no reconoces este registro, ignora este correo o contáctanos en <a href="mailto:${CONTACT_EMAIL}" style="color:${ACCENT_COLOR};">${CONTACT_EMAIL}</a>.</p>`;
-  return base("Registro Confirmado — SC Security Summit 2026", body);
-}
-
-export function confirmationEmailSubject(language: "es" | "en", folio: string): string {
-  return language === "en"
-    ? `Registration Confirmed — ${folio} · SC Security Summit 2026`
-    : `Registro Confirmado — ${folio} · SC Security Summit 2026`;
-}
-
-export function folioRecoveryEmailHtml(params: {
-  nombre: string;
-  folio: string;
-  tipo_acceso: string;
-}): string {
-  const { nombre, folio, tipo_acceso } = params;
-  const tier = TIER_LABEL[tipo_acceso] ?? tipo_acceso;
-  const body = `
-    <p style="margin:0 0 16px;color:#1e293b;font-size:16px;font-weight:600;">Recuperación de folio de registro</p>
-    <p style="margin:0 0 24px;color:#475569;font-size:14px;line-height:1.6;">Hola <strong>${escapeHtml(nombre)}</strong>, aquí está tu folio de confirmación para el SC Security Summit 2026:</p>
-    <div style="background:#f8fafc;border:2px dashed #cbd5e1;border-radius:8px;padding:20px;text-align:center;margin:0 0 24px;">
-      <p style="margin:0 0 4px;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:1px;">Folio de Confirmación</p>
-      <p style="margin:0;color:#0f172a;font-size:22px;font-weight:700;font-family:monospace;letter-spacing:1px;">${folio}</p>
-    </div>
-    <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px;background:#f8fafc;border-radius:6px;overflow:hidden;">
-      <tr style="background:#e2e8f0;">
-        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Detalle</td>
-        <td style="padding:8px 12px;font-size:11px;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;">Valor</td>
-      </tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Evento</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">SC Security Summit 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Fecha</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">24 de Septiembre, 2026</td></tr>
-      <tr><td style="padding:10px 12px;font-size:13px;color:#475569;border-top:1px solid #e2e8f0;">Tipo de Acceso</td><td style="padding:10px 12px;font-size:13px;color:#1e293b;font-weight:500;border-top:1px solid #e2e8f0;">${tier}</td></tr>
-    </table>
-    <p style="margin:0;color:#475569;font-size:13px;line-height:1.6;">Si no solicitaste esta recuperación, puedes ignorar este correo.</p>`;
-  return base("Tu Folio de Registro — SC Security Summit 2026", body);
-}
-
-export function folioRecoveryEmailSubject(): string {
-  return "Tu folio de registro — SC Security Summit 2026";
 }

@@ -1,9 +1,4 @@
-// Vitest global setup: fill in env vars that env.ts validates so that
-// importing modules with transitive deps on env (e.g. lib/supabase) does
-// not throw during tests.
-process.env.NEXT_PUBLIC_SUPABASE_URL ??= "http://localhost:54321";
-process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??= "test-anon-key";
-process.env.SUPABASE_SERVICE_ROLE_KEY ??= "test-service-role-key";
+// Vitest global setup.
 process.env.NEXT_PUBLIC_SITE_URL ??= "http://localhost:3000";
 
 // next/headers `cookies()` requires a real request scope, which doesn't
@@ -33,29 +28,5 @@ vi.mock("next/headers", () => {
       },
     }),
     headers: async () => new Map<string, string>(),
-  };
-});
-
-// Stub the Supabase admin client so tests don't reach a real network. Tests
-// that need a specific DB shape can override per-test with vi.mocked().
-vi.mock("@/lib/supabase", () => {
-  const adminThenable = {
-    from: () => ({
-      select: () => ({
-        eq: () => ({
-          eq: () => ({
-            single: async () => ({ data: { email: "admin@example.com", active: true }, error: null }),
-          }),
-          single: async () => ({ data: null, error: null }),
-        }),
-      }),
-    }),
-    rpc: async () => ({ data: 0, error: null }),
-  };
-  return {
-    supabasePublic: adminThenable,
-    supabaseAdmin: adminThenable,
-    createPublicClient: () => adminThenable,
-    createAdminClient: () => adminThenable,
   };
 });

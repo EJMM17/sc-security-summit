@@ -11,9 +11,7 @@ import { useEffect } from "react";
  * Events emitted:
  *   click_register   → any link to #registro
  *   click_sponsor    → sponsorship mailto / sponsors page / #patrocinadores
- *   click_whatsapp   → wa.me links (off the success page)
- *   click_calendar   → "add to calendar" on /registro-exitoso
- *   share_whatsapp   → WhatsApp share on /registro-exitoso
+ *   click_whatsapp   → wa.me links
  *   section_view     → first meaningful view of each landing section
  *   scroll_depth     → 25/50/75/90/100% page-depth milestones
  *
@@ -55,14 +53,6 @@ export default function InteractionTracker() {
       const ctaLocation =
         anchor.closest("section")?.id || anchor.closest("[id]")?.id || "";
       const base = { cta_location: ctaLocation, page_path: path, language };
-
-      // ── Success page (/registro-exitoso) ──────────────────────────
-      if (path.startsWith("/registro-exitoso")) {
-        if (href.includes("calendar.google.com")) pushEvent("click_calendar", base);
-        else if (href.includes("wa.me") || href.includes("api.whatsapp.com"))
-          pushEvent("share_whatsapp", base);
-        return;
-      }
 
       // ── Registration intent ───────────────────────────────────────
       if (href.includes("#registro") || href.includes("eventbrite.")) {

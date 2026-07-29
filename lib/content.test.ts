@@ -1,14 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { BASE_URL, CONTENT, PRECIOS } from "./content";
+import { BASE_URL, CONTENT } from "./content";
 
 describe("content SSOT", () => {
-  it("exports the canonical base URL and pricing", () => {
+  it("exports the canonical base URL", () => {
     expect(BASE_URL).toBe("https://scsecuritysummit.com");
-    expect(PRECIOS).toStrictEqual({
-      estudiante: 850,
-      general: 2500,
-      vip: 4800,
-    });
   });
 
   it("preserves the live speaker copy from app/page.tsx", () => {

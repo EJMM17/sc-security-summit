@@ -47,18 +47,16 @@ if (existsSync(envFile)) {
 }
 
 const REQUIRED = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
-  "SUPABASE_SERVICE_ROLE_KEY",
+  "RESEND_API_KEY",
+  "CONTACT_EMAIL",
 ];
 
 const RECOMMENDED = [
-  "ADMIN_SESSION_SECRET",
+  "NEXT_PUBLIC_SITE_URL",
+  "NEXT_PUBLIC_EVENTBRITE_URL",
   "UPSTASH_REDIS_REST_URL",
   "UPSTASH_REDIS_REST_TOKEN",
-  "RESEND_API_KEY",
   "EMAIL_FROM",
-  "CONTACT_EMAIL",
 ];
 
 const isMissing = (name) => !process.env[name] || process.env[name].trim().length === 0;
@@ -70,14 +68,6 @@ const resendUnusable = resendKey.length === 0 || RESEND_PLACEHOLDERS.has(resendK
 
 const missingRequired = REQUIRED.filter(isMissing);
 const missingRecommended = RECOMMENDED.filter(isMissing);
-
-const shortSecret =
-  process.env.ADMIN_SESSION_SECRET && process.env.ADMIN_SESSION_SECRET.length < 32;
-
-if (strictValidation && shortSecret) {
-  console.error("✖ [check-env] ADMIN_SESSION_SECRET must be at least 32 characters");
-  process.exit(1);
-}
 
 if (strictValidation && missingRequired.length > 0) {
   console.error("\n✖ [check-env] Build aborted. Missing required env vars:");
@@ -99,26 +89,20 @@ if (missingRecommended.length > 0) {
   for (const name of missingRecommended) console.warn(`  • ${name}`);
 }
 
-if (!strictValidation && shortSecret) {
-  console.warn("\n⚠ [check-env] ADMIN_SESSION_SECRET is set but shorter than 32 characters");
-}
-
 if (resendUnusable) {
   const detail = resendKey.length === 0 ? "not set" : "still a placeholder";
   if (strictValidation) {
     console.error(
-      `\n✖ [check-env] RESEND_API_KEY is ${detail}. Registration confirmation emails will NOT be sent.`,
+      `\n✖ [check-env] RESEND_API_KEY is ${detail}. Corporate-pass and sponsor inquiries will NOT be delivered.`,
     );
     console.error("  Set a real Resend API key (Vercel: Production + Preview) and redeploy.");
     console.error("  Bypass for emergency builds: SKIP_ENV_VALIDATION=1 npm run build\n");
     process.exit(1);
   }
   console.warn(
-    `\n⚠ [check-env] RESEND_API_KEY is ${detail} → registration confirmation emails will NOT be sent`,
+    `\n⚠ [check-env] RESEND_API_KEY is ${detail} → inquiry emails will NOT be delivered`,
   );
-  console.warn(
-    "  Registrations still succeed and are audited as skipped_no_api_key in email_events.",
-  );
+  console.warn("  The forms still accept submissions, but nothing reaches CONTACT_EMAIL.");
 }
 
 console.log(

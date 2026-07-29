@@ -3,12 +3,6 @@ export const EVENTBRITE_URL =
   process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
   "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
 
-export const PRECIOS = {
-  estudiante: 850,
-  general: 2500,
-  vip: 4800,
-} as const;
-
 export type IconKey =
   | "shield-check"
   | "network"
