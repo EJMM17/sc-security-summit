@@ -7,7 +7,7 @@
     "prebuild": "node scripts/check-env.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "test": "vitest run",
     "test:run": "vitest run",
     "test:watch": "vitest",
@@ -16,11 +16,21 @@
     "test:e2e:ui": "playwright test --ui",
     "typecheck": "tsc --noEmit",
     "check-env": "node scripts/check-env.mjs",
+    "env:contract": "node scripts/check-env.mjs --contract",
+    "db:start": "supabase db start",
+    "db:stop": "supabase stop --no-backup",
+    "db:reset": "supabase db reset --local",
+    "db:test": "supabase test db --local",
+    "db:lint": "supabase db lint --local --level error --fail-on error",
+    "db:types": "supabase gen types --local --lang typescript --schema public > lib/database.types.ts",
     "prepare": "husky || true"
   },
   "engines": {
-    "node": "20.x",
+    "node": "22.x",
     "npm": ">=10.0.0"
+  },
+  "overrides": {
+    "brace-expansion": "5.0.8"
   },
   "lint-staged": {
     "*.{ts,tsx}": [
@@ -29,14 +39,15 @@
     "*.{json,md,yml,yaml}": []
   },
   "dependencies": {
-    "@sentry/nextjs": "^10.50.0",
+    "@sentry/nextjs": "10.69.0",
+    "@supabase/supabase-js": "2.111.0",
     "@tailwindcss/postcss": "^4.0.0",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "lucide-react": "^0.441.0",
-    "next": "^15.5.15",
+    "next": "15.5.22",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "resend": "^6.12.3",
@@ -46,16 +57,18 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.48.0",
-    "@types/node": "^20",
+    "@eslint/eslintrc": "3.3.6",
+    "@types/node": "22.20.1",
     "@types/react": "^18",
     "@types/react-dom": "^18",
-    "@vitest/coverage-v8": "^4.1.5",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.5.15",
+    "@vitest/coverage-v8": "4.1.10",
+    "eslint": "9.39.5",
+    "eslint-config-next": "15.5.22",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
-    "sharp": "^0.34.5",
+    "sharp": "0.35.3",
+    "supabase": "2.110.0",
     "typescript": "^5",
-    "vitest": "^4.1.5"
+    "vitest": "4.1.10"
   }
 }

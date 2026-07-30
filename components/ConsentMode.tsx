@@ -14,11 +14,12 @@
  * Nonce-based: compatible with the per-request CSP in middleware.ts.
  */
 export default function ConsentMode({ nonce }: { nonce?: string }) {
+  const storageKey = JSON.stringify(COOKIE_CONSENT_STORAGE_KEY);
   const script = `window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 window.gtag=window.gtag||gtag;
 var s='denied';
-try{var r=window.localStorage.getItem('scss2026:cookie-consent');if(r){var d=JSON.parse(r);if(d&&d.decision==='all')s='granted';}}catch(e){}
+try{var r=window.localStorage.getItem(${storageKey});if(r){var d=JSON.parse(r);if(d&&d.decision==='all')s='granted';}}catch(e){}
 gtag('consent','default',{ad_storage:s,ad_user_data:s,ad_personalization:s,analytics_storage:s,functionality_storage:'granted',security_storage:'granted',wait_for_update:500});
 gtag('set','url_passthrough',true);
 gtag('set','ads_data_redaction',s!=='granted');`;
@@ -31,3 +32,4 @@ gtag('set','ads_data_redaction',s!=='granted');`;
     />
   );
 }
+import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/consent";

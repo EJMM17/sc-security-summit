@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { Cookie } from "lucide-react";
-import { CONSENT_EVENT } from "@/components/MarketingConsentGate";
-
-const STORAGE_KEY = "scss2026:cookie-consent";
-
-type Decision = "all" | "essential";
+import { clearAttribution } from "@/lib/attribution";
+import {
+  COOKIE_CONSENT_EVENT,
+  COOKIE_CONSENT_STORAGE_KEY,
+  readCookieConsentDecision,
+  type CookieConsentDecision,
+} from "@/lib/consent";
 
 type Language = "es" | "en";
 
@@ -17,6 +19,7 @@ const text = {
     acceptAll: "Aceptar todas",
     essential: "Solo esenciales",
     privacyLabel: "Aviso de Privacidad",
+    settings: "Configurar cookies",
   },
   en: {
     title: "Privacy & cookies",
@@ -24,30 +27,30 @@ const text = {
     acceptAll: "Accept all",
     essential: "Essential only",
     privacyLabel: "Privacy Notice",
+    settings: "Cookie settings",
   },
 } as const;
 
 export default function CookieConsent({ language = "es" }: { language?: Language }) {
   const [visible, setVisible] = useState(false);
+  const [hasDecision, setHasDecision] = useState(false);
 
   useEffect(() => {
-    try {
-      if (!window.localStorage.getItem(STORAGE_KEY)) {
-        setVisible(true);
-      }
-    } catch {
-      // localStorage unavailable (private mode, etc.) — show banner this session.
-      setVisible(true);
-    }
+    const decision = readCookieConsentDecision();
+    setHasDecision(decision !== null);
+    setVisible(decision === null);
   }, []);
 
-  function decide(decision: Decision) {
+  function decide(decision: CookieConsentDecision) {
+    const previousDecision = readCookieConsentDecision();
     try {
       window.localStorage.setItem(
-        STORAGE_KEY,
+        COOKIE_CONSENT_STORAGE_KEY,
         JSON.stringify({ decision, ts: Date.now() }),
       );
     } catch {}
+
+    if (decision === "essential") clearAttribution();
 
     // Google Consent Mode v2 — flip storage based on the choice. GTM requires
     // the real gtag `arguments` object (not a plain array), so we reuse the
@@ -75,15 +78,35 @@ export default function CookieConsent({ language = "es" }: { language?: Language
 
     // Notify consent-gated pixels (Meta, LinkedIn) without a page reload.
     try {
-      window.dispatchEvent(new CustomEvent(CONSENT_EVENT, { detail: decision }));
+      window.dispatchEvent(
+        new CustomEvent(COOKIE_CONSENT_EVENT, { detail: decision }),
+      );
     } catch {}
 
+    setHasDecision(true);
     setVisible(false);
+
+    // Reload only when withdrawing a previous grant. This guarantees that
+    // third-party scripts already loaded in this page are removed.
+    if (previousDecision === "all" && decision === "essential") {
+      window.location.reload();
+    }
   }
 
-  if (!visible) return null;
-
   const t = text[language];
+
+  if (!visible) {
+    if (!hasDecision) return null;
+    return (
+      <button
+        type="button"
+        onClick={() => setVisible(true)}
+        className="fixed bottom-3 left-3 z-[90] rounded-full border border-slate-300 bg-white/95 px-3 py-2 text-xs font-semibold text-slate-700 shadow-md backdrop-blur transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+      >
+        {t.settings}
+      </button>
+    );
+  }
 
   return (
     <div

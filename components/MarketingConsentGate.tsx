@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
-
-const STORAGE_KEY = "scss2026:cookie-consent";
-export const CONSENT_EVENT = "scss2026:consent";
+import {
+  COOKIE_CONSENT_EVENT,
+  readCookieConsentDecision,
+} from "@/lib/consent";
 
 /**
  * Renders marketing pixels (Meta, LinkedIn) only after the visitor accepts
@@ -16,21 +17,13 @@ export default function MarketingConsentGate({ children }: { children: ReactNode
   const [granted, setGranted] = useState(false);
 
   useEffect(() => {
-    try {
-      const raw = window.localStorage.getItem(STORAGE_KEY);
-      if (raw && JSON.parse(raw)?.decision === "all") {
-        setGranted(true);
-        return;
-      }
-    } catch {
-      // localStorage unavailable — stay gated until an explicit accept event.
-    }
+    setGranted(readCookieConsentDecision() === "all");
 
     const onConsent = (event: Event) => {
-      if ((event as CustomEvent).detail === "all") setGranted(true);
+      setGranted((event as CustomEvent).detail === "all");
     };
-    window.addEventListener(CONSENT_EVENT, onConsent);
-    return () => window.removeEventListener(CONSENT_EVENT, onConsent);
+    window.addEventListener(COOKIE_CONSENT_EVENT, onConsent);
+    return () => window.removeEventListener(COOKIE_CONSENT_EVENT, onConsent);
   }, []);
 
   if (!granted) return null;

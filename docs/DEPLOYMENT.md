@@ -1,184 +1,280 @@
-# Deployment — Vercel
+# Deployment — Vercel + Supabase
 
-The `prebuild` hook (`scripts/check-env.mjs`) validates env vars on every build.
-By default it reports warnings and **does not block deploys**.  
-If you want fail-fast behavior in any environment, set
-`ENFORCE_ENV_VALIDATION=1`.
+Última revisión: 2026-07-29.
 
-This guide is the playbook for getting a deploy green on the first try.
+Este documento es el procedimiento canónico de despliegue. La aplicación y la
+base se despliegan por separado y en este orden:
 
----
+```text
+migración compatible → verificación de base → aplicación → smoke tests
+```
 
-## 1. First-time setup (per developer / per laptop)
+No ejecutes `supabase db reset --linked` ni uses datos o secretos de Production
+en GitHub Actions, pruebas locales o Preview.
+
+## 1. Gates antes de desplegar
+
+No se activa la persistencia hasta completar todos estos puntos:
+
+- [ ] El aviso `2026-07-29-draft` fue revisado y aprobado por la persona
+      responsable legal/privacidad.
+- [ ] El plazo de retención y el procedimiento de eliminación fueron aprobados.
+- [ ] Preview usa un proyecto o branch de Supabase distinto de Production.
+- [ ] Existe un backup reciente y verificado de Production.
+- [ ] El historial de migraciones local y remoto está reconciliado.
+- [ ] Security Advisor y Performance Advisor no tienen errores críticos sin
+      resolver.
+- [ ] Vercel Preview y Production tienen sus variables completas.
+- [ ] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
+      compatible con Hobby.
+- [ ] El operador y la ventana para retirar el webhook legado están
+      confirmados según el corte controlado de la siguiente sección.
+
+El plan Vercel Pro fue confirmado durante la revisión del 2026-07-29. Debe
+confirmarse otra vez si cambia la suscripción: en Hobby, `*/5 * * * *` hace que
+el deployment falle.
+
+### Corte único del webhook legado
+
+El retiro ocurre dentro del mismo bloque controlado de las tres migraciones
+nuevas, respetando siempre su timestamp. Una sola persona designada debe:
+
+1. Crear backup y comprobar que `public.registros` contiene los siete registros
+   históricos esperados.
+2. Confirmar que las únicas versiones pendientes son, en este orden:
+   `20260730024502_add_inquiry_persistence`,
+   `20260730030134_harden_legacy_grants` y
+   `20260730030137_retire_legacy_registration_webhook`.
+3. Aplicar esas tres versiones en ese orden. La tercera retira
+   `trg_send_confirmation_email`, `public.notify_new_registro()` y ejecuta
+   `DROP EXTENSION pg_net RESTRICT` dentro de una transacción. Si otra
+   dependencia usa `pg_net`, esa migración falla y revierte; el operador se
+   detiene y no despliega la aplicación.
+4. Verificar que no quede una invocación activa desde la base.
+5. Desplegar `supabase/functions/send-confirmation-email/index.ts` como una
+   función tombstone HTTP 410 protegida con verificación JWT. Su única
+   finalidad es rechazar llamadas rezagadas; no contiene ni documenta
+   credenciales heredadas.
+6. Confirmar nuevamente que los siete registros históricos siguen intactos y
+   que no se generaron correos al ejecutar el smoke test del dominio nuevo.
+
+No borres la Edge Function antes de completar el periodo de observación. El
+tombstone hace visible cualquier cliente rezagado sin reactivar el flujo
+retirado.
+
+## 2. Fuentes de verdad
+
+| Tema | Fuente |
+|---|---|
+| Contrato de variables | `scripts/env-spec.mjs` |
+| Plantilla local generada | `.env.local.example` |
+| Validador | `scripts/check-env.mjs` |
+| Esquema de base | `supabase/migrations/` |
+| Pruebas de base | `supabase/tests/database/` |
+| Tipos generados | `lib/database.types.ts` |
+| Cron de reintentos | `vercel.json` |
+| Operación diaria | `docs/INQUIRY_OPERATIONS.md` |
+
+`.env.example` está retirado deliberadamente. No se debe crear una segunda
+plantilla.
+
+## 3. Preparar una máquina
 
 ```bash
-# One-time: install Vercel CLI globally and authenticate.
-npm i -g vercel
-vercel login
+npm ci
+cp .env.local.example .env.local
+npm run env:contract
+npm run check-env
+```
 
-# Inside the repo: link this checkout to the Vercel project.
-# Pick the existing "sc-security-summit" project when prompted; do NOT
-# create a new one.
+`npm run env:contract` no usa secretos: comprueba que el contrato no tenga
+duplicados, que ningún secreto sea público y que `.env.local.example` coincida
+exactamente con `scripts/env-spec.mjs`.
+
+`npm run check-env` carga `.env.local`. En desarrollo reporta faltantes como
+advertencias; para una comprobación estricta:
+
+```bash
+ENFORCE_ENV_VALIDATION=1 npm run check-env
+```
+
+En PowerShell:
+
+```powershell
+$env:ENFORCE_ENV_VALIDATION = "1"
+npm run check-env
+Remove-Item Env:ENFORCE_ENV_VALIDATION
+```
+
+Después de traer valores de un ambiente, valida también sus requisitos
+específicos:
+
+```bash
+npm run check-env -- --target=preview
+npm run check-env -- --target=production
+```
+
+Vercel ignora un target manual y usa `VERCEL_ENV`, por lo que no se puede
+degradar la validación del deployment mediante argumentos.
+
+`SKIP_ENV_VALIDATION=1` está reservado al paso `build` de GitHub Actions.
+El validador lo rechaza en Vercel y fuera de GitHub Actions.
+
+## 4. Variables por ambiente
+
+| Variable | Development | Preview | Production |
+|---|---:|---:|---:|
+| `SUPABASE_URL` | local/autorizada | requerida, aislada | requerida |
+| `SUPABASE_SECRET_KEY` | local/autorizada | requerida, `sb_secret_…` | requerida, `sb_secret_…` |
+| `RESEND_API_KEY` | recomendada | requerida | requerida |
+| `CONTACT_EMAIL` | recomendada | requerida, inbox de prueba | requerida |
+| `UPSTASH_REDIS_REST_URL` | opcional | requerida | requerida |
+| `UPSTASH_REDIS_REST_TOKEN` | opcional | requerida | requerida |
+| `CRON_SECRET` | opcional | opcional para smoke manual | requerida |
+| `NEXT_PUBLIC_SITE_URL` | opcional | opcional | requerida |
+| `ENFORCE_ENV_VALIDATION` | `0` o ausente | `1` | `1` |
+
+Upstash se configura siempre como par. `SUPABASE_URL` y
+`SUPABASE_SECRET_KEY` también. Preview nunca apunta al proyecto productivo.
+
+`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `UPSTASH_REDIS_REST_TOKEN`,
+`CRON_SECRET` y `SENTRY_AUTH_TOKEN` son server-only. Ninguno lleva el prefijo
+`NEXT_PUBLIC_`.
+
+## 5. Configurar Vercel
+
+Vincula el checkout al proyecto existente:
+
+```bash
 vercel link
 ```
 
-`vercel link` writes `.vercel/project.json` (already in `.gitignore`).
-
----
-
-## 2. The single source of truth: `.env.local`
-
-Local `.env.local` drives both local builds and what we push to Vercel.
+Agrega o rota secretos de forma interactiva para no dejarlos en el historial
+del shell:
 
 ```bash
-cp .env.local.example .env.local
-# Edit .env.local with real values from:
-#   - Resend → API Keys
-#   - Upstash → Redis instance → REST tab
-#   - Sentry → Project → Client Keys (DSN)
+vercel env add SUPABASE_URL preview
+vercel env add SUPABASE_SECRET_KEY preview --sensitive
+vercel env add SUPABASE_URL production
+vercel env add SUPABASE_SECRET_KEY production --sensitive
 ```
 
-Verify locally:
+Repite para las variables de la tabla anterior. Usa valores distintos para
+Preview y Production.
+
+`vercel env pull .env.local --environment=preview --yes` reemplaza el archivo
+completo. Guarda cualquier override local en `.env.development.local` o vuelve
+a añadirlo después del pull. Nunca confirmes esos archivos.
+
+Los cambios de variables solo aplican a deployments nuevos: siempre redeploy
+después de agregar o rotar un valor.
+
+## 6. CI sin secretos productivos
+
+`.github/workflows/ci.yml` mantiene dos contratos independientes:
+
+1. Calidad de aplicación: ejecuta `npm run env:contract`, typecheck, lint,
+   coverage Vitest con umbrales de 85% y build. Solo el paso de build recibe
+   `SKIP_ENV_VALIDATION=1`.
+2. Base local: usa Supabase CLI `2.110.0`, reconstruye las migraciones, ejecuta
+   pgTAP, lint y verifica que regenerar `lib/database.types.ts` no produzca diff.
+
+El job de base usa Docker y credenciales locales generadas por Supabase. No
+enlaza ni consulta proyectos remotos.
+
+## 7. Validación local
+
+Con Docker activo:
 
 ```bash
-npm run check-env   # green ✓ before you push to Vercel
+npx supabase db start
+npx supabase db reset --local
+npx supabase test db --local
+npx supabase db lint --local --level error --fail-on error
+npx supabase gen types --local --lang typescript --schema public > lib/database.types.ts
+git diff --exit-code -- lib/database.types.ts
 ```
 
----
-
-## 3. Push env vars to Vercel
-
-Two options; **prefer the Vercel CLI** so a typo in the dashboard can't bite us.
-
-### Option A — Vercel CLI (recommended)
-
-Use `vercel env add <NAME>` for both `production` and `preview`, or use
-`vercel env pull .env.local` to inspect existing values before rotating a key.
-
-### Option B — Vercel Dashboard
-
-Project → Settings → Environment Variables → "Add". Add each variable for both
-**Production** and **Preview**. Slow and error-prone for the initial set; fine
-for one-off changes after that.
-
----
-
-## 4. Pull Vercel env vars back to `.env.local`
-
-When you join the project from a new laptop, or someone rotated a secret in
-the dashboard:
+Después:
 
 ```bash
-vercel env pull .env.local
+npm run env:contract
+npm run typecheck
+npm run lint
+npm test
+npm run build
+npm run test:e2e
 ```
 
-This overwrites your local file with the values currently set in Vercel for
-the linked environment.
+Llena `.env.local` y usa `ENFORCE_ENV_VALIDATION=1 npm run build` para la
+verificación local previa al despliegue; no uses el bypass.
 
----
+## 8. Preview
 
-## 5. Required vars at a glance
+La persona designada para base de datos:
 
-The build-time validator lives in `scripts/check-env.mjs`. Summary:
+1. Verifica que el proyecto enlazado sea Preview, nunca Production.
+2. Ejecuta `supabase migration list` y revisa el resultado.
+3. Ejecuta `supabase db push --dry-run`.
+4. Revisa manualmente el SQL y el plan de rollback.
+5. Ejecuta `supabase db push`.
+6. Ejecuta Security Advisor y Performance Advisor.
 
-**Required for every build (local and Vercel):**
+Después despliega la aplicación a Preview y comprueba:
 
-| Name                              | Format                                                |
-| --------------------------------- | ----------------------------------------------------- |
-| `RESEND_API_KEY`                  | `re_...` — without it no inquiry ever reaches the team |
-| `CONTACT_EMAIL`                   | `name@domain.tld` — inbox for corporate/sponsor inquiries |
-| `NEXT_PUBLIC_SITE_URL`            | `https://www.scsecuritysummit.com` (no trailing `/`)  |
-| `NEXT_PUBLIC_EVENTBRITE_URL`      | Public event URL; falls back to the value in `lib/content.ts` |
+- una solicitud corporate y una sponsor;
+- fila persistida antes de la notificación;
+- replay con el mismo `submission_id` sin duplicado;
+- fallo de Resend que deja la notificación en cola;
+- fallo de Supabase que devuelve error sin falso éxito;
+- acceso de `anon` y `authenticated` denegado;
+- cron manual autenticado con un secreto de Preview;
+- ausencia de PII en logs y respuestas técnicas.
 
-**Recommended additionally on Vercel builds (especially production):**
+El gate de Preview es 48 horas sin errores no explicados.
 
-| Name                       | Why                                                    |
-| -------------------------- | ------------------------------------------------------ |
-| `UPSTASH_REDIS_REST_URL`   | Distributed rate limiting (fail-closed in production)  |
-| `UPSTASH_REDIS_REST_TOKEN` | "                                                      |
+## 9. Production
 
-**Optional (set if used):**
-`EMAIL_FROM`, `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`,
-`SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN`.
+1. Congela cambios y designa un único operador de base.
+2. Crea y verifica el backup inmediatamente anterior.
+3. Comprueba historial y advisors.
+4. Confirma que solo estén pendientes las tres versiones `20260730...` y
+   aplícalas en el orden exacto indicado en “Corte único del webhook legado”.
+   Nunca vuelvas a aplicar el baseline ni sus quince marcadores históricos.
+5. Vuelve a ejecutar pruebas y advisors.
+6. Confirma `CRON_SECRET`, `ENFORCE_ENV_VALIDATION=1` y plan Pro.
+7. Despliega la aplicación.
+8. Envía una solicitud corporate y una sponsor controladas.
+9. Confirma `inquiries`, outbox, intento, evento y correo.
+10. Monitorea intensivamente durante 24 horas.
 
-### Transactional email (Resend) — inquiry delivery
+El cron de `vercel.json` llama en Production a
+`/api/cron/inquiry-notifications` cada cinco minutos. Vercel puede entregar un
+evento más de una vez; el worker debe conservar idempotencia y bloqueo de
+concurrencia.
 
-Resend is the **only** channel by which a corporate-pass or sponsorship
-request reaches the team: there is no database fallback. If the send fails,
-the form reports `email_unavailable` and the lead is lost.
+## 10. Rollback
 
-To make inquiry emails actually send:
+Si falla la aplicación:
 
-1. **`RESEND_API_KEY`** — set a real key (not the `re_PLACEHOLDER` value)
-   in Vercel for **both Production and Preview**.
-2. **`EMAIL_FROM`** — must use a domain **verified in Resend** (SPF +
-   DKIM). Defaults to `SC Security Summit <hola@scsecuritysummit.com>`.
-   An unverified domain causes `failed` events (visible in Sentry/logs);
-   the failure is never silently swallowed. See `docs/DNS.md`.
-3. **Redeploy after changing env vars** — Vercel only picks up new values
-   on the next build/deploy.
-4. **Verify delivery:** submit one test corporate-pass form and confirm the
-   message in Resend Dashboard → Logs and in `CONTACT_EMAIL`; also check
-   Spam/Promotions; and confirm SPF/DKIM/DMARC DNS records.
+1. Promueve el deployment verde anterior.
+2. Conserva las tablas y solicitudes nuevas.
+3. Deshabilita el cron desde Vercel si está generando reintentos incorrectos.
+4. Exporta únicamente las solicitudes de la ventana si existe autorización.
+5. Corrige con una migración nueva; nunca edites una ya aplicada.
 
----
+Un Instant Rollback de Vercel no actualiza automáticamente la configuración de
+crons. Revisa el cron de forma separada.
 
-## 6. Pre-deploy checklist
+No uses `DROP` como rollback automático y nunca ejecutes
+`supabase db reset --linked` contra Production.
 
-Run before merging to `main` (Vercel auto-deploys `main` to production):
+## 11. Agregar una variable
 
-```bash
-npm run check-env       # all required vars present locally
-npm run typecheck       # TS clean
-npm test                # unit tests green
-npm run build           # full prod build succeeds locally
-```
-
-If `check-env` is red, fix `.env.local` first; then mirror those values onto
-the Vercel project via CLI/dashboard before the next deploy.
-
----
-
-## 7. Strict mode (optional)
-
-If you enable strict validation:
-
-```
-✖ [check-env] Build aborted. Fix these env vars:
-  ...
-```
-
-Recommended workflow:
-
-```bash
-# 1. Make sure your local .env.local has the right values.
-npm run check-env
-
-# 2. Push them to Vercel via CLI/dashboard.
-
-# 3. Re-trigger the deploy: Vercel Dashboard → Deployments → ⋯ → Redeploy.
-#    (Or just push a new commit.)
-```
-
-To turn strict mode on in any environment:
-
-```bash
-ENFORCE_ENV_VALIDATION=1
-```
-
-To temporarily bypass all validation checks:
-
-```bash
-SKIP_ENV_VALIDATION=1 npm run build
-```
-
----
-
-## 8. Adding a new env var
-
-1. Add it to `.env.local.example` with a placeholder + comment explaining
-   where to source the value.
-2. Reference it in code via `process.env.<NAME>`.
-3. Add it to `scripts/check-env.mjs` when it should be checked during builds.
-4. If sensitive, document in `CLAUDE.md` under "Environment Variables".
-5. Update your local `.env.local`, then mirror the value in Vercel via CLI/dashboard.
+1. Añádela solo a `scripts/env-spec.mjs`.
+2. Define alcance, secreto, ambientes, formato y placeholders.
+3. Ejecuta `node scripts/check-env.mjs --print-template`.
+4. Actualiza `.env.local.example` con la salida.
+5. Ejecuta `npm run env:contract`.
+6. Configura los ambientes Vercel necesarios.
+7. Actualiza este documento solo si cambia la operación.

@@ -1,29 +1,74 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowRight, Building2, Mail, MessageSquareText, Phone, UserRound } from "lucide-react";
+import Link from "next/link";
 import { submitInquiry } from "@/app/actions/inquiries";
+import AttributionCapture from "@/components/AttributionCapture";
 import { CONTENT } from "@/lib/content";
+import {
+  createSubmissionId,
+  inquiryErrorMessage,
+  runInquirySubmission,
+} from "@/lib/inquiries/client-submit";
+import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
+import type { InquiryFailureReason } from "@/lib/inquiries/result";
 import type { Language } from "@/lib/language";
+
+type FormStatus =
+  | { kind: "idle" }
+  | { kind: "success" }
+  | { kind: "error"; reason: InquiryFailureReason };
 
 export default function SponsorInquiryForm({ language }: { language: Language }) {
   const copy = CONTENT[language].forms.sponsor;
   const ui = CONTENT[language].ui;
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
+  const [isSending, setIsSending] = useState(false);
+  const [submissionId, setSubmissionId] = useState("");
+
+  useEffect(() => {
+    setSubmissionId(createSubmissionId());
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
-    setStatus("sending");
-    const result = await submitInquiry(new FormData(form));
-    setStatus(result.ok ? "success" : "error");
-    if (result.ok) form.reset();
+    const currentSubmissionId = submissionId || createSubmissionId();
+    if (!submissionId) setSubmissionId(currentSubmissionId);
+    setStatus({ kind: "idle" });
+
+    const result = await runInquirySubmission({
+      setSending: setIsSending,
+      submit: () => {
+        const formData = new FormData(form);
+        formData.set("submissionId", currentSubmissionId);
+        return submitInquiry(formData);
+      },
+    });
+
+    if (result.ok) {
+      form.reset();
+      setStatus({ kind: "success" });
+      setSubmissionId(createSubmissionId());
+    } else {
+      setStatus({ kind: "error", reason: result.reason });
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="inquiry-form">
       <input type="hidden" name="kind" value="sponsor" />
+      <input type="hidden" name="submissionId" value={submissionId} readOnly />
+      <input type="hidden" name="language" value={language} readOnly />
+      <input
+        type="hidden"
+        name="consentVersion"
+        value={INQUIRY_CONSENT_VERSION}
+        readOnly
+      />
+      <AttributionCapture asInputs />
       <input
         className="sr-only"
         type="text"
@@ -71,22 +116,33 @@ export default function SponsorInquiryForm({ language }: { language: Language })
           <textarea required name="interest" rows={4} placeholder={copy.interestPlaceholder} />
         </span>
       </label>
+      <p className="mt-5 text-xs text-slate-500 leading-relaxed">
+        {ui.inquiryPrivacy}{" "}
+        <Link className="underline underline-offset-2" href="/aviso-de-privacidad">
+          {ui.inquiryPrivacyLink}
+        </Link>
+      </p>
       <button
         type="submit"
-        disabled={status === "sending"}
+        disabled={isSending || !submissionId}
+        aria-busy={isSending}
         className="btn-primary w-full sm:w-auto mt-6 px-8 py-4 text-sm"
       >
-        {status === "sending" ? ui.inquirySending : ui.sponsorFormSubmit}
+        {isSending ? ui.inquirySending : ui.sponsorFormSubmit}
         <ArrowRight className="w-4 h-4" aria-hidden="true" />
       </button>
-      {status === "success" && (
+      {status.kind === "success" && (
         <p className="inquiry-status is-success" role="status">
           {ui.sponsorSuccess}
         </p>
       )}
-      {status === "error" && (
+      {status.kind === "error" && (
         <p className="inquiry-status is-error" role="alert">
-          {ui.inquiryError}
+          {inquiryErrorMessage(status.reason, {
+            invalid: ui.inquiryInvalid,
+            rateLimited: ui.inquiryRateLimited,
+            unavailable: ui.inquiryError,
+          })}
         </p>
       )}
     </form>

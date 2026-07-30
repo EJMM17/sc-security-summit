@@ -2,6 +2,13 @@
 
 Fecha: 2026-04-25 (UTC)
 
+> **Documento histórico.** Este informe describe el repositorio tal como
+> existía el 25 de abril de 2026. Varios hallazgos ya fueron resueltos y el
+> producto cambió de arquitectura más de una vez. La venta individual ahora
+> ocurre en Eventbrite y Supabase se limita a solicitudes corporate/sponsor.
+> Para el estado vigente consulta `docs/PROJECT_CONTEXT.md`, `AGENTS.md` y
+> `README.md`.
+
 ## Resumen ejecutivo
 
 El proyecto está bien encaminado para un landing + registro productivo (Next.js 15, validación con Zod, Server Actions, honeypot, rate limiting con Upstash, headers de seguridad y hardening de DB). Aun así, para acercarlo a un estado “casi perfecto” en contexto de evento con captura de datos personales, faltan varios componentes de excelencia operativa.

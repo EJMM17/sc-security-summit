@@ -16,11 +16,7 @@ vi.mock("next/headers", () => {
   return {
     cookies: async () => ({
       get: (name: string) => COOKIE_STORE.get(name),
-      set: (
-        name: string,
-        value: string,
-        _opts?: Record<string, unknown>,
-      ) => {
+      set: (name: string, value: string) => {
         COOKIE_STORE.set(name, { value });
       },
       delete: (name: string) => {

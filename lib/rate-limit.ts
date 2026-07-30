@@ -3,6 +3,7 @@ import "server-only";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
+import { isIP } from "node:net";
 
 const isProd = process.env.NODE_ENV === "production";
 const hasRedis = !!(
@@ -56,12 +57,23 @@ export async function checkRateLimit(key: string): Promise<void> {
   }
 }
 
+export function resolveClientIp(
+  requestHeaders: Pick<Headers, "get">,
+): string {
+  // Vercel overwrites x-vercel-forwarded-for at its edge and keeps it
+  // independent from an optional upstream proxy. Do not trust vendor-specific
+  // headers supplied by the browser without a verified-proxy contract.
+  for (const name of [
+    "x-vercel-forwarded-for",
+    "x-forwarded-for",
+    "x-real-ip",
+  ]) {
+    const candidate = requestHeaders.get(name)?.split(",")[0].trim();
+    if (candidate && isIP(candidate) !== 0) return candidate;
+  }
+  return "unknown";
+}
+
 export async function getClientIp(): Promise<string> {
-  const h = await headers();
-  return (
-    h.get("cf-connecting-ip") ??
-    h.get("x-forwarded-for")?.split(",")[0].trim() ??
-    h.get("x-real-ip") ??
-    "unknown"
-  );
+  return resolveClientIp(await headers());
 }

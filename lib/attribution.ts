@@ -1,8 +1,10 @@
 // =============================================================
+
+import { hasMarketingConsent } from "@/lib/consent";
 // First-party marketing attribution capture (client-side)
 // =============================================================
-// Captures campaign parameters (UTM + ad click IDs) plus landing page
-// and referrer, and persists BOTH a first-touch and a last-touch record
+// Captures campaign parameters (UTM + ad click IDs) plus a landing path
+// and referrer origin, and persists BOTH a first-touch and a last-touch record
 // in localStorage AND a first-party cookie. This survives internal
 // navigation, so a visitor who arrives from an Ad, browses the site and
 // later registers still carries their original acquisition data into the
@@ -107,11 +109,46 @@ function writeStore(store: Store): void {
   }
 }
 
+/**
+ * Removes first-party marketing attribution after consent is denied or
+ * withdrawn. This also cleans data written by older site versions.
+ */
+export function clearAttribution(): void {
+  if (!hasWindow()) return;
+  try {
+    window.localStorage.removeItem(LS_KEY);
+  } catch {
+    /* ignore */
+  }
+  try {
+    document.cookie = `${COOKIE_KEY}=; Max-Age=0; Path=/; SameSite=Lax`;
+  } catch {
+    /* ignore */
+  }
+}
+
 function currentTouch(timestamp: string): Touch {
+  const landingPath = window.location.pathname.startsWith("//")
+    ? "/"
+    : window.location.pathname.slice(0, 2048);
+  let referrerOrigin = "";
+  try {
+    const parsedReferrer = new URL(document.referrer);
+    if (
+      (parsedReferrer.protocol === "http:" ||
+        parsedReferrer.protocol === "https:") &&
+      parsedReferrer.origin !== "null"
+    ) {
+      referrerOrigin = parsedReferrer.origin.slice(0, 2048);
+    }
+  } catch {
+    // Empty, relative or malformed referrers are deliberately discarded.
+  }
+
   return {
     params: parseParams(window.location.search),
-    landing_page: window.location.pathname + window.location.search,
-    referrer: document.referrer || "",
+    landing_page: landingPath || "/",
+    referrer: referrerOrigin,
     timestamp,
   };
 }
@@ -125,8 +162,12 @@ function currentTouch(timestamp: string): Touch {
  *
  * Idempotent — safe to call on every page load / multiple components.
  */
-export function captureAttribution(): void {
+export function captureAttribution(consentGranted = hasMarketingConsent()): void {
   if (!hasWindow()) return;
+  if (!consentGranted) {
+    clearAttribution();
+    return;
+  }
   const now = new Date().toISOString();
   const touch = currentTouch(now);
   const hasParams = Object.keys(touch.params).length > 0;
@@ -154,12 +195,15 @@ function emptyPayload(): AttributionPayload {
 
 /**
  * Flat snapshot suitable for hidden form inputs and the DB.
- * UTM / click IDs use LAST-touch (the converting campaign); landing page
- * and referrer use FIRST-touch (original acquisition). Both timestamps
- * are included.
+ * UTM / click IDs use LAST-touch (the converting campaign); landing path and
+ * referrer origin use FIRST-touch (original acquisition). Query strings and
+ * referrer paths are never returned because they may contain personal data.
  */
-export function getAttributionPayload(): AttributionPayload {
+export function getAttributionPayload(
+  consentGranted = hasMarketingConsent(),
+): AttributionPayload {
   const payload = emptyPayload();
+  if (!consentGranted) return payload;
   const store = readStore();
 
   if (!store) {

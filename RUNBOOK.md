@@ -1,79 +1,47 @@
 # RUNBOOK — SC Security Summit 2026
 
-## Objetivo
+> Resumen de continuidad. El procedimiento canónico está en
+> [`docs/RUNBOOK.md`](docs/RUNBOOK.md) y la operación de solicitudes en
+> [`docs/INQUIRY_OPERATIONS.md`](docs/INQUIRY_OPERATIONS.md).
 
-Definir la operación mínima para continuidad de la captación de leads (pase corporativo y
-patrocinio) y de la venta de accesos cuando fallen servicios críticos: Eventbrite, Resend,
-Upstash o el despliegue web.
+## Alcance
 
-## Servicios críticos
+- Eventbrite administra accesos individuales, pagos, boletos y check-in.
+- Supabase conserva solicitudes corporate y sponsor.
+- Resend notifica después de persistir.
+- Vercel Cron reintenta la outbox cada cinco minutos.
 
-- Frontend/App: Next.js (Vercel)
-- Venta de accesos individuales: **Eventbrite** (fuera del sitio)
-- Correo transaccional de solicitudes: Resend → `CONTACT_EMAIL`
-- Anti-bot: honeypot + rate limiting distribuido + validación server-side (Zod)
-- Rate limiting: Upstash Redis
+## Revisión rápida
 
-El sitio no tiene base de datos en runtime: si el formulario responde, no hay nada que
-persistir más allá del correo.
+1. `/api/health` responde `200` (aplicación + storage crítico).
+2. Último deployment Vercel verde.
+3. Sin tres fallos de persistencia en 15 minutos.
+4. Sin notificaciones `dead`.
+5. Cron ejecutado en los últimos 15 minutos.
+6. Solicitudes `new` de menos de 24 horas o con seguimiento asignado.
+7. Eventbrite publicado.
 
-## Señales de incidente
+## Incidencias
 
-- Errores en la Server Action `submitInquiry` (Sentry).
-- Caída de solicitudes recibidas en `CONTACT_EMAIL`.
-- Errores 5xx en Vercel o timeouts en Server Action.
-- Rebotes o fallos de entrega en el panel de Resend.
-- CTA de accesos que no abre Eventbrite, o evento de Eventbrite despublicado/agotado.
+- Supabase caído: el formulario no debe mostrar éxito; ofrece el canal de
+  contacto autorizado.
+- Resend caído: confirma que la solicitud persista y quede `pending`/`retry`.
+- Cron caído: confirma Vercel Pro, `CRON_SECRET` y la ruta
+  `/api/cron/inquiry-notifications`.
+- Upstash caído: el formulario falla cerrado en Preview/Production; no
+  desactives la protección.
+- Bad deploy: vuelve al deployment verde, conserva tablas/datos y revisa el
+  cron por separado.
 
-## Niveles de severidad
+Nunca ejecutes `supabase db reset --linked` en Production ni uses un `DROP`
+como rollback automático.
 
-- **SEV-1:** el sitio está caído, o los CTA de compra no llegan a Eventbrite, por más de 10 minutos.
-- **SEV-2:** degradación parcial (las solicitudes no llegan por correo, intermitencia, rechazos anómalos).
-- **SEV-3:** incidencias menores sin impacto significativo de conversión.
+## Gates de Production
 
-## Protocolo de respuesta
-
-1. **Confirmar el alcance (5 min):**
-   - Revisar logs de despliegue y errores de Server Action.
-   - Verificar estado de Vercel, Resend, Upstash, Eventbrite y DNS.
-2. **Mitigar (10 min):**
-   - Si Resend falla, publicar temporalmente el correo de contacto directo junto al formulario.
-   - Si el rate limiting bloquea tráfico legítimo, comunicarlo y revisar la ventana en `lib/rate-limit.ts`.
-   - Si Eventbrite está caído, sustituir el CTA por captura de interés al correo de contacto.
-3. **Comunicar (inmediato):**
-   - Publicar aviso interno al equipo operativo/comercial.
-   - Ajustar copy de CTA en la web si aplica (`lib/content.ts`).
-4. **Recuperar (hasta resolución):**
-   - Restaurar el flujo normal y validar de punta a punta.
-5. **Postmortem (24-48 h):**
-   - Documentar causa raíz, impacto, tiempo de resolución y acciones preventivas.
-
-## Fallback de captación manual
-
-Cuando el envío por Resend no esté disponible:
-
-1. Habilitar un canal temporal de captura (Google Form o Typeform interno).
-2. Campos mínimos requeridos (los mismos del formulario corporativo):
-   - nombre(s), apellidos
-   - correo corporativo
-   - empresa
-   - cargo
-   - teléfono móvil
-3. Al recuperar el servicio, cargar esos leads al CRM/hoja del equipo comercial y evitar
-   duplicados por correo.
-
-## Checklist operativo pre-evento
-
-- [ ] Validar que `npm run lint`, `npm test` y `npm run build` pasan en CI.
-- [ ] Confirmar variables de entorno de producción (`RESEND_API_KEY`, `CONTACT_EMAIL`, `UPSTASH_*`).
-- [ ] Enviar una solicitud de prueba de pase corporativo y otra de patrocinio, y confirmar recepción.
-- [ ] Verificar que cada CTA de accesos abre el evento correcto en Eventbrite y que los 4 niveles
-      (VIP, Plus, General, Estudiante) existen ahí con el precio publicado en el sitio.
-- [ ] Verificar monitoreo y contactos de escalamiento.
-
-## Contactos de escalamiento (completar)
-
-- Responsable técnico:
-- Responsable comercial/evento:
-- Soporte plataforma:
-- Ventana de guardia:
+- aviso final y retención aprobados;
+- backup verificado;
+- migraciones, pgTAP, lint, tipos y advisors verdes;
+- Preview aislado y estable 48 horas;
+- variables estrictas completas;
+- Vercel Pro + `CRON_SECRET`;
+- smoke corporate y sponsor de extremo a extremo.

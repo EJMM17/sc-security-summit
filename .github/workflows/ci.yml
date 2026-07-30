@@ -5,29 +5,73 @@ on:
   push:
     branches: [main]
 
-env:
-  SKIP_ENV_VALIDATION: "1"
-  NEXT_PUBLIC_SUPABASE_URL: "https://ci.invalid"
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: "ci-placeholder-anon-key"
-  SUPABASE_SERVICE_ROLE_KEY: "ci-placeholder-service-role-key"
+permissions:
+  contents: read
 
 jobs:
+  database:
+    name: Database contract
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Setup Supabase CLI
+        # supabase/setup-cli v2.1.1. Keep this SHA and the CLI version fixed.
+        uses: supabase/setup-cli@3c2f5e2ae34c34e428e8e206e2c4d21fa2d20fbf
+        with:
+          version: 2.110.0
+
+      - name: Start local database
+        run: supabase db start
+
+      - name: Rebuild schema from migrations
+        run: supabase db reset --local
+
+      - name: Database tests
+        run: supabase test db --local
+
+      - name: Database lint
+        run: supabase db lint --local --level error --fail-on error
+
+      - name: Generate database types
+        run: supabase gen types --local --lang typescript --schema public > /tmp/database.types.ts
+
+      - name: Upload generated database types
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: database-types
+          path: /tmp/database.types.ts
+          retention-days: 2
+
+      - name: Verify generated database types
+        run: diff -u lib/database.types.ts /tmp/database.types.ts
+
+      - name: Stop local database
+        if: always()
+        run: supabase stop --no-backup
+
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Environment contract
+        run: npm run env:contract
 
       - name: Typecheck
         run: npm run typecheck
@@ -35,30 +79,34 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Unit tests
-        run: npm run test:run
+      - name: Unit tests and coverage
+        run: npm run test:coverage
 
       - name: Build
         run: npm run build
+        env:
+          # Runtime secrets live in Vercel, not GitHub. check-env still validates
+          # the committed contract before honoring this build-only bypass.
+          SKIP_ENV_VALIDATION: "1"
 
       - name: Audit (informativo)
         run: npm audit --omit=dev
         continue-on-error: true
 
   e2e:
-    needs: quality
+    needs: [database, quality]
     runs-on: ubuntu-latest
     timeout-minutes: 30
     if: github.event_name == 'pull_request' || github.ref == 'refs/heads/main'
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - name: Install dependencies
@@ -69,6 +117,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          SKIP_ENV_VALIDATION: "1"
 
       - name: Start server (background)
         run: npm run start &
@@ -76,14 +126,22 @@ jobs:
           PORT: "3000"
 
       - name: Wait for server
-        run: npx wait-on http://localhost:3000 --timeout 60000
+        run: |
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:3000 >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::error::The production server did not become ready within 60 seconds."
+          exit 1
 
       - name: Run Playwright tests
         run: npm run test:e2e
 
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: playwright-report
           path: playwright-report/
@@ -97,10 +155,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Lighthouse CI
-        uses: treosh/lighthouse-ci-action@v12
+        uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
         with:
           urls: |
             https://www.scsecuritysummit.com/

@@ -1,58 +1,74 @@
 # Photo Manifest — SC Security Summit 2026
-## Drop-in Image Guide
 
-Place all photos inside `/public/images/`. The site will automatically
-pick them up — no code changes needed.
+Última revisión: 2026-07-29.
 
----
+Todas las imágenes activas se sirven localmente desde `public/images/`. Los
+nombres utilizados por la aplicación se definen en `lib/content.ts` o
+directamente en los componentes de marketing. Agregar un archivo nuevo no hace
+que el sitio lo use automáticamente: también hay que referenciarlo en código o
+contenido.
 
-## Required Images
+## Inventario activo
 
-### Hero & Background Photos
+### Marca y metadatos
 
-| Filename | Used in | Recommended Size | Notes |
-|---|---|---|---|
-| `hero-bg.jpg` | HeroSection — full-bleed background | 1920×1080px min | High contrast scene: logistics, warehouse, or border crossing. Dark areas on left/center for text overlay. |
-| `networking-hub.jpg` | BusinessHubSection — left photo column | 1200×900px min | People networking, handshakes, corporate event setting. |
-| `venue-reynosa.jpg` | RegistroForm — left panel background | 1200×1600px min | Centro de Convenciones Reynosa exterior or interior. Portrait orientation preferred. |
+| Archivo | Uso |
+|---|---|
+| `logo-full-blue.png`, `logo-full-navy.png`, `logo-full-white.png` | Logotipo completo en distintos fondos |
+| `logo-symbol-blue.png`, `logo-symbol-white.png`, `logo-symbol-square.png` | Isotipo y aplicaciones compactas |
+| `og-image.png`, `og-image.webp` | Imagen social estática y respaldo |
 
-### Speaker Portraits
+Los favicons y los iconos PWA viven directamente en `public/`, no en
+`public/images/`.
 
-| Filename | Speaker | Recommended Size | Notes |
-|---|---|---|---|
-| `speaker-fidel-guerrero.jpg` | Fidel Guerrero (INDEX) | 600×600px min | Square or portrait crop. Professional headshot. |
-| `speaker-isidoro-juarez.jpg` | Isidoro Juárez (Mandatario Aduanal) | 600×600px min | Square or portrait crop. Professional headshot. |
-| `speaker-julio-suarez.jpg` | Julio César Suárez (Trade Compliance) | 600×600px min | Square or portrait crop. Professional headshot. |
-| `speaker-eduardo-luna.jpg` | Eduardo Luna (Innovación) | 600×600px min | Square or portrait crop. Professional headshot. |
+### Hero y galería
 
----
+| Archivo | Uso |
+|---|---|
+| `hero-bg.webp`, `hero-bg-1200.webp`, `hero-bg-800.webp` | Hero responsive |
+| `gallery-hall.webp` | Auditorio |
+| `gallery-hub.webp` | Networking |
+| `gallery-keynote.webp` | Conferencia |
+| `gallery-registro.webp` | Recepción del evento |
+| `photo-conference-audience.webp` | Audiencia |
+| `photo-conference-networking.webp` | Networking |
+| `photo-conference-speaker.webp` | Ponente |
+| `photo-logistics-operations.webp` | Operación logística |
+| `photo-logistics-team.webp` | Equipo de logística |
 
-## Optimal Photo Specs
+### Conferencistas
 
-- **Format:** JPG or WebP (Next.js auto-converts to AVIF/WebP at build time)
-- **Color Profile:** sRGB
-- **Hero backgrounds:** Minimum 1920×1080px, 72–150 DPI
-- **Speaker portraits:** Minimum 600×600px square crop
-- **Max file size:** 2–4MB per photo (Next.js optimizes at runtime)
+Cada ponente tiene una imagen web optimizada y una fuente de mayor resolución:
 
-## Image Overlay System
+- `speaker-eduardo.webp` / `speaker-eduardo-4k.webp`
+- `speaker-fidel.webp` / `speaker-fidel-4k.webp`
+- `speaker-isidoro.webp` / `speaker-isidoro-4k.webp`
+- `speaker-julio.webp` / `speaker-julio-4k.webp`
+- `speaker-sandra.webp` / `speaker-sandra-4k.webp`
+- `speaker-sandra.src.png` se conserva como fuente original.
 
-All background photos have programmatic overlays applied in code:
-- `hero-bg.jpg` → `rgba(5,15,40,0.92)` gradient (dark navy, AAA contrast)
-- `networking-hub.jpg` → `rgba(10,25,47,0.35)` right-to-left fade
-- `venue-reynosa.jpg` → `rgba(5,15,45,0.94)` overlay (heavy, for text legibility)
+### Presentadores
 
-You do NOT need to pre-darken your photos — the overlays handle contrast.
+- `presenter-lanz-logistics.png`
+- `presenter-iies.png`
+- `presenter-villa-florida.png`
 
----
+## Reglas para reemplazos
 
-## Placeholder During Development
+- Mantener exactamente el nombre cuando el reemplazo deba ser transparente.
+- Preferir WebP para fotografías y PNG cuando se necesite transparencia.
+- Mantener perfil sRGB.
+- Conservar la relación de aspecto del recurso sustituido para evitar saltos de
+  layout y recortes inesperados.
+- Optimizar antes de subir; usar `npm run build` para verificar que Next.js
+  pueda procesar el recurso.
+- Si cambia un nombre, actualizar todas sus referencias y las variantes `es` y
+  `en` de `lib/content.ts` cuando corresponda.
 
-If you don't have photos yet, use a service like:
-- `https://picsum.photos/1920/1080` (landscape)
-- `https://picsum.photos/600/600` (square headshots)
+## Herramientas
 
-Or install the `sharp` package for local placeholder generation:
-```bash
-npm install sharp
-```
+- `scripts/optimize-hero.mjs`: genera las variantes responsive del hero.
+- `scripts/optimize-images.mjs`: utilidades de optimización para el inventario.
+
+Después de cualquier cambio visual, revisar al menos la landing en móvil y
+escritorio y ejecutar las pruebas E2E.

@@ -16,8 +16,28 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["lib/**/*.ts"],
-      exclude: ["lib/**/*.test.ts"],
+      include: [
+        "app/actions/inquiries.ts",
+        "app/api/cron/inquiry-notifications/route.ts",
+        "app/api/health/route.ts",
+        "lib/email.ts",
+        "lib/inquiries/**/*.ts",
+        "lib/supabase-server.ts",
+        "server/repositories/inquiry-repository.ts",
+        "server/services/inquiry-notifier.ts",
+        "server/services/inquiry-observability.ts",
+        "server/use-cases/submit-inquiry.ts",
+      ],
+      exclude: [
+        "lib/**/*.test.ts",
+        "lib/inquiries/result.ts",
+      ],
+      thresholds: {
+        statements: 85,
+        branches: 85,
+        functions: 85,
+        lines: 85,
+      },
     },
   },
 });

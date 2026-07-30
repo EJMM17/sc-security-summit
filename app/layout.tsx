@@ -107,7 +107,7 @@ export default async function RootLayout({
           <MetaPixel nonce={nonce} />
           <LinkedInInsight nonce={nonce} />
         </MarketingConsentGate>
-        {/* Persist first/last-touch attribution + emit interaction events */}
+        {/* Attribution stays empty until explicit marketing consent. */}
         <AttributionCapture />
         <InteractionTracker />
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}

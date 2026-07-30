@@ -74,35 +74,44 @@ button markup changed).
 
 `lib/attribution.ts` + `components/AttributionCapture.tsx` persist **first
 touch** and **last touch** to `localStorage` and a first-party cookie
-(`scss_attr`, 90 days, SameSite=Lax). Captured on every page load, so an
-Ad → browse → register journey keeps its attribution.
+(`scss_attr`, 90 days, SameSite=Lax), but only after the visitor chooses
+**Accept all**. Before a decision or with **Essential only**, attribution is
+empty and any value left by an older site version is deleted. After consent,
+capture runs on every page load, so an Ad → browse → register journey keeps its
+attribution.
 
-**Captured params:** `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`,
-`utm_content`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `li_fat_id`, `msclkid`,
-plus `landing_page`, `referrer`, `first_touch_timestamp`,
-`last_touch_timestamp`.
+**Captured client-side params:** `utm_source`, `utm_medium`, `utm_campaign`,
+`utm_term`, `utm_content`, `gclid`, `gbraid`, `wbraid`, `fbclid`, `li_fat_id`,
+`msclkid`, plus `landing_page` (path only), `referrer` (origin only),
+`first_touch_timestamp` and `last_touch_timestamp`. Query strings and referrer
+paths are deliberately excluded because they may contain personal data.
 
-The values stay client-side (cookie + `localStorage`) and are read from GTM.
-Nothing is persisted server-side: the site has no database.
+When a corporate or sponsor form is submitted, the server validates and stores
+only the five UTM fields, landing page, referrer and both timestamps with that
+inquiry. Advertising click IDs remain client-side and are intentionally
+discarded by `lib/inquiries/schema.ts` under the data-minimization policy.
+
+The attribution cookie/localStorage lifetime remains 90 days. The inquiry row
+follows the separately approved retention policy; do not infer database
+retention from the cookie lifetime.
+
+Withdrawing a previous grant through **Cookie settings** stores the denied
+choice, deletes first-party attribution and reloads the page so already loaded
+marketing scripts are removed.
 
 ---
 
 ## 4. Enhanced Conversions (Google Ads)
 
-Not applicable while checkout lives on Eventbrite: the site never sees an
-attendee's identity, so there is no user data to hash or attach. If Enhanced
-Conversions are needed, configure them on the Eventbrite side.
+Not implemented in this repository.
 
-**GTM/Google Ads setup required (external):**
-
-1. In Google Ads → Conversions → turn on **Enhanced Conversions for leads**.
-2. In GTM, on the Google Ads Conversion tag, set **User-Provided Data** to read
-   the already-hashed fields from `{{DLV - user_data}}` (Data Layer Variable).
-3. Confirm the diagnostics in Google Ads show enhanced conversions received.
-
-> Prefer doing the hashing/match in GTM only if you switch to pushing
-> unhashed user data. We chose frontend hashing for privacy; keep the GTM tag
-> configured to accept SHA-256 input.
+- Ticket purchase identity belongs to Eventbrite; configure ticket-sale
+  matching there.
+- The site receives identity for corporate/sponsor inquiries, but it does not
+  push email or phone (plain or hashed) into `dataLayer`.
+- Do not add Enhanced Conversions for leads without a separate privacy review,
+  consent decision, dataLayer contract and tests proving that raw PII never
+  reaches analytics logs.
 
 ---
 
@@ -139,12 +148,17 @@ Conversions are needed, configure them on the Eventbrite side.
 
 ### Manual smoke test
 
-1. Visit `/?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=ABC123`.
-2. Navigate around, then click an access CTA.
-3. Confirm `click_register` reaches the dataLayer with `cta_location`.
-4. Inspect the `scss_attr` cookie: UTMs, `gclid`, `landing_page` and the touch
+1. Visit `/?utm_source=google&utm_medium=cpc&utm_campaign=test&gclid=ABC123`
+   with a clean browser profile.
+2. Before deciding, confirm `scss_attr` and `scss:attribution` do not exist.
+3. Choose **Accept all**, navigate around, then click an access CTA.
+4. Confirm `click_register` reaches the dataLayer with `cta_location`.
+5. Inspect the `scss_attr` cookie: UTMs, `gclid`, `landing_page` and the touch
    timestamps are populated.
-5. Confirm no console CSP errors.
+6. Open **Cookie settings**, choose **Essential only**, and confirm the page
+   reloads and both attribution stores are gone.
+7. Confirm the corporate/sponsor hidden attribution inputs are empty and there
+   are no console CSP errors.
 
 ### Avoiding double counting — recap
 
@@ -193,12 +207,13 @@ Implemented and wired to the cookie banner:
   denied (better modeling, no ad cookies).
 - `components/CookieConsent.tsx` calls `gtag('consent','update', …)` on the
   user's choice: **Aceptar todas → granted**, **Solo esenciales → denied**, and
-  pushes a `consent_update` dataLayer event.
+  pushes a `consent_update` dataLayer event. A persistent settings control lets
+  the visitor revisit the choice.
+- First-party attribution and the Meta/LinkedIn gates use the same decision.
+  Attribution is never written or submitted without `all`.
 
-> Default-denied is the privacy-first / compliant choice: with Consent Mode,
-> GTM still sends cookieless pings so GA4/Ads can model conversions. If the
-> client prefers analytics-on-by-default, change the defaults in
-> `ConsentMode.tsx` (and review legal copy in the banner).
+> Default-denied is the privacy-first choice. Do not change it without a new
+> legal decision, updated notice, implementation review and tests.
 
 **GTM setup required (external):** In GTM → Container Settings, enable
 **Consent Overview / "Require additional consent for tags"**, then set each

@@ -1,0 +1,82 @@
+# Generated from Supabase CLI 2.110.0 defaults and intentionally reduced to the
+# services used by this repository. Do not add secrets to this file.
+project_id = "sc-security-summit"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[api.tls]
+enabled = false
+
+[db]
+port = 54322
+shadow_port = 54320
+health_timeout = "2m"
+# Verified against the hosted Summit project on 2026-07-29.
+major_version = 17
+
+[db.pooler]
+enabled = false
+port = 54329
+pool_mode = "transaction"
+default_pool_size = 20
+max_client_conn = 100
+
+[db.migrations]
+enabled = true
+schema_paths = []
+
+[db.seed]
+# No production or synthetic PII is committed. Database tests create all rows
+# inside transactions and roll them back.
+enabled = false
+sql_paths = []
+
+[realtime]
+enabled = false
+
+[studio]
+enabled = true
+port = 54323
+api_url = "http://127.0.0.1"
+
+[local_smtp]
+enabled = false
+port = 54324
+
+[storage]
+enabled = false
+file_size_limit = "50MiB"
+
+[auth]
+# The application does not use Supabase Auth. Database roles still exist in the
+# local stack and are exercised by the negative privilege tests.
+enabled = false
+site_url = "http://127.0.0.1:3000"
+additional_redirect_urls = []
+jwt_expiry = 3600
+enable_signup = false
+enable_anonymous_sign_ins = false
+minimum_password_length = 8
+
+[edge_runtime]
+enabled = false
+policy = "per_worker"
+inspector_port = 8083
+deno_version = 2
+
+[functions.send-confirmation-email]
+# Tombstone only. Hosted deployment must require a valid JWT even though the
+# previous legacy function was public.
+enabled = true
+verify_jwt = true
+entrypoint = "./functions/send-confirmation-email/index.ts"
+
+[analytics]
+enabled = false
+port = 54327
+backend = "postgres"

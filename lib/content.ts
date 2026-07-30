@@ -199,9 +199,13 @@ export const UI_TEXT = {
     corporateAccessNote: "DC-3 incluido para cada participante.",
     corporateSubmit: "SOLICITAR PASE CORPORATIVO",
     corporateSuccess: "Recibimos tu solicitud de pase corporativo. Te contactaremos muy pronto.",
-    corporatePrivacy:
+    inquiryPrivacy:
       "Al continuar, aceptas que usemos tus datos únicamente para dar seguimiento a esta solicitud.",
+    inquiryPrivacyLink: "Consulta el Aviso de Privacidad.",
     inquirySending: "ENVIANDO...",
+    inquiryInvalid: "Revisa los campos e inténtalo de nuevo.",
+    inquiryRateLimited:
+      "Has realizado varios intentos. Espera unos minutos antes de volver a intentar.",
     inquiryError:
       "No pudimos enviar tu solicitud en este momento. Escríbenos a hola@scsecuritysummit.com.",
     finalCTATitlePart1: "Cupo Limitado. ¿Listo para",
@@ -356,9 +360,13 @@ export const UI_TEXT = {
     corporateAccessNote: "DC-3 training certificate included for each participant.",
     corporateSubmit: "REQUEST A CORPORATE PASS",
     corporateSuccess: "We received your corporate pass request. We will contact you shortly.",
-    corporatePrivacy:
+    inquiryPrivacy:
       "By continuing, you agree that we may use your information only to follow up on this request.",
+    inquiryPrivacyLink: "Read the Privacy Notice.",
     inquirySending: "SENDING...",
+    inquiryInvalid: "Review the fields and try again.",
+    inquiryRateLimited:
+      "There have been several attempts. Wait a few minutes before trying again.",
     inquiryError:
       "We could not send your request right now. Email us at hola@scsecuritysummit.com.",
     finalCTATitlePart1: "Limited Seats. Ready to",
@@ -908,6 +916,7 @@ export const INQUIRY_FORMS = {
       company: "Empresa",
       role: "Cargo",
       phone: "Teléfono móvil",
+      requestedSeats: "Número de accesos",
       firstNamePlaceholder: "Ej. María",
       lastNamePlaceholder: "Ej. González López",
       emailPlaceholder: "nombre@empresa.com",
@@ -938,6 +947,7 @@ export const INQUIRY_FORMS = {
       company: "Company",
       role: "Job title",
       phone: "Mobile phone",
+      requestedSeats: "Number of passes",
       firstNamePlaceholder: "e.g. Maria",
       lastNamePlaceholder: "e.g. Gonzalez Lopez",
       emailPlaceholder: "name@company.com",

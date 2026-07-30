@@ -1,227 +1,306 @@
 # SC Security Summit 2026 — Agent Guide
 
-> This file is written for AI coding agents. It assumes zero prior knowledge of the project.
+> Canonical current state: `docs/PROJECT_CONTEXT.md` (reviewed 2026-07-29).
+> Deployment order and gates: `docs/DEPLOYMENT.md`.
+> Database design record: `docs/SUPABASE_INQUIRIES_IMPLEMENTATION_PLAN.md`.
 
----
+## Product boundaries
 
-## Project Overview
+SC Security Summit 2026 is a bilingual Next.js 15 marketing site for the
+September 24, 2026 event in Reynosa, Mexico.
 
-SC Security Summit 2026 is a **Next.js 15** marketing site for a supply-chain security conference in Reynosa, Mexico (Sept 24, 2026). It is a bilingual (Spanish/English) landing page.
+Internalize these boundaries before changing code:
 
-Two things to internalize before changing anything:
+1. Individual ticketing is off-site in Eventbrite. The app does not sell,
+   price-check, refund, confirm, or store individual orders.
+2. Supabase stores only corporate-pass and sponsorship inquiries.
+3. Supabase persistence defines receipt. Resend is a recoverable notification
+   channel after persistence.
+4. Do not reuse historical `public.registros`, folios, payment fields, or the
+   retired `/admin` architecture.
+5. The browser never connects to Supabase. All database access is server-only.
 
-1. **Individual ticketing is off-site.** Every access CTA links to Eventbrite. The site does not sell, price-check or confirm anything.
-2. **There is no database.** The site's only write path is an email: the corporate-pass and sponsorship forms send an inquiry to `CONTACT_EMAIL` through Resend. Nothing is persisted.
-
-The earlier build had a Supabase-backed registration flow (folios, `/admin` dashboard, payment reconciliation). It was retired when ticketing moved to Eventbrite. `supabase/migrations/` remains only as the historical record — do not wire it back up without an explicit decision.
-
----
-
-## Technology Stack
+## Stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 15 (App Router) |
-| Language | TypeScript 5 (strict mode) |
+| Framework | Next.js 15 App Router |
+| Language | TypeScript 5 strict |
 | Styling | Tailwind CSS v4 + PostCSS |
-| Fonts | Google Fonts (Inter, Oswald) via `next/font` |
+| Database | Supabase PostgreSQL |
+| Client | `@supabase/supabase-js`, server-only |
 | Validation | Zod |
-| Rate Limiting | Upstash Redis (`@upstash/ratelimit`, `@upstash/redis`) |
-| Bot Protection | Honeypot + Upstash rate limiting + server-side validation |
+| Rate limiting | Upstash Redis |
 | Email | Resend |
-| Error Tracking | Sentry (`@sentry/nextjs`) |
+| Error tracking | Sentry |
 | Analytics | GTM/GA4 + Vercel Speed Insights |
-| Testing | Vitest 4 + Playwright |
-| Icons | Lucide React |
-| Toasts | Sonner |
+| Tests | Vitest, Playwright, pgTAP |
+| Deployment | Vercel Pro |
 
----
+## Critical request flow
 
-## Project Structure
+```text
+form → honeypot → Zod → Upstash → create_inquiry RPC
+                                  ├─ inquiry row
+                                  ├─ outbox row
+                                  └─ created event
+                               → immediate Resend attempt
 
+Vercel Cron (5 min) → same notification processor → retry/dead
 ```
-app/                          # Next.js App Router
-  layout.tsx                  # Root layout: SEO metadata, JSON-LD, fonts, CSP nonce
-  page.tsx                    # Landing page — composes the marketing sections
-  globals.css                 # Tailwind v4 import + the design system (CSS variables, animations)
-  (marketing)/_components/    # Hero, WhyAttend, Pillars, NetworkingHub, Speakers, Agenda,
-                              # Gallery, Value, Audience, Pricing, Sponsors, FinalCTA,
-                              # Registro, Location, Faq, Footer, Header
-  (marketing)/_components/_primitives/  # PrimaryCTA, SectionIntro, WaveSeparator, PremiumCheck
-  actions/
-    inquiries.ts              # Server Action: corporate-pass + sponsorship → Resend
-    language.ts               # Server Action: set language cookie
-  api/health/route.ts         # Liveness probe (no external dependency)
-  ctpat-oea/, seguridad-cadena-suministro/, evento-logistica-reynosa/,
-  sponsors/, media-kit/       # SEO landing pages
-  aviso-de-privacidad/, terminos-y-condiciones/   # Legal (noindex)
 
-components/                   # Shared/client components
-  SpeakersCarousel.tsx        # Speaker carousel (autoplay + keyboard + dots)
-  CorporatePassForm.tsx       # Corporate-pass request form
-  SponsorInquiryForm.tsx      # Sponsorship request form
-  CountdownTimer.tsx, AnimatedCounter.tsx, ScrollReveal.tsx, HeaderScroll.tsx,
-  MobileNav.tsx, MouseGlow.tsx, HeroGradientMesh.tsx, MarqueeStrip.tsx,
-  AmbientCanvas(.Lazy).tsx, ScrollProgress.tsx, WhatsAppButton.tsx, FAQAccordion.tsx
-  Analytics.tsx, ConsentMode.tsx, CookieConsent.tsx, MetaPixel.tsx,
-  LinkedInInsight.tsx, InteractionTracker.tsx, AttributionCapture.tsx
+Outcomes:
+
+- persistence + email: success, `notification: sent`;
+- persistence + email failure: success, `notification: queued`;
+- persistence failure: `storage_unavailable`, do not call Resend;
+- identical replay: return the original inquiry;
+- same UUID with a different canonical payload: `idempotency_conflict`, never
+  overwrite the original.
+
+## Project map
+
+```text
+app/
+  (marketing)/_components/        Landing sections
+  actions/inquiries.ts            FormData adapter and typed public result
+  api/cron/inquiry-notifications/ Authenticated retry route
+  aviso-de-privacidad/            Privacy notice (currently a legal draft)
+
+components/
+  CorporatePassForm.tsx
+  SponsorInquiryForm.tsx
 
 lib/
-  content.ts                  # SSOT for ALL copy, speakers, agenda, pricing, sponsors, FAQ (es + en)
-  content.test.ts             # Guards the shape of that content
-  email.ts                    # Resend sender (lazy singleton, never throws)
-  email-templates.ts          # escapeHtml + emailShell (branded chrome)
-  rate-limit.ts               # Upstash sliding window (5 req / 15 min per IP)
-  language.ts                 # Server-side language detection
-  attribution.ts              # First/last-touch UTM capture (client-side only)
-  sentry-scrub.ts             # PII redactor for Sentry events
+  content.ts                      SSOT for bilingual marketing copy
+  inquiries/
+    constants.ts                  Consent version
+    schema.ts                     Zod + FormData parsing + inferred types
+    canonical-payload.ts          Versioned canonicalization and SHA-256 input
+    result.ts                     Public result union
+  supabase-server.ts              Lazy server-only client
+  database.types.ts               Generated; never hand-edit
+  rate-limit.ts
+  email.ts / email-templates.ts
 
-tests/                        # Cross-cutting tests + vitest setup
-e2e/landing.spec.ts           # Playwright smoke test of the landing page
-scripts/check-env.mjs         # Prebuild env-var validator
-supabase/migrations/          # Historical record of the retired registration table
+server/
+  use-cases/submit-inquiry.ts
+  repositories/inquiry-repository.ts
+  services/inquiry-notifier.ts
+  services/inquiry-observability.ts
 
-sentry.{client,server,edge}.config.ts   # Sentry SDK init (gated by DSN)
-instrumentation.ts            # Wires Sentry per runtime
-middleware.ts                 # Nonce-based CSP on every request
-next.config.ts                # Next config + security headers + Sentry wrapping
+supabase/
+  config.toml
+  migrations/                     Reproducible baseline + forward migrations
+  tests/database/                 pgTAP contract/security tests
+
+scripts/
+  env-spec.mjs                    Environment SSOT
+  check-env.mjs                   Contract/runtime validator
 ```
 
----
-
-## Build and Test Commands
+## Commands
 
 ```bash
-npm run dev            # dev server on :3000
-npm run build          # production build (prebuild runs check-env)
-npm run typecheck      # tsc --noEmit
-npm run lint           # eslint
-npm test               # vitest (lib/**/*.test.ts + tests/**/*.test.ts)
-npm run test:coverage  # vitest + v8 coverage
-npm run test:e2e       # playwright (assumes http://localhost:3000)
-npm run check-env      # validate env vars without building
+npm run dev
+npm run env:contract
+npm run check-env
+npm run typecheck
+npm run lint
+npm test
+npm run test:coverage
+npm run build
+npm run test:e2e
+
+npx supabase db start
+npx supabase db reset --local
+npx supabase test db --local
+npx supabase db lint --local --level error --fail-on error
 ```
 
----
+Node 22.x and npm 10+ are required. Node 20 reached end of life and is no
+longer supported by the pinned Supabase JavaScript client.
 
-## Environment Variables
+## Environment contract
 
-| Variable | Required? | Description |
-|---|---|---|
-| `RESEND_API_KEY` | Yes | Without it, no inquiry ever reaches the team |
-| `CONTACT_EMAIL` | Yes | Inbox that receives corporate-pass and sponsorship requests |
-| `NEXT_PUBLIC_SITE_URL` | Recommended | Canonical URL for SEO/metadata |
-| `NEXT_PUBLIC_EVENTBRITE_URL` | Recommended | Overrides the Eventbrite URL hardcoded in `lib/content.ts` |
-| `UPSTASH_REDIS_REST_URL` / `_TOKEN` | Production | Distributed rate limiting |
-| `EMAIL_FROM` | Optional | Sender; domain must be verified in Resend |
-| `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN` | Optional | SDK no-ops when unset |
-| `SENTRY_ORG`, `SENTRY_PROJECT`, `SENTRY_AUTH_TOKEN` | Optional | Source-map upload (Vercel only) |
-| `NEXT_PUBLIC_GTM_ID`, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `NEXT_PUBLIC_META_PIXEL_ID`, `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` | Optional | Measurement; see `docs/TRACKING.md` |
+`scripts/env-spec.mjs` is the only source of truth. `.env.local.example` is
+generated from it. `.env.example` must not exist.
 
-Build-time checks live in `scripts/check-env.mjs`. Copy `.env.local.example` to `.env.local` to get started, then mirror values into Vercel (production + preview).
+Required in Vercel Preview and Production:
 
----
+- `SUPABASE_URL`
+- `SUPABASE_SECRET_KEY`
+- `RESEND_API_KEY`
+- `CONTACT_EMAIL`
+- `UPSTASH_REDIS_REST_URL`
+- `UPSTASH_REDIS_REST_TOKEN`
+- `ENFORCE_ENV_VALIDATION=1`
 
-## Security Conventions
+Production also requires `CRON_SECRET` and `NEXT_PUBLIC_SITE_URL`.
 
-The inquiry forms use **layered bot/spam protection**:
-1. **Honeypot field** (`name="website"`, hidden from real users)
-2. **Distributed rate limiting** (Upstash Redis, 5 req / 15 min per IP)
-3. **Server-side Zod validation** (discriminated union on `kind`)
+Rules:
 
-Do not weaken any of these layers without adding an equivalent replacement.
+- Preview uses a Supabase project/branch isolated from Production.
+- Prefer modern `sb_secret_…`; never add `NEXT_PUBLIC_` to a secret.
+- Upstash URL/token and Supabase URL/key are indivisible pairs.
+- `INQUIRY_NOTIFICATION_BATCH_SIZE` is optional, 1–25, default 10.
+- `SKIP_ENV_VALIDATION=1` is allowed only on GitHub Actions build steps.
+- Vercel rejects `SKIP_ENV_VALIDATION`.
+- GitHub contains no Production integration secrets.
 
-Security headers are split:
-- `next.config.ts` sets HSTS, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, X-Permitted-Cross-Origin-Policies
-- `middleware.ts` sets a **nonce-based CSP** per request
+When adding an env var: edit `scripts/env-spec.mjs`, print/sync the template,
+run `npm run env:contract`, then update only the necessary Vercel environments.
 
-If adding external scripts or font sources, update the CSP allowlist in `middleware.ts` and validate at https://csp-evaluator.withgoogle.com.
+## Database contract
 
-**Critical:** `RESEND_API_KEY` and `CONTACT_EMAIL` are server-only. They belong in Server Actions, never in a client component.
+New tables:
 
-PII is scrubbed from Sentry events via `lib/sentry-scrub.ts` (emails, RFCs, phone numbers, credit-card patterns, and known sensitive keys).
+- `public.inquiries`
+- `public.inquiry_notifications`
+- `public.inquiry_notification_attempts`
+- `public.inquiry_events`
 
----
+Internal RPCs:
 
-## Code Style Guidelines
+- `create_inquiry`
+- `claim_inquiry_notification`
+- `claim_inquiry_notifications`
+- `complete_inquiry_notification`
 
-- **TypeScript strict mode.** No `any` without explicit justification.
-- **Path alias:** `@/` maps to the project root (`tsconfig.json` + `vitest.config.ts`).
-- **Server-only modules** that touch secrets start with `import "server-only";`.
-- **Lazy singletons** for optional third-party clients (Resend, Upstash) so missing env vars never throw during `next build`.
-- **Bilingual components** accept a `language: "es" | "en"` prop; text objects are keyed by language.
-- **Content updates** (speakers, pricing, sponsors, FAQ, landing copy) go in `lib/content.ts`, in **both** `es` and `en`. Never hardcode marketing text into components.
-- **Design tokens** (colors, spacing, shadows, radii) are CSS custom properties in `app/globals.css`. Prefer them over hardcoded Tailwind values for brand colors.
-- **Tailwind v4** uses `@import "tailwindcss"` and `@theme` blocks in CSS. There is no `tailwind.config.js`.
+Security rules:
 
----
+- enable RLS on every new public table;
+- revoke access from `anon` and `authenticated`;
+- test negative SELECT/INSERT/UPDATE/DELETE access with pgTAP;
+- no permissive public insert policy;
+- no public `SECURITY DEFINER` workaround;
+- functions set a safe explicit `search_path`;
+- never log payloads or provider errors containing PII;
+- do not store IP or user-agent in inquiries.
+- never capture or submit attribution without explicit marketing consent;
+  `essential` must keep the fields empty and remove legacy attribution stores.
 
-## Testing Instructions
+Migration rules:
 
-Unit tests live next to their source (`lib/foo.test.ts`) or in `tests/` when they cross modules.
+1. Create migrations with the pinned Supabase CLI.
+2. Test with local reset, pgTAP and lint.
+3. Regenerate `lib/database.types.ts`; do not edit it manually.
+4. Run Security and Performance Advisors.
+5. Apply compatible migrations before application code.
+6. Never edit an applied migration.
+7. Use expand → migrate → contract for destructive evolution.
+8. Never run `supabase db reset --linked` on Production.
 
-Current suites:
-- `lib/content.test.ts` — content SSOT: speaker carousel copy, the four access tiers, agenda blocks
-- `lib/language.test.ts` — language detection precedence
-- `lib/sentry-scrub.test.ts` — PII redaction
-- `tests/email.test.ts` — Resend sender behavior with/without an API key
-- `tests/email-templates.test.ts` — escaping and the branded email shell
-- `e2e/landing.spec.ts` — Playwright: hero, presenter logos, carousel, section order, prices, Eventbrite CTA, both forms
+Only one designated person performs remote migration operations after a
+verified backup and dry run.
 
-CI (`.github/workflows/ci.yml`) runs typecheck → test → build on every PR.
+## Application conventions
 
----
+- Strict TypeScript; no unjustified `any`.
+- `@/` maps to the repository root.
+- Secret-bearing modules begin with `import "server-only";`.
+- Third-party clients are lazy so import/build without secrets does not throw.
+- Components do not import Supabase or repository modules.
+- The Server Action translates input/results; the use case owns ordering.
+- All Supabase queries stay in `server/repositories/`.
+- Immediate and cron notification use the same processor.
+- Client forms keep a stable `submission_id` across retries.
+- Clear form state only after confirmed persistence.
+- Always release the UI sending state in `finally`.
 
-## Deployment Process
+Marketing content belongs in `lib/content.ts`, in both `es` and `en`. Do not
+hardcode copy into components. Brand tokens belong in `app/globals.css`.
 
-Target platform: **Vercel**.
+## Bot and abuse controls
 
-```bash
-npm run check-env && npm run typecheck && npm test && npm run build
-```
+Keep all three layers:
 
-- `scripts/check-env.mjs` runs as a `prebuild` hook. Default: warnings only. Strict: `ENFORCE_ENV_VALIDATION=1`. Bypass: `SKIP_ENV_VALIDATION=1`.
-- Sentry source maps upload only when `SENTRY_AUTH_TOKEN` is present. The `/monitoring` tunnel route proxies Sentry events around ad blockers.
-- The app is stateless, so rolling back to a previous Vercel deployment is always safe.
+1. hidden `website` honeypot;
+2. Upstash sliding window, 5 requests / 15 minutes / IP;
+3. server-side Zod validation.
 
----
+Upstash fails closed in Preview/Production. Do not weaken a layer without an
+equivalent replacement and tests.
 
-## Key Architecture Decisions
+## Privacy
 
-1. **Server Actions over API routes** for form submissions (`app/actions/inquiries.ts`).
-2. **One content source.** `lib/content.ts` holds every string, price and agenda entry for both languages; components take data, never literals.
-3. **Email is the product's write path.** A failed Resend send loses the lead — it is surfaced to the user as `email_unavailable` rather than swallowed.
-4. **Rate limiting fails closed in production**: `lib/rate-limit.ts` throws if Upstash vars are missing outside development.
-5. **Health endpoint has no dependencies**, so it reports on the app itself and never on a third party.
-6. **CSP nonce** is generated per request in `middleware.ts` with the Web Crypto API (Edge-compatible) and applied to inline scripts via `headers()`.
-7. **Images are local.** Everything is served from `/public/images`; no remote domains are configured. Use `next/image` with local paths.
+The canonical consent version is
+`lib/inquiries/constants.ts::INQUIRY_CONSENT_VERSION`.
 
----
+`2026-07-29-draft` and the proposed 18-month retention period are not legal
+approval. Do not deploy persistence to Production until the privacy owner
+approves the notice, retention, ARCO process and deletion/anon procedure.
 
-## Routes Reference
+PII rules:
 
-| Route | Purpose |
-|---|---|
-| `/` | Marketing landing; `#registro` corporate-pass form, `#contacto-patrocinio` sponsorship form |
-| `/ctpat-oea`, `/seguridad-cadena-suministro`, `/evento-logistica-reynosa` | SEO landing pages |
-| `/sponsors` | Sponsorship detail page |
-| `/media-kit` | Press/media assets |
-| `/api/health` | Liveness probe |
-| `/terminos-y-condiciones`, `/aviso-de-privacidad` | Legal (noindex) |
+- Sentry and Vercel logs receive IDs/codes only;
+- notification attempts never store recipient, subject or body;
+- events never contain names, email, phone, free-form interest or notes;
+- exports require authorization, minimum fields and a deletion date.
 
----
+## Tests
 
-## Operational Docs
+Required coverage includes:
 
-- `docs/DEPLOYMENT.md` — Vercel deploy guide, env sync, adding new env vars
-- `docs/RUNBOOK.md` — Event-week playbook (monitoring, SOPs, disaster recovery)
-- `docs/TROUBLESHOOTING.md` — Symptom → cause → fix
-- `docs/TRACKING.md` — GTM/GA4 setup and the dataLayer contract
-- `docs/DNS.md` — SPF / DKIM / DMARC / Vercel apex
-- `CLAUDE.md` — Additional guidance for Claude Code
+- Zod boundaries and discriminated fields;
+- canonical payload stability;
+- honeypot and rate limiting;
+- persistence before notification;
+- queued email failure;
+- storage failure without Resend;
+- identical replay and UUID conflict;
+- cron auth, batch clamp and idempotent processing;
+- PII redaction;
+- pgTAP constraints, triggers, RPCs, RLS and grants;
+- Playwright ES/EN, mobile/desktop and consent-gated attribution;
+- unit + pgTAP replay/retry behavior, followed by controlled end-to-end
+  submission smoke tests only in an isolated Preview.
 
----
+CI runs application quality in parallel with a local Supabase database
+contract. Coverage enforces at least 85% for statements, branches, functions
+and lines across the critical inquiry modules. The database job uses pinned CLI
+`2.110.0`, never Production.
 
-## Node Version
+## Deployment
 
-Node 20.x (enforced in `package.json` `engines` and `.nvmrc`).
+Vercel Cron calls `/api/cron/inquiry-notifications` every five minutes. This
+requires Pro; Hobby rejects schedules more frequent than daily. Confirm the
+plan and `CRON_SECRET` before deploying.
+
+Production sequence:
+
+1. legal/retention approval;
+2. verified backup;
+3. verify the seven historical `registros` rows;
+4. retire the legacy registration webhook/`pg_net` via its separate migration
+   and deploy the JWT-protected HTTP 410 tombstone;
+5. migration history/advisors check;
+6. additive DB migration;
+7. DB verification, including the seven historical rows;
+8. Vercel deploy;
+9. one controlled corporate and sponsor submission;
+10. verify inquiry, outbox, attempt, event and email;
+11. monitor for 24 hours.
+
+Rollback preserves new tables/data and reverts the application. Never use an
+automatic `DROP`. Vercel Instant Rollback does not restore cron configuration;
+check/disable the cron separately.
+
+## Human operation
+
+There is no `/admin` in v1. Operators use Supabase Studio with individual
+accounts and MFA. They may edit only `status`, `owner`, `internal_notes` and
+`next_follow_up_at` in `inquiries`.
+
+Canonical SOP: `docs/INQUIRY_OPERATIONS.md`.
+
+## Documentation
+
+- `docs/PROJECT_CONTEXT.md` — current architecture
+- `docs/DEPLOYMENT.md` — gates and deployment
+- `docs/INQUIRY_OPERATIONS.md` — Studio operation
+- `docs/RUNBOOK.md` — incidents and continuity
+- `docs/TROUBLESHOOTING.md` — symptom diagnosis
+- `docs/TRACKING.md` — analytics/attribution
+- `docs/DNS.md` — Vercel and email DNS
+- `docs/history/` — historical evidence only
