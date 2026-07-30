@@ -24,6 +24,13 @@ const eslintConfig = [
       "@typescript-eslint/triple-slash-reference": "off",
     },
   },
+  {
+    files: ["app/opengraph-image.tsx"],
+    rules: {
+      // ImageResponse renders its own image tree; next/image is not used here.
+      "@next/next/no-img-element": "off",
+    },
+  },
 ];
 
 export default eslintConfig;
