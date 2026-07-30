@@ -1,6 +1,3 @@
-// Vitest global setup.
-process.env.NEXT_PUBLIC_SITE_URL ??= "http://localhost:3000";
-
 // next/headers `cookies()` requires a real request scope, which doesn't
 // exist under vitest. Provide an in-memory store so cookie round-trip
 // tests can run in plain node.

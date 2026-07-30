@@ -49,6 +49,17 @@ npx supabase test db --local
 npx supabase db lint --local --level error --fail-on error
 ```
 
+Playwright targets `http://localhost:3000` by default. Set the test-only
+`PLAYWRIGHT_BASE_URL` explicitly for a controlled deployed smoke test;
+`NEXT_PUBLIC_SITE_URL` is application metadata, not an E2E target. With an
+explicit deployed URL, Playwright does not start a local `.next` server.
+
+The `postcss` and `sharp` overrides in `package.json` are deliberate security
+controls for vulnerable transitive versions still selected by Next.js
+15.5.22. Never remove them or run `npm audit fix --force`; wait for a stable
+Next.js release with patched ranges, then validate the rebuilt lockfile,
+audit, build, image optimization and E2E suite.
+
 Use Node 22.x. Node 20 reached end of life and is no longer supported by the
 pinned Supabase JavaScript client.
 
@@ -56,12 +67,25 @@ pinned Supabase JavaScript client.
 
 `scripts/env-spec.mjs` is the SSOT; `.env.local.example` must match it.
 
-Vercel Preview/Production require Supabase, Resend, Contact Email, both Upstash
-values and `ENFORCE_ENV_VALIDATION=1`. Production also requires
-`CRON_SECRET`.
+Vercel Production requires Supabase, Resend, Contact Email,
+`KV_REST_API_URL`/`KV_REST_API_TOKEN`, `CRON_SECRET`,
+`NEXT_PUBLIC_SITE_URL` and `ENFORCE_ENV_VALIDATION=1`. The KV pair is
+provisioned and rotated by `summit-rate-limit-production`, connected only to
+Production in Vercel Storage. The previous Redis resource stays archived;
+manual `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` aliases are retired.
+
+`KV_URL`, `REDIS_URL` and `KV_REST_API_READ_ONLY_TOKEN` are provider-managed
+outputs that this app does not consume. Do not add manual duplicates. Never
+use `vercel env rm NAME preview` on a multi-target entry; inventory and back up
+metadata first, then edit targets in Dashboard/API or change the Storage
+connection.
 
 Secrets are server-only. Use `SUPABASE_SECRET_KEY`, never a
-`NEXT_PUBLIC_SUPABASE_*` secret. Preview must be isolated from Production.
+`NEXT_PUBLIC_SUPABASE_*` secret. Every non-Production Vercel deployment is a
+visual-only, disconnected environment: integrations and marketing analytics
+including Sentry are forbidden, forms are disabled and health returns 503.
+Tests use local/CI Supabase and controlled adapters; real providers are
+exercised only by controlled Production smoke tests.
 
 `SKIP_ENV_VALIDATION=1` is reserved for GitHub Actions build steps. It is
 rejected locally and on Vercel.
@@ -95,6 +119,12 @@ Production persistence is gated on that approval.
 
 Never place names, email, phone, interest, notes, recipient, subject or email
 body in Sentry, Vercel logs, attempts or events.
+
+Sentry is optional, Production-only and error-only. Disable traces, replay,
+logs and metrics; rebuild outgoing events from the technical allowlist. Basic
+consent mode keeps every analytics/pixel/product-telemetry integration and
+interaction tracker unmounted until `all`. The server clears hidden
+attribution unless that submitted decision is exactly `all`.
 
 ## Content and UI
 

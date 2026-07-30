@@ -1,6 +1,6 @@
 # Contexto vigente del proyecto
 
-Última revisión: 2026-07-29.
+Última revisión: 2026-07-30.
 
 Este documento describe el repositorio después de incorporar persistencia para
 solicitudes. No demuestra que el código, migraciones o variables ya estén
@@ -109,6 +109,13 @@ usan identificadores y códigos técnicos, no payloads completos.
 La atribución se captura y se adjunta a los formularios solo después de
 consentimiento de marketing `all`. Sin decisión o con “solo esenciales”, los
 campos permanecen vacíos y el sitio elimina los stores de atribución heredados.
+Como los campos ocultos son entrada no confiable, el servidor vuelve a aplicar
+el gate: descarta toda atribución salvo que la decisión enviada sea exactamente
+`all`. Esa señal de transporte no sustituye la aceptación versionada del aviso.
+
+El proyecto usa Consent Mode básico. GTM, GA, Ads, Meta, LinkedIn, Vercel
+Analytics/Speed Insights y el rastreador de interacciones no se montan ni
+acumulan eventos antes del opt-in; por tanto, tampoco salen pings sin cookies.
 
 ## 5. Operación
 
@@ -143,29 +150,61 @@ intentos o eventos. Consulta `docs/INQUIRY_OPERATIONS.md`.
 `/api/health` carga el cliente Supabase de forma lazy y ejecuta un probe
 privacy-safe sobre `inquiries` con presupuesto de tres segundos. Devuelve `503`
 si la configuración o el almacenamiento crítico no están disponibles. No
-comprueba Resend, Upstash, cron o Eventbrite.
+comprueba Resend, Upstash, cron o Eventbrite. Las solicitudes concurrentes
+comparten un solo probe; un resultado sano se reutiliza 30 segundos y un fallo
+5 segundos, con el mismo TTL corto en CDN, para evitar amplificación hacia
+Supabase.
 
 ## 7. Entorno
 
 El runtime canónico es Node 22.x con npm 10+. Node 20 terminó su ciclo de
 soporte y ya no es compatible con la versión fijada de Supabase JavaScript.
 
-Requeridas en Preview y Production:
+Requeridas en Production:
 
 - `SUPABASE_URL`;
 - `SUPABASE_SECRET_KEY`;
 - `RESEND_API_KEY`;
 - `CONTACT_EMAIL`;
-- `UPSTASH_REDIS_REST_URL`;
-- `UPSTASH_REDIS_REST_TOKEN`;
-- `ENFORCE_ENV_VALIDATION=1`.
-
-Además, Production requiere:
-
+- `KV_REST_API_URL`;
+- `KV_REST_API_TOKEN`;
+- `ENFORCE_ENV_VALIDATION=1`;
 - `CRON_SECRET`;
 - `NEXT_PUBLIC_SITE_URL`.
 
 `INQUIRY_NOTIFICATION_BATCH_SIZE` es opcional, rango 1–25, default 10.
+
+La integración Upstash conectada desde Vercel Storage administra y rota el par
+REST de Production mediante `summit-rate-limit-production`, conectado solo a
+Production. El recurso Redis anterior permanece archivado y no se reconecta.
+Los aliases manuales `UPSTASH_REDIS_REST_URL` y
+`UPSTASH_REDIS_REST_TOKEN` están retirados. La aplicación no consume `KV_URL`,
+`REDIS_URL` ni `KV_REST_API_READ_ONLY_TOKEN`, aunque el proveedor las genere;
+permanecen fuera del contrato de aplicación y no se duplican manualmente.
+
+Nunca se ejecuta `vercel env rm NAME preview` sobre una entrada multi-target.
+Antes de cualquier cambio se hace un inventario y se respalda la metadata; los
+targets se editan siempre en Dashboard/API y la conexión Upstash desde Vercel
+Storage.
+
+Todo deployment Vercel cuyo target no sea Production es una vista visual
+desconectada y estricta. Supabase, Resend, Upstash, cron, aliases Supabase
+legados e IDs de analytics de marketing están prohibidos. Los formularios se
+renderizan deshabilitados, la Server Action corta antes de leer datos y
+`/api/health` devuelve `503`. Vercel Analytics, Speed Insights, el rastreador de
+interacciones, la atribución y Sentry no se montan.
+
+Sentry es opcional y exclusivo de Production. Opera solo con errores: sin
+trazas, replay, logs, métricas, requests, encabezados, cuerpos, query strings,
+usuarios, breadcrumbs, mensajes libres, contexto de fuente o variables
+locales. Cada evento se reconstruye desde una allowlist de IDs/códigos y frames
+técnicos.
+
+Las pruebas integradas usan Supabase loopback/CI y adaptadores controlados. Los
+proveedores reales se ejercitan únicamente mediante smoke controlado después
+del rebuild Production. Un `SUPABASE_URL` remoto debe coincidir con el host
+exacto de Summit fijado en `config/deployment-contract.json`; localhost HTTP
+solo se admite para desarrollo.
 
 La especificación completa está en `scripts/env-spec.mjs`.
 `.env.local.example` se genera de ese contrato. `.env.example` no debe existir.
@@ -188,13 +227,14 @@ CI no contiene secretos productivos.
 `npm run lint` usa ESLint CLI directamente; no depende del comando deprecado
 `next lint`.
 
-Riesgo de dependencias conocido: Next 15.5.22 mantiene versiones transitivas de
-PostCSS y Sharp reportadas por `npm audit`. No existe corrección compatible en
-la línea Next 15: la recomendación automática es un downgrade inválido. El
-riesgo queda acotado porque el build no acepta CSS de terceros y las imágenes
-son locales. `npm audit --omit=dev` permanece visible en CI y la eliminación
-del hallazgo requiere una actualización mayor de Next, con su propia migración
-y pruebas; no se usarán overrides transitivos no soportados para ocultarlo.
+Compatibilidad vigilada: Next 15.5.22 declara rangos transitivos de PostCSS y
+Sharp anteriores a las correcciones de seguridad disponibles. `package.json`
+fija overrides temporales a versiones corregidas, y `sharp` es dependencia de
+runtime explícita para que el optimizador no dependa de devDependencies. CI
+bloquea `npm audit --audit-level=high`, build y E2E, incluida una petición real
+al optimizador de imágenes en Linux. Los overrides se retiran solo cuando una
+versión estable de Next incluya rangos corregidos y toda esa matriz pase sin
+ellos; nunca se usa `npm audit fix --force`.
 
 ## 9. Privacidad y retención
 
@@ -217,7 +257,8 @@ Anticorrupción y Buen Gobierno, no el extinto INAI.
 
 - Supabase no disponible: el usuario recibe error y no se intenta correo.
 - Resend no disponible: la solicitud persiste y queda en cola.
-- Upstash no disponible en Preview/Production: rate limiting falla cerrado.
+- Upstash no disponible en Production: rate limiting falla cerrado. Preview
+  corta antes de invocarlo.
 - Cron no disponible: outbox se conserva; Operaciones escala si supera 15 min.
 - Eventbrite no disponible: se detiene la venta individual, sin afectar datos
   de solicitudes ya guardadas.

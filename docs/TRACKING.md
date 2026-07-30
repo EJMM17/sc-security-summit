@@ -13,9 +13,18 @@ contract, environment variables, the GTM configuration that must happen
 
 ## 1. Environment variables
 
-All are `NEXT_PUBLIC_*` (build-time, browser-safe). Set them in Vercel →
-Project Settings → Environment Variables (Production **and** Preview), then
-redeploy. None are hardcoded.
+All marketing IDs are `NEXT_PUBLIC_*` (build-time, browser-readable). Set them
+only in Vercel Production, then redeploy. They are forbidden in local,
+Development, Preview and custom non-Production targets so reviews cannot
+contaminate live metrics. `SENTRY_DSN` and its intentionally public browser
+counterpart `NEXT_PUBLIC_SENTRY_DSN` are also Production-only. None are
+hardcoded.
+
+All marketing measurement, `InteractionTracker`, Vercel Analytics and Speed
+Insights render only in Vercel Production and only after **Accept all**. A
+visual Preview does not collect attribution, telemetry or engagement events
+even after cookie consent. Sentry is absent from Preview and, in Production,
+accepts only allowlisted technical error data.
 
 | Variable | Purpose | Notes |
 | --- | --- | --- |
@@ -23,7 +32,7 @@ redeploy. None are hardcoded.
 | `NEXT_PUBLIC_GA_MEASUREMENT_ID` | GA4 (`G-XXXXXXXXXX`) | Optional. Only loaded **directly** when `NEXT_PUBLIC_GTM_ID` is absent. With GTM present, configure GA4 inside GTM instead. |
 | `NEXT_PUBLIC_META_PIXEL_ID` | Meta Pixel base code | Loaded directly by `components/MetaPixel.tsx`. Leave empty to disable. |
 | `NEXT_PUBLIC_LINKEDIN_PARTNER_ID` | LinkedIn Insight Tag | Loaded directly by `components/LinkedInInsight.tsx`. Leave empty to disable. |
-| `SENTRY_DSN` | Error monitoring (optional) | Unrelated to marketing; SDK no-ops when unset. |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | Error monitoring (optional) | Production-only, error-only and fail-safe when unset; no traces, replay, logs, metrics, request/user data or free-form messages. |
 
 ### Avoiding double counting (important)
 
@@ -90,6 +99,8 @@ When a corporate or sponsor form is submitted, the server validates and stores
 only the five UTM fields, landing page, referrer and both timestamps with that
 inquiry. Advertising click IDs remain client-side and are intentionally
 discarded by `lib/inquiries/schema.ts` under the data-minimization policy.
+Hidden inputs are untrusted: the server clears every attribution value unless
+the submitted marketing-consent decision is exactly `all`.
 
 The attribution cookie/localStorage lifetime remains 90 days. The inquiry row
 follows the separately approved retention policy; do not infer database
@@ -197,20 +208,25 @@ named is the one to extend.
 
 Implemented and wired to the cookie banner:
 
-- `components/ConsentMode.tsx` sets the **default** consent state before GTM /
-  GA / Ads / pixels load (`strategy="beforeInteractive"`, nonce for CSP).
+- `components/ConsentMode.tsx` sets the **default** consent state before any
+  analytics integration can mount (nonce for CSP).
   Defaults are **denied** (`ad_storage`, `ad_user_data`, `ad_personalization`,
   `analytics_storage`), with `functionality_storage` / `security_storage`
   granted. Returning visitors who previously accepted get `granted` applied as
   the default immediately (read from `localStorage`).
-- `url_passthrough` is on and `ads_data_redaction` is enabled while consent is
-  denied (better modeling, no ad cookies).
+- This is **basic consent mode**: GTM, GA, Ads, Meta, LinkedIn, Vercel
+  Analytics/Speed Insights and `InteractionTracker` do not mount before
+  opt-in. No cookieless modeling ping or queued interaction event is sent
+  later.
+- `url_passthrough` and `ads_data_redaction` remain configured defensively in
+  the consent command, but no Google tag receives it until consent is granted.
 - `components/CookieConsent.tsx` calls `gtag('consent','update', …)` on the
   user's choice: **Aceptar todas → granted**, **Solo esenciales → denied**, and
   pushes a `consent_update` dataLayer event. A persistent settings control lets
   the visitor revisit the choice.
-- First-party attribution and the Meta/LinkedIn gates use the same decision.
-  Attribution is never written or submitted without `all`.
+- First-party attribution and the shared analytics/marketing gate use the same
+  decision. Attribution is never written or submitted without `all`, and the
+  server applies the gate again to untrusted form fields.
 
 > Default-denied is the privacy-first choice. Do not change it without a new
 > legal decision, updated notice, implementation review and tests.
@@ -219,8 +235,9 @@ Implemented and wired to the cookie banner:
 **Consent Overview / "Require additional consent for tags"**, then set each
 tag's **Consent Settings** to require the right consent type (GA4 →
 `analytics_storage`; Ads/remarketing → `ad_storage`, `ad_user_data`,
-`ad_personalization`). The Conversion Linker should be set to fire regardless
-(it respects consent automatically). Optionally configure consent **regions**.
+`ad_personalization`). This is defense in depth even though the whole container
+mounts only after opt-in. Do not mark measurement tags “Consent not required”.
+Optionally configure consent **regions**.
 
 ## 9. Pending external tasks (not code)
 

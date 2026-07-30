@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 
 vi.mock("@/server/use-cases/submit-inquiry", () => ({
@@ -30,6 +30,25 @@ function validSponsorForm(): FormData {
 describe("submitInquiry server action", () => {
   beforeEach(() => {
     mockedUseCase.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it("rejects visual Preview before reading form data or invoking the use case", async () => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    const get = vi.fn();
+
+    await expect(
+      submitInquiry({ get } as unknown as FormData),
+    ).resolves.toEqual({
+      ok: false,
+      reason: "storage_unavailable",
+    });
+    expect(get).not.toHaveBeenCalled();
+    expect(mockedUseCase).not.toHaveBeenCalled();
   });
 
   it("returns a false success for the honeypot without persistence", async () => {
@@ -76,4 +95,3 @@ describe("submitInquiry server action", () => {
     });
   });
 });
-

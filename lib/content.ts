@@ -1,4 +1,6 @@
-export const BASE_URL = "https://scsecuritysummit.com" as const;
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  "https://scsecuritysummit.com";
 export const EVENTBRITE_URL =
   process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
   "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
@@ -202,6 +204,9 @@ export const UI_TEXT = {
     inquiryPrivacy:
       "Al continuar, aceptas que usemos tus datos únicamente para dar seguimiento a esta solicitud.",
     inquiryPrivacyLink: "Consulta el Aviso de Privacidad.",
+    inquiryPreviewDisabled:
+      "Vista previa: este formulario está desactivado y no recopila ni envía datos. Usa el sitio de producción para contactar al equipo.",
+    inquiryPreviewDisabledButton: "NO DISPONIBLE EN VISTA PREVIA",
     inquirySending: "ENVIANDO...",
     inquiryInvalid: "Revisa los campos e inténtalo de nuevo.",
     inquiryRateLimited:
@@ -363,6 +368,9 @@ export const UI_TEXT = {
     inquiryPrivacy:
       "By continuing, you agree that we may use your information only to follow up on this request.",
     inquiryPrivacyLink: "Read the Privacy Notice.",
+    inquiryPreviewDisabled:
+      "Preview mode: this form is disabled and does not collect or send data. Use the production site to contact the team.",
+    inquiryPreviewDisabledButton: "UNAVAILABLE IN PREVIEW",
     inquirySending: "SENDING...",
     inquiryInvalid: "Review the fields and try again.",
     inquiryRateLimited:

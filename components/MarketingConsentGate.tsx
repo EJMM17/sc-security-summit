@@ -7,11 +7,9 @@ import {
 } from "@/lib/consent";
 
 /**
- * Renders marketing pixels (Meta, LinkedIn) only after the visitor accepts
- * all cookies. GTM/GA stay outside this gate because they honor Google
- * Consent Mode v2 defaults (denied) on their own; Meta Pixel and LinkedIn
- * Insight have no equivalent built-in gating, so they must not load until
- * consent is granted.
+ * Renders analytics and marketing integrations only after the visitor accepts
+ * all cookies. This is basic consent mode: no third-party tag or product
+ * telemetry is mounted, and no interaction event is queued, before opt-in.
  */
 export default function MarketingConsentGate({ children }: { children: ReactNode }) {
   const [granted, setGranted] = useState(false);

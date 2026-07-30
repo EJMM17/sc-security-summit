@@ -6,6 +6,7 @@ import { ArrowRight, Building2, Mail, Phone, UserRound, UsersRound } from "lucid
 import Link from "next/link";
 import { submitInquiry } from "@/app/actions/inquiries";
 import AttributionCapture from "@/components/AttributionCapture";
+import EmptyAttributionFields from "@/components/EmptyAttributionFields";
 import { CONTENT } from "@/lib/content";
 import {
   createSubmissionId,
@@ -21,7 +22,13 @@ type FormStatus =
   | { kind: "success" }
   | { kind: "error"; reason: InquiryFailureReason };
 
-export default function CorporatePassForm({ language }: { language: Language }) {
+export default function CorporatePassForm({
+  language,
+  previewDisabled = false,
+}: {
+  language: Language;
+  previewDisabled?: boolean;
+}) {
   const copy = CONTENT[language].forms.corporate;
   const ui = CONTENT[language].ui;
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
@@ -34,6 +41,8 @@ export default function CorporatePassForm({ language }: { language: Language }) 
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (previewDisabled) return;
+
     const form = event.currentTarget;
     const currentSubmissionId = submissionId || createSubmissionId();
     if (!submissionId) setSubmissionId(currentSubmissionId);
@@ -58,26 +67,47 @@ export default function CorporatePassForm({ language }: { language: Language }) 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="inquiry-form">
-      <input type="hidden" name="kind" value="corporate" />
-      <input type="hidden" name="submissionId" value={submissionId} readOnly />
-      <input type="hidden" name="language" value={language} readOnly />
-      <input
-        type="hidden"
-        name="consentVersion"
-        value={INQUIRY_CONSENT_VERSION}
-        readOnly
-      />
-      <AttributionCapture asInputs />
-      <input
-        className="sr-only"
-        type="text"
-        name="website"
-        tabIndex={-1}
-        autoComplete="off"
-        aria-hidden="true"
-      />
-      <div className="grid sm:grid-cols-2 gap-5">
+    <form
+      onSubmit={handleSubmit}
+      className="inquiry-form"
+      aria-describedby={previewDisabled ? "corporate-preview-disabled" : undefined}
+    >
+      {previewDisabled && (
+        <p
+          id="corporate-preview-disabled"
+          className="inquiry-status is-error mb-5"
+          role="status"
+        >
+          {ui.inquiryPreviewDisabled}
+        </p>
+      )}
+      <fieldset
+        disabled={previewDisabled}
+        className="m-0 min-w-0 border-0 p-0 disabled:opacity-60"
+      >
+        <input type="hidden" name="kind" value="corporate" />
+        <input type="hidden" name="submissionId" value={submissionId} readOnly />
+        <input type="hidden" name="language" value={language} readOnly />
+        <input
+          type="hidden"
+          name="consentVersion"
+          value={INQUIRY_CONSENT_VERSION}
+          readOnly
+        />
+        {previewDisabled ? (
+          <EmptyAttributionFields />
+        ) : (
+          <AttributionCapture asInputs />
+        )}
+        <input
+          className="sr-only"
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
+        <div className="grid sm:grid-cols-2 gap-5">
         <FormField
           icon={<UserRound aria-hidden="true" />}
           label={copy.firstName}
@@ -138,23 +168,28 @@ export default function CorporatePassForm({ language }: { language: Language }) 
             />
           </span>
         </label>
-      </div>
+        </div>
 
-      <p className="mt-5 text-xs text-slate-500 leading-relaxed">
-        {ui.inquiryPrivacy}{" "}
-        <Link className="underline underline-offset-2" href="/aviso-de-privacidad">
-          {ui.inquiryPrivacyLink}
-        </Link>
-      </p>
-      <button
-        type="submit"
-        disabled={isSending || !submissionId}
-        aria-busy={isSending}
-        className="btn-primary w-full sm:w-auto mt-6 px-8 py-4 text-sm"
-      >
-        {isSending ? ui.inquirySending : ui.corporateSubmit}
-        <ArrowRight className="w-4 h-4" aria-hidden="true" />
-      </button>
+        <p className="mt-5 text-xs text-slate-500 leading-relaxed">
+          {ui.inquiryPrivacy}{" "}
+          <Link className="underline underline-offset-2" href="/aviso-de-privacidad">
+            {ui.inquiryPrivacyLink}
+          </Link>
+        </p>
+        <button
+          type="submit"
+          disabled={previewDisabled || isSending || !submissionId}
+          aria-busy={isSending}
+          className="btn-primary w-full sm:w-auto mt-6 px-8 py-4 text-sm"
+        >
+          {previewDisabled
+            ? ui.inquiryPreviewDisabledButton
+            : isSending
+              ? ui.inquirySending
+              : ui.corporateSubmit}
+          <ArrowRight className="w-4 h-4" aria-hidden="true" />
+        </button>
+      </fieldset>
       {status.kind === "success" && (
         <p className="inquiry-status is-success" role="status">
           {ui.corporateSuccess}

@@ -1,7 +1,12 @@
 import "server-only";
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import deploymentContract from "@/config/deployment-contract.json";
 import type { Database } from "@/lib/database.types";
+import {
+  isVercelProductionDeployment,
+  isVisualOnlyVercelDeployment,
+} from "@/lib/deployment-environment";
 
 let client: SupabaseClient<Database> | null = null;
 let clientSignature = "";
@@ -14,6 +19,10 @@ export class SupabaseConfigurationError extends Error {
 }
 
 function getServerConfiguration(): { url: string; secretKey: string } {
+  if (isVisualOnlyVercelDeployment()) {
+    throw new SupabaseConfigurationError();
+  }
+
   const url = process.env.SUPABASE_URL?.trim();
   const secretKey = process.env.SUPABASE_SECRET_KEY?.trim();
 
@@ -25,10 +34,20 @@ function getServerConfiguration(): { url: string; secretKey: string } {
   const localHttp =
     parsedUrl.protocol === "http:" &&
     ["localhost", "127.0.0.1", "::1", "[::1]"].includes(parsedUrl.hostname);
+  const hostedSupabase =
+    parsedUrl.protocol === "https:" &&
+    parsedUrl.hostname === deploymentContract.supabaseProductionHost &&
+    parsedUrl.port === "";
+  const permittedEndpoint = isVercelProductionDeployment()
+    ? hostedSupabase
+    : localHttp;
   if (
-    (parsedUrl.protocol !== "https:" && !localHttp) ||
+    !permittedEndpoint ||
     parsedUrl.username ||
-    parsedUrl.password
+    parsedUrl.password ||
+    parsedUrl.pathname !== "/" ||
+    parsedUrl.search ||
+    parsedUrl.hash
   ) {
     throw new SupabaseConfigurationError();
   }

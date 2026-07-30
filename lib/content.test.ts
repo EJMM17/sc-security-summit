@@ -46,6 +46,8 @@ describe("content SSOT", () => {
       expect(CONTENT[language].ui.inquiryError).toBeTruthy();
       expect(CONTENT[language].ui.inquiryPrivacy).toBeTruthy();
       expect(CONTENT[language].ui.inquiryPrivacyLink).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPreviewDisabled).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPreviewDisabledButton).toBeTruthy();
     }
   });
 

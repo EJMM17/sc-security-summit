@@ -29,22 +29,42 @@ Abre <http://localhost:3000>.
 
 ## Variables mínimas
 
-Para probar el flujo completo:
+Para desarrollo con Supabase local:
 
 ```dotenv
-SUPABASE_URL=
-SUPABASE_SECRET_KEY=
-RESEND_API_KEY=
-CONTACT_EMAIL=hola@scsecuritysummit.com
-UPSTASH_REDIS_REST_URL=
-UPSTASH_REDIS_REST_TOKEN=
+SUPABASE_URL=http://127.0.0.1:54321
+SUPABASE_SECRET_KEY=<clave-local-generada-por-supabase>
 ```
 
-Vercel Preview y Production requieren esas variables y
-`ENFORCE_ENV_VALIDATION=1`. Production también requiere `CRON_SECRET`.
+Resend, `CONTACT_EMAIL`, Upstash, cron, Sentry y analytics de marketing están
+prohibidos en local. Production requiere el conjunto completo descrito en
+`.env.local.example`, incluido `NEXT_PUBLIC_SITE_URL` y
+`ENFORCE_ENV_VALIDATION=1`.
 
-Preview debe usar una base Supabase aislada de Production. Ningún secreto lleva
-`NEXT_PUBLIC_`.
+Los deployments Vercel que no son Production son vistas visuales desconectadas:
+deben omitir Supabase, Resend, Upstash, cron, analytics de marketing y
+telemetría de Vercel/Sentry. Los formularios aparecen deshabilitados,
+`/api/health` responde `503` y ninguna solicitud se procesa. Las pruebas usan
+Supabase loopback/CI y adaptadores controlados; los proveedores reales se
+verifican solo mediante smoke controlado después del rebuild Production.
+
+`SUPABASE_URL` acepta solo loopback HTTP en desarrollo o una raíz HTTPS bajo
+el host Summit fijado en `config/deployment-contract.json` en Production.
+El rate limiter consume exclusivamente `KV_REST_API_URL` y
+`KV_REST_API_TOKEN`, creadas por la integración Upstash conectada desde Vercel
+Storage mediante el recurso `summit-rate-limit-production`, conectado solo a
+Production. El recurso Redis anterior permanece archivado y no debe
+reconectarse. `UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` son aliases
+manuales retirados y están prohibidos. `KV_URL`, `REDIS_URL` y
+`KV_REST_API_READ_ONLY_TOKEN` son variables administradas por el proveedor que
+la aplicación no consume; no se replican ni rotan manualmente. Ningún secreto
+lleva `NEXT_PUBLIC_`.
+
+Nunca uses `vercel env rm NAME preview` para quitar Preview de una entrada
+multi-target: puede eliminar la entrada completa. Primero haz un inventario y
+respalda su metadata; después edita sus targets en Dashboard/API. Para Upstash,
+cambia la conexión o rota credenciales desde Vercel Storage. El procedimiento
+detallado está en `docs/DEPLOYMENT.md`.
 
 `SKIP_ENV_VALIDATION=1` está reservado al paso build de GitHub Actions; el
 validador lo rechaza en Vercel y en una terminal local.
@@ -110,6 +130,17 @@ npm run build
 npm run test:e2e
 ```
 
+Playwright usa `http://localhost:3000` por defecto. Un smoke contra un
+deployment debe declarar `PLAYWRIGHT_BASE_URL` de forma explícita;
+`NEXT_PUBLIC_SITE_URL` nunca selecciona el destino de pruebas y, cuando existe
+`PLAYWRIGHT_BASE_URL`, Playwright no intenta iniciar `.next` ni el puerto local.
+
+Los overrides de `postcss` y `sharp` en `package.json` son controles de
+seguridad intencionales para las copias transitivas de Next.js 15.5.22. No los
+retires ni ejecutes `npm audit fix --force`: primero actualiza a una versión
+estable de Next.js que incluya las correcciones, reconstruye el lockfile y
+exige `npm audit` + build + E2E verdes.
+
 Base local:
 
 ```bash
@@ -156,7 +187,8 @@ Lee [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) antes de desplegar.
 Orden:
 
 ```text
-backup → migración aditiva → advisors → app → smoke tests → monitoreo
+aprobación legal → backup → historial/advisors → 3 migraciones por timestamp
+→ tombstone 410 → verificación DB/advisors → app → smoke tests → monitoreo
 ```
 
 El cron `*/5 * * * *` requiere Vercel Pro y `CRON_SECRET`. El plan Pro fue

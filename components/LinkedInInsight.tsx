@@ -1,10 +1,13 @@
 import Script from "next/script";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 
 /**
  * LinkedIn Insight Tag.
  * Renders nothing when NEXT_PUBLIC_LINKEDIN_PARTNER_ID is not set.
  */
 export default function LinkedInInsight({ nonce }: { nonce?: string }) {
+  if (!isVercelProductionDeployment()) return null;
+
   const partnerId = process.env.NEXT_PUBLIC_LINKEDIN_PARTNER_ID;
 
   if (!partnerId) return null;

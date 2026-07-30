@@ -17,9 +17,13 @@ describe("sendEmail", () => {
 
   beforeEach(() => {
     sendMock.mockReset();
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("VERCEL_TARGET_ENV", "production");
   });
 
   afterEach(() => {
+    vi.unstubAllEnvs();
     if (originalKey === undefined) delete process.env.RESEND_API_KEY;
     else process.env.RESEND_API_KEY = originalKey;
   });
@@ -52,6 +56,19 @@ describe("sendEmail", () => {
     sendMock.mockResolvedValue({ data: { id: "msg_123" }, error: null });
     const result = await sendEmail(PARAMS);
     expect(result).toEqual({ ok: true, id: "msg_123" });
+  });
+
+  it("ignores a copied hosted key outside Vercel Production", async () => {
+    vi.stubEnv("VERCEL", "0");
+    vi.stubEnv("VERCEL_ENV", "development");
+    vi.stubEnv("VERCEL_TARGET_ENV", "development");
+    process.env.RESEND_API_KEY = "re_live_accidentally_copied";
+
+    await expect(sendEmail(PARAMS)).resolves.toEqual({
+      ok: false,
+      code: "missing_api_key",
+    });
+    expect(sendMock).not.toHaveBeenCalled();
   });
 
   it("passes an idempotency key to Resend", async () => {

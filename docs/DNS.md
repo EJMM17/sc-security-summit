@@ -63,8 +63,8 @@ WebP responses to avoid double-compressing the hero asset.
 
 ## 3. Health monitoring
 
-Add an external uptime check (UptimeRobot / Better Stack) on
-`https://www.scsecuritysummit.com/api/health`. Expect:
+Add an external uptime check (UptimeRobot / Better Stack) on the canonical
+apex URL `https://scsecuritysummit.com/api/health`. Expect:
 
 - `200` with `{"ok":true,...}` when the application and critical Supabase
   inquiry storage respond within three seconds.

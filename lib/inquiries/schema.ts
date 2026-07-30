@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { MARKETING_CONSENT_FORM_FIELD } from "@/lib/consent";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 
 const normalizedText = (minimum: number, maximum: number) =>
@@ -148,6 +149,14 @@ function formString(formData: FormData, key: string): string {
 }
 
 function formAttribution(formData: FormData): Record<string, string> {
+  // Every FormData field is untrusted. Attribution fails closed unless the
+  // browser submits its explicit marketing-consent decision alongside it.
+  // The decision is transport evidence only; it is not persisted as inquiry
+  // consent and does not replace the versioned privacy-notice acceptance.
+  if (formString(formData, MARKETING_CONSENT_FORM_FIELD) !== "all") {
+    return Object.fromEntries(ATTRIBUTION_KEYS.map((key) => [key, ""]));
+  }
+
   return Object.fromEntries(
     ATTRIBUTION_KEYS.map((key) => [key, formString(formData, key)]),
   );

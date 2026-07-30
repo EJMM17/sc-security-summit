@@ -1,5 +1,6 @@
 import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 import { processDueInquiryNotifications } from "@/server/services/inquiry-notifier";
 
 export const dynamic = "force-dynamic";
@@ -24,6 +25,13 @@ function notificationBatchSize(): number {
 }
 
 export async function GET(request: Request) {
+  if (!isVercelProductionDeployment()) {
+    return NextResponse.json(
+      { ok: false, reason: "cron_unavailable" },
+      { status: 503 },
+    );
+  }
+
   const secret = process.env.CRON_SECRET?.trim();
   if (!secret) {
     return NextResponse.json(

@@ -1,6 +1,6 @@
 # SC Security Summit 2026 — Agent Guide
 
-> Canonical current state: `docs/PROJECT_CONTEXT.md` (reviewed 2026-07-29).
+> Canonical current state: `docs/PROJECT_CONTEXT.md` (reviewed 2026-07-30).
 > Deployment order and gates: `docs/DEPLOYMENT.md`.
 > Database design record: `docs/SUPABASE_INQUIRIES_IMPLEMENTATION_PLAN.md`.
 
@@ -118,6 +118,16 @@ npx supabase test db --local
 npx supabase db lint --local --level error --fail-on error
 ```
 
+Playwright targets `http://localhost:3000` by default. Set the test-only
+`PLAYWRIGHT_BASE_URL` explicitly for a controlled deployed smoke test; never
+use `NEXT_PUBLIC_SITE_URL` to choose the E2E target.
+
+The `postcss` and `sharp` overrides in `package.json` intentionally replace
+vulnerable transitive copies still selected by Next.js 15.5.22. Do not remove
+them or run `npm audit fix --force`. Remove them only after a stable Next.js
+release carries patched ranges and the lockfile, audit, build, image
+optimization and E2E suite all pass without them.
+
 Node 22.x and npm 10+ are required. Node 20 reached end of life and is no
 longer supported by the pinned Supabase JavaScript client.
 
@@ -126,30 +136,62 @@ longer supported by the pinned Supabase JavaScript client.
 `scripts/env-spec.mjs` is the only source of truth. `.env.local.example` is
 generated from it. `.env.example` must not exist.
 
-Required in Vercel Preview and Production:
+Required in Vercel Production:
 
 - `SUPABASE_URL`
 - `SUPABASE_SECRET_KEY`
 - `RESEND_API_KEY`
 - `CONTACT_EMAIL`
-- `UPSTASH_REDIS_REST_URL`
-- `UPSTASH_REDIS_REST_TOKEN`
+- `KV_REST_API_URL`
+- `KV_REST_API_TOKEN`
 - `ENFORCE_ENV_VALIDATION=1`
-
-Production also requires `CRON_SECRET` and `NEXT_PUBLIC_SITE_URL`.
+- `CRON_SECRET`
+- `NEXT_PUBLIC_SITE_URL`
 
 Rules:
 
-- Preview uses a Supabase project/branch isolated from Production.
+- Every non-Production Vercel deployment is visual-only and fail-closed.
+- Visual deployments must omit Supabase, Resend, Upstash, cron, retired
+  `NEXT_PUBLIC_SUPABASE_*` values, and marketing analytics IDs.
+- Their forms are disabled and health intentionally returns 503.
+- Integrated tests use local/CI Supabase and controlled adapters. Real
+  providers are exercised only by controlled smoke tests after a Production
+  rebuild.
 - Prefer modern `sb_secret_…`; never add `NEXT_PUBLIC_` to a secret.
-- Upstash URL/token and Supabase URL/key are indivisible pairs.
+- Supabase URL/key, Resend key/contact inbox, and
+  `KV_REST_API_URL`/`KV_REST_API_TOKEN` and
+  `SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN` are indivisible pairs.
+- The Upstash integration connected through Vercel Storage owns and rotates
+  the Production KV variables. Its active resource is
+  `summit-rate-limit-production`, connected only to Production; the previous
+  Redis resource remains archived and must not be reconnected. Manual
+  `UPSTASH_REDIS_REST_URL`/`UPSTASH_REDIS_REST_TOKEN` aliases are retired and
+  forbidden. The app does not consume provider-managed
+  `KV_URL`, `REDIS_URL`, or `KV_REST_API_READ_ONLY_TOKEN`; do not recreate,
+  rename, or rotate them manually.
+- Production `SUPABASE_URL` must match the exact Summit host in
+  `config/deployment-contract.json`; other Supabase projects fail closed.
+- Outside Vercel Production, only loopback Supabase is allowed. Resend,
+  Upstash, cron and marketing analytics are disabled and forbidden.
 - `INQUIRY_NOTIFICATION_BATCH_SIZE` is optional, 1–25, default 10.
 - `SKIP_ENV_VALIDATION=1` is allowed only on GitHub Actions build steps.
 - Vercel rejects `SKIP_ENV_VALIDATION`.
 - GitHub contains no Production integration secrets.
+- Vercel scope changes affect only new deployments. Before claiming Preview is
+  isolated, audit historical deployment snapshots and coordinate revocation or
+  rotation of any credential that was previously shared with Production.
+- The environment spec governs current application variables, not unrelated
+  legacy secrets. Audit the complete Vercel Preview inventory as an external
+  deployment gate.
+- Never run `vercel env rm NAME preview` against a multi-target entry. Inventory
+  and back up its metadata first, then edit the target array in Vercel
+  Dashboard/API. For integration-managed KV entries, change the project
+  connection or rotate from Vercel Storage.
 
 When adding an env var: edit `scripts/env-spec.mjs`, print/sync the template,
 run `npm run env:contract`, then update only the necessary Vercel environments.
+Provider-managed variables that the app does not read stay outside the app
+contract.
 
 ## Database contract
 
@@ -178,7 +220,9 @@ Security rules:
 - never log payloads or provider errors containing PII;
 - do not store IP or user-agent in inquiries.
 - never capture or submit attribution without explicit marketing consent;
-  `essential` must keep the fields empty and remove legacy attribution stores.
+  `essential` must keep the fields empty and remove legacy attribution stores;
+- treat hidden attribution fields as untrusted: the server discards them unless
+  the submitted marketing-consent decision is exactly `all`.
 
 Migration rules:
 
@@ -219,8 +263,17 @@ Keep all three layers:
 2. Upstash sliding window, 5 requests / 15 minutes / IP;
 3. server-side Zod validation.
 
-Upstash fails closed in Preview/Production. Do not weaken a layer without an
-equivalent replacement and tests.
+Upstash runs and fails closed only in Vercel Production. Preview disables the
+forms and the Server Action rejects before parsing. Do not weaken a layer
+without an equivalent replacement and tests.
+
+Visual Preview deployments do not mount Vercel Analytics, Speed Insights,
+`InteractionTracker`, attribution capture or Sentry. Every Sentry variable is
+Production-only. In Production, Sentry is error-only: no tracing, replay, logs,
+metrics, request/user data, headers, bodies, query parameters, breadcrumbs,
+free-form messages, source context or stack variables. Keep the `Preview
+isolation` CI browser test green when changing layout, consent, analytics or
+forms.
 
 ## Privacy
 
@@ -253,8 +306,8 @@ Required coverage includes:
 - PII redaction;
 - pgTAP constraints, triggers, RPCs, RLS and grants;
 - Playwright ES/EN, mobile/desktop and consent-gated attribution;
-- unit + pgTAP replay/retry behavior, followed by controlled end-to-end
-  submission smoke tests only in an isolated Preview.
+- unit + pgTAP replay/retry behavior, followed by controlled end-to-end smoke
+  tests only after rebuilding the approved commit as Production.
 
 CI runs application quality in parallel with a local Supabase database
 contract. Coverage enforces at least 85% for statements, branches, functions
@@ -272,11 +325,17 @@ Production sequence:
 1. legal/retention approval;
 2. verified backup;
 3. verify the seven historical `registros` rows;
-4. retire the legacy registration webhook/`pg_net` via its separate migration
-   and deploy the JWT-protected HTTP 410 tombstone;
-5. migration history/advisors check;
-6. additive DB migration;
-7. DB verification, including the seven historical rows;
+4. reconcile local/remote migration history and review Security/Performance
+   Advisors;
+5. confirm that the only pending versions are
+   `20260730024502_add_inquiry_persistence`,
+   `20260730030134_harden_legacy_grants` and
+   `20260730030137_retire_legacy_registration_webhook`;
+6. apply those three migrations in timestamp order; the third retires the
+   webhook and executes `DROP EXTENSION pg_net RESTRICT`, so any dependency
+   aborts and rolls back the cut;
+7. deploy the JWT-protected HTTP 410 tombstone and verify the database,
+   Advisors and seven historical rows again;
 8. Vercel deploy;
 9. one controlled corporate and sponsor submission;
 10. verify inquiry, outbox, attempt, event and email;

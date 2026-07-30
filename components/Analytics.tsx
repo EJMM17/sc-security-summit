@@ -1,4 +1,5 @@
 import Script from "next/script";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 
 /**
  * Google Tag Manager + GA4 analytics.
@@ -14,6 +15,8 @@ import Script from "next/script";
  * a fallback for when GTM is not configured.
  */
 export default function Analytics({ nonce }: { nonce?: string }) {
+  if (!isVercelProductionDeployment()) return null;
+
   const gtmId = process.env.NEXT_PUBLIC_GTM_ID;
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 

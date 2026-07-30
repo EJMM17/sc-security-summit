@@ -1,6 +1,6 @@
 # SC Security Summit 2026 — Runbook
 
-Última revisión: 2026-07-29.
+Última revisión: 2026-07-30.
 
 Runbook de continuidad para el sitio, Eventbrite y las solicitudes corporate /
 sponsor. La operación detallada de solicitudes está en
@@ -21,16 +21,16 @@ sponsor. La operación detallada de solicitudes está en
 
 | Recurso | Ubicación |
 |---|---|
-| Sitio | <https://www.scsecuritysummit.com> |
-| Health | <https://www.scsecuritysummit.com/api/health> |
+| Sitio | <https://scsecuritysummit.com> |
+| Health | <https://scsecuritysummit.com/api/health> |
 | Solicitudes | Supabase Studio → `public.inquiries` |
 | Outbox | Supabase Studio → `public.inquiry_notifications` |
 | Intentos | Supabase Studio → `public.inquiry_notification_attempts` |
 | Eventos | Supabase Studio → `public.inquiry_events` |
 | Correo | Resend Dashboard → Emails |
 | Deploys y cron | Vercel Dashboard |
-| Errores | Sentry |
-| Rate limiting | Upstash Console |
+| Errores operativos | Vercel Runtime Logs por código técnico; Sentry solo para excepciones no controladas si está configurado |
+| Rate limiting | Vercel Storage → recurso Upstash / Upstash Console |
 | Venta individual | Eventbrite Organizer |
 
 Los enlaces de cuentas, responsables y teléfonos de escalación se mantienen en
@@ -43,7 +43,8 @@ Durante operación normal: una vez al día. Durante semana del evento: 09:00 y
 
 1. `/api/health` responde `200`, confirmando app + storage crítico.
 2. El último deployment de Vercel está verde.
-3. No existen errores nuevos de persistencia en Sentry.
+3. Vercel Runtime Logs no contiene tres eventos técnicos
+   `inquiry_persistence_failed` en los últimos 15 minutos.
 4. No existen notificaciones `dead`.
 5. Las notificaciones `pending`, `processing` o `retry` no están detenidas.
 6. Las solicitudes `new` de más de 24 horas tienen responsable o seguimiento.
@@ -131,8 +132,22 @@ Si una persona legítima recibe `rate_limited`:
 4. No registres su IP en tickets, Sentry o Supabase.
 5. No eleves el límite sin revisar el patrón de abuso y añadir pruebas.
 
-Upstash falla cerrado en Preview y Production. No desactives la protección para
-resolver una incidencia.
+Upstash solo se usa en Vercel Production y falla cerrado allí. Preview mantiene
+los formularios deshabilitados. No copies credenciales ni desactives la
+protección para resolver una incidencia.
+
+La aplicación consume `KV_REST_API_URL` y `KV_REST_API_TOKEN`; ambas son
+aprovisionadas y rotadas por `summit-rate-limit-production`, conectado solo a
+Production en Vercel Storage. El recurso Redis anterior permanece archivado y
+no se reconecta.
+`KV_URL`, `REDIS_URL` y `KV_REST_API_READ_ONLY_TOKEN` son provider-managed y
+no se consumen. Si falta el par REST, comprueba primero el recurso, su conexión
+al proyecto y el target Production; no recrees variables manuales.
+
+Incidente de alcance: nunca uses `vercel env rm NAME preview` sobre una entrada
+multi-target. Antes haz un inventario y respalda IDs/targets/origen sin copiar
+valores, y edita el target desde Dashboard/API. Para Upstash, cambia o rota la
+conexión en Vercel Storage y reconstruye Production.
 
 ## 10. Venta y evento
 
@@ -189,9 +204,13 @@ Nunca ejecutes `supabase db reset --linked` en Production.
 - [ ] Migraciones alineadas y reproducibles desde cero.
 - [ ] pgTAP, lint y tipos generados verdes.
 - [ ] Advisors sin errores críticos.
-- [ ] Preview aislado y estable durante 48 horas.
+- [ ] Preview visual desconectado, sin variables Production.
 - [ ] Vercel Pro confirmado y cron activo cada cinco minutos.
-- [ ] Variables Preview/Production validadas en estricto.
+- [ ] `summit-rate-limit-production` conectado solo a Production; par
+      `KV_REST_API_URL`/`KV_REST_API_TOKEN` presente.
+- [ ] Variables Production validadas en estricto.
+- [ ] El commit fue reconstruido como Production; no se promovió el artefacto
+      Preview.
 - [ ] Una solicitud corporate y sponsor confirmadas de extremo a extremo.
 - [ ] Fallo controlado de Resend conserva la solicitud.
 - [ ] Fallo controlado de Supabase no devuelve falso éxito.

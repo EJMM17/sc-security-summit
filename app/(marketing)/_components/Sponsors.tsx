@@ -2,6 +2,7 @@ import { ArrowRight, Sparkles, LayoutGrid, Ruler, CheckCircle2, Star } from "luc
 import ScrollReveal from "@/components/ScrollReveal";
 import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
+import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
 import type { Language } from "@/lib/language";
 import SectionIntro from "./_primitives/SectionIntro";
 
@@ -9,6 +10,7 @@ export default function Sponsors({ language }: { language: Language }) {
   const { ui, sponsorTierMeta, sponsors } = CONTENT[language];
   const sponsor = sponsors[0];
   const meta = sponsorTierMeta[0];
+  const inquiriesDisabled = isVisualOnlyVercelDeployment();
 
   const benefitGroups = groupBenefits(sponsor.benefits, language);
 
@@ -124,7 +126,10 @@ export default function Sponsors({ language }: { language: Language }) {
                 <h3>{ui.sponsorFormTitle}</h3>
                 <p>{ui.sponsorFormDesc}</p>
               </div>
-              <SponsorInquiryForm language={language} />
+              <SponsorInquiryForm
+                language={language}
+                previewDisabled={inquiriesDisabled}
+              />
             </div>
           </ScrollReveal>
         </div>

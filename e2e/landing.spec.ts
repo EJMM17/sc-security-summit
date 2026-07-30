@@ -20,7 +20,7 @@ test.describe("Homepage comercial", () => {
     await expect(speakers.getByRole("heading", { name: "Sandra Romero" })).toBeVisible();
     await expect(speakers.getByRole("img", { name: "Sandra Romero" })).toBeVisible();
 
-    await speakers.getByRole("button", { name: /siguiente conferencista/i }).click();
+    await speakers.getByRole("button", { name: "Fidel Guerrero", exact: true }).click();
     await expect(speakers.getByRole("heading", { name: "Fidel Guerrero" })).toBeVisible();
 
     const sectionOrder = await page.evaluate(() =>
@@ -75,6 +75,19 @@ test.describe("Homepage comercial", () => {
     expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport);
   });
 
+  test("optimiza una imagen local con la versión segura de Sharp", async ({
+    request,
+  }) => {
+    const response = await request.get(
+      "/_next/image?url=%2Fimages%2Fhero-bg.webp&w=640&q=75",
+      { headers: { accept: "image/webp" } },
+    );
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("image/webp");
+    expect((await response.body()).byteLength).toBeGreaterThan(1_000);
+  });
+
   test("renderiza los dos formularios y privacidad en inglés", async ({ page }) => {
     await page.goto("/?lang=en");
 
@@ -116,6 +129,9 @@ test.describe("Homepage comercial", () => {
     await expect(page.getByRole("dialog", { name: "Privacidad y cookies" })).toBeVisible();
     await expect.poll(storedAttribution).toEqual({ local: null, cookie: false });
     await expect(page.locator('input[name="utm_source"]').first()).toHaveValue("");
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("essential");
 
     await page.getByRole("button", { name: "Aceptar todas" }).click();
     await expect.poll(storedAttribution).toEqual({
@@ -125,6 +141,9 @@ test.describe("Homepage comercial", () => {
     await expect(page.locator('input[name="utm_source"]').first()).toHaveValue(
       "linkedin",
     );
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("all");
     await expect(page.locator('input[name="landing_page"]').first()).toHaveValue("/");
     const serialized = (await storedAttribution()).local ?? "";
     expect(serialized).not.toContain("pii@example.com");
@@ -137,5 +156,8 @@ test.describe("Homepage comercial", () => {
 
     await expect.poll(storedAttribution).toEqual({ local: null, cookie: false });
     await expect(page.locator('input[name="utm_source"]').first()).toHaveValue("");
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("essential");
   });
 });

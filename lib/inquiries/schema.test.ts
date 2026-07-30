@@ -166,7 +166,7 @@ describe("attributionSchema", () => {
 });
 
 describe("parseInquiryFormData", () => {
-  it("converts form strings, requested seats, and attribution", () => {
+  it("converts form strings, requested seats, and consented attribution", () => {
     const formData = new FormData();
     Object.entries({
       kind: "corporate",
@@ -180,6 +180,7 @@ describe("parseInquiryFormData", () => {
       requestedSeats: "7",
       language: "en",
       consentVersion: INQUIRY_CONSENT_VERSION,
+      marketingConsent: "all",
       utm_source: "linkedin",
       first_touch_timestamp: "2026-07-01T10:00:00.000Z",
       last_touch_timestamp: "2026-07-01T10:00:00.000Z",
@@ -194,6 +195,35 @@ describe("parseInquiryFormData", () => {
       expect("gclid" in result.data.attribution).toBe(false);
     }
   });
+
+  it.each([undefined, "essential", "forged-value"])(
+    "discards attribution when marketing consent is %s",
+    (marketingConsent) => {
+      const formData = new FormData();
+      Object.entries({
+        kind: "sponsor",
+        submissionId: COMMON.submissionId,
+        name: "Grace Hopper",
+        email: "grace@example.com",
+        company: "Example Logistics",
+        phone: "+52 899 123 4567",
+        interest: "Sponsor package information",
+        language: "es",
+        consentVersion: INQUIRY_CONSENT_VERSION,
+        utm_source: "hostile-hidden-field",
+        referrer: "https://attacker.example/private",
+      }).forEach(([key, value]) => formData.set(key, value));
+      if (marketingConsent) {
+        formData.set("marketingConsent", marketingConsent);
+      }
+
+      const result = parseInquiryFormData(formData);
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.attribution).toEqual({});
+      }
+    },
+  );
 
   it("rejects an unknown inquiry kind", () => {
     const formData = new FormData();

@@ -2,11 +2,11 @@
  * Google Consent Mode v2 — default state.
  *
  * Rendered as a plain nonce'd inline <script> at the very top of <body> so it
- * executes during HTML parse — before GTM / GA / Ads / pixels (which load via
- * next/script `afterInteractive`). Storage is DENIED by default (privacy-first);
- * GTM still receives cookieless modeling pings. Returning visitors who
- * previously accepted have their stored choice applied as the default
- * immediately (no flicker, no re-prompt).
+ * executes during HTML parse before any consent-gated analytics integration.
+ * Storage is DENIED by default. This project uses basic consent mode, so GTM,
+ * GA, Ads and pixels are not mounted and send no cookieless pings before the
+ * visitor opts in. Returning visitors who previously accepted have their
+ * stored choice applied immediately.
  *
  * The cookie banner (components/CookieConsent.tsx) calls
  * gtag('consent','update', …) to flip storage to granted/denied.

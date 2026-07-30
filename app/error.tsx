@@ -28,8 +28,7 @@ export default function GlobalError({
           Algo salió mal
         </h1>
         <p className="mt-3 text-sm text-slate-600">
-          Ocurrió un error inesperado. Nuestro equipo fue notificado automáticamente.
-          Intenta de nuevo en unos segundos.
+          Ocurrió un error inesperado. Intenta de nuevo en unos segundos.
         </p>
         {error.digest && (
           <p className="mt-3 font-mono text-xs text-slate-400">ref: {error.digest}</p>

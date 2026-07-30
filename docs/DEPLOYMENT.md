@@ -1,6 +1,6 @@
 # Deployment — Vercel + Supabase
 
-Última revisión: 2026-07-29.
+Última revisión: 2026-07-30.
 
 Este documento es el procedimiento canónico de despliegue. La aplicación y la
 base se despliegan por separado y en este orden:
@@ -19,12 +19,19 @@ No se activa la persistencia hasta completar todos estos puntos:
 - [ ] El aviso `2026-07-29-draft` fue revisado y aprobado por la persona
       responsable legal/privacidad.
 - [ ] El plazo de retención y el procedimiento de eliminación fueron aprobados.
-- [ ] Preview usa un proyecto o branch de Supabase distinto de Production.
+- [ ] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing
+      ni telemetría de Vercel/Sentry.
+- [ ] El inventario completo de Preview fue revisado y no conserva secretos
+      legacy ajenos al contrato actual.
 - [ ] Existe un backup reciente y verificado de Production.
 - [ ] El historial de migraciones local y remoto está reconciliado.
 - [ ] Security Advisor y Performance Advisor no tienen errores críticos sin
       resolver.
-- [ ] Vercel Preview y Production tienen sus variables completas.
+- [ ] Production tiene sus variables completas y Preview no hereda sus scopes.
+- [ ] Los deployments Preview históricos que recibieron secretos compartidos
+      están protegidos o retirados, o sus credenciales fueron rotadas mediante
+      una ventana coordinada con rollback.
+- [ ] Vercel Project Settings y `package.json` usan Node 22.x.
 - [ ] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
       compatible con Hobby.
 - [ ] El operador y la ventana para retirar el webhook legado están
@@ -124,22 +131,38 @@ El validador lo rechaza en Vercel y fuera de GitHub Actions.
 
 | Variable | Development | Preview | Production |
 |---|---:|---:|---:|
-| `SUPABASE_URL` | local/autorizada | requerida, aislada | requerida |
-| `SUPABASE_SECRET_KEY` | local/autorizada | requerida, `sb_secret_…` | requerida, `sb_secret_…` |
-| `RESEND_API_KEY` | recomendada | requerida | requerida |
-| `CONTACT_EMAIL` | recomendada | requerida, inbox de prueba | requerida |
-| `UPSTASH_REDIS_REST_URL` | opcional | requerida | requerida |
-| `UPSTASH_REDIS_REST_TOKEN` | opcional | requerida | requerida |
-| `CRON_SECRET` | opcional | opcional para smoke manual | requerida |
+| `SUPABASE_URL` | solo loopback local | prohibida | requerida; host exacto fijado en `config/deployment-contract.json` |
+| `SUPABASE_SECRET_KEY` | clave local | prohibida | requerida, `sb_secret_…` |
+| `RESEND_API_KEY` | prohibida | prohibida | requerida |
+| `CONTACT_EMAIL` | prohibida | prohibida | requerida |
+| `KV_REST_API_URL` | prohibida | prohibida | requerida; administrada por la integración Upstash |
+| `KV_REST_API_TOKEN` | prohibida | prohibida | requerida; administrada y sensible |
+| `KV_URL` / `REDIS_URL` / `KV_REST_API_READ_ONLY_TOKEN` | prohibidas | prohibidas | provider-managed; no consumidas por la app |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | prohibidas | prohibidas | aliases manuales retirados y prohibidos |
+| `CRON_SECRET` | prohibida | prohibida | requerida |
 | `NEXT_PUBLIC_SITE_URL` | opcional | opcional | requerida |
-| `ENFORCE_ENV_VALIDATION` | `0` o ausente | `1` | `1` |
+| `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | prohibidas | prohibidas | opcionales como grupo |
+| `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | prohibidas | prohibidas | opcionales |
+| IDs de analytics de marketing | prohibidos | prohibidos | opcionales |
+| `ENFORCE_ENV_VALIDATION` | `0` o ausente | opcional; strict automático | `1` |
 
-Upstash se configura siempre como par. `SUPABASE_URL` y
-`SUPABASE_SECRET_KEY` también. Preview nunca apunta al proyecto productivo.
+Supabase URL/key, Resend key/contact inbox,
+`KV_REST_API_URL`/`KV_REST_API_TOKEN` y
+`SENTRY_DSN`/`NEXT_PUBLIC_SENTRY_DSN` son pares indivisibles. Fuera de Vercel
+Production solo se permite Supabase local por loopback. El runtime ignora
+Resend, Upstash, cron, Sentry y marketing fuera de Production aunque alguien
+copie una clave.
 
-`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `UPSTASH_REDIS_REST_TOKEN`,
-`CRON_SECRET` y `SENTRY_AUTH_TOKEN` son server-only. Ninguno lleva el prefijo
-`NEXT_PUBLIC_`.
+`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `KV_REST_API_TOKEN`, `CRON_SECRET` y
+`SENTRY_AUTH_TOKEN` son server-only. También lo son las salidas sensibles
+provider-managed `KV_URL`, `REDIS_URL` y `KV_REST_API_READ_ONLY_TOKEN`, aunque
+la aplicación no las lea. Ninguna lleva el prefijo `NEXT_PUBLIC_`.
+
+`NEXT_PUBLIC_SENTRY_DSN` es público por diseño, pero su scope sigue siendo solo
+Production. Sentry se inicializa únicamente para errores y el evento saliente
+se reconstruye desde una allowlist técnica: no se envían trazas, replay, logs,
+métricas, requests, encabezados, cuerpos, query strings, usuario, breadcrumbs,
+mensajes libres, contexto de fuente ni variables locales.
 
 ## 5. Configurar Vercel
 
@@ -153,21 +176,68 @@ Agrega o rota secretos de forma interactiva para no dejarlos en el historial
 del shell:
 
 ```bash
-vercel env add SUPABASE_URL preview
-vercel env add SUPABASE_SECRET_KEY preview --sensitive
 vercel env add SUPABASE_URL production
 vercel env add SUPABASE_SECRET_KEY production --sensitive
 ```
 
-Repite para las variables de la tabla anterior. Usa valores distintos para
-Preview y Production.
+Repite solo para las variables manuales Production de la tabla. Revisa y retira
+sus scopes Preview; también retira `SUPABASE_SERVICE_ROLE_KEY` y cualquier
+`NEXT_PUBLIC_SUPABASE_*` legado.
 
-`vercel env pull .env.local --environment=preview --yes` reemplaza el archivo
-completo. Guarda cualquier override local en `.env.development.local` o vuelve
-a añadirlo después del pull. Nunca confirmes esos archivos.
+Upstash no se configura con `vercel env add`. En Vercel Dashboard abre
+**Storage**, selecciona `summit-rate-limit-production` y confirma que el
+proyecto esté conectado únicamente al ambiente Production. El recurso Redis
+anterior permanece archivado: no lo reconectes ni restaures sus variables. La
+integración activa aprovisiona y rota
+`KV_REST_API_URL`/`KV_REST_API_TOKEN`, que son el único par consumido por la
+aplicación. Puede crear además `KV_URL`, `REDIS_URL` y
+`KV_REST_API_READ_ONLY_TOKEN`: son salidas provider-managed, no pertenecen al
+contrato de código y no se renombran, duplican, borran ni rotan a mano.
+Los aliases manuales `UPSTASH_REDIS_REST_URL` y
+`UPSTASH_REDIS_REST_TOKEN` están retirados y el validador los rechaza.
+
+Audita el inventario completo, no solo las variables que consume el código.
+Preview no debe conservar ninguna variable de la conexión Upstash, tampoco sus
+salidas provider-managed. Variables ajenas como `ADMIN_SESSION_SECRET`,
+`BROWSERBASE_API_KEY` o `EDGE_CONFIG` requieren inventario y propietario
+separados; no se incorporan al contrato por coincidencia histórica.
+
+### Incidente de alcance al retirar un target
+
+Nunca ejecutes `vercel env rm NAME preview` sobre una entrada multi-target.
+Ese comando puede retirar la entrada completa, incluida Production, en lugar
+de limitarse a quitar Preview.
+
+Antes de cambiar cualquier alcance:
+
+1. haz un inventario de nombres, IDs, tipo, targets y origen de cada entrada
+   desde Dashboard/API, sin descifrar ni copiar valores a tickets;
+2. respalda esa metadata y registra la conexión de Vercel Storage, deployments
+   vigentes, propietario y plan de rollback;
+3. identifica si la entrada es manual o provider-managed;
+4. edita el arreglo de targets en Dashboard/API conservando Production; para
+   Upstash, cambia los ambientes de la conexión del recurso en Vercel Storage;
+5. verifica que Production conserve el par REST y que Preview no tenga ninguna
+   salida KV/Redis;
+6. reconstruye el deployment y ejecuta `check-env`, health y un smoke
+   controlado.
+
+Si una entrada administrada fue eliminada por accidente, detén más cambios,
+reconecta el recurso o rota sus credenciales desde Vercel Storage y reconstruye
+Production. No intentes restaurar valores desde historial de shell, logs o
+documentos.
+
+No descargues secretos Production a `.env.local`. Para revisar el contrato sin
+persistirlos usa un proceso efímero autorizado, por ejemplo
+`vercel env run -e production -- npm run check-env -- --target=production`.
 
 Los cambios de variables solo aplican a deployments nuevos: siempre redeploy
-después de agregar o rotar un valor.
+después de agregar o rotar un valor. Un Preview histórico conserva el snapshot
+de variables con el que se construyó. Si recibió una credencial compartida,
+quitar el scope no la revoca retroactivamente: protege o retira ese deployment,
+o rota la credencial con propietario, ventana, actualización de Production,
+rebuild y rollback explícitos. No hagas una rotación improvisada que deje fuera
+de servicio al sitio vigente.
 
 ## 6. CI sin secretos productivos
 
@@ -206,32 +276,58 @@ npm run build
 npm run test:e2e
 ```
 
-Llena `.env.local` y usa `ENFORCE_ENV_VALIDATION=1 npm run build` para la
-verificación local previa al despliegue; no uses el bypass.
+Playwright apunta a `http://localhost:3000` por defecto. Para un smoke
+controlado de un deployment, define `PLAYWRIGHT_BASE_URL` explícitamente.
+`NEXT_PUBLIC_SITE_URL` es metadata de la aplicación y nunca debe decidir el
+destino E2E.
 
-## 8. Preview
+`package.json` fuerza las versiones corregidas de `postcss` y `sharp` que
+Next.js 15.5.22 todavía resuelve de forma transitiva. No uses
+`npm audit fix --force` ni retires esos overrides hasta que una versión estable
+de Next.js incluya rangos corregidos y pasen lockfile, audit, build,
+optimización de imágenes y E2E sin ellos.
 
-La persona designada para base de datos:
+Llena `.env.local` solo con Supabase loopback y valores no hospedados. Usa
+`ENFORCE_ENV_VALIDATION=1 npm run build` para la verificación local; no copies
+Resend, Upstash, cron o marketing y no uses el bypass.
 
-1. Verifica que el proyecto enlazado sea Preview, nunca Production.
-2. Ejecuta `supabase migration list` y revisa el resultado.
-3. Ejecuta `supabase db push --dry-run`.
-4. Revisa manualmente el SQL y el plan de rollback.
-5. Ejecuta `supabase db push`.
-6. Ejecuta Security Advisor y Performance Advisor.
+## 8. Preview visual desconectado
 
-Después despliega la aplicación a Preview y comprueba:
+Antes de desplegar, confirma que el scope Preview no contiene:
 
-- una solicitud corporate y una sponsor;
-- fila persistida antes de la notificación;
-- replay con el mismo `submission_id` sin duplicado;
-- fallo de Resend que deja la notificación en cola;
-- fallo de Supabase que devuelve error sin falso éxito;
-- acceso de `anon` y `authenticated` denegado;
-- cron manual autenticado con un secreto de Preview;
-- ausencia de PII en logs y respuestas técnicas.
+- Supabase, incluidos aliases `SUPABASE_SERVICE_ROLE_KEY` y
+  `NEXT_PUBLIC_SUPABASE_*`;
+- Resend y `CONTACT_EMAIL`;
+- la conexión Upstash y todas sus salidas: `KV_REST_API_URL`,
+  `KV_REST_API_TOKEN`, `KV_URL`, `REDIS_URL` y
+  `KV_REST_API_READ_ONLY_TOKEN`;
+- `CRON_SECRET`;
+- Sentry: `SENTRY_DSN`, `NEXT_PUBLIC_SENTRY_DSN`, `SENTRY_ORG`,
+  `SENTRY_PROJECT` y `SENTRY_AUTH_TOKEN`;
+- GTM, GA4, Meta Pixel o LinkedIn Insight.
 
-El gate de Preview es 48 horas sin errores no explicados.
+Después comprueba:
+
+- ambos formularios están deshabilitados con mensaje ES/EN;
+- `/api/health` devuelve `503` sin detalles;
+- la Server Action devuelve fallo cerrado sin leer el formulario;
+- no salen requests de marketing, Vercel Analytics, Speed Insights ni
+  integraciones de negocio;
+- navegación, contenido y diseño funcionan en móvil/escritorio.
+
+Las pruebas de dominio usan Supabase loopback, pgTAP, Vitest y adaptadores
+controlados en CI. Preview no es un staging operativo: la UI no recopila ni
+envía datos. Una llamada fabricada se descarta antes de leer, validar,
+registrar, persistir o invocar integraciones, sin falso éxito.
+
+Sentry, Vercel Analytics, Speed Insights, `InteractionTracker` y la atribución
+de marketing no se montan en Preview. El job `Preview isolation` de CI congela
+este contrato con navegador real.
+
+No promociones ni reutilices el artefacto construido para Preview: contiene la
+política desconectada. El mismo commit aprobado debe construirse nuevamente con
+target Production y variables Production; después se ejecutan los smoke tests
+controlados.
 
 ## 9. Production
 
@@ -242,8 +338,11 @@ El gate de Preview es 48 horas sin errores no explicados.
    aplícalas en el orden exacto indicado en “Corte único del webhook legado”.
    Nunca vuelvas a aplicar el baseline ni sus quince marcadores históricos.
 5. Vuelve a ejecutar pruebas y advisors.
-6. Confirma `CRON_SECRET`, `ENFORCE_ENV_VALIDATION=1` y plan Pro.
-7. Despliega la aplicación.
+6. Confirma `CRON_SECRET`, `ENFORCE_ENV_VALIDATION=1`, URLs permitidas, plan
+   Pro y `summit-rate-limit-production` conectado solo a Production con el par
+   REST presente.
+7. Despliega el mismo commit, reconstruido como target Production; no promuevas
+   el artefacto Preview.
 8. Envía una solicitud corporate y una sponsor controladas.
 9. Confirma `inquiries`, outbox, intento, evento y correo.
 10. Monitorea intensivamente durante 24 horas.
@@ -278,3 +377,7 @@ No uses `DROP` como rollback automático y nunca ejecutes
 5. Ejecuta `npm run env:contract`.
 6. Configura los ambientes Vercel necesarios.
 7. Actualiza este documento solo si cambia la operación.
+
+Excepción: una salida provider-managed que la aplicación no consume no se
+añade al SSOT. Las variables consumidas de Upstash sí se validan en el
+contrato, pero sus valores, conexión y rotación pertenecen a Vercel Storage.

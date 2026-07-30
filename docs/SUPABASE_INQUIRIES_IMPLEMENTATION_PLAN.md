@@ -1,7 +1,7 @@
 # Plan de implementación — solicitudes en Supabase
 
 Estado: implementación local ejecutada; activación remota pendiente de gates.  
-Última revisión: 2026-07-29.  
+Última revisión: 2026-07-30.
 Alcance: solicitudes de patrocinio y pases corporativos/equipos.  
 Fuera de alcance: venta individual, pagos, folios y administración de asistentes.
 
@@ -10,14 +10,14 @@ Fuera de alcance: venta individual, pagos, folios y administración de asistente
 Este documento conserva el diseño y la secuencia de decisiones. La fuente
 canónica del código actual es `docs/PROJECT_CONTEXT.md`.
 
-| Área | Estado al 2026-07-29 |
+| Área | Estado al 2026-07-30 |
 |---|---|
 | Esquema, pgTAP, tipos y baseline local | Implementado en el repositorio |
 | Dominio, formularios, idempotencia y outbox | Implementado en el repositorio |
 | Contrato env, CI, cron y runbooks | Implementado en el repositorio |
 | Reconciliación/aplicación remota | Pendiente; requiere operador y backup |
 | Aviso y retención | Borrador técnico; pendiente aprobación legal |
-| Preview | Pendiente migración, secretos, smoke tests y ventana de 48 h |
+| Preview | Inventario de variables vacío y contrato desconectado; pendiente validar el deployment reconstruido |
 | Production | No activada por esta implementación local |
 
 Las descripciones de “estado actual” que siguen son el snapshot previo a la
@@ -289,7 +289,9 @@ privilegios sobre secuencias o funciones internas.
 
 ### PII
 
-- Sentry recibe IDs y códigos técnicos, nunca payloads completos.
+- Sentry es Production-only y error-only; el evento se reconstruye desde una
+  allowlist de IDs/códigos y frames, sin request/user data, mensajes, trazas,
+  replay, logs ni métricas.
 - Los errores de Resend guardan códigos, no cuerpos ni direcciones.
 - Logs de Vercel no incluyen nombre, correo, teléfono, interés o notas.
 - Los datos de atribución se limitan en longitud y se validan.
@@ -317,9 +319,11 @@ evitar dos plantillas contradictorias.
 
 | Variable | Dónde | Secreto |
 |---|---|---|
-| `SUPABASE_URL` | Vercel Preview/Production y desarrollo autorizado | No publicar en bundle |
-| `SUPABASE_SECRET_KEY` | Vercel Preview/Production | Sí |
+| `SUPABASE_URL` | Supabase loopback local o Vercel Production | No publicar en bundle |
+| `SUPABASE_SECRET_KEY` | Supabase local o Vercel Production | Sí |
 | `CRON_SECRET` | Vercel Production | Sí |
+| `KV_REST_API_URL` | Integración Upstash en Vercel Storage, solo Production | Server-only |
+| `KV_REST_API_TOKEN` | Integración Upstash en Vercel Storage, solo Production | Sí |
 
 ### Estrategia GitHub Actions
 
@@ -335,16 +339,21 @@ Se conserva la razón válida de no usar secretos de producción en GitHub.
    - `supabase test db`
    - `supabase db lint --local --level error`
 6. Este job usa credenciales locales generadas; nunca accede a producción.
-7. Vercel Preview y Production usan `ENFORCE_ENV_VALIDATION=1`.
+7. Preview es strict automático y desconectado; Production usa
+   `ENFORCE_ENV_VALIDATION=1`.
 8. Si `VERCEL=1`, el validador rechaza `SKIP_ENV_VALIDATION=1`.
-9. Upstash se valida como par indivisible y obligatorio en Preview/Production.
+9. Upstash se valida como el par indivisible
+   `KV_REST_API_URL`/`KV_REST_API_TOKEN`, administrado por la integración de
+   Vercel Storage y obligatorio solo en Production. `KV_URL`, `REDIS_URL` y
+   `KV_REST_API_READ_ONLY_TOKEN` son salidas provider-managed no consumidas por
+   la aplicación.
 10. La generación local de tipos debe dejar `git diff --exit-code` limpio.
 
 La versión de `supabase/setup-cli` y la versión del CLI se fijan; no se usa
 `latest`.
 
-Preview usa un proyecto o branch de Supabase separado de Production. Nunca se
-ejecutan pruebas E2E contra los datos del proyecto productivo.
+Preview no usa Supabase ni secretos hospedados. Las pruebas integradas usan
+Supabase loopback/CI; nunca datos o credenciales del proyecto productivo.
 
 ## 8. Reconciliación del historial de migraciones
 
@@ -529,14 +538,15 @@ GitHub no recibe secretos de integraciones. Por eso Playwright en CI cubre:
 - enlaces al aviso;
 - atribución vacía antes del consentimiento;
 - captura minimizada después de `all`;
+- descarte server-side de campos ocultos si la decisión no es `all`;
 - borrado al volver a “solo esenciales”;
 - ausencia de claves secretas en HTML o JavaScript.
 
 Los fallos de persistencia/Resend, rate limit, liberación de UI y replay
 idempotente se prueban con Vitest y pgTAP usando dependencias controladas. Los
-envíos corporate/sponsor reales, el fallo recuperable y el reintento del
-navegador se ejecutan como smoke tests en Preview aislado; nunca contra
-Production ni desde GitHub Actions.
+flujos corporate/sponsor, el fallo recuperable y el reintento del navegador se
+prueban con adaptadores controlados y Supabase local/CI. Los envíos reales se
+limitan al smoke controlado posterior al rebuild Production.
 
 ## 12. Observabilidad
 
@@ -703,7 +713,7 @@ Gate: ningún import de Supabase en módulos cliente y cobertura crítica ≥ 85
 - [x] Idioma, consentimiento y atribución.
 - [x] Errores tipados.
 - [x] Accesibilidad y E2E automatizado de contrato visual.
-- [ ] Smoke manual ES/EN contra Preview aislado.
+- [ ] Verificación visual ES/EN con formularios deshabilitados en Preview.
 
 Gate: prueba manual ES/EN, móvil/escritorio y reintento sin duplicación.
 
@@ -718,22 +728,31 @@ Gate: prueba manual ES/EN, móvil/escritorio y reintento sin duplicación.
 Gate: una persona no desarrolladora puede encontrar, actualizar y recuperar una
 solicitud siguiendo únicamente la documentación.
 
-### Fase 5 — Preview
+### Fase 5 — Preview visual
 
-- [ ] Migración en entorno de preview/staging.
-- [ ] Variables Vercel completas.
-- [ ] Smoke tests con direcciones controladas.
-- [ ] Prueba de fallo de Resend.
-- [ ] Prueba de fallo de Supabase.
-- [ ] Rollback ensayado.
+- [x] Retirar de Preview Supabase, Resend, Sentry, la conexión Upstash y todas sus
+      salidas KV/Redis provider-managed, cron, aliases legados y analytics de
+      marketing.
+- [x] Para variables multi-target, inventariar/respaldar metadata y editar
+      targets en Dashboard/API. Nunca usar `vercel env rm NAME preview`;
+      gestionar Upstash desde Vercel Storage.
+- [ ] Confirmar formularios deshabilitados, health 503 y ausencia de requests
+      externos.
+- [ ] Validar contenido y diseño ES/EN, móvil y escritorio.
+- [ ] Registrar el SHA aprobado para reconstruirlo como Production.
 
-Gate: 48 horas sin errores no explicados.
+Gate: revisión visual aprobada sin acceso a PII ni integraciones.
 
 ### Fase 6 — Producción
 
+- [ ] Aprobación legal/retención y operador designado.
 - [ ] Backup inmediatamente anterior.
-- [ ] Aplicar migración aditiva.
-- [ ] Ejecutar advisors.
+- [ ] Reconciliar historial, revisar advisors y confirmar que solo están
+      pendientes las tres migraciones `20260730...`.
+- [ ] Aplicar en orden `add_inquiry_persistence`,
+      `harden_legacy_grants` y `retire_legacy_registration_webhook`.
+- [ ] Desplegar tombstone HTTP 410 y volver a verificar advisors y las siete
+      filas históricas.
 - [ ] Desplegar aplicación.
 - [ ] Enviar una solicitud corporate y una sponsor.
 - [ ] Confirmar fila, outbox, correo y evento.
@@ -782,7 +801,7 @@ La implementación no está terminada hasta que:
 - un fallo de Supabase se comunica sin falso éxito;
 - RLS y grants están probados negativamente;
 - CI funciona sin secretos de producción;
-- Preview está aislado de Production;
+- Preview está desconectado de Production y no comparte secretos;
 - Vercel valida secretos reales;
 - el aviso de privacidad es correcto;
 - existe retención definida;

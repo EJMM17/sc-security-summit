@@ -1,5 +1,6 @@
 export const COOKIE_CONSENT_STORAGE_KEY = "scss2026:cookie-consent";
 export const COOKIE_CONSENT_EVENT = "scss2026:consent";
+export const MARKETING_CONSENT_FORM_FIELD = "marketingConsent";
 
 export type CookieConsentDecision = "all" | "essential";
 

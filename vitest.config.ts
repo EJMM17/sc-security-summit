@@ -21,6 +21,8 @@ export default defineConfig({
         "app/api/cron/inquiry-notifications/route.ts",
         "app/api/health/route.ts",
         "lib/email.ts",
+        "lib/deployment-environment.ts",
+        "lib/health-readiness.ts",
         "lib/inquiries/**/*.ts",
         "lib/supabase-server.ts",
         "server/repositories/inquiry-repository.ts",

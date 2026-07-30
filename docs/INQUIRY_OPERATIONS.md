@@ -1,6 +1,6 @@
 # Operación de solicitudes
 
-Última revisión: 2026-07-29.  
+Última revisión: 2026-07-30.
 Ámbito: pases corporativos y patrocinio.  
 Herramienta inicial: Supabase Studio.
 
@@ -226,5 +226,6 @@ Operaciones nunca:
 Todo cambio técnico sigue:
 
 ```text
-migración versionada → pgTAP → db reset local → lint → tipos → review → Preview
+migración versionada → pgTAP → db reset local → lint → tipos → Preview visual
+→ rebuild Production → smoke controlado
 ```

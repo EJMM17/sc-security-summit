@@ -149,6 +149,16 @@ export default function AvisoPrivacidad() {
               condiciones contractuales aplicables.
             </p>
             <p className="mt-3">
+              De forma opcional y solo en Producción, <strong>Sentry</strong>{" "}
+              procesa errores técnicos minimizados, sin contenido de
+              formularios, encabezados, consultas, datos de usuario ni mensajes
+              libres. Después del consentimiento de analítica y marketing,
+              también pueden intervenir <strong>Google</strong> (Tag Manager,
+              Analytics y Ads), <strong>Meta</strong> y{" "}
+              <strong>LinkedIn</strong> para las finalidades descritas en la
+              sección de cookies.
+            </p>
+            <p className="mt-3">
               El Responsable no comunica los datos de las solicitudes a
               terceros ajenos para finalidades propias, salvo que exista
               consentimiento o un supuesto permitido u obligatorio conforme a
@@ -196,10 +206,13 @@ export default function AvisoPrivacidad() {
               <li><strong>Marketing</strong>: Google Ads y, cuando estén configurados, Meta Pixel y LinkedIn Insight Tag, para medir el resultado de nuestras campañas y mostrar publicidad relevante.</li>
             </ul>
             <p className="mt-3">
-              Mientras no se otorgue el consentimiento, dichas tecnologías permanecen deshabilitadas mediante
-              el Consent Mode de Google. El titular puede otorgar, rechazar o cambiar su elección en cualquier
-              momento desde el control permanente de configuración de cookies
-              del sitio, o escribiendo a{" "}
+              Mientras no se otorgue el consentimiento, dichas tecnologías no
+              se cargan ni envían mediciones, incluidos pings sin cookies. El
+              Consent Mode de Google se inicializa denegado y las etiquetas se
+              montan solo después de elegir “Aceptar todas”. El titular puede
+              otorgar, rechazar o cambiar su elección en cualquier momento
+              desde el control permanente de configuración de cookies del
+              sitio, o escribiendo a{" "}
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>.
             </p>
             <p className="mt-3">

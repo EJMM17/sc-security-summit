@@ -28,8 +28,9 @@
 - Resend caído: confirma que la solicitud persista y quede `pending`/`retry`.
 - Cron caído: confirma Vercel Pro, `CRON_SECRET` y la ruta
   `/api/cron/inquiry-notifications`.
-- Upstash caído: el formulario falla cerrado en Preview/Production; no
-  desactives la protección.
+- Upstash caído en Production: confirma en Vercel Storage la conexión y el par
+  `KV_REST_API_URL`/`KV_REST_API_TOKEN`; el formulario falla cerrado. No
+  desactives la protección. En Preview los formularios ya están deshabilitados.
 - Bad deploy: vuelve al deployment verde, conserva tablas/datos y revisa el
   cron por separado.
 
@@ -41,7 +42,12 @@ como rollback automático.
 - aviso final y retención aprobados;
 - backup verificado;
 - migraciones, pgTAP, lint, tipos y advisors verdes;
-- Preview aislado y estable 48 horas;
-- variables estrictas completas;
+- Preview visual desconectado verificado, sin scopes Production;
+- variables Production estrictas completas;
+- conexión Upstash de Vercel Storage limitada a Production;
 - Vercel Pro + `CRON_SECRET`;
-- smoke corporate y sponsor de extremo a extremo.
+- rebuild del mismo commit como Production y smoke corporate/sponsor.
+
+Nunca uses `vercel env rm NAME preview` sobre una entrada multi-target. Edita
+targets en Dashboard/API después de inventariar y respaldar la metadata; las
+variables Upstash se gestionan y rotan desde Vercel Storage.

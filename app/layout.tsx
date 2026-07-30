@@ -14,14 +14,16 @@ import Analytics from "@/components/Analytics";
 import MarketingConsentGate from "@/components/MarketingConsentGate";
 import MetaPixel from "@/components/MetaPixel";
 import LinkedInInsight from "@/components/LinkedInInsight";
-import LeadCapture from "@/components/LeadCapture";
 import AttributionCapture from "@/components/AttributionCapture";
 import InteractionTracker from "@/components/InteractionTracker";
 import ConsentMode from "@/components/ConsentMode";
+import {
+  isVercelProductionDeployment,
+  isVisualOnlyVercelDeployment,
+} from "@/lib/deployment-environment";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-oswald" });
-const enableSpeedInsights = process.env.VERCEL === "1";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
@@ -84,6 +86,8 @@ export default async function RootLayout({
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
   const language = await getRequestLanguage();
+  const marketingDataEnabled = !isVisualOnlyVercelDeployment();
+  const productionTelemetryEnabled = isVercelProductionDeployment();
 
   return (
     <html lang={language} className="scroll-smooth">
@@ -94,22 +98,23 @@ export default async function RootLayout({
         <ConsentMode nonce={nonce} />
         {children}
         <WhatsAppButton />
-        <LeadCapture language={language} />
-        <CookieConsent language={language} />
+        <CookieConsent
+          language={language}
+          marketingEnabled={marketingDataEnabled}
+        />
         <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
-        {enableSpeedInsights && <SpeedInsights />}
-        {enableSpeedInsights && <VercelAnalytics />}
-        {/* ── Analytics & Marketing ── */}
-        <Analytics nonce={nonce} />
-        {/* Meta/LinkedIn don't support Consent Mode — load only after opt-in */}
+        {/* Analytics, pixels and interaction tracking use basic consent mode. */}
         <MarketingConsentGate>
+          {productionTelemetryEnabled && <SpeedInsights />}
+          {productionTelemetryEnabled && <VercelAnalytics />}
+          <Analytics nonce={nonce} />
           <MetaPixel nonce={nonce} />
           <LinkedInInsight nonce={nonce} />
+          {marketingDataEnabled && <InteractionTracker />}
         </MarketingConsentGate>
-        {/* Attribution stays empty until explicit marketing consent. */}
-        <AttributionCapture />
-        <InteractionTracker />
+        {/* Attribution is mounted only in Production and stays empty until explicit consent. */}
+        {marketingDataEnabled && <AttributionCapture />}
         {/* JSON-LD structured data is rendered in page.tsx for language-aware schemas */}
       </body>
     </html>

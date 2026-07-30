@@ -31,15 +31,22 @@ const text = {
   },
 } as const;
 
-export default function CookieConsent({ language = "es" }: { language?: Language }) {
+export default function CookieConsent({
+  language = "es",
+  marketingEnabled = true,
+}: {
+  language?: Language;
+  marketingEnabled?: boolean;
+}) {
   const [visible, setVisible] = useState(false);
   const [hasDecision, setHasDecision] = useState(false);
 
   useEffect(() => {
     const decision = readCookieConsentDecision();
+    if (!marketingEnabled) clearAttribution();
     setHasDecision(decision !== null);
     setVisible(decision === null);
-  }, []);
+  }, [marketingEnabled]);
 
   function decide(decision: CookieConsentDecision) {
     const previousDecision = readCookieConsentDecision();
@@ -50,7 +57,7 @@ export default function CookieConsent({ language = "es" }: { language?: Language
       );
     } catch {}
 
-    if (decision === "essential") clearAttribution();
+    if (!marketingEnabled || decision === "essential") clearAttribution();
 
     // Google Consent Mode v2 — flip storage based on the choice. GTM requires
     // the real gtag `arguments` object (not a plain array), so we reuse the

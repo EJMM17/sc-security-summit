@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Resend } from "resend";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 
 let _resend: Resend | null = null;
 let _resendKey: string | null = null;
@@ -12,6 +13,8 @@ function isUsableApiKey(apiKey: string | undefined): apiKey is string {
 }
 
 function getResend(): Resend | null {
+  if (!isVercelProductionDeployment()) return null;
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!isUsableApiKey(apiKey)) return null;
   // Re-create the client if the key changed (relevant for tests).

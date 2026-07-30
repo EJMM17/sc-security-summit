@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("@/server/services/inquiry-notifier", () => ({
   processDueInquiryNotifications: vi.fn(),
@@ -17,13 +17,30 @@ function request(authorization?: string): Request {
 
 describe("inquiry notification cron", () => {
   beforeEach(() => {
+    vi.stubEnv("VERCEL", "1");
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("VERCEL_TARGET_ENV", "production");
     delete process.env.CRON_SECRET;
     delete process.env.INQUIRY_NOTIFICATION_BATCH_SIZE;
     mockedProcess.mockReset();
   });
 
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
   it("fails closed when CRON_SECRET is not configured", async () => {
     const response = await GET(request());
+    expect(response.status).toBe(503);
+    expect(mockedProcess).not.toHaveBeenCalled();
+  });
+
+  it("ignores a copied cron secret outside Vercel Production", async () => {
+    vi.stubEnv("VERCEL_ENV", "preview");
+    vi.stubEnv("VERCEL_TARGET_ENV", "preview");
+    process.env.CRON_SECRET = "correct-secret";
+
+    const response = await GET(request("Bearer correct-secret"));
     expect(response.status).toBe(503);
     expect(mockedProcess).not.toHaveBeenCalled();
   });
