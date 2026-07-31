@@ -2248,8 +2248,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 
 .hero-background-image {
-  animation: heroSceneDrift 22s ease-in-out infinite alternate;
-  will-change: transform;
+  transform: scale(1.015);
 }
 
 .hero-presenters {
@@ -2280,17 +2279,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   position: relative;
   flex: none;
   overflow: hidden;
-  opacity: 0;
-  animation: heroPartnerIn 760ms cubic-bezier(0.16, 1, 0.3, 1) both;
-}
-.hero-presenter-logo:nth-child(1) {
-  animation-delay: 360ms;
-}
-.hero-presenter-logo:nth-child(2) {
-  animation-delay: 450ms;
-}
-.hero-presenter-logo:nth-child(3) {
-  animation-delay: 540ms;
 }
 .hero-presenter-logo.is-standard {
   width: clamp(6.5rem, 10vw, 8rem);
@@ -2367,22 +2355,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-weight: 780;
   line-height: 1.08;
   text-wrap: balance;
-}
-@keyframes heroSceneDrift {
-  from { transform: scale(1.015) translate3d(-0.35%, 0, 0); }
-  to { transform: scale(1.065) translate3d(0.35%, -0.35%, 0); }
-}
-@keyframes heroPartnerIn {
-  from {
-    opacity: 0;
-    filter: blur(5px);
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    filter: blur(0);
-    transform: translateY(0);
-  }
 }
 @keyframes heroSignalPulse {
   0%, 100% {
