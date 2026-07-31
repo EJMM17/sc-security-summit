@@ -82,7 +82,6 @@ export const UI_TEXT = {
     heroTitleHighlight: "CADENA DE SUMINISTROS",
     heroDescription:
       "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
-    countdownLabel: "Faltan",
     heroUrgency: "Cupo limitado · asegura tu acceso antes del cierre de registro",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
@@ -250,7 +249,6 @@ export const UI_TEXT = {
     heroTitleHighlight: "SUPPLY CHAIN",
     heroDescription:
       "Where strategic updates, business networking, and technology solutions come together to strengthen northern Mexico's industrial ecosystem.",
-    countdownLabel: "Time left",
     heroUrgency: "Limited capacity · secure your pass before registration closes",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",

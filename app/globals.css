@@ -763,57 +763,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   bottom: -150px; left: -100px;
 }
 
-/* ═══ COUNTDOWN UNIT ═══ */
-.countdown-unit {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.25rem;
-  min-width: 4.5rem;
-}
-.countdown-number {
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 2.5rem;
-  font-weight: 700;
-  line-height: 1;
-  color: #FFFFFF;
-}
-.countdown-label {
-  font-size: 0.65rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.6);
-}
-@media (min-width: 768px) {
-  .countdown-number { font-size: 3.5rem; }
-  .countdown-unit { min-width: 6rem; }
-  .countdown-label { font-size: 0.7rem; }
-}
-
-.countdown-separator {
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 2rem;
-  font-weight: 300;
-  color: rgba(255,255,255,0.3);
-  align-self: flex-start;
-  margin-top: 0.25rem;
-}
-@media (min-width: 768px) {
-  .countdown-separator { font-size: 3rem; }
-}
-
-@media (max-width: 640px) {
-  .countdown-unit { min-width: 3.2rem; }
-  .countdown-number { font-size: 2rem; }
-  .countdown-label { font-size: 0.56rem; letter-spacing: 0.1em; }
-  .countdown-separator { font-size: 1.5rem; margin-top: 0.35rem; }
-}
-@media (max-width: 420px) {
-  .countdown-unit { min-width: 2.9rem; }
-  .countdown-number { font-size: 1.8rem; }
-}
-
 /* ═══ SPEAKER CARDS ═══ */
 @keyframes tagSlideIn {
   from { opacity: 0; transform: translateX(-10px) translateY(-4px); }
@@ -1988,8 +1937,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   }
 
   .hero-background-image,
-  .hero-presenter-logo,
-  .hero-countdown-label svg {
+  .hero-presenter-logo {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
@@ -2181,23 +2129,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .hero-intelligence::before {
   content: none;
-}
-.hero-countdown-clock {
-  display: flex;
-  min-width: 0;
-  justify-content: center;
-}
-.hero-intelligence .countdown-unit {
-  min-width: 3.35rem;
-}
-.hero-intelligence .countdown-number {
-  font-size: 2.2rem;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: 0.02em;
-  text-shadow: 0 8px 28px rgba(0, 18, 58, 0.5);
-}
-.hero-intelligence .countdown-separator {
-  font-size: 1.7rem;
 }
 .hero-stat-grid {
   display: grid;
@@ -2481,21 +2412,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
     width: min(100%, 24rem);
     margin-top: 1rem;
   }
-  .hero-countdown-clock {
-    margin-top: 0;
-  }
-  .hero-intelligence .countdown-unit {
-    min-width: 2.75rem;
-  }
-  .hero-intelligence .countdown-number {
-    font-size: 1.75rem;
-  }
-  .hero-intelligence .countdown-label {
-    font-size: 0.52rem;
-  }
-  .hero-intelligence .countdown-separator {
-    font-size: 1.35rem;
-  }
   .hero-stat-grid > div {
     padding-inline: 0.35rem;
   }
@@ -2777,24 +2693,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .safe-offset-bottom-left {
   bottom: max(1rem, env(safe-area-inset-bottom));
   left: max(1rem, env(safe-area-inset-left));
-}
-
-/* ═══ COUNTDOWN FLIP ANIMATION ═══
-   Numbers slide up from below when they change. The key prop on
-   the element forces a re-mount each update, restarting the animation. */
-@keyframes countFlip {
-  from {
-    opacity: 0;
-    transform: translateY(40%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.countdown-flip {
-  animation: countFlip 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
-  display: block;
 }
 
 /* ═══ SCALE-IN (success state entrance) ═══ */

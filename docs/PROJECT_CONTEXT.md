@@ -259,6 +259,14 @@ explícita del visitante. Esta decisión mantiene la carga inicial y el
 presupuesto Lighthouse libres de los scripts del mapa, además de reducir
 conexiones de terceros no solicitadas.
 
+El hero se mantiene deliberadamente estático: fecha, sede y métricas se
+renderizan en servidor, sin contadores por segundo ni animaciones que repinten
+el contenido principal. La fecha visible es la fuente suficiente para el
+visitante; reintroducir un contador requiere demostrar que no retrasa LCP,
+no crea un intervalo permanente y conserva los presupuestos de Lighthouse. La
+imagen principal usa exclusivamente el `srcset` optimizado de `next/image`;
+envolverla con fuentes manuales provoca descargas duplicadas y está prohibido.
+
 El proyecto Summit está actualmente en Supabase Free, que no ofrece backups
 programados. El 2026-07-30 se creó un dump lógico de `public` y
 `supabase_migrations`, cifrado fuera del repositorio con DPAPI, y se probó
