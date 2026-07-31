@@ -67,7 +67,8 @@ export default function Hero({ language }: { language: Language }) {
         className="hero-background-image object-cover object-center"
         sizes="100vw"
         priority
-        quality={82}
+        fetchPriority="high"
+        quality={70}
       />
       <div className="hero-image-overlay" />
 
