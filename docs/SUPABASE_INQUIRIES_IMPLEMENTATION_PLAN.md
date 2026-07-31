@@ -15,10 +15,10 @@ canónica del código actual es `docs/PROJECT_CONTEXT.md`.
 | Esquema, pgTAP, tipos y baseline local | Implementado en el repositorio |
 | Dominio, formularios, idempotencia y outbox | Implementado en el repositorio |
 | Contrato env, CI, cron y runbooks | Implementado en el repositorio |
-| Reconciliación/aplicación remota | Historial y backup verificados; aplicación pendiente del corte coordinado con Vercel |
+| Reconciliación/aplicación remota | Tres migraciones aplicadas y verificadas el 2026-07-30 |
 | Aviso y retención | Versión final `2026-07-30`; aprobados aviso, 18 meses, ARCO y eliminación/anonimización |
-| Preview | Inventario de variables vacío y contrato desconectado; pendiente validar el deployment reconstruido |
-| Production | No activada por esta implementación local |
+| Preview | Inventario vacío y aislamiento validado por CI |
+| Production | Activa desde el merge `d1c5241`; smoke tests corporate/sponsor completados |
 
 Las descripciones de “estado actual” que siguen son el snapshot previo a la
 implementación y explican por qué se tomó cada decisión; no deben usarse como
@@ -747,19 +747,20 @@ Gate: revisión visual aprobada sin acceso a PII ni integraciones.
 ### Fase 6 — Producción
 
 - [x] Aprobación legal/retención registrada el 2026-07-30.
-- [ ] Operador de base designado para la ventana de corte.
-- [ ] Regenerar inmediatamente antes del corte si cambió Production. El
+- [x] Operador de base designado para la ventana de corte.
+- [x] Regenerar inmediatamente antes del corte si cambió Production. El
       snapshot cifrado del 2026-07-30 ya fue restaurado y validado en una
       instancia separada.
 - [x] Reconciliar historial, revisar advisors y confirmar que solo están
       pendientes las tres migraciones `20260730...`.
-- [ ] Aplicar en orden `add_inquiry_persistence`,
+- [x] Aplicar en orden `add_inquiry_persistence`,
       `harden_legacy_grants` y `retire_legacy_registration_webhook`.
-- [ ] Desplegar tombstone HTTP 410 y volver a verificar advisors y las diez
+- [x] Desplegar tombstone HTTP 410 y volver a verificar advisors y las diez
       filas históricas.
-- [ ] Desplegar aplicación.
-- [ ] Enviar una solicitud corporate y una sponsor.
-- [ ] Confirmar fila, outbox, correo y evento.
+- [x] Desplegar aplicación.
+- [x] Enviar una solicitud corporate y una sponsor.
+- [x] Confirmar fila, outbox, correo y evento; eliminar después las dos filas
+      sintéticas de smoke test.
 - [ ] Monitoreo intensivo durante 24 horas.
 
 ## 17. Rollback

@@ -88,6 +88,25 @@ test.describe("Homepage comercial", () => {
     expect((await response.body()).byteLength).toBeGreaterThan(1_000);
   });
 
+  test("carga Google Maps solo después de una acción explícita", async ({
+    page,
+  }) => {
+    await page.goto("/?lang=es");
+
+    const location = page.locator("#ubicacion");
+    const mapFrame = location.locator('iframe[src*="google.com/maps"]');
+    await expect(mapFrame).toHaveCount(0);
+
+    await location
+      .getByRole("button", { name: "Cargar mapa interactivo" })
+      .click();
+    await expect(mapFrame).toHaveCount(1);
+    await expect(mapFrame).toHaveAttribute(
+      "title",
+      "Mapa del Centro de Convenciones de Reynosa",
+    );
+  });
+
   test("renderiza los dos formularios y privacidad en inglés", async ({ page }) => {
     await page.goto("/?lang=en");
 

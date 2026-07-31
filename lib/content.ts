@@ -187,6 +187,10 @@ export const UI_TEXT = {
     addressLine1: "Libramiento Ote S/N, Azteca",
     addressLine2: "Reynosa, Tamaulipas, C.P. 88680",
     viewOnMaps: "Ver en Google Maps",
+    loadInteractiveMap: "Cargar mapa interactivo",
+    mapPrivacyNote:
+      "Google Maps se carga solo cuando lo solicitas, evitando conexiones de terceros durante la visita inicial.",
+    mapTitle: "Mapa del Centro de Convenciones de Reynosa",
     datesLabel: "Fechas",
     datesValue: "24 de septiembre, 2026",
     datesHours: "8:00 AM — 7:00 PM",
@@ -351,6 +355,10 @@ export const UI_TEXT = {
     addressLine1: "Libramiento Ote S/N, Azteca",
     addressLine2: "Reynosa, Tamaulipas, C.P. 88680",
     viewOnMaps: "View on Google Maps",
+    loadInteractiveMap: "Load interactive map",
+    mapPrivacyNote:
+      "Google Maps loads only when you request it, avoiding third-party connections during the initial visit.",
+    mapTitle: "Map of the Reynosa Convention Center",
     datesLabel: "Dates",
     datesValue: "September 24, 2026",
     datesHours: "8:00 AM — 7:00 PM",
