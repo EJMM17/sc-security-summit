@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
-import CountdownTimer from "@/components/CountdownTimer";
 import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
@@ -45,9 +44,6 @@ export default function Hero({ language }: { language: Language }) {
 
   const renderIntelligence = (modifier = "") => (
     <aside className={`hero-intelligence ${modifier}`}>
-      <div className="hero-countdown-clock">
-        <CountdownTimer language={language} />
-      </div>
       <div className="hero-stat-grid">
         {heroStats.map((stat, index) => (
           <div key={index}>
@@ -64,19 +60,15 @@ export default function Hero({ language }: { language: Language }) {
 
   return (
     <section className="hero-section">
-      <picture className="absolute inset-0">
-        <source srcSet="/images/hero-bg-800.webp" media="(max-width: 768px)" />
-        <source srcSet="/images/hero-bg-1200.webp" media="(max-width: 1200px)" />
-          <Image
-            src="/images/hero-bg.webp"
-            alt={ui.heroAlt}
-            fill
-            className="hero-background-image object-cover object-center"
-          sizes="100vw"
-          priority
-          quality={82}
-        />
-      </picture>
+      <Image
+        src="/images/hero-bg.webp"
+        alt={ui.heroAlt}
+        fill
+        className="hero-background-image object-cover object-center"
+        sizes="100vw"
+        priority
+        quality={82}
+      />
       <div className="hero-image-overlay" />
 
       <div className="hero-layout">
