@@ -16,8 +16,8 @@ const text = {
   es: {
     title: "Privacidad y cookies",
     essentialCopy: "Usamos cookies esenciales para que el sitio funcione.",
-    optionalCopy:
-      "Con tu permiso, usamos analítica y marketing para mejorar tu experiencia y medir campañas.",
+    optionalCopy: "Con tu permiso, usamos analítica y marketing.",
+    purposeCopy: "Esto nos ayuda a mejorar tu experiencia y medir campañas.",
     acceptAll: "Aceptar todas",
     essential: "Solo esenciales",
     privacyLabel: "Aviso de Privacidad",
@@ -26,8 +26,8 @@ const text = {
   en: {
     title: "Privacy & cookies",
     essentialCopy: "We use essential cookies to run the site.",
-    optionalCopy:
-      "With your permission, we use analytics and marketing to improve your experience and measure campaigns.",
+    optionalCopy: "With your permission, we use analytics and marketing.",
+    purposeCopy: "This helps us improve your experience and measure campaigns.",
     acceptAll: "Accept all",
     essential: "Essential only",
     privacyLabel: "Privacy Notice",
@@ -141,6 +141,9 @@ export default function CookieConsent({
             </p>
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
               {t.optionalCopy}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">
+              {t.purposeCopy}
             </p>
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
               <a

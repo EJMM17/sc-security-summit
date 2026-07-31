@@ -224,6 +224,9 @@ jobs:
         with:
           urls: |
             https://www.scsecuritysummit.com/
+          # A small sample prevents transient shared-runner CPU contention from
+          # deciding the production gate while preserving every budget.
+          runs: 3
           budgetPath: ./lighthouse-budget.json
           uploadArtifacts: true
           temporaryPublicStorage: true
