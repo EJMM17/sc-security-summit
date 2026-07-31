@@ -15,7 +15,9 @@ type Language = "es" | "en";
 const text = {
   es: {
     title: "Privacidad y cookies",
-    body: "Usamos cookies esenciales para que el sitio funcione y, con tu permiso, cookies de analítica y marketing para mejorar tu experiencia y medir nuestras campañas. Elige cómo quieres continuar. Más información en el",
+    essentialCopy: "Usamos cookies esenciales para que el sitio funcione.",
+    optionalCopy:
+      "Con tu permiso, usamos analítica y marketing para mejorar tu experiencia y medir campañas.",
     acceptAll: "Aceptar todas",
     essential: "Solo esenciales",
     privacyLabel: "Aviso de Privacidad",
@@ -23,7 +25,9 @@ const text = {
   },
   en: {
     title: "Privacy & cookies",
-    body: "We use essential cookies to run the site and, with your permission, analytics and marketing cookies to improve your experience and measure our campaigns. Choose how you'd like to continue. Learn more in our",
+    essentialCopy: "We use essential cookies to run the site.",
+    optionalCopy:
+      "With your permission, we use analytics and marketing to improve your experience and measure campaigns.",
     acceptAll: "Accept all",
     essential: "Essential only",
     privacyLabel: "Privacy Notice",
@@ -133,14 +137,18 @@ export default function CookieConsent({
           <div className="flex-1">
             <p className="text-sm font-semibold text-white">{t.title}</p>
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              {t.body}{" "}
+              {t.essentialCopy}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">
+              {t.optionalCopy}
+            </p>
+            <p className="mt-1 text-sm leading-relaxed text-slate-300">
               <a
                 href="/aviso-de-privacidad"
                 className="font-semibold text-cyan-300 underline-offset-2 hover:underline"
               >
                 {t.privacyLabel}
               </a>
-              .
             </p>
             <div className="mt-3 flex flex-col gap-2 sm:flex-row">
               <button
