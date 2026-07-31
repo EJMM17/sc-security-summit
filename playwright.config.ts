@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E config — runs against either a locally booted `npm run start` (preview)
-// or a deployed URL via NEXT_PUBLIC_SITE_URL. Browser matrix mirrors what
-// real attendees use: desktop Chrome/Firefox/Safari + Pixel/iPhone.
+// E2E runs against the local production build by default. Select a deployed
+// target explicitly with PLAYWRIGHT_BASE_URL so application metadata can never
+// redirect the suite to Production by accident.
 export default defineConfig({
   testDir: "./e2e",
   fullyParallel: true,
@@ -11,7 +11,7 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: process.env.CI ? [["html"], ["github"]] : "html",
   use: {
-    baseURL: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     video: "retain-on-failure",
@@ -23,7 +23,7 @@ export default defineConfig({
     { name: "Mobile Chrome", use: { ...devices["Pixel 5"] } },
     { name: "Mobile Safari", use: { ...devices["iPhone 12"] } },
   ],
-  webServer: process.env.CI
+  webServer: process.env.CI || process.env.PLAYWRIGHT_BASE_URL
     ? undefined
     : {
         command: "npm run start",

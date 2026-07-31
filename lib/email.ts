@@ -1,6 +1,7 @@
 import "server-only";
 
 import { Resend } from "resend";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 
 let _resend: Resend | null = null;
 let _resendKey: string | null = null;
@@ -12,6 +13,8 @@ function isUsableApiKey(apiKey: string | undefined): apiKey is string {
 }
 
 function getResend(): Resend | null {
+  if (!isVercelProductionDeployment()) return null;
+
   const apiKey = process.env.RESEND_API_KEY;
   if (!isUsableApiKey(apiKey)) return null;
   // Re-create the client if the key changed (relevant for tests).
@@ -25,14 +28,20 @@ function getResend(): Resend | null {
 export const DEFAULT_FROM = "SC Security Summit <hola@scsecuritysummit.com>";
 
 export type SendEmailResult =
-  | { ok: true; id?: string }
-  | { ok: false; error: string; code?: string };
+  | { ok: true; id: string }
+  | { ok: false; code: string };
+
+function safeEmailErrorCode(value: unknown, fallback: string): string {
+  const candidate = typeof value === "string" ? value : "";
+  return /^[a-zA-Z0-9_.-]{1,120}$/.test(candidate) ? candidate : fallback;
+}
 
 export async function sendEmail(params: {
   to: string;
   subject: string;
   html: string;
   from?: string;
+  idempotencyKey?: string;
 }): Promise<SendEmailResult> {
   const resend = getResend();
   if (!resend) {
@@ -40,13 +49,10 @@ export async function sendEmail(params: {
       JSON.stringify({
         timestamp: new Date().toISOString(),
         event: "email_skipped_no_api_key",
-        to: params.to,
-        subject: params.subject,
       }),
     );
     return {
       ok: false,
-      error: "RESEND_API_KEY missing or placeholder",
       code: "missing_api_key",
     };
   }
@@ -54,21 +60,32 @@ export async function sendEmail(params: {
   const from = params.from ?? process.env.EMAIL_FROM ?? DEFAULT_FROM;
 
   try {
-    const { data, error } = await resend.emails.send({
-      from,
-      to: params.to,
-      subject: params.subject,
-      html: params.html,
-    });
+    const { data, error } = await resend.emails.send(
+      {
+        from,
+        to: params.to,
+        subject: params.subject,
+        html: params.html,
+      },
+      params.idempotencyKey ? { idempotencyKey: params.idempotencyKey } : undefined,
+    );
 
     if (error) {
-      return { ok: false, error: error.message, code: error.name };
+      return {
+        ok: false,
+        code: safeEmailErrorCode(error.name, "provider_error"),
+      };
     }
-    return { ok: true, id: data?.id };
-  } catch (err) {
+    if (!data?.id) {
+      return {
+        ok: false,
+        code: "invalid_provider_response",
+      };
+    }
+    return { ok: true, id: data.id };
+  } catch {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : String(err),
       code: "send_exception",
     };
   }

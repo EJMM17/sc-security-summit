@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { scrubString, scrubValue } from "./sentry-scrub";
+import {
+  sanitizeSentryEvent,
+  scrubString,
+  scrubValue,
+} from "./sentry-scrub";
 
 describe("scrubString", () => {
   it("redacts email addresses", () => {
@@ -95,5 +99,161 @@ describe("scrubValue", () => {
     expect(
       scrubValue({ Authorization: "Bearer abc", cookie: "sid=xyz" }),
     ).toEqual({ Authorization: "[REDACTED]", cookie: "[REDACTED]" });
+  });
+});
+
+describe("sanitizeSentryEvent", () => {
+  it("keeps only allowlisted error diagnostics", () => {
+    const result = sanitizeSentryEvent({
+      event_id: "0123456789abcdef0123456789abcdef",
+      timestamp: 1_785_300_000,
+      platform: "javascript",
+      level: "error",
+      environment: "production",
+      release: "abcdef1234567890",
+      message: "Failed for Ada at Acme Logistics",
+      request: {
+        url: "https://example.com/?email=ada@example.com",
+        method: "POST",
+        headers: {
+          authorization: "Bearer secret",
+          cookie: "session=secret",
+          referer: "https://partner.example/private",
+          "user-agent": "private browser",
+        },
+        data: { company: "Acme Logistics", phone: "+52 899 123 4567" },
+      },
+      user: { id: "attendee-123", email: "ada@example.com" },
+      breadcrumbs: [{ message: "Typed Acme Logistics" }],
+      contexts: { browser: { name: "Private Browser" } },
+      extra: { interest: "Our confidential sponsor plans" },
+      tags: {
+        router_kind: "AppRouter",
+        route_type: "action",
+        company: "Acme Logistics",
+      },
+      exception: {
+        values: [
+          {
+            type: "DatabaseError",
+            value: "ada@example.com from Acme Logistics failed",
+            mechanism: {
+              type: "auto.function.nextjs.on_request_error",
+              handled: false,
+              data: { request_path: "/companies/acme" },
+            },
+            stacktrace: {
+              frames: [
+                {
+                  filename:
+                    "C:\\Users\\private-person\\workspace\\app\\actions\\inquiries.ts?email=ada@example.com",
+                  abs_path: "C:\\Users\\private-person\\workspace\\app\\actions\\inquiries.ts",
+                  function: "submitInquiry",
+                  module: "app.actions.inquiries",
+                  lineno: 42,
+                  colno: 7,
+                  in_app: true,
+                  vars: { company: "Acme Logistics" },
+                  pre_context: ["const email = 'ada@example.com'"],
+                  context_line: "throw new Error(company)",
+                  post_context: ["// private"],
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    expect(result).toEqual({
+      event_id: "0123456789abcdef0123456789abcdef",
+      timestamp: 1_785_300_000,
+      platform: "javascript",
+      level: "error",
+      environment: "production",
+      release: "abcdef1234567890",
+      tags: {
+        router_kind: "AppRouter",
+        route_type: "action",
+      },
+      exception: {
+        values: [
+          {
+            type: "DatabaseError",
+            value: "[REDACTED:error-message]",
+            mechanism: {
+              type: "auto.function.nextjs.on_request_error",
+              handled: false,
+            },
+            stacktrace: {
+              frames: [
+                {
+                  filename: "workspace/app/actions/inquiries.ts",
+                  function: "submitInquiry",
+                  module: "app.actions.inquiries",
+                  lineno: 42,
+                  colno: 7,
+                  in_app: true,
+                },
+              ],
+            },
+          },
+        ],
+      },
+    });
+
+    const serialized = JSON.stringify(result);
+    for (const sensitive of [
+      "ada@example.com",
+      "Acme Logistics",
+      "Bearer secret",
+      "session=secret",
+      "private-person",
+      "confidential sponsor",
+      "user-agent",
+      "request_path",
+      "vars",
+      "context_line",
+    ]) {
+      expect(serialized).not.toContain(sensitive);
+    }
+  });
+
+  it("drops messages and non-error telemetry", () => {
+    expect(
+      sanitizeSentryEvent({
+        message: "Acme Logistics clicked a button",
+        level: "info",
+        spans: [{ description: "POST /inquiries" }],
+      }),
+    ).toBeNull();
+  });
+
+  it("rejects arbitrary free-form technical fields", () => {
+    const result = sanitizeSentryEvent({
+      environment: "preview",
+      release: "release with customer name",
+      platform: "custom platform",
+      level: "info",
+      tags: {
+        router_kind: "App Router with spaces",
+        route_type: "route",
+      },
+      exception: {
+        values: [{ type: "Error", value: "Sensitive message" }],
+      },
+    });
+
+    expect(result).toEqual({
+      tags: { route_type: "route" },
+      exception: {
+        values: [
+          {
+            type: "Error",
+            value: "[REDACTED:error-message]",
+          },
+        ],
+      },
+    });
   });
 });

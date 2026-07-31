@@ -1,33 +1,44 @@
 import { NextResponse } from "next/server";
-
-// =============================================================
-// GET /api/health
-// =============================================================
-// Lightweight liveness check for Vercel uptime monitors.
-//   • returns 200 { ok: true, ... } while the app is serving requests
-//
-// The site has no runtime database dependency: ticketing lives in
-// Eventbrite and the inquiry forms deliver over Resend, so there is
-// nothing to probe beyond the app itself. Resend failures surface in
-// Sentry (see lib/email.ts), not here.
-// =============================================================
+import { readHealthSnapshot } from "@/lib/health-readiness";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 export const runtime = "nodejs";
 
-const NO_STORE = { "Cache-Control": "no-store, max-age=0" };
+const HEALTHY_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=30, stale-while-revalidate=60";
+const UNAVAILABLE_CACHE_CONTROL =
+  "public, max-age=0, s-maxage=5, stale-while-revalidate=10";
 
-export function GET() {
-  const startedAt = Date.now();
+export async function GET() {
+  const snapshot = await readHealthSnapshot();
+  if (snapshot.ok) {
+    return NextResponse.json(
+      {
+        ok: true,
+        service: "sc-security-summit",
+        status: "healthy",
+        durationMs: snapshot.durationMs,
+        timestamp: new Date(snapshot.checkedAt).toISOString(),
+      },
+      {
+        status: 200,
+        headers: { "Cache-Control": HEALTHY_CACHE_CONTROL },
+      },
+    );
+  }
 
   return NextResponse.json(
     {
-      ok: true,
+      ok: false,
       service: "sc-security-summit",
-      durationMs: Date.now() - startedAt,
-      timestamp: new Date().toISOString(),
+      status: "unavailable",
+      durationMs: snapshot.durationMs,
+      timestamp: new Date(snapshot.checkedAt).toISOString(),
     },
-    { status: 200, headers: NO_STORE },
+    {
+      status: 503,
+      headers: { "Cache-Control": UNAVAILABLE_CACHE_CONTROL },
+    },
   );
 }

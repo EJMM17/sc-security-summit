@@ -26,7 +26,6 @@ export default async function OgImage() {
       }}
     >
       {/* Background photo */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         alt=""
         src={base64}

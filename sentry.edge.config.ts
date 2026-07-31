@@ -1,22 +1,43 @@
 // Sentry — Edge runtime (middleware.ts and edge route handlers)
 
 import * as Sentry from "@sentry/nextjs";
-import { scrubValue } from "@/lib/sentry-scrub";
+import { sanitizeSentryEvent } from "@/lib/sentry-scrub";
 
-const dsn = process.env.SENTRY_DSN;
+const dsn = process.env.SENTRY_DSN?.trim();
+const target = (
+  process.env.VERCEL_TARGET_ENV ??
+  process.env.VERCEL_ENV ??
+  ""
+).trim();
+const isProduction = process.env.VERCEL === "1" && target === "production";
 
-if (dsn) {
+if (dsn && isProduction) {
   Sentry.init({
     dsn,
-    environment: process.env.VERCEL_ENV ?? "development",
+    environment: "production",
     release: process.env.VERCEL_GIT_COMMIT_SHA,
-    tracesSampleRate: 0.1,
-
+    sendDefaultPii: false,
+    enableLogs: false,
+    enableMetrics: false,
+    tracePropagationTargets: [],
+    dataCollection: {
+      userInfo: false,
+      cookies: false,
+      httpHeaders: { request: false, response: false },
+      httpBodies: [],
+      urlQueryParams: false,
+      graphQL: { document: false, variables: false },
+      genAI: { inputs: false, outputs: false },
+      databaseQueryData: false,
+      stackFrameVariables: false,
+      frameContextLines: 0,
+    },
     beforeSend(event) {
-      return scrubValue(event) as typeof event;
+      return sanitizeSentryEvent(event);
     },
-    beforeBreadcrumb(breadcrumb) {
-      return scrubValue(breadcrumb) as typeof breadcrumb;
-    },
+    beforeSendTransaction: () => null,
+    beforeSendLog: () => null,
+    beforeSendMetric: () => null,
+    beforeBreadcrumb: () => null,
   });
 }

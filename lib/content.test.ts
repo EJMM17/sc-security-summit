@@ -38,6 +38,19 @@ describe("content SSOT", () => {
     expect(CONTENT.es.agenda).toHaveLength(4);
   });
 
+  it("keeps the complete inquiry UI contract in both languages", () => {
+    for (const language of ["es", "en"] as const) {
+      expect(CONTENT[language].forms.corporate.requestedSeats).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryInvalid).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryRateLimited).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryError).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPrivacy).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPrivacyLink).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPreviewDisabled).toBeTruthy();
+      expect(CONTENT[language].ui.inquiryPreviewDisabledButton).toBeTruthy();
+    }
+  });
+
   it("keeps the FAQ free of the retired registration flow", () => {
     // Ticketing lives in Eventbrite: no on-site form, no folio, no bank transfer.
     const retired = /folio|formulario de registro|transferencia bancaria|confirmation code|bank transfer/i;

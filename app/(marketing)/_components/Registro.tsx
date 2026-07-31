@@ -2,6 +2,7 @@ import { BadgeCheck, UsersRound } from "lucide-react";
 import CorporatePassForm from "@/components/CorporatePassForm";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
+import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
 import type { Language } from "@/lib/language";
 import WaveSeparator from "./_primitives/WaveSeparator";
 
@@ -11,6 +12,7 @@ export default function Registro({
   language: Language;
 }) {
   const { ui } = CONTENT[language];
+  const inquiriesDisabled = isVisualOnlyVercelDeployment();
 
   return (
     <>
@@ -35,7 +37,10 @@ export default function Registro({
                 </span>
               </div>
               <div className="corporate-pass-form">
-                <CorporatePassForm language={language} />
+                <CorporatePassForm
+                  language={language}
+                  previewDisabled={inquiriesDisabled}
+                />
               </div>
             </div>
           </ScrollReveal>

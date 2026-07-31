@@ -1,132 +1,292 @@
 # Troubleshooting
 
-Symptom → likely cause → fix. Pair with `RUNBOOK.md`. If you've hit something
-not listed here, add a row before forgetting how you fixed it.
+Última revisión: 2026-07-30.
 
-Scope: the site sells nothing and stores nothing. Ticket problems (orders,
-refunds, missing tickets) are Eventbrite's — see `docs/RUNBOOK.md` §3. What can
-break here is an inquiry form failing to deliver.
+Diagnóstico de la aplicación y las solicitudes persistidas. Para operación
+diaria usa `docs/INQUIRY_OPERATIONS.md`; para incidentes usa
+`docs/RUNBOOK.md`.
 
----
+## 1. Resultado del formulario
 
-## Inquiry forms (corporate pass / sponsorship)
+| Resultado | Significado | Acción |
+|---|---|---|
+| `ok`, `notification: sent` | Persistida y Resend aceptó el correo | Seguimiento normal |
+| `ok`, `notification: queued` | Persistida; correo pendiente/retry | Revisar outbox, no pedir reenvío |
+| `invalid` | Zod rechazó campos o consentimiento | Corregir datos; no tocar la base |
+| `rate_limited` | Ventana Upstash excedida | Esperar 15 min y revisar abuso |
+| `storage_unavailable` | No se pudo persistir | No fue recibida; revisar Supabase |
+| `idempotency_conflict` | Mismo UUID con payload distinto | Evento de seguridad; no sobrescribir |
+| `unexpected` | Excepción no clasificada | Correlacionar Sentry/logs sin PII |
 
-### Legitimate users are blocked by anti-spam controls
+Una respuesta de éxito significa que la solicitud ya existe en
+`public.inquiries`. El correo nunca define por sí solo la recepción.
 
-**Cause:** The forms intentionally use no external CAPTCHA. Bot/spam protection
-is the hidden honeypot field, Upstash rate limiting and Zod server validation.
+### La persona recibió éxito pero no llegó correo
 
-**Fix:**
-1. Check whether the user hit the rate limiter (see the next section).
-2. Confirm browser autofill did not populate the hidden `website` honeypot.
-3. If both are clean, inspect Sentry for `submitInquiry` errors.
+1. Busca la solicitud en `public.inquiries`.
+2. Busca su notificación en `public.inquiry_notifications`.
+3. Si está `pending` o `retry`, el comportamiento es recuperable y el cron debe
+   volver a intentar.
+4. Si está `sent`, revisa Resend y Spam/Promociones.
+5. Si está `dead`, escala como SEV-2.
 
-### "Demasiados intentos. Espera 15 minutos."
+No pidas reenviar mientras exista la fila: el problema es de notificación, no
+de captura.
 
-**Cause:** Upstash sliding window hit (5 req / 15min / IP).
+### La persona recibió `storage_unavailable`
 
-**Fix:** Usually legitimate — wait it out. If a real user is blocked:
-1. Get their public IP (they can curl `ifconfig.me`).
-2. From Upstash console, run `DEL scss2026:rl:<ip>` to clear their bucket.
-3. If this happens often, raise the limit in `lib/rate-limit.ts` — but
-   investigate the abuse pattern first.
+1. Confirma `SUPABASE_URL` y `SUPABASE_SECRET_KEY` en ese ambiente.
+2. Verifica que Preview no apunte a Production.
+3. Revisa disponibilidad de Supabase.
+4. Revisa la RPC `create_inquiry` y el error técnico sanitizado.
+5. Cuando vuelva, ejecuta una solicitud controlada.
 
-### Form "succeeds" but nothing arrives in the inbox
+La aplicación no intenta Resend si la persistencia falla.
 
-**Cause 1 — the honeypot fired.** The action returns a fake success to fool the
-bot. If a real human reports this, confirm they don't have an autofill
-extension filling `<input name="website">`, then have them retry with it off.
+### `idempotency_conflict`
 
-**Cause 2 — the send failed.** The form surfaces `email_unavailable` when Resend
-rejects the message; check Resend → Emails and Sentry for the window in
-question. There is no database fallback, so a failed send means the lead is
-lost — follow up manually if you can identify the sender.
+El `submission_id` ya existe con otro `payload_hash`. La fila original se
+preserva.
 
-### Submit button stuck on "Enviando..."
+1. Conserva `submission_id` e `inquiryId` solo en el canal técnico autorizado.
+2. Revisa si hubo manipulación, un bug de cliente o datos obsoletos.
+3. No actualices el hash ni la fila original.
+4. Añade un caso de regresión antes de cambiar la canonicalización.
 
-**Cause:** The server action failed silently (network, Resend, Sentry).
+### Honeypot
 
-**Fix:** DevTools → Network → look for the POST to `/?_rsc=...`:
-- 5xx → check Sentry for the exception.
-- 200 with `{ ok: false, reason: "..." }` → the reason maps to the message the
-  form renders; `invalid` means Zod rejected a field.
+Un bot que llena `website` recibe un éxito falso y no persiste. Si una persona
+legítima reporta éxito sin fila, revisa extensiones de autofill que completen
+campos ocultos.
 
----
+### Botón detenido en “Enviando…”
 
-## Email delivery
+Los formularios liberan el estado en `finally`. Si queda detenido:
 
-### The inquiry email doesn't arrive at `CONTACT_EMAIL`
+1. revisa errores JavaScript y la petición de Server Action;
+2. prueba sin extensiones;
+3. confirma que el deployment contiene la versión actual;
+4. abre un bug con navegador, hora y ambiente, sin copiar PII.
 
-1. **Is the key real?** If `RESEND_API_KEY` is missing or still
-   `re_PLACEHOLDER` in this environment, nothing is ever sent. Set a real key
-   in Vercel (Production **and** Preview) and **redeploy** — env changes don't
-   take effect until the next deploy.
-2. **Did Resend accept it?** Resend Dashboard → Emails, filter the last hour.
-   A `failed` entry carries the reason (invalid `from`, unverified domain, rate
-   limit); a matching warning is in Sentry.
-3. **Did it get filtered?** Check Junk / Spam / Promotions on the receiving
-   inbox.
-4. **Is the sender domain verified?** `EMAIL_FROM` must use a domain with SPF +
-   DKIM in Resend. Run `dig TXT scsecuritysummit.com` and confirm `v=spf1 ...`
-   and `_dmarc.` records exist (see `docs/DNS.md`).
-5. **Is `CONTACT_EMAIL` right?** Confirm it is set on Vercel and points at an
-   inbox someone actually monitors.
+## 2. Notificaciones
 
----
+### `pending` o `retry` no avanza
 
-## Health and infrastructure
+1. Confirma cron cada cinco minutos en Vercel Production.
+2. Confirma Vercel Pro y `CRON_SECRET`.
+3. Revisa respuestas del route:
+   - `401 unauthorized`: bearer incorrecto;
+   - `503 cron_unavailable`: falta `CRON_SECRET`;
+   - `500 processing_unavailable`: repositorio o worker falló.
+4. Revisa `next_attempt_at` y el lease de filas `processing`.
+5. Confirma que `CONTACT_EMAIL` y `RESEND_API_KEY` sean utilizables.
 
-### `/api/health` is unreachable or non-200
+### Resend rechaza el mensaje
 
-**Cause:** The probe has no external dependency — it answers 200 whenever the
-app is serving. A failure means the deployment itself is down.
+1. Revisa el código sanitizado en el último intento.
+2. Confirma que `EMAIL_FROM` use un dominio verificado.
+3. Confirma SPF, DKIM y DMARC según `docs/DNS.md`.
+4. Confirma que `CONTACT_EMAIL` sea una bandeja monitoreada.
+5. No copies el cuerpo o destinatario a logs.
 
-**Fix:** Check Vercel → Deployments for a failed build or a broken promotion,
-and roll back to the last green deployment if needed.
+Errores permanentes o cinco intentos llevan la notificación a `dead`.
 
-### Build fails locally with `[check-env]` errors
+### El cron envía duplicados
 
-You're missing a required env var. Either:
-1. Copy `.env.local.example` to `.env.local` and fill the values, OR
-2. `SKIP_ENV_VALIDATION=1 npm run build` to bypass (not recommended for
-   prod).
+Vercel puede entregar la misma invocación más de una vez. Revisa:
 
-### Build fails with `Type error: Property 'X' does not exist`
+- reclamación atómica mediante las RPC de notificación;
+- lease de `processing`;
+- restricción única de outbox;
+- `provider_message_id` y número de intento;
+- ausencia de cambios manuales de estado.
 
-A SDK upgrade likely changed an option's name. Re-read the migration
-guide for whichever package was bumped. Past offenders: Sentry
-(`hideSourceMaps` → `sourcemaps`), Next.js App Router (`useFormState`
-→ `useActionState`).
+No resuelvas duplicados deshabilitando idempotencia.
 
-### Middleware response is 502
+## 3. Rate limiting
 
-**Cause:** Edge runtime ran out of memory or hit timeout, often
-because Sentry middleware tracing was enabled and the bundle is too
-large.
+### `rate_limited`
 
-**Fix:** Confirm `SENTRY_DSN` is set if `withSentryConfig` is wrapping
-next.config. If you're not running Sentry, unset the DSN — the wrapper
-short-circuits and the middleware drops back to its small baseline.
+El límite es cinco solicitudes por 15 minutos por IP.
 
----
+1. Espera la ventana.
+2. Revisa métricas agregadas de Upstash.
+3. No almacenes la IP en Supabase, Sentry o tickets.
+4. Si hay falsos positivos repetidos, cambia límite y pruebas en el mismo PR.
 
-## CSP violations in browser console
+### Todos reciben error en Production
 
-**Cause:** New external resource (font, analytics, image CDN) added
-without updating the CSP allow-list.
+Upstash falla cerrado:
 
-**Fix:** Update `middleware.ts` (`script-src`, `style-src`,
-`connect-src`, `img-src`, etc). Test the change at
-https://csp-evaluator.withgoogle.com to make sure you're not weakening
-the policy.
+1. confirma `KV_REST_API_URL` y `KV_REST_API_TOKEN` como par;
+2. revisa en Vercel Storage que `summit-rate-limit-production` siga conectado
+   al proyecto y únicamente a Production; el recurso Redis anterior debe
+   continuar archivado;
+3. revisa conectividad y estado del proveedor;
+4. rota o reconecta desde Vercel Storage, nunca creando duplicados manuales;
+5. redeploy después de cualquier cambio.
 
----
+`KV_URL`, `REDIS_URL` y `KV_REST_API_READ_ONLY_TOKEN` también pueden aparecer
+como salidas provider-managed, pero la aplicación no las consume.
+`UPSTASH_REDIS_REST_URL` y `UPSTASH_REDIS_REST_TOKEN` están retiradas y no son
+un fallback válido.
 
-## Signals to look for
+No agregues un fallback allow-all en Production.
 
-| Where | Signal | What it means | Action |
-| --- | --- | --- | --- |
-| Sentry | Unhandled exception captured by `app/error.tsx` | A page or server action threw | Triage the stack trace; usually a missing env var |
-| Vercel logs | `{"event":"email_skipped_no_api_key"}` | `RESEND_API_KEY` missing or a placeholder — the inquiry was never sent | Set a real key in Vercel (Prod + Preview) and redeploy |
-| Form response | `reason: "email_unavailable"` | Resend rejected the send | Check Resend → Emails for the reason; the lead is lost, follow up manually |
-| Form response | `reason: "rate_limited"` | The IP hit the sliding window | Expected under abuse; investigate if a real user reports it |
+## 4. Entorno y builds
+
+### Falla `npm run env:contract`
+
+El contrato no usa secretos. El mensaje indica uno de estos problemas:
+
+- variable duplicada o con alcance inválido;
+- secreto marcado como público;
+- `.env.local.example` fuera de sincronía;
+- reaparición de `.env.example`;
+- regla de grupo hacia una variable inexistente.
+
+Actualiza `scripts/env-spec.mjs`, inspecciona:
+
+```bash
+node scripts/check-env.mjs --print-template
+```
+
+y sincroniza `.env.local.example`.
+
+### Falla `npm run check-env`
+
+- En local, llena `.env.local` o acepta las advertencias durante desarrollo.
+- En Vercel Production, todos los faltantes obligatorios bloquean y
+  `ENFORCE_ENV_VALIDATION` debe valer `1`.
+- Preview es estricto pero desconectado: bloquea las variables de aplicación
+  Supabase, Resend, el par `KV_REST_API_URL`/`KV_REST_API_TOKEN`, cron o
+  analytics de marketing que estén presentes.
+- Placeholders, formatos inválidos, aliases Supabase legados y pares
+  incompletos bloquean en modo estricto.
+
+`check-env` no inventaría salidas provider-managed que la app no consume, como
+`KV_URL`, `REDIS_URL` o `KV_REST_API_READ_ONLY_TOKEN`. Su ausencia en Preview
+se verifica externamente en Vercel Storage y en el inventario Dashboard/API.
+
+Para validar localmente un archivo traído de Vercel, usa
+`npm run check-env -- --target=preview` o `--target=production`.
+
+`SKIP_ENV_VALIDATION=1` solo funciona en el paso build de GitHub Actions. Si
+aparece en Vercel o en una terminal local, el validador falla de forma
+intencional.
+
+### Preview muestra formularios deshabilitados y health 503
+
+Es el comportamiento esperado del Preview visual. La UI no recopila ni envía
+datos. Si un cliente fabrica una llamada, la Server Action la descarta antes de
+leer, validar, registrar o persistir el payload y antes de invocar Upstash,
+Supabase o Resend; nunca devuelve falso éxito. Quita del scope Preview cualquier
+variable compartida con Production, incluidas `SUPABASE_*`, `RESEND_API_KEY`,
+`CONTACT_EMAIL`, `KV_REST_API_URL`, `KV_REST_API_TOKEN`, `KV_URL`,
+`REDIS_URL`, `KV_REST_API_READ_ONLY_TOKEN`, `CRON_SECRET`,
+`NEXT_PUBLIC_SUPABASE_*` y los IDs de marketing. Para Upstash, retira Preview
+de la conexión en Vercel Storage; no copies secretos para “arreglar” el 503.
+
+### Una variable desapareció al retirar Preview
+
+Detén los cambios y trata el caso como un incidente de alcance. Nunca uses
+`vercel env rm NAME preview` sobre una entrada multi-target: puede eliminar la
+entrada completa, incluida Production.
+
+1. haz un inventario de las entradas restantes y respalda su metadata
+   (ID, nombre, tipo, targets y origen), sin descifrar valores;
+2. confirma en Activity Log qué entrada cambió y qué deployments conservan un
+   snapshot anterior;
+3. edita targets mediante Dashboard/API en vez de borrar la entrada;
+4. si era provider-managed, reconecta o rota el recurso desde Vercel Storage;
+5. verifica el par `KV_REST_API_URL`/`KV_REST_API_TOKEN` en Production y la
+   ausencia de todas las salidas KV/Redis en Preview;
+6. reconstruye Production y valida contrato, health y smoke controlado.
+
+No recuperes ni pegues secretos desde logs, tickets o historial del shell.
+
+### Vercel rechaza `vercel.json`
+
+El cron `*/5 * * * *` requiere Pro. Confirma el plan del equipo. Hobby solo
+permite una ejecución diaria y rechazará el deployment.
+
+### CI falla en “Database contract”
+
+Ejecuta localmente con Docker:
+
+```bash
+npx supabase db start
+npx supabase db reset --local
+npx supabase test db --local
+npx supabase db lint --local --level error --fail-on error
+```
+
+Si falla el diff de tipos:
+
+```bash
+npx supabase gen types --local --lang typescript --schema public > lib/database.types.ts
+git diff -- lib/database.types.ts
+```
+
+Revisa y confirma el cambio generado; no edites los tipos manualmente.
+
+## 5. Base de datos
+
+### `db reset --local` falla
+
+1. Identifica la primera migración que falla.
+2. Comprueba orden y dependencias.
+3. Si la migración aún no se aplicó remotamente, corrígela.
+4. Si ya se aplicó, crea otra migración; nunca edites la aplicada.
+5. Repite reset, pgTAP, lint y tipos.
+
+Nunca pruebes la corrección con `db reset --linked` en Production.
+
+### La aplicación recibe permission denied
+
+La aplicación debe usar `SUPABASE_SECRET_KEY` server-only. Comprueba:
+
+- no se importó cliente Supabase en un componente;
+- no se usó una clave `NEXT_PUBLIC_`;
+- la RPC existe con firma coincidente;
+- grants y `search_path` siguen como en la migración;
+- Production tiene la clave canónica del proyecto; Preview no tiene ninguna.
+
+No crees una policy permisiva de `anon` o `authenticated` como arreglo rápido.
+
+### `anon` puede leer o escribir
+
+Trata el hallazgo como SEV-1:
+
+1. conserva evidencia mínima;
+2. limita el acceso afectado;
+3. revisa RLS y grants, incluidas funciones/secuencias;
+4. corrige con migración separada y pgTAP negativo;
+5. ejecuta Security Advisor.
+
+## 6. Health, CSP y ticketing
+
+`/api/health` comprueba la aplicación y una lectura privacy-safe de
+`inquiries`, con timeout de tres segundos. Un `503` puede indicar configuración
+Supabase ausente, storage inaccesible o timeout; su cuerpo nunca incluye PII ni
+errores del proveedor. Los probes concurrentes se coalescen; un resultado sano
+se cachea 30 segundos y uno fallido 5 segundos para proteger Supabase. Por eso,
+tras recuperar el proveedor, espera hasta cinco segundos antes de escalar un
+`503` aislado. Un `200` no prueba Resend, Upstash, cron o Eventbrite.
+
+Los errores CSP requieren actualizar la directiva mínima en `middleware.ts`;
+no añadas `'unsafe-inline'` a `script-src`.
+
+Pedidos, pagos y boletos se investigan exclusivamente en Eventbrite.
+
+## 7. Señales
+
+| Señal | Interpretación |
+|---|---|
+| Tres `storage_unavailable` en 15 min | SEV-1 de persistencia |
+| Una notificación `dead` | SEV-2 de entrega |
+| Cron sin ejecución >15 min | SEV-2 |
+| Solicitud `new` >24 h | Incumplimiento operativo |
+| `idempotency_conflict` | Seguridad o bug de canonicalización |
+| `401` en cron | `CRON_SECRET` desalineado |
+| Diff de tipos en CI | Migración y cliente fuera de sincronía |

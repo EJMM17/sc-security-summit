@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Shield, ArrowLeft } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 
 export const revalidate = 86400; // 24 hours — static content, revalidate daily
 
@@ -39,7 +40,9 @@ export default function AvisoPrivacidad() {
         <h1 className="text-3xl font-bold text-slate-900 mb-2" style={{ fontFamily: "var(--font-oswald)" }}>
           Aviso de Privacidad
         </h1>
-        <p className="text-sm text-slate-400 mb-10">Última actualización: julio de 2026</p>
+        <p className="text-sm text-slate-400 mb-4">
+          Versión vigente: {INQUIRY_CONSENT_VERSION}
+        </p>
 
         <div className="prose prose-slate max-w-none space-y-8 text-sm text-slate-700 leading-relaxed">
 
@@ -67,12 +70,36 @@ export default function AvisoPrivacidad() {
             </p>
             <ul className="list-disc pl-6 mt-3 space-y-1">
               <li>Nombre(s) y apellidos</li>
-              <li>Correo electrónico corporativo</li>
+              <li>Correo electrónico</li>
               <li>Número de teléfono móvil</li>
               <li>Empresa y cargo</li>
-              <li>El mensaje o interés que el titular decida incluir en la solicitud de patrocinio</li>
-              <li>Datos fiscales para facturación (RFC, razón social y código postal fiscal), únicamente si el titular los envía voluntariamente por correo electrónico al solicitar una factura CFDI</li>
+              <li>
+                Cantidad de accesos solicitados, para pases corporativos
+              </li>
+              <li>
+                El mensaje o interés que el titular incluya en una solicitud de
+                patrocinio
+              </li>
+              <li>
+                Idioma, versión del aviso aceptado y fecha y hora del
+                consentimiento
+              </li>
+              <li>
+                Datos de atribución de campaña, página de llegada, referencia y
+                marcas de tiempo de primera y última interacción, únicamente
+                cuando el titular haya aceptado las tecnologías de analítica y
+                marketing
+              </li>
+              <li>
+                Estado, responsable asignado, notas internas y fecha de
+                seguimiento que se generen al atender la solicitud
+              </li>
             </ul>
+            <p className="mt-3">
+              Para limitar abuso, la dirección IP puede procesarse de forma
+              transitoria por el servicio de rate limiting. No se guarda la
+              dirección IP ni el user-agent en el registro de la solicitud.
+            </p>
             <p className="mt-3">
               La <strong>compra de accesos individuales se realiza en Eventbrite</strong>. Los datos de compra
               y de pago se proporcionan directamente a esa plataforma, que los trata bajo su propio aviso de
@@ -89,35 +116,48 @@ export default function AvisoPrivacidad() {
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li>Atender las solicitudes de pase corporativo y de patrocinio recibidas a través del sitio.</li>
               <li>Contactar al titular para dar seguimiento a su solicitud, compartir cotizaciones, disponibilidad y beneficios.</li>
-              <li>Emitir la factura CFDI cuando sea solicitada por el titular.</li>
               <li>Atender consultas relacionadas con el 1er Summit de Seguridad en la Cadena de Suministros 2026.</li>
+              <li>
+                Prevenir abuso, mantener la seguridad del servicio y conservar
+                evidencia del consentimiento y del seguimiento operativo.
+              </li>
             </ul>
-            <p className="mt-4"><strong>Finalidades secundarias</strong> (no necesarias para la relación jurídica; puede oponerse a ellas):</p>
-            <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Envío de comunicaciones informativas sobre futuros eventos organizados por Lanz Logistics.</li>
-              <li>Realización de encuestas de satisfacción posteriores al evento.</li>
-            </ul>
-            <p className="mt-3">
-              Si no desea que sus datos sean tratados para las finalidades secundarias, puede manifestarlo enviando un correo a{" "}
-              <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>{" "}
-              con el asunto "Oposición finalidades secundarias".
+            <p className="mt-4">
+              Los datos de estos formularios no se utilizarán para campañas de
+              eventos futuros sin recabar por separado el consentimiento que
+              resulte aplicable.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-3">4. Transferencias de Datos</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">
+              4. Personas Encargadas y Transferencias
+            </h2>
             <p>
-              El Responsable no realizará transferencias de datos personales a terceros sin el consentimiento del titular,
-              salvo las excepciones previstas en el artículo 37 de la LFPDPPP, incluyendo:
+              Los encargados tecnológicos que intervienen en la operación son{" "}
+              <strong>Vercel</strong> (hospedaje y ejecución de la aplicación),{" "}
+              <strong>Supabase</strong> (base de datos de las solicitudes),{" "}
+              <strong>Resend</strong> (entrega de notificaciones por correo) y{" "}
+              <strong>Upstash</strong> (rate limiting y prevención de abuso).
+              Estos proveedores tratan datos por cuenta del Responsable y
+              pueden utilizar infraestructura fuera de México conforme a sus
+              condiciones contractuales aplicables.
             </p>
-            <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Cuando sea necesario por virtud de un contrato celebrado o por celebrar en interés del titular.</li>
-              <li>Cuando sea preciso para el mantenimiento o cumplimiento de una relación jurídica entre el Responsable y el titular.</li>
-              <li>Cuando la transferencia sea efectuada a encargados del Responsable (ej. proveedores de tecnología) que traten los datos conforme a instrucciones del Responsable y con las mismas medidas de seguridad.</li>
-            </ul>
             <p className="mt-3">
-              Los encargados que intervienen en la operación del sitio son <strong>Vercel</strong> (hospedaje
-              del sitio web) y <strong>Resend</strong> (entrega de los correos generados por los formularios).
+              De forma opcional y solo en Producción, <strong>Sentry</strong>{" "}
+              procesa errores técnicos minimizados, sin contenido de
+              formularios, encabezados, consultas, datos de usuario ni mensajes
+              libres. Después del consentimiento de analítica y marketing,
+              también pueden intervenir <strong>Google</strong> (Tag Manager,
+              Analytics y Ads), <strong>Meta</strong> y{" "}
+              <strong>LinkedIn</strong> para las finalidades descritas en la
+              sección de cookies.
+            </p>
+            <p className="mt-3">
+              El Responsable no comunica los datos de las solicitudes a
+              terceros ajenos para finalidades propias, salvo que exista
+              consentimiento o un supuesto permitido u obligatorio conforme a
+              la legislación aplicable.
             </p>
             <p className="mt-3">
               Adicionalmente, <strong>Eventbrite</strong> opera la venta de accesos al Evento. Cuando el
@@ -161,10 +201,20 @@ export default function AvisoPrivacidad() {
               <li><strong>Marketing</strong>: Google Ads y, cuando estén configurados, Meta Pixel y LinkedIn Insight Tag, para medir el resultado de nuestras campañas y mostrar publicidad relevante.</li>
             </ul>
             <p className="mt-3">
-              Mientras no se otorgue el consentimiento, dichas tecnologías permanecen deshabilitadas mediante
-              el Consent Mode de Google. El titular puede otorgar, rechazar o cambiar su elección en cualquier
-              momento desde el banner de cookies del sitio, o escribiendo a{" "}
+              Mientras no se otorgue el consentimiento, dichas tecnologías no
+              se cargan ni envían mediciones, incluidos pings sin cookies. El
+              Consent Mode de Google se inicializa denegado y las etiquetas se
+              montan solo después de elegir “Aceptar todas”. El titular puede
+              otorgar, rechazar o cambiar su elección en cualquier momento
+              desde el control permanente de configuración de cookies del
+              sitio, o escribiendo a{" "}
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>.
+            </p>
+            <p className="mt-3">
+              La atribución propia de campañas también permanece deshabilitada
+              sin consentimiento. Al elegir solo cookies esenciales se borran
+              del navegador los datos de atribución que hubiera generado una
+              versión anterior del sitio y no se incorporan a la solicitud.
             </p>
           </section>
 
@@ -176,15 +226,39 @@ export default function AvisoPrivacidad() {
               autorizado.
             </p>
             <p className="mt-3">
-              El sitio web <strong>no almacena los datos en base de datos alguna</strong>: la información de los
-              formularios se transmite cifrada y se entrega por correo electrónico a las cuentas corporativas del
-              Responsable, donde se conserva únicamente durante el tiempo necesario para atender la solicitud y
-              cumplir las obligaciones legales aplicables.
+              La información de los formularios se transmite mediante HTTPS y
+              se almacena en Supabase antes de intentar la notificación por
+              correo. El acceso de la aplicación utiliza credenciales
+              exclusivas del servidor; el navegador no recibe claves de la
+              base. Las tablas tienen controles de acceso a nivel de fila y se
+              bloquea el acceso de los roles públicos.
+            </p>
+            <p className="mt-3">
+              Los registros técnicos y de notificación se diseñaron para no
+              incluir el contenido libre del formulario, correo, teléfono ni
+              otros datos personales innecesarios. El acceso operativo debe
+              realizarse mediante cuentas individuales con autenticación
+              multifactor.
             </p>
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-3">8. Cambios al Aviso de Privacidad</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">
+              8. Conservación y Eliminación
+            </h2>
+            <p>
+              Cada solicitud se conserva durante 18 meses desde su creación,
+              salvo que exista una relación contractual, una solicitud ARCO en
+              trámite o una obligación jurídica que justifique otro plazo. Al
+              vencer, una persona autorizada elimina los datos personales o
+              los anonimiza de forma irreversible, documentando únicamente la
+              fecha, el responsable, el número de registros y el resultado,
+              sin duplicar datos personales en la evidencia operativa.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">9. Cambios al Aviso de Privacidad</h2>
             <p>
               El Responsable se reserva el derecho de modificar el presente Aviso de Privacidad. Cualquier modificación
               será publicada en el sitio web{" "}
@@ -196,13 +270,13 @@ export default function AvisoPrivacidad() {
           </section>
 
           <section>
-            <h2 className="text-lg font-bold text-slate-900 mb-3">9. Autoridad de Control</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-3">10. Autoridad de Control</h2>
             <p>
               Si considera que el tratamiento de sus datos personales no está siendo realizado conforme a la LFPDPPP,
-              tiene derecho a presentar una queja ante el Instituto Nacional de Transparencia, Acceso a la Información
-              y Protección de Datos Personales (INAI), a través de su sitio web{" "}
-              <a href="https://www.inai.org.mx" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                www.inai.org.mx
+              puede acudir a la <strong>Secretaría Anticorrupción y Buen Gobierno</strong>, autoridad competente
+              conforme a la legislación federal vigente, a través de su sitio web{" "}
+              <a href="https://www.gob.mx/buengobierno" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+                www.gob.mx/buengobierno
               </a>.
             </p>
           </section>

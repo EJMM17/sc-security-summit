@@ -1,10 +1,13 @@
 import Script from "next/script";
+import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 
 /**
  * Meta (Facebook) Pixel base code.
  * Renders nothing when NEXT_PUBLIC_META_PIXEL_ID is not set.
  */
 export default function MetaPixel({ nonce }: { nonce?: string }) {
+  if (!isVercelProductionDeployment()) return null;
+
   const pixelId = process.env.NEXT_PUBLIC_META_PIXEL_ID;
 
   if (!pixelId) return null;

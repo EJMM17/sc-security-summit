@@ -20,7 +20,7 @@ test.describe("Homepage comercial", () => {
     await expect(speakers.getByRole("heading", { name: "Sandra Romero" })).toBeVisible();
     await expect(speakers.getByRole("img", { name: "Sandra Romero" })).toBeVisible();
 
-    await speakers.getByRole("button", { name: /siguiente conferencista/i }).click();
+    await speakers.getByRole("button", { name: "Fidel Guerrero", exact: true }).click();
     await expect(speakers.getByRole("heading", { name: "Fidel Guerrero" })).toBeVisible();
 
     const sectionOrder = await page.evaluate(() =>
@@ -51,10 +51,18 @@ test.describe("Homepage comercial", () => {
     await expect(corporate.getByLabel(/empresa/i)).toBeVisible();
     await expect(corporate.getByLabel(/cargo/i)).toBeVisible();
     await expect(corporate.getByLabel(/teléfono/i)).toBeVisible();
+    await expect(corporate.getByLabel(/número de accesos/i)).toHaveAttribute("min", "2");
+    await expect(corporate.getByLabel(/número de accesos/i)).toHaveAttribute("max", "10");
+    await expect(
+      corporate.getByRole("link", { name: /aviso de privacidad/i }),
+    ).toHaveAttribute("href", "/aviso-de-privacidad");
 
     const sponsor = page.locator("#contacto-patrocinio");
     await expect(sponsor.getByRole("heading", { name: /hablemos de tu marca/i })).toBeVisible();
     await expect(sponsor.getByRole("button", { name: /solicitar información/i })).toBeVisible();
+    await expect(
+      sponsor.getByRole("link", { name: /aviso de privacidad/i }),
+    ).toHaveAttribute("href", "/aviso-de-privacidad");
   });
 
   test("no produce desbordamiento horizontal", async ({ page }) => {
@@ -65,5 +73,91 @@ test.describe("Homepage comercial", () => {
     }));
 
     expect(dimensions.document).toBeLessThanOrEqual(dimensions.viewport);
+  });
+
+  test("optimiza una imagen local con la versión segura de Sharp", async ({
+    request,
+  }) => {
+    const response = await request.get(
+      "/_next/image?url=%2Fimages%2Fhero-bg.webp&w=640&q=75",
+      { headers: { accept: "image/webp" } },
+    );
+
+    expect(response.status()).toBe(200);
+    expect(response.headers()["content-type"]).toContain("image/webp");
+    expect((await response.body()).byteLength).toBeGreaterThan(1_000);
+  });
+
+  test("renderiza los dos formularios y privacidad en inglés", async ({ page }) => {
+    await page.goto("/?lang=en");
+
+    const corporate = page.locator("#registro");
+    await expect(
+      corporate.getByRole("heading", { name: /train your entire team/i }),
+    ).toBeVisible();
+    await expect(corporate.getByLabel("First name")).toBeVisible();
+    await expect(corporate.getByLabel("Last name")).toBeVisible();
+    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("min", "2");
+    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("max", "10");
+    await expect(
+      corporate.getByRole("link", { name: /privacy notice/i }),
+    ).toHaveAttribute("href", "/aviso-de-privacidad");
+
+    const sponsor = page.locator("#contacto-patrocinio");
+    await expect(
+      sponsor.getByRole("heading", { name: /let's talk about your brand/i }),
+    ).toBeVisible();
+    await expect(sponsor.getByLabel("What would you like to know?")).toBeVisible();
+    await expect(
+      page.getByRole("dialog", { name: "Privacy & cookies" }),
+    ).toBeVisible();
+  });
+
+  test("no captura atribución sin consentimiento y la borra al retirarlo", async ({
+    page,
+  }) => {
+    await page.goto(
+      "/?lang=es&utm_source=linkedin&gclid=CLICK-123&email=pii%40example.com",
+    );
+
+    const storedAttribution = () =>
+      page.evaluate(() => ({
+        local: window.localStorage.getItem("scss:attribution"),
+        cookie: document.cookie.includes("scss_attr="),
+      }));
+
+    await expect(page.getByRole("dialog", { name: "Privacidad y cookies" })).toBeVisible();
+    await expect.poll(storedAttribution).toEqual({ local: null, cookie: false });
+    await expect(page.locator('input[name="utm_source"]').first()).toHaveValue("");
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("essential");
+
+    await page.getByRole("button", { name: "Aceptar todas" }).click();
+    await expect.poll(storedAttribution).toEqual({
+      local: expect.any(String),
+      cookie: true,
+    });
+    await expect(page.locator('input[name="utm_source"]').first()).toHaveValue(
+      "linkedin",
+    );
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("all");
+    await expect(page.locator('input[name="landing_page"]').first()).toHaveValue("/");
+    const serialized = (await storedAttribution()).local ?? "";
+    expect(serialized).not.toContain("pii@example.com");
+    expect(serialized).not.toContain("email=");
+
+    await page.getByRole("button", { name: "Configurar cookies" }).click();
+    const reloaded = page.waitForEvent("load");
+    await page.getByRole("button", { name: "Solo esenciales" }).click();
+    await reloaded;
+
+    await expect.poll(storedAttribution).toEqual({ local: null, cookie: false });
+    await expect(page.locator('input[name="utm_source"]').first()).toHaveValue("");
+    await expect(
+      page.locator('input[name="marketingConsent"]').first(),
+    ).toHaveValue("essential");
   });
 });

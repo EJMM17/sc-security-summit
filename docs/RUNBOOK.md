@@ -1,136 +1,221 @@
 # SC Security Summit 2026 — Runbook
 
-Operational playbook for the Lanz Logistics ops team. Keep this near the
-on-call laptop the week of the event.
+Última revisión: 2026-07-30.
 
-Scope note: individual ticket sales live in **Eventbrite**. This site sells nothing and
-stores nothing — it markets the event and emails two kinds of inquiry (corporate pass and
-sponsorship) to `CONTACT_EMAIL`. Attendee lists, refunds, check-in and payment disputes are
-handled in the Eventbrite dashboard, not here.
+Runbook de continuidad para el sitio, Eventbrite y las solicitudes corporate /
+sponsor. La operación detallada de solicitudes está en
+`docs/INQUIRY_OPERATIONS.md`.
 
----
+## 1. Límites del sistema
 
-## 1. Quick reference
+- Eventbrite administra compras, pagos, boletos, reembolsos y check-in
+  individuales.
+- Supabase conserva únicamente solicitudes de pase corporativo y patrocinio.
+- Resend notifica al equipo después de que la solicitud quedó persistida.
+- Un correo fallido queda en outbox para reintento; no borra el lead.
+- El navegador nunca accede directamente a Supabase.
+- Las tablas históricas (`registros`, `admins`, etc.) no forman parte del flujo
+  nuevo.
 
-| What                | Where                                                                 |
-| ------------------- | --------------------------------------------------------------------- |
-| Production site     | https://www.scsecuritysummit.com                                      |
-| Ticketing           | Eventbrite event dashboard (link in `NEXT_PUBLIC_EVENTBRITE_URL`)     |
-| Health probe        | https://www.scsecuritysummit.com/api/health                           |
-| Vercel project      | https://vercel.com/<team>/sc-security-summit                          |
-| Resend dashboard    | https://resend.com/emails                                             |
-| Sentry project      | https://sentry.io/organizations/<org>/projects/sc-security-summit/    |
-| Upstash Redis       | https://console.upstash.com/redis/<id>                                |
-| Domain registrar    | (fill in)                                                             |
-| Cloudflare account  | (fill in if domain proxied through CF)                                |
+## 2. Referencias
 
-Inbox that receives inquiries (`CONTACT_EMAIL` on Vercel): (fill in)
-Operators with Eventbrite dashboard access: (fill in)
+| Recurso | Ubicación |
+|---|---|
+| Sitio | <https://scsecuritysummit.com> |
+| Health | <https://scsecuritysummit.com/api/health> |
+| Solicitudes | Supabase Studio → `public.inquiries` |
+| Outbox | Supabase Studio → `public.inquiry_notifications` |
+| Intentos | Supabase Studio → `public.inquiry_notification_attempts` |
+| Eventos | Supabase Studio → `public.inquiry_events` |
+| Correo | Resend Dashboard → Emails |
+| Deploys y cron | Vercel Dashboard |
+| Errores operativos | Vercel Runtime Logs por código técnico; Sentry solo para excepciones no controladas si está configurado |
+| Rate limiting | Vercel Storage → recurso Upstash / Upstash Console |
+| Venta individual | Eventbrite Organizer |
 
----
+Los enlaces de cuentas, responsables y teléfonos de escalación se mantienen en
+el gestor interno autorizado, no en el repositorio.
 
-## 2. Daily monitoring (event week)
+## 3. Revisión diaria
 
-Mon → Sun of event week, 09:00 and 17:00 (CDMX):
+Durante operación normal: una vez al día. Durante semana del evento: 09:00 y
+17:00, hora de Ciudad de México.
 
-1. **Sentry** → Issues → filter "Last 24h, level error or fatal".
-   - Zero new issues = green.
-   - Errors from the `submitInquiry` server action = page on-call: leads may be lost.
-2. **Vercel** → Deployments. Latest deploy should be green; click into Functions
-   → /api/health should be 200.
-3. **Resend** → Emails → status filter. Every corporate-pass and sponsorship submission
-   should appear as a delivered message to `CONTACT_EMAIL`. A gap here means leads are
-   being silently dropped — treat as SEV-2.
-4. **Eventbrite** → check the event is published, the four tiers (VIP, Plus, General,
-   Estudiante) are on sale, and the prices match `lib/content.ts`.
-5. **Upstash** → metrics. If eviction count spikes, check for an attack via Sentry's
-   `rate_limit_exceeded` entries.
+1. `/api/health` responde `200`, confirmando app + storage crítico.
+2. El último deployment de Vercel está verde.
+3. Vercel Runtime Logs no contiene tres eventos técnicos
+   `inquiry_persistence_failed` en los últimos 15 minutos.
+4. No existen notificaciones `dead`.
+5. Las notificaciones `pending`, `processing` o `retry` no están detenidas.
+6. Las solicitudes `new` de más de 24 horas tienen responsable o seguimiento.
+7. Resend no muestra un aumento anormal de rechazos.
+8. Upstash no muestra fallos o abuso sostenido.
+9. Eventbrite sigue publicado con accesos y precios correctos.
 
-Reach for Slack `#summit-ops` if any of the above flags red.
+Registra fecha, operador, conteos y decisiones. Nunca copies nombres, correos,
+teléfonos o mensajes del formulario a logs o tickets no autorizados.
 
----
+## 4. Severidad
 
-## 3. SOP — "I paid but got no ticket"
+| Nivel | Condición | Respuesta |
+|---|---|---|
+| SEV-1 | No se puede abrir el sitio o toda persistencia falla | Inmediata; activar fallback y evaluar rollback |
+| SEV-2 | Notificaciones detenidas/dead, cron sin ejecución >15 min o formularios degradados | Atender en menos de 30 min |
+| SEV-3 | Una solicitud requiere corrección o seguimiento manual | Mismo día hábil |
 
-Ticketing is Eventbrite's, so the site has nothing to look up.
+Tres fallos de persistencia en 15 minutos se tratan como SEV-1.
 
-1. Ask for the email used at checkout and the Eventbrite order number if they have it.
-2. In the Eventbrite dashboard → Orders, search by email. Resend the confirmation from
-   there ("Resend confirmation email").
-3. If no order exists, the payment did not complete — ask them to retry from the site's
-   access CTA and confirm the charge with their bank.
-4. Log anything you resolve manually in `#summit-ops`.
+## 5. SOP — solicitud sin respuesta
 
----
+1. Busca por empresa o correo en `public.inquiries`.
+2. Si existe, conserva su `id` como correlación y revisa `status`, `owner` y
+   `next_follow_up_at`.
+3. Revisa su fila en `public.inquiry_notifications`.
+4. Si está `sent`, confirma el correo en Resend y la bandeja de
+   `CONTACT_EMAIL`.
+5. Si está `pending` o `retry`, revisa el último `error_code` sanitizado y el
+   cron.
+6. Si está `dead`, escala como SEV-2; no cambies el estado manualmente sin una
+   instrucción aprobada.
+7. Si la solicitud no existe, el envío no quedó recibido. Pide reintentar y
+   ofrece el correo de contacto como canal alterno.
 
-## 4. SOP — "I sent the corporate-pass / sponsorship form and nobody replied"
+No solicites que la persona vuelva a enviar si la fila ya existe: un replay
+idéntico es seguro, pero no sustituye el seguimiento humano.
 
-1. Search `CONTACT_EMAIL` for the sender's company name. Subject lines are
-   `Solicitud de pase corporativo · <empresa>` and `Solicitud de patrocinio · <empresa>`.
-2. If nothing arrived, check Resend → Emails for a failed send in that window, and Sentry
-   for `submitInquiry` errors.
-3. If Resend shows nothing at all, the submission never reached the server (rate limit or
-   validation). Ask the person to retry, and take their details by email in the meantime.
+## 6. SOP — Resend no disponible
 
----
+1. Confirma el incidente en Resend Status y en sus logs.
+2. Comprueba que las solicitudes nuevas siguen apareciendo en `inquiries`.
+3. Comprueba que su outbox queda `pending` o `retry`.
+4. No despliegues un cambio que envíe correo antes de persistir.
+5. Cuando el proveedor vuelva, confirma que el cron drene la cola gradualmente.
+6. Escala cualquier fila `dead`.
 
-## 5. Event day
+Mientras Supabase esté sano, la captura sigue disponible y el usuario recibe
+éxito aunque la notificación quede en cola.
 
-- Attendee check-in runs on **Eventbrite's organizer app** (QR scan). Export a printed
-  attendee list from Eventbrite as the offline backup.
-- Walk-ins: sell through Eventbrite on a tablet, or capture name/email/company on paper
-  and reconcile afterwards.
-- The website's only event-day job is being reachable — keep the health probe monitor on.
+## 7. SOP — Supabase no disponible
 
----
+1. Confirma el estado del proveedor y los errores de persistencia.
+2. El formulario debe responder `storage_unavailable` y no mostrar éxito.
+3. Publica temporalmente el canal de contacto autorizado junto al formulario si
+   la indisponibilidad continúa.
+4. No cambies el flujo para enviar correo sin persistir: rompería la fuente de
+   verdad e idempotencia.
+5. Cuando vuelva el servicio, ejecuta una solicitud controlada y confirma fila,
+   outbox y notificación.
 
-## 6. Post-event
+## 8. SOP — cron detenido
 
-| Day  | Task                                                                                       |
-| ---- | ------------------------------------------------------------------------------------------ |
-| +1   | Send post-event survey (separate Resend batch). Export the final attendee list from Eventbrite and store it with the ops archive. |
-| +7   | Reconcile Eventbrite payouts. Issue any CFDIs requested by attendees.                        |
-| +30  | Disable Vercel Cron / scheduled jobs for the event domain.                                   |
-| +180 | **LFPDPPP retention deadline.** Purge the inquiry emails and any exported attendee lists holding personal data from shared drives and inboxes, and document the run in `docs/PII_DELETION_LOG.md`. The app itself stores no personal data. |
+1. Confirma que el equipo Vercel sigue en Pro.
+2. Confirma que `CRON_SECRET` existe en Production y no contiene saltos de
+   línea.
+3. En Vercel → Cron Jobs, confirma
+   `/api/cron/inquiry-notifications` con `*/5 * * * *`.
+4. Revisa logs de Function y respuestas `401`, `503` o `500`.
+5. Ejecuta una invocación manual autenticada desde una estación autorizada sin
+   imprimir el secreto.
+6. Confirma que el worker reclama un lote acotado y que no hay dos procesos
+   sobre la misma fila.
 
----
+Vercel no reintenta una invocación cron fallida y puede entregar una misma
+invocación más de una vez. El worker debe seguir siendo idempotente.
 
-## 7. Disaster recovery
+## 9. SOP — rate limiting
 
-- **Domain outage**: If `scsecuritysummit.com` is unreachable, the Vercel
-  preview URL `sc-security-summit.vercel.app` is the fallback. Update the
-  `NEXT_PUBLIC_SITE_URL` env var temporarily and redeploy.
-- **Resend down**: confirm at https://status.resend.com. While it is down, inquiry emails
-  do not arrive — publish the contact address next to the form so leads have another path.
-- **Eventbrite down**: confirm at https://www.eventbritestatus.com. Sales stop entirely;
-  swap the access CTA copy in `lib/content.ts` to point at the contact email until it returns.
-- **Bad deploy**: Vercel → Deployments → previous green deployment → "Promote to Production".
-  The site is stateless, so a rollback is always safe.
+Si una persona legítima recibe `rate_limited`:
 
-Escalation chain (in order):
-1. On-call developer (rotation TBD).
-2. Lanz Logistics ops lead.
-3. Vercel support: https://vercel.com/help.
-4. Resend support: https://resend.com/help.
+1. Confirma hora y ambiente.
+2. Revisa métricas de Upstash y abuso agregado.
+3. Espera la ventana de 15 minutos como primera opción.
+4. No registres su IP en tickets, Sentry o Supabase.
+5. No eleves el límite sin revisar el patrón de abuso y añadir pruebas.
 
----
+Upstash solo se usa en Vercel Production y falla cerrado allí. Preview mantiene
+los formularios deshabilitados. No copies credenciales ni desactives la
+protección para resolver una incidencia.
 
-## 8. Pre-launch checklist (T-7 days)
+La aplicación consume `KV_REST_API_URL` y `KV_REST_API_TOKEN`; ambas son
+aprovisionadas y rotadas por `summit-rate-limit-production`, conectado solo a
+Production en Vercel Storage. El recurso Redis anterior permanece archivado y
+no se reconecta.
+`KV_URL`, `REDIS_URL` y `KV_REST_API_READ_ONLY_TOKEN` son provider-managed y
+no se consumen. Si falta el par REST, comprueba primero el recurso, su conexión
+al proyecto y el target Production; no recrees variables manuales.
 
-Re-run on Sept 17, 2026.
+Incidente de alcance: nunca uses `vercel env rm NAME preview` sobre una entrada
+multi-target. Antes haz un inventario y respalda IDs/targets/origen sin copiar
+valores, y edita el target desde Dashboard/API. Para Upstash, cambia o rota la
+conexión en Vercel Storage y reconstruye Production.
 
-- [ ] All env vars present in Vercel Production. Confirm with
-      `npm run check-env` from a fresh checkout pointing at the prod env.
-- [ ] Eventbrite event published, four tiers on sale, prices matching the site.
-- [ ] Upstash Redis provisioned and reachable from Vercel.
-- [ ] Resend domain verified (SPF + DKIM + DMARC). Submit one test corporate-pass and one
-      test sponsorship form; confirm both land in `CONTACT_EMAIL` (Gmail and Outlook).
-- [ ] Sentry DSN active. Trigger a `Sentry.captureMessage("smoke")` and confirm it appears
-      within 60s.
-- [ ] Vercel Speed Insights / Analytics enabled.
-- [ ] Lighthouse mobile run on `/`: Performance ≥ 90, A11y ≥ 95,
-      Best Practices ≥ 95, SEO ≥ 95.
-- [ ] axe-core: 0 critical violations on `/` and `/sponsors`.
-- [ ] Mozilla Observatory: A or A+ on the apex domain.
-- [ ] DNS pointing at Vercel, SSL valid (cert expiry > Sept 30, 2026).
-- [ ] Code freeze 72h before the event (Sept 21, 18:00).
+## 10. Venta y evento
+
+Para “pagué y no recibí boleto”, busca el pedido en Eventbrite por el correo de
+compra y reenvía la confirmación desde Eventbrite. El sitio y Supabase no
+contienen órdenes individuales.
+
+El check-in se realiza con Eventbrite Organizer. La lista offline se exporta
+desde Eventbrite bajo el procedimiento de privacidad autorizado.
+
+## 11. Retención
+
+La política aprobada el 2026-07-30 conserva cada solicitud durante 18 meses
+desde `created_at`, salvo relación contractual, solicitud ARCO en trámite u
+obligación jurídica documentada. Una persona autorizada ejecuta la revisión
+mensual, elimina los datos personales o los anonimiza de forma irreversible y
+registra:
+
+- fecha de ejecución;
+- responsable;
+- número de filas procesadas;
+- resultado y, si aplica, código técnico del fallo.
+
+La tarea mensual nunca registra PII. Ante un fallo, detén el lote, conserva las
+filas sin cambios y escala a privacidad antes de reintentar.
+
+## 12. Recuperación
+
+- **Health 503:** revisa primero configuración/conectividad Supabase y luego el
+  deployment; el probe tiene un timeout de tres segundos.
+- **Bad deploy:** promueve el deployment verde anterior. Mantén las tablas y
+  datos nuevos; no hagas `DROP`.
+- **Cron defectuoso:** deshabilítalo por separado. Instant Rollback no restaura
+  automáticamente la configuración de cron.
+- **Migración defectuosa:** corrige con una migración nueva aditiva. Nunca
+  edites una migración aplicada.
+- **Pérdida o corrupción:** detén escrituras, conserva evidencia y sigue el
+  procedimiento de backup/restauración de Supabase.
+- **Eventbrite caído:** pausa ventas y dirige temporalmente al canal de contacto
+  aprobado; no construyas checkout local de emergencia.
+
+Nunca ejecutes `supabase db reset --linked` en Production.
+
+## 13. Checklist pre-lanzamiento
+
+- [x] Aviso final `2026-07-30`, retención de 18 meses, ARCO y procedimiento de
+      eliminación/anonimización aprobados el 2026-07-30.
+- [ ] Backup de Production verificado.
+- [ ] `public.registros` conserva exactamente los diez registros históricos
+      esperados antes y después del corte.
+- [ ] Migración `retire_legacy_registration_webhook` aplicada: retiró
+      `trg_send_confirmation_email`, `public.notify_new_registro()` y `pg_net`
+      con `RESTRICT` dentro de una transacción.
+- [ ] `supabase/functions/send-confirmation-email/index.ts` desplegada como
+      tombstone HTTP 410 con verificación JWT; no se reutilizó ni documentó el
+      secreto heredado.
+- [ ] Migraciones alineadas y reproducibles desde cero.
+- [ ] pgTAP, lint y tipos generados verdes.
+- [ ] Advisors sin errores críticos.
+- [ ] Preview visual desconectado, sin variables Production.
+- [ ] Vercel Pro confirmado y cron activo cada cinco minutos.
+- [ ] `summit-rate-limit-production` conectado solo a Production; par
+      `KV_REST_API_URL`/`KV_REST_API_TOKEN` presente.
+- [ ] Variables Production validadas en estricto.
+- [ ] El commit fue reconstruido como Production; no se promovió el artefacto
+      Preview.
+- [ ] Una solicitud corporate y sponsor confirmadas de extremo a extremo.
+- [ ] Fallo controlado de Resend conserva la solicitud.
+- [ ] Fallo controlado de Supabase no devuelve falso éxito.
+- [ ] Acceso `anon`/`authenticated` denegado.
+- [ ] Operadores con cuentas individuales y MFA.

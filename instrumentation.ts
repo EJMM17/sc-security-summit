@@ -1,11 +1,18 @@
 // Next.js loads this file once per runtime to bootstrap instrumentation.
 // We use it to wire up Sentry for the right runtime.
 //
-// The dynamic imports + DSN gate keep @sentry/nextjs out of the bundle when
-// observability is disabled (local dev, preview without DSN, etc), which
-// matters for Edge runtime size budgets.
+// The dynamic imports + Production gate keep @sentry/nextjs inactive in local
+// development, visual Preview and custom targets.
 
-const sentryEnabled = Boolean(process.env.SENTRY_DSN);
+const target = (
+  process.env.VERCEL_TARGET_ENV ??
+  process.env.VERCEL_ENV ??
+  ""
+).trim();
+const sentryEnabled =
+  process.env.VERCEL === "1" &&
+  target === "production" &&
+  Boolean(process.env.SENTRY_DSN?.trim());
 
 export async function register() {
   if (!sentryEnabled) return;
@@ -17,11 +24,17 @@ export async function register() {
   }
 }
 
-// Forward server-action / route-handler request errors to Sentry.
+// Capture the exception without forwarding Next.js' normalized request object.
 export async function onRequestError(
   ...args: Parameters<typeof import("@sentry/nextjs").captureRequestError>
 ) {
   if (!sentryEnabled) return;
+  const [error, , context] = args;
   const Sentry = await import("@sentry/nextjs");
-  Sentry.captureRequestError(...args);
+  Sentry.captureException(error, {
+    tags: {
+      router_kind: context.routerKind,
+      route_type: context.routeType,
+    },
+  });
 }

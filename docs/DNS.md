@@ -16,10 +16,10 @@ The sender domain in `EMAIL_FROM` must be verified in Resend. Steps:
    verbatim into DNS.
 3. Wait for "Verified" — usually <30 min on most registrars.
 
-> If `EMAIL_FROM` uses an **unverified** domain, the registration
-> confirmation email send returns an error that is logged as a `failed`
-> event in `email_events` and surfaced in Sentry — it is never silently
-> dropped. The registration itself still succeeds.
+> If `EMAIL_FROM` uses an **unverified** domain, Resend rejects the
+> notification. The inquiry remains persisted and the outbox records a
+> sanitized retry/dead result. Fix domain verification, then follow the
+> notification procedure in `docs/RUNBOOK.md`.
 
 ### SPF (sender policy framework)
 
@@ -63,11 +63,13 @@ WebP responses to avoid double-compressing the hero asset.
 
 ## 3. Health monitoring
 
-Add an external uptime check (UptimeRobot / Better Stack) on
-`https://www.scsecuritysummit.com/api/health`. Expect:
+Add an external uptime check (UptimeRobot / Better Stack) on the canonical
+apex URL `https://scsecuritysummit.com/api/health`. Expect:
 
-- 200 with body `{"ok":true}` while the app is serving requests
-  (the probe has no external dependency)
+- `200` with `{"ok":true,...}` when the application and critical Supabase
+  inquiry storage respond within three seconds.
+- `503` with a privacy-safe body when configuration, Supabase or the probe
+  timeout fails.
 
 Alert threshold: 2 consecutive failures = page on-call.
 

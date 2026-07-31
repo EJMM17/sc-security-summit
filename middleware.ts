@@ -6,6 +6,12 @@ export function middleware(request: NextRequest) {
   crypto.getRandomValues(array);
   const nonce = btoa(String.fromCharCode(...array));
   const devEval = process.env.NODE_ENV === "development" ? " 'unsafe-eval'" : "";
+  const forwardedProtocol = request.headers
+    .get("x-forwarded-proto")
+    ?.split(",", 1)[0]
+    ?.trim();
+  const isHttps =
+    request.nextUrl.protocol === "https:" || forwardedProtocol === "https";
 
   // Nonce-based CSP: script-src no longer needs 'unsafe-inline'.
   // style-src retains 'unsafe-inline' because Tailwind + inline style props require it.
@@ -27,7 +33,9 @@ export function middleware(request: NextRequest) {
     "base-uri 'self'",
     "frame-ancestors 'self'",
     "object-src 'none'",
-    "upgrade-insecure-requests",
+    // WebKit upgrades localhost assets to HTTPS when this directive is sent
+    // over plain HTTP. Vercel requests are HTTPS, so production keeps it.
+    ...(isHttps ? ["upgrade-insecure-requests"] : []),
   ].join("; ");
 
   const requestHeaders = new Headers(request.headers);

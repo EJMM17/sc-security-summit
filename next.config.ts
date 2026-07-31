@@ -1,7 +1,22 @@
 import type { NextConfig } from "next";
 import { withSentryConfig } from "@sentry/nextjs";
 
+const deploymentTarget = (
+  process.env.VERCEL_TARGET_ENV ??
+  process.env.VERCEL_ENV ??
+  ""
+).trim();
+const isVercelProduction =
+  process.env.VERCEL === "1" && deploymentTarget === "production";
+
 const nextConfig: NextConfig = {
+  // Compile a non-secret target marker for client-only integration gates.
+  // It is derived from Vercel system metadata, never configured by users.
+  env: {
+    NEXT_PUBLIC_DEPLOYMENT_TARGET: isVercelProduction
+      ? "production"
+      : "visual",
+  },
   poweredByHeader: false,
   experimental: {
     optimizePackageImports: ["lucide-react"],
@@ -79,7 +94,9 @@ const nextConfig: NextConfig = {
 // Source map uploads only happen when SENTRY_AUTH_TOKEN is present in the
 // environment (set in Vercel → Project Settings → Environment Variables).
 // Local builds skip the upload step.
-const sentryEnabled = Boolean(process.env.SENTRY_DSN);
+const sentryEnabled =
+  isVercelProduction &&
+  Boolean(process.env.SENTRY_DSN?.trim());
 
 export default sentryEnabled
   ? withSentryConfig(nextConfig, {

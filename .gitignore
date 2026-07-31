@@ -7,8 +7,9 @@ node_modules/
 out/
 
 # Env
-.env.local
-.env*.local
+.env
+.env.*
+!.env.local.example
 
 # Misc
 tsconfig.tsbuildinfo
@@ -17,3 +18,7 @@ pnpm-lock.yaml
 /tmp/
 /playwright-report/
 /test-results/
+/coverage/
+/.vercel/
+/supabase/.branches/
+/supabase/.temp/
