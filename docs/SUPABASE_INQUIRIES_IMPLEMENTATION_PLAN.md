@@ -15,7 +15,7 @@ canónica del código actual es `docs/PROJECT_CONTEXT.md`.
 | Esquema, pgTAP, tipos y baseline local | Implementado en el repositorio |
 | Dominio, formularios, idempotencia y outbox | Implementado en el repositorio |
 | Contrato env, CI, cron y runbooks | Implementado en el repositorio |
-| Reconciliación/aplicación remota | Pendiente; requiere operador y backup |
+| Reconciliación/aplicación remota | Historial y backup verificados; aplicación pendiente del corte coordinado con Vercel |
 | Aviso y retención | Versión final `2026-07-30`; aprobados aviso, 18 meses, ARCO y eliminación/anonimización |
 | Preview | Inventario de variables vacío y contrato desconectado; pendiente validar el deployment reconstruido |
 | Production | No activada por esta implementación local |
@@ -748,8 +748,10 @@ Gate: revisión visual aprobada sin acceso a PII ni integraciones.
 
 - [x] Aprobación legal/retención registrada el 2026-07-30.
 - [ ] Operador de base designado para la ventana de corte.
-- [ ] Backup inmediatamente anterior.
-- [ ] Reconciliar historial, revisar advisors y confirmar que solo están
+- [ ] Regenerar inmediatamente antes del corte si cambió Production. El
+      snapshot cifrado del 2026-07-30 ya fue restaurado y validado en una
+      instancia separada.
+- [x] Reconciliar historial, revisar advisors y confirmar que solo están
       pendientes las tres migraciones `20260730...`.
 - [ ] Aplicar en orden `add_inquiry_persistence`,
       `harden_legacy_grants` y `retire_legacy_registration_webhook`.

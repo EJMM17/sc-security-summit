@@ -24,9 +24,9 @@ No se activa la persistencia hasta completar todos estos puntos:
       ni telemetría de Vercel/Sentry.
 - [ ] El inventario completo de Preview fue revisado y no conserva secretos
       legacy ajenos al contrato actual.
-- [ ] Existe un backup reciente y verificado de Production.
-- [ ] El historial de migraciones local y remoto está reconciliado.
-- [ ] Security Advisor y Performance Advisor no tienen errores críticos sin
+- [x] Existe un backup reciente y verificado de Production.
+- [x] El historial de migraciones local y remoto está reconciliado.
+- [x] Security Advisor y Performance Advisor no tienen errores críticos sin
       resolver.
 - [ ] Production tiene sus variables completas y Preview no hereda sus scopes.
 - [ ] Los deployments Preview históricos que recibieron secretos compartidos
@@ -47,11 +47,23 @@ el deployment falle.
 ### Estado del backup de Supabase
 
 El proyecto Summit continúa en Supabase Free. El Dashboard confirmó el
-2026-07-30 que ese plan no incluye backups programados. Antes del corte, el
-operador debe crear un backup lógico manual con credenciales de base, guardarlo
-en almacenamiento corporativo autorizado y verificar que pueda restaurarse en
-un entorno separado. No se considera backup una consulta, exportación parcial
-ni la disponibilidad del proyecto en el Dashboard.
+2026-07-30 que ese plan no incluye backups programados. El 2026-07-30 se creó
+un dump lógico manual de `public` y `supabase_migrations`, se restauró en una
+instancia PostgreSQL desechable y se verificaron tablas, datos, historial,
+trigger y función legados. La copia quedó cifrada con Windows DPAPI para el
+usuario operador, fuera del repositorio, junto con un manifiesto sin PII y el
+SHA-256 del dump original. La restauración recuperó 10 registros, 2
+administradores, 15 eventos de auditoría, 7 eventos de correo, 1 fila de
+configuración y 16 migraciones.
+
+El artefacto operativo está en
+`E:\GitHubProyectos\_backups\sc-security-summit\supabase-production-20260731004918.dump.dpapi`.
+Solo puede descifrarlo el mismo usuario de Windows. Una segunda copia en
+almacenamiento corporativo sigue siendo recomendable para continuidad del
+equipo, pero no sustituye ni invalida la restauración ya comprobada.
+Como el sitio legado continúa activo, el operador debe comparar conteos y
+regenerar el dump inmediatamente antes de aplicar migraciones si hubo cualquier
+escritura posterior a este snapshot.
 
 ### Corte único del webhook legado
 

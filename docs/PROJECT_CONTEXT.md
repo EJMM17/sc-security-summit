@@ -246,14 +246,18 @@ jurídica documentada. Al vencimiento, una persona autorizada elimina los datos
 personales o los anonimiza de forma irreversible y registra solo fecha,
 responsable, conteo y resultado, nunca PII.
 
-Esta aprobación cierra únicamente el gate legal. Production continúa bloqueada
-hasta verificar el backup, historial y advisors, completar el corte de base,
-resolver la facturación de Vercel y ejecutar los controles de despliegue.
+Esta aprobación cierra únicamente el gate legal. El backup, el historial y los
+advisors quedaron verificados el 2026-07-30. Production continúa bloqueada hasta
+completar el corte de base, resolver la imposibilidad de nuevos deployments en
+la cuenta Vercel vencida y ejecutar los controles de despliegue.
 
 El proyecto Summit está actualmente en Supabase Free, que no ofrece backups
-programados. El backup previo al corte debe ser un dump lógico manual,
-custodiado en almacenamiento corporativo y probado mediante una restauración
-separada; este gate sigue pendiente.
+programados. El 2026-07-30 se creó un dump lógico de `public` y
+`supabase_migrations`, cifrado fuera del repositorio con DPAPI, y se probó
+mediante una restauración separada. La verificación recuperó las diez filas
+históricas y todos los objetos legados que afectará el corte. Mientras el sitio
+legado siga activo, el conteo y el dump deben refrescarse justo antes del corte
+si se registra una escritura posterior.
 
 La autoridad federal vigente indicada en el borrador es la Secretaría
 Anticorrupción y Buen Gobierno, no el extinto INAI.
