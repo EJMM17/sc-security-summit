@@ -268,6 +268,8 @@ visitante; reintroducir un contador requiere demostrar que no retrasa LCP,
 no crea un intervalo permanente y conserva los presupuestos de Lighthouse. La
 imagen principal usa exclusivamente el `srcset` optimizado de `next/image`;
 envolverla con fuentes manuales provoca descargas duplicadas y está prohibido.
+El recurso usa prioridad alta explícita y calidad 70 bajo el overlay del hero;
+ambos valores forman parte del presupuesto LCP.
 El título principal usa la pila tipográfica del sistema y la fuente decorativa
 no se precarga: el contenido LCP nunca debe depender de una fuente secundaria.
 
