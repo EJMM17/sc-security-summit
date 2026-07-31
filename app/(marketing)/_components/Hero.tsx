@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import CountdownTimer from "@/components/CountdownTimer";
-import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
@@ -82,18 +81,18 @@ export default function Hero({ language }: { language: Language }) {
 
       <div className="hero-layout">
         <div className="hero-main">
-          <ScrollReveal delay={80}>
+          <div>
             <p className="hero-eyebrow">{ui.heroKicker}</p>
             <h1 className="hero-title">
               {ui.heroTitlePrefix} <span>{ui.heroTitleHighlight}</span>
             </h1>
-          </ScrollReveal>
+          </div>
 
-          <ScrollReveal delay={120}>
+          <div>
             {renderPresenters()}
-          </ScrollReveal>
+          </div>
 
-          <ScrollReveal delay={150}>
+          <div>
             <div className="hero-event-facts">
               <div>
                 <Calendar aria-hidden="true" />
@@ -110,13 +109,13 @@ export default function Hero({ language }: { language: Language }) {
                 </div>
               </div>
             </div>
-          </ScrollReveal>
+          </div>
 
-          <ScrollReveal delay={180}>
+          <div>
             <p className="hero-description">{ui.heroDescription}</p>
-          </ScrollReveal>
+          </div>
 
-          <ScrollReveal delay={210}>
+          <div>
             <div className="hero-actions">
               <PrimaryCTA href={EVENTBRITE_URL} external size="lg">
                 {ui.registerNowBtn}
@@ -126,11 +125,11 @@ export default function Hero({ language }: { language: Language }) {
                 {ui.heroAgendaBtn}
               </a>
             </div>
-          </ScrollReveal>
+          </div>
 
-          <ScrollReveal delay={240} direction="scale" className="hero-intelligence-wrap">
+          <div className="hero-intelligence-wrap">
             {renderIntelligence()}
-          </ScrollReveal>
+          </div>
         </div>
       </div>
     </section>
