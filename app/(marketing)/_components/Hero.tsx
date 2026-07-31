@@ -1,6 +1,5 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
-import AnimatedCounter from "@/components/AnimatedCounter";
 import CountdownTimer from "@/components/CountdownTimer";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
@@ -54,7 +53,7 @@ export default function Hero({ language }: { language: Language }) {
         {heroStats.map((stat, index) => (
           <div key={index}>
             <div>
-              <AnimatedCounter target={stat.number} />
+              <span>{stat.number}</span>
               {stat.suffix ? <span>{stat.suffix}</span> : null}
             </div>
             <p>{stat.label}</p>
