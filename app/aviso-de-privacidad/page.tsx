@@ -41,13 +41,8 @@ export default function AvisoPrivacidad() {
           Aviso de Privacidad
         </h1>
         <p className="text-sm text-slate-400 mb-4">
-          Versión técnica: {INQUIRY_CONSENT_VERSION}
+          Versión vigente: {INQUIRY_CONSENT_VERSION}
         </p>
-        <div className="mb-10 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-          Este texto incorpora el tratamiento técnico previsto para las
-          solicitudes. Debe ser validado por la persona responsable legal y de
-          privacidad antes de habilitar la persistencia en producción.
-        </div>
 
         <div className="prose prose-slate max-w-none space-y-8 text-sm text-slate-700 leading-relaxed">
 
@@ -252,16 +247,13 @@ export default function AvisoPrivacidad() {
               8. Conservación y Eliminación
             </h2>
             <p>
-              La política técnica propuesta conserva cada solicitud durante 18
-              meses desde su creación, salvo que exista una relación
-              contractual u obligación jurídica que justifique otro plazo. Al
-              vencer, los datos deberán eliminarse o anonimizarse conforme al
-              procedimiento aprobado.
-            </p>
-            <p className="mt-3 font-semibold text-amber-800">
-              El plazo y el procedimiento definitivos están pendientes de
-              validación legal y deben aprobarse antes de activar la
-              persistencia en producción.
+              Cada solicitud se conserva durante 18 meses desde su creación,
+              salvo que exista una relación contractual, una solicitud ARCO en
+              trámite o una obligación jurídica que justifique otro plazo. Al
+              vencer, una persona autorizada elimina los datos personales o
+              los anonimiza de forma irreversible, documentando únicamente la
+              fecha, el responsable, el número de registros y el resultado,
+              sin duplicar datos personales en la evidencia operativa.
             </p>
           </section>
 

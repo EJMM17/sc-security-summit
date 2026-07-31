@@ -16,9 +16,10 @@ en GitHub Actions, pruebas locales o Preview.
 
 No se activa la persistencia hasta completar todos estos puntos:
 
-- [ ] El aviso `2026-07-29-draft` fue revisado y aprobado por la persona
-      responsable legal/privacidad.
-- [ ] El plazo de retención y el procedimiento de eliminación fueron aprobados.
+- [x] El aviso final `2026-07-30` fue revisado y aprobado por la persona
+      responsable legal/privacidad el 2026-07-30.
+- [x] El plazo de retención de 18 meses, el proceso ARCO y el procedimiento de
+      eliminación/anonimización fueron aprobados el 2026-07-30.
 - [ ] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing
       ni telemetría de Vercel/Sentry.
 - [ ] El inventario completo de Preview fue revisado y no conserva secretos
@@ -34,6 +35,8 @@ No se activa la persistencia hasta completar todos estos puntos:
 - [ ] Vercel Project Settings y `package.json` usan Node 22.x.
 - [ ] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
       compatible con Hobby.
+- [ ] La cuenta de Vercel está al corriente, sin facturas vencidas ni avisos de
+      suspensión. El estado `overdue` observado el 2026-07-30 bloquea el corte.
 - [ ] El operador y la ventana para retirar el webhook legado están
       confirmados según el corte controlado de la siguiente sección.
 
@@ -41,13 +44,23 @@ El plan Vercel Pro fue confirmado durante la revisión del 2026-07-29. Debe
 confirmarse otra vez si cambia la suscripción: en Hobby, `*/5 * * * *` hace que
 el deployment falle.
 
+### Estado del backup de Supabase
+
+El proyecto Summit continúa en Supabase Free. El Dashboard confirmó el
+2026-07-30 que ese plan no incluye backups programados. Antes del corte, el
+operador debe crear un backup lógico manual con credenciales de base, guardarlo
+en almacenamiento corporativo autorizado y verificar que pueda restaurarse en
+un entorno separado. No se considera backup una consulta, exportación parcial
+ni la disponibilidad del proyecto en el Dashboard.
+
 ### Corte único del webhook legado
 
 El retiro ocurre dentro del mismo bloque controlado de las tres migraciones
 nuevas, respetando siempre su timestamp. Una sola persona designada debe:
 
-1. Crear backup y comprobar que `public.registros` contiene los siete registros
-   históricos esperados.
+1. Crear backup y comprobar que `public.registros` contiene los diez registros
+   históricos legítimos confirmados por el propietario del proyecto el
+   2026-07-30.
 2. Confirmar que las únicas versiones pendientes son, en este orden:
    `20260730024502_add_inquiry_persistence`,
    `20260730030134_harden_legacy_grants` y
@@ -62,7 +75,7 @@ nuevas, respetando siempre su timestamp. Una sola persona designada debe:
    función tombstone HTTP 410 protegida con verificación JWT. Su única
    finalidad es rechazar llamadas rezagadas; no contiene ni documenta
    credenciales heredadas.
-6. Confirmar nuevamente que los siete registros históricos siguen intactos y
+6. Confirmar nuevamente que los diez registros históricos siguen intactos y
    que no se generaron correos al ejecutar el smoke test del dominio nuevo.
 
 No borres la Edge Function antes de completar el periodo de observación. El

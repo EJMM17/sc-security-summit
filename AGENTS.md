@@ -65,7 +65,7 @@ app/
   (marketing)/_components/        Landing sections
   actions/inquiries.ts            FormData adapter and typed public result
   api/cron/inquiry-notifications/ Authenticated retry route
-  aviso-de-privacidad/            Privacy notice (currently a legal draft)
+  aviso-de-privacidad/            Approved privacy notice
 
 components/
   CorporatePassForm.tsx
@@ -280,9 +280,10 @@ forms.
 The canonical consent version is
 `lib/inquiries/constants.ts::INQUIRY_CONSENT_VERSION`.
 
-`2026-07-29-draft` and the proposed 18-month retention period are not legal
-approval. Do not deploy persistence to Production until the privacy owner
-approves the notice, retention, ARCO process and deletion/anon procedure.
+The privacy owner approved consent version `2026-07-30`, the 18-month
+retention period, the ARCO process and the deletion/anonymization procedure on
+2026-07-30. This approval does not satisfy the independent backup, database,
+Vercel billing, migration, merge or Production deployment gates.
 
 PII rules:
 
@@ -322,9 +323,9 @@ plan and `CRON_SECRET` before deploying.
 
 Production sequence:
 
-1. legal/retention approval;
+1. confirm the recorded legal/retention approval remains current;
 2. verified backup;
-3. verify the seven historical `registros` rows;
+3. verify the ten legitimate historical `registros` rows;
 4. reconcile local/remote migration history and review Security/Performance
    Advisors;
 5. confirm that the only pending versions are
@@ -335,7 +336,7 @@ Production sequence:
    webhook and executes `DROP EXTENSION pg_net RESTRICT`, so any dependency
    aborts and rolls back the cut;
 7. deploy the JWT-protected HTTP 410 tombstone and verify the database,
-   Advisors and seven historical rows again;
+   Advisors and ten historical rows again;
 8. Vercel deploy;
 9. one controlled corporate and sponsor submission;
 10. verify inquiry, outbox, attempt, event and email;

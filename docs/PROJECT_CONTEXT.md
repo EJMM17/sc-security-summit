@@ -238,17 +238,22 @@ ellos; nunca se usa `npm audit fix --force`.
 
 ## 9. Privacidad y retención
 
-El consentimiento actual usa `2026-07-29-draft`. El aviso y la propuesta de
-retención de 18 meses están técnicamente redactados, pero pendientes de
-validación legal. No se activa persistencia en Production ni se ejecuta
-eliminación hasta aprobar:
+El consentimiento vigente usa `2026-07-30`. La persona responsable de
+privacidad aprobó el 2026-07-30 el aviso, la retención de 18 meses, el proceso
+ARCO y el procedimiento de eliminación/anonimización. Las excepciones al plazo
+son una relación contractual, una solicitud ARCO en trámite o una obligación
+jurídica documentada. Al vencimiento, una persona autorizada elimina los datos
+personales o los anonimiza de forma irreversible y registra solo fecha,
+responsable, conteo y resultado, nunca PII.
 
-- identidad/domicilio completos del Responsable;
-- finalidades y encargados;
-- transferencias aplicables;
-- plazo y excepciones;
-- proceso ARCO;
-- eliminación o anonimización.
+Esta aprobación cierra únicamente el gate legal. Production continúa bloqueada
+hasta verificar el backup, historial y advisors, completar el corte de base,
+resolver la facturación de Vercel y ejecutar los controles de despliegue.
+
+El proyecto Summit está actualmente en Supabase Free, que no ofrece backups
+programados. El backup previo al corte debe ser un dump lógico manual,
+custodiado en almacenamiento corporativo y probado mediante una restauración
+separada; este gate sigue pendiente.
 
 La autoridad federal vigente indicada en el borrador es la Secretaría
 Anticorrupción y Buen Gobierno, no el extinto INAI.
@@ -294,5 +299,6 @@ El repositorio incluye una migración separada para retirar
 `trg_send_confirmation_email`, `public.notify_new_registro()` y `pg_net`, más
 un tombstone JWT/HTTP 410 en
 `supabase/functions/send-confirmation-email/index.ts`. La aplicación remota de
-ese corte sigue gated por backup y por verificar que las siete filas históricas
-de `public.registros` permanezcan intactas.
+ese corte sigue gated por backup y por verificar que las diez filas históricas
+legítimas de `public.registros` permanezcan intactas. El propietario del
+proyecto confirmó ese conteo el 2026-07-30; no autoriza modificar esas filas.

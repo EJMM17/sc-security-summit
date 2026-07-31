@@ -114,8 +114,10 @@ idempotency. Do not log PII or return it from the route.
 ## Privacy
 
 `INQUIRY_CONSENT_VERSION` in `lib/inquiries/constants.ts` is canonical.
-`2026-07-29-draft` and 18-month retention remain pending legal approval.
-Production persistence is gated on that approval.
+Consent version `2026-07-30`, 18-month retention, the ARCO process and the
+deletion/anonymization procedure were approved by the privacy owner on
+2026-07-30. Production remains gated independently on backup, database
+verification, Vercel billing, migrations and deployment checks.
 
 Never place names, email, phone, interest, notes, recipient, subject or email
 body in Sentry, Vercel logs, attempts or events.

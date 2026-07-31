@@ -34,7 +34,7 @@ No uses para este flujo las tablas históricas `registros`, `admins`,
 `app_config`, `app_secrets`, `audit_log` o `email_events`.
 
 Durante el corte inicial, una persona designada verifica en modo lectura que
-`public.registros` conserve sus siete filas históricas antes y después de
+`public.registros` conserve sus diez filas históricas legítimas antes y después de
 retirar el webhook legado. Operaciones no modifica esas filas. La función
 `send-confirmation-email` queda como tombstone HTTP 410 con verificación JWT;
 no intentes reactivarla ni recuperar su secreto anterior.
@@ -147,7 +147,7 @@ reclamada de nuevo por el worker. No la liberes manualmente.
 
 ### Retención próxima
 
-Solo después de aprobación legal:
+La política aprobada el 2026-07-30 requiere:
 
 - Tabla: `inquiries`
 - Filtro: `retention_until` dentro de los próximos 30 días
@@ -199,9 +199,14 @@ No guardes exportaciones en equipos personales, correo personal o chats.
 
 ## 10. Retención y ARCO
 
-La propuesta técnica es 18 meses, pero sigue pendiente de aprobación legal. No
-elimines ni anonimices filas hasta que el procedimiento definitivo esté
-aprobado.
+La política aprobada el 2026-07-30 conserva cada solicitud durante 18 meses
+desde `created_at`, salvo relación contractual, solicitud ARCO en trámite u
+obligación jurídica documentada. Una persona autorizada revisa mensualmente
+`retention_until`; al vencimiento elimina los datos personales o los anonimiza
+de forma irreversible. La evidencia conserva solo fecha, responsable, conteo
+y resultado, nunca PII. Si existe una excepción, documenta su fundamento y la
+nueva fecha de revisión en el sistema corporativo autorizado antes de aplazar
+la eliminación.
 
 Para una solicitud ARCO:
 

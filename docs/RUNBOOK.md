@@ -160,17 +160,19 @@ desde Eventbrite bajo el procedimiento de privacidad autorizado.
 
 ## 11. Retención
 
-La propuesta técnica es 18 meses desde `created_at`, salvo relación contractual
-u obligación aplicable. No ejecutes eliminación ni anonimización hasta que la
-persona responsable legal apruebe:
+La política aprobada el 2026-07-30 conserva cada solicitud durante 18 meses
+desde `created_at`, salvo relación contractual, solicitud ARCO en trámite u
+obligación jurídica documentada. Una persona autorizada ejecuta la revisión
+mensual, elimina los datos personales o los anonimiza de forma irreversible y
+registra:
 
-- plazo final;
-- excepciones;
-- método de eliminación o anonimización;
-- responsable de ejecución;
-- evidencia de la corrida.
+- fecha de ejecución;
+- responsable;
+- número de filas procesadas;
+- resultado y, si aplica, código técnico del fallo.
 
-La tarea mensual registra solo conteos y resultado, nunca PII.
+La tarea mensual nunca registra PII. Ante un fallo, detén el lote, conserva las
+filas sin cambios y escala a privacidad antes de reintentar.
 
 ## 12. Recuperación
 
@@ -191,9 +193,10 @@ Nunca ejecutes `supabase db reset --linked` en Production.
 
 ## 13. Checklist pre-lanzamiento
 
-- [ ] Aviso y retención aprobados; versión de consentimiento actualizada.
+- [x] Aviso final `2026-07-30`, retención de 18 meses, ARCO y procedimiento de
+      eliminación/anonimización aprobados el 2026-07-30.
 - [ ] Backup de Production verificado.
-- [ ] `public.registros` conserva exactamente los siete registros históricos
+- [ ] `public.registros` conserva exactamente los diez registros históricos
       esperados antes y después del corte.
 - [ ] Migración `retire_legacy_registration_webhook` aplicada: retiró
       `trg_send_confirmation_email`, `public.notify_new_registro()` y `pg_net`

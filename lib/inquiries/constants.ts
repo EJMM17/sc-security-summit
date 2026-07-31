@@ -1,2 +1,1 @@
-export const INQUIRY_CONSENT_VERSION = "2026-07-29-draft";
-
+export const INQUIRY_CONSENT_VERSION = "2026-07-30";

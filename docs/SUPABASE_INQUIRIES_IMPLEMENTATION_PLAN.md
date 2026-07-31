@@ -16,7 +16,7 @@ canónica del código actual es `docs/PROJECT_CONTEXT.md`.
 | Dominio, formularios, idempotencia y outbox | Implementado en el repositorio |
 | Contrato env, CI, cron y runbooks | Implementado en el repositorio |
 | Reconciliación/aplicación remota | Pendiente; requiere operador y backup |
-| Aviso y retención | Borrador técnico; pendiente aprobación legal |
+| Aviso y retención | Versión final `2026-07-30`; aprobados aviso, 18 meses, ARCO y eliminación/anonimización |
 | Preview | Inventario de variables vacío y contrato desconectado; pendiente validar el deployment reconstruido |
 | Production | No activada por esta implementación local |
 
@@ -172,7 +172,7 @@ estados, consultas, índices, retención y herramientas de operación.
 | `owner` | `text` nullable | Responsable interno |
 | `internal_notes` | `text` nullable | Máximo operativo definido en DB |
 | `next_follow_up_at` | `timestamptz` nullable | Seguimiento |
-| `retention_until` | `date` | Fecha calculada; la política final requiere aprobación antes de Production |
+| `retention_until` | `date` | Fecha calculada con la política de 18 meses aprobada el 2026-07-30 |
 | `created_at` | `timestamptz` | `NOT NULL DEFAULT now()` |
 | `updated_at` | `timestamptz` | `NOT NULL DEFAULT now()` |
 
@@ -592,7 +592,7 @@ Alertas mínimas:
 
 ## 13. Privacidad y retención
 
-Antes de desplegar:
+Completado y aprobado el 2026-07-30:
 
 - actualizar `app/aviso-de-privacidad/page.tsx`;
 - incluir Supabase como encargado/proveedor de infraestructura;
@@ -601,9 +601,10 @@ Antes de desplegar:
 - versionar el consentimiento enviado por cada formulario;
 - validar el texto con la persona responsable legal/privacidad.
 
-Política técnica propuesta: 18 meses desde la creación, salvo que exista una
-relación contractual u obligación aplicable que requiera otro plazo. El plazo
-final debe ser aprobado antes de producción.
+Política final: 18 meses desde la creación, salvo que exista una relación
+contractual, una solicitud ARCO en trámite u obligación aplicable que requiera
+otro plazo. La persona responsable de privacidad aprobó el aviso, el plazo, el
+proceso ARCO y el procedimiento de eliminación/anonimización el 2026-07-30.
 
 Un job mensual:
 
@@ -719,11 +720,11 @@ Gate: prueba manual ES/EN, móvil/escritorio y reintento sin duplicación.
 
 ### Fase 4 — Operación y legal
 
-- [ ] Aviso de privacidad aprobado.
+- [x] Aviso de privacidad final `2026-07-30` aprobado.
 - [x] Runbook de solicitudes.
 - [x] Cron implementado y autenticado.
 - [ ] Alertas y vistas guardadas configuradas por Operaciones.
-- [ ] Retención aprobada.
+- [x] Retención de 18 meses, ARCO y eliminación/anonimización aprobados.
 
 Gate: una persona no desarrolladora puede encontrar, actualizar y recuperar una
 solicitud siguiendo únicamente la documentación.
@@ -745,13 +746,14 @@ Gate: revisión visual aprobada sin acceso a PII ni integraciones.
 
 ### Fase 6 — Producción
 
-- [ ] Aprobación legal/retención y operador designado.
+- [x] Aprobación legal/retención registrada el 2026-07-30.
+- [ ] Operador de base designado para la ventana de corte.
 - [ ] Backup inmediatamente anterior.
 - [ ] Reconciliar historial, revisar advisors y confirmar que solo están
       pendientes las tres migraciones `20260730...`.
 - [ ] Aplicar en orden `add_inquiry_persistence`,
       `harden_legacy_grants` y `retire_legacy_registration_webhook`.
-- [ ] Desplegar tombstone HTTP 410 y volver a verificar advisors y las siete
+- [ ] Desplegar tombstone HTTP 410 y volver a verificar advisors y las diez
       filas históricas.
 - [ ] Desplegar aplicación.
 - [ ] Enviar una solicitud corporate y una sponsor.

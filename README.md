@@ -187,16 +187,17 @@ Lee [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) antes de desplegar.
 Orden:
 
 ```text
-aprobación legal → backup → historial/advisors → 3 migraciones por timestamp
+aprobación legal registrada → backup → historial/advisors → 3 migraciones por timestamp
 → tombstone 410 → verificación DB/advisors → app → smoke tests → monitoreo
 ```
 
 El cron `*/5 * * * *` requiere Vercel Pro y `CRON_SECRET`. El plan Pro fue
 confirmado el 2026-07-29; vuelve a confirmarlo si cambia la suscripción.
 
-El aviso `2026-07-29-draft` y la retención propuesta de 18 meses siguen
-pendientes de aprobación legal. No se debe habilitar persistencia en
-Production hasta cerrar ese gate.
+El aviso `2026-07-30`, la retención de 18 meses, el proceso ARCO y el
+procedimiento de eliminación/anonimización fueron aprobados el 2026-07-30.
+Esta aprobación no sustituye los gates independientes de backup, verificación
+de base, facturación de Vercel, migraciones y despliegue.
 
 ## Operación
 

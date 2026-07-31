@@ -18,6 +18,10 @@ const COMMON = {
 };
 
 describe("inquiry schemas", () => {
+  it("pins the approved privacy notice version", () => {
+    expect(INQUIRY_CONSENT_VERSION).toBe("2026-07-30");
+  });
+
   it.each([2, 10])("accepts a corporate inquiry with %i seats", (requestedSeats) => {
     const result = corporateInquirySchema.safeParse({
       ...COMMON,
