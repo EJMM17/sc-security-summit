@@ -96,12 +96,14 @@ export default async function RootLayout({
       >
         {/* Consent Mode v2 defaults — must run before GTM / GA / pixels */}
         <ConsentMode nonce={nonce} />
-        {children}
-        <WhatsAppButton />
+        {/* Keep the undecided privacy choice ahead of streamed page content so
+            it is available and paintable without waiting for the landing page. */}
         <CookieConsent
           language={language}
           marketingEnabled={marketingDataEnabled}
         />
+        {children}
+        <WhatsAppButton />
         <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
         {/* Analytics, pixels and interaction tracking use basic consent mode. */}
