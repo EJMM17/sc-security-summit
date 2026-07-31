@@ -50,7 +50,9 @@ test.describe("Preview isolation contract", () => {
       },
     ]);
 
-    await page.goto("/?lang=es&utm_source=preview-test");
+    await page.goto("/?lang=es&utm_source=preview-test", {
+      waitUntil: "domcontentloaded",
+    });
 
     const corporate = page.locator("#registro");
     const sponsor = page.locator("#contacto-patrocinio");
@@ -122,7 +124,9 @@ test.describe("Preview isolation contract", () => {
     });
 
     await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto("/?lang=en&utm_source=preview-test");
+    await page.goto("/?lang=en&utm_source=preview-test", {
+      waitUntil: "domcontentloaded",
+    });
     const mobileCorporate = page.locator("#registro");
     const mobileSponsor = page.locator("#contacto-patrocinio");
     await expect(mobileCorporate.locator("fieldset")).toHaveAttribute(
