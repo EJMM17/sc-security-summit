@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useLayoutEffect, useState } from "react";
 import { Cookie } from "lucide-react";
 import { clearAttribution } from "@/lib/attribution";
 import {
@@ -38,10 +38,13 @@ export default function CookieConsent({
   language?: Language;
   marketingEnabled?: boolean;
 }) {
-  const [visible, setVisible] = useState(false);
+  // Render the undecided state in the initial HTML. Besides avoiding a late
+  // layout change, this makes the privacy choice available before hydration.
+  // Returning visitors are reconciled from localStorage before paint.
+  const [visible, setVisible] = useState(true);
   const [hasDecision, setHasDecision] = useState(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const decision = readCookieConsentDecision();
     if (!marketingEnabled) clearAttribution();
     setHasDecision(decision !== null);
