@@ -212,12 +212,38 @@ jobs:
   lighthouse:
     needs: quality
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     if: github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      statuses: read
 
     steps:
       - name: Checkout
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Wait for this commit's Vercel deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in $(seq 1 60); do
+            state="$(
+              gh api "repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/status" \
+                --jq '[.statuses[] | select(.context == "Vercel")][0].state // "pending"'
+            )"
+            case "$state" in
+              success)
+                exit 0
+                ;;
+              error|failure)
+                echo "::error::Vercel failed to deploy commit ${GITHUB_SHA}."
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+          echo "::error::Vercel did not finish deploying commit ${GITHUB_SHA} within 10 minutes."
+          exit 1
 
       - name: Lighthouse CI
         uses: treosh/lighthouse-ci-action@3e7e23fb74242897f95c0ba9cabad3d0227b9b18 # v12.6.2
