@@ -79,7 +79,7 @@ test.describe("Homepage comercial", () => {
     request,
   }) => {
     const response = await request.get(
-      "/_next/image?url=%2Fimages%2Fhero-bg.webp&w=640&q=75",
+      "/_next/image?url=%2Fimages%2Fhero-bg.webp&w=640&q=70",
       { headers: { accept: "image/webp" } },
     );
 
