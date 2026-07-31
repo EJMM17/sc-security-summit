@@ -27,6 +27,7 @@ const archivo = Archivo({
   subsets: ["latin"],
   variable: "--font-oswald",
   display: "optional",
+  preload: false,
 });
 
 export const metadata: Metadata = {
