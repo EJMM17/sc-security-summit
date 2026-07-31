@@ -246,10 +246,18 @@ jurídica documentada. Al vencimiento, una persona autorizada elimina los datos
 personales o los anonimiza de forma irreversible y registra solo fecha,
 responsable, conteo y resultado, nunca PII.
 
-Esta aprobación cierra únicamente el gate legal. El backup, el historial y los
-advisors quedaron verificados el 2026-07-30. Production continúa bloqueada hasta
-completar el corte de base, resolver la imposibilidad de nuevos deployments en
-la cuenta Vercel vencida y ejecutar los controles de despliegue.
+Esta aprobación cerró el gate legal. El backup, el historial y los advisors se
+verificaron el 2026-07-30. Ese mismo día se aplicaron las tres migraciones, se
+desplegó el tombstone JWT/HTTP 410 y Vercel publicó el merge `d1c5241` en
+Production. La cuenta Vercel continúa vencida por decisión del propietario:
+el deployment actual está activo, pero una suspensión futura sigue siendo un
+riesgo operativo externo.
+
+Google Maps no se descarga durante la visita inicial. La sección de ubicación
+presenta un control bilingüe y crea el iframe únicamente después de una acción
+explícita del visitante. Esta decisión mantiene la carga inicial y el
+presupuesto Lighthouse libres de los scripts del mapa, además de reducir
+conexiones de terceros no solicitadas.
 
 El proyecto Summit está actualmente en Supabase Free, que no ofrece backups
 programados. El 2026-07-30 se creó un dump lógico de `public` y
@@ -299,10 +307,11 @@ expand → migrate → contract y una decisión independiente.
 constituyen instrucciones operativas. El baseline vigente y las nuevas
 migraciones están en `supabase/migrations/`.
 
-El repositorio incluye una migración separada para retirar
-`trg_send_confirmation_email`, `public.notify_new_registro()` y `pg_net`, más
-un tombstone JWT/HTTP 410 en
-`supabase/functions/send-confirmation-email/index.ts`. La aplicación remota de
-ese corte sigue gated por backup y por verificar que las diez filas históricas
-legítimas de `public.registros` permanezcan intactas. El propietario del
-proyecto confirmó ese conteo el 2026-07-30; no autoriza modificar esas filas.
+El corte remoto retiró `trg_send_confirmation_email`,
+`public.notify_new_registro()` y `pg_net`. El tombstone de
+`supabase/functions/send-confirmation-email/index.ts` quedó activo como versión
+5, con JWT obligatorio: responde 401 sin credenciales y 410 con un JWT válido.
+Las diez filas históricas legítimas de `public.registros` permanecieron
+intactas. Dos smoke tests controlados —corporate y sponsor— confirmaron fila,
+outbox, intento, evento y entrega a Resend; después se eliminaron únicamente
+las dos solicitudes sintéticas para no contaminar la operación.

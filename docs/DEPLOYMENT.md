@@ -14,35 +14,45 @@ en GitHub Actions, pruebas locales o Preview.
 
 ## 1. Gates antes de desplegar
 
-No se activa la persistencia hasta completar todos estos puntos:
+Este checklist conserva tanto el gate como el estado comprobado del corte. La
+activación del 2026-07-30 continuó por decisión explícita del propietario con
+dos riesgos externos todavía abiertos: la factura Vercel vencida y la auditoría
+histórica de snapshots Preview. Ninguno se marca como resuelto:
 
 - [x] El aviso final `2026-07-30` fue revisado y aprobado por la persona
       responsable legal/privacidad el 2026-07-30.
 - [x] El plazo de retención de 18 meses, el proceso ARCO y el procedimiento de
       eliminación/anonimización fueron aprobados el 2026-07-30.
-- [ ] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing
+- [x] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing
       ni telemetría de Vercel/Sentry.
-- [ ] El inventario completo de Preview fue revisado y no conserva secretos
+- [x] El inventario completo de Preview fue revisado y no conserva secretos
       legacy ajenos al contrato actual.
 - [x] Existe un backup reciente y verificado de Production.
 - [x] El historial de migraciones local y remoto está reconciliado.
 - [x] Security Advisor y Performance Advisor no tienen errores críticos sin
       resolver.
-- [ ] Production tiene sus variables completas y Preview no hereda sus scopes.
+- [x] Production tiene sus variables completas y Preview no hereda sus scopes.
 - [ ] Los deployments Preview históricos que recibieron secretos compartidos
       están protegidos o retirados, o sus credenciales fueron rotadas mediante
       una ventana coordinada con rollback.
 - [ ] Vercel Project Settings y `package.json` usan Node 22.x.
-- [ ] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
+- [x] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
       compatible con Hobby.
 - [ ] La cuenta de Vercel está al corriente, sin facturas vencidas ni avisos de
       suspensión. El estado `overdue` observado el 2026-07-30 bloquea el corte.
-- [ ] El operador y la ventana para retirar el webhook legado están
+- [x] El operador y la ventana para retirar el webhook legado están
       confirmados según el corte controlado de la siguiente sección.
 
 El plan Vercel Pro fue confirmado durante la revisión del 2026-07-29. Debe
 confirmarse otra vez si cambia la suscripción: en Hobby, `*/5 * * * *` hace que
 el deployment falle.
+
+El propietario decidió el 2026-07-30 no pagar la factura Vercel vencida y
+aceptó continuar mientras la plataforma permitiera el despliegue. Production
+aceptó y publicó el merge `d1c5241` como deployment
+`dpl_2FHggQ6zK16w4baLr36gZpohmt1o`. La factura y el posible bloqueo futuro de
+la cuenta siguen siendo un riesgo operativo externo; no se presentan como
+resueltos por el éxito de este deployment.
 
 ### Estado del backup de Supabase
 

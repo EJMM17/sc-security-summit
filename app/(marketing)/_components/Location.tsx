@@ -1,4 +1,5 @@
 import { Calendar, ExternalLink, MapPin, Phone } from "lucide-react";
+import OnDemandMap from "@/components/OnDemandMap";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
@@ -20,15 +21,11 @@ export default function Location({ language }: { language: Language }) {
 
         <ScrollReveal>
           <div className="grid md:grid-cols-5 gap-8 items-start">
-            <div className="md:col-span-3 rounded-[20px] overflow-hidden border border-slate-200 shadow-sm">
-              <iframe
-                src="https://www.google.com/maps?q=Libramiento+Ote+S/N,+Azteca,+88680+Reynosa,+Tamaulipas,+Mexico&output=embed"
-                className="w-full h-[280px] sm:h-[350px]"
-                style={{ border: 0 }}
-                allowFullScreen
-                loading="lazy"
-                referrerPolicy="no-referrer-when-downgrade"
-                title="Centro de Convenciones de Reynosa"
+            <div className="md:col-span-3 overflow-hidden rounded-[20px] border border-slate-200 shadow-sm">
+              <OnDemandMap
+                buttonLabel={ui.loadInteractiveMap}
+                privacyNote={ui.mapPrivacyNote}
+                title={ui.mapTitle}
               />
             </div>
 
