@@ -23,7 +23,11 @@ import {
 } from "@/lib/deployment-environment";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const archivo = Archivo({ subsets: ["latin"], variable: "--font-oswald" });
+const archivo = Archivo({
+  subsets: ["latin"],
+  variable: "--font-oswald",
+  display: "optional",
+});
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
