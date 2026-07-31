@@ -16,8 +16,12 @@ const text = {
   es: {
     title: "Privacidad y cookies",
     essentialCopy: "Usamos cookies esenciales para que el sitio funcione.",
-    optionalCopy: "Con tu permiso, usamos analítica y marketing.",
-    purposeCopy: "Esto nos ayuda a mejorar tu experiencia y medir campañas.",
+    optionalDetails: [
+      "Con tu permiso, usamos analítica.",
+      "También usamos marketing.",
+      "Esto ayuda a mejorar tu experiencia.",
+      "También permite medir campañas.",
+    ],
     acceptAll: "Aceptar todas",
     essential: "Solo esenciales",
     privacyLabel: "Aviso de Privacidad",
@@ -26,8 +30,12 @@ const text = {
   en: {
     title: "Privacy & cookies",
     essentialCopy: "We use essential cookies to run the site.",
-    optionalCopy: "With your permission, we use analytics and marketing.",
-    purposeCopy: "This helps us improve your experience and measure campaigns.",
+    optionalDetails: [
+      "With your permission, we use analytics.",
+      "We also use marketing.",
+      "This helps improve your experience.",
+      "It also helps measure campaigns.",
+    ],
     acceptAll: "Accept all",
     essential: "Essential only",
     privacyLabel: "Privacy Notice",
@@ -139,12 +147,11 @@ export default function CookieConsent({
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
               {t.essentialCopy}
             </p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              {t.optionalCopy}
-            </p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              {t.purposeCopy}
-            </p>
+            <ul className="mt-1 space-y-0.5 text-sm leading-relaxed text-slate-300">
+              {t.optionalDetails.map((detail) => (
+                <li key={detail}>{detail}</li>
+              ))}
+            </ul>
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
               <a
                 href="/aviso-de-privacidad"
