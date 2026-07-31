@@ -2041,7 +2041,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .hero-title {
   max-width: 22ch;
   color: #FFFFFF;
-  font-family: var(--font-oswald), sans-serif;
+  font-family: system-ui, sans-serif;
   font-size: 4.15rem;
   font-weight: 800;
   letter-spacing: 0;

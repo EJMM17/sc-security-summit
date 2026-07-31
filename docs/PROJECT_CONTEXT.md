@@ -266,6 +266,8 @@ visitante; reintroducir un contador requiere demostrar que no retrasa LCP,
 no crea un intervalo permanente y conserva los presupuestos de Lighthouse. La
 imagen principal usa exclusivamente el `srcset` optimizado de `next/image`;
 envolverla con fuentes manuales provoca descargas duplicadas y está prohibido.
+El título principal usa la pila tipográfica del sistema y la fuente decorativa
+no se precarga: el contenido LCP nunca debe depender de una fuente secundaria.
 
 El proyecto Summit está actualmente en Supabase Free, que no ofrece backups
 programados. El 2026-07-30 se creó un dump lógico de `public` y
