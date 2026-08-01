@@ -30,41 +30,45 @@ export type IconKey =
 
 export const NAV_LINKS = {
   es: [
-    { href: "#enfoque", label: "Enfoque" },
-    { href: "#speakers", label: "Conferencistas" },
-    { href: "#audiencia", label: "Audiencia" },
+    { href: "#formacion", label: "Formación" },
+    { href: "#programa", label: "Programa" },
+    { href: "#especialistas", label: "Especialistas" },
     { href: "#accesos", label: "Accesos" },
-    { href: "#patrocinadores", label: "Patrocinadores" },
-    { href: "#ubicacion", label: "Ubicación" },
+    { href: "#registro", label: "Pase corporativo" },
+    { href: "#patrocinadores", label: "Patrocinio" },
   ],
   en: [
-    { href: "#enfoque", label: "Focus" },
-    { href: "#speakers", label: "Speakers" },
-    { href: "#audiencia", label: "Audience" },
+    { href: "#formacion", label: "Training" },
+    { href: "#programa", label: "Program" },
+    { href: "#especialistas", label: "Specialists" },
     { href: "#accesos", label: "Passes" },
-    { href: "#patrocinadores", label: "Sponsors" },
-    { href: "#ubicacion", label: "Location" },
+    { href: "#registro", label: "Corporate pass" },
+    { href: "#patrocinadores", label: "Sponsorship" },
   ],
 } as const;
 
 export const FOOTER_LINKS = {
   es: [
-    { href: "#enfoque", label: "Enfoque" },
-    { href: "#speakers", label: "Conferencistas" },
-    { href: "#agenda", label: "Agenda" },
+    { href: "#formacion", label: "Formación" },
+    { href: "#especialistas", label: "Especialistas" },
+    { href: "#programa", label: "Programa" },
     { href: "#audiencia", label: "Audiencia" },
     { href: "#accesos", label: "Accesos" },
-    { href: "#patrocinadores", label: "Patrocinadores" },
+    { href: "#registro", label: "Pase corporativo" },
+    { href: "#patrocinadores", label: "Patrocinio" },
+    { href: "#ser-presentador", label: "Ser presentador" },
     { href: "#ubicacion", label: "Ubicación" },
     { href: "#faq", label: "FAQ" },
   ],
   en: [
-    { href: "#enfoque", label: "Focus" },
-    { href: "#speakers", label: "Speakers" },
-    { href: "#agenda", label: "Agenda" },
+    { href: "#formacion", label: "Training" },
+    { href: "#especialistas", label: "Specialists" },
+    { href: "#programa", label: "Program" },
     { href: "#audiencia", label: "Audience" },
     { href: "#accesos", label: "Passes" },
-    { href: "#patrocinadores", label: "Sponsors" },
+    { href: "#registro", label: "Corporate pass" },
+    { href: "#patrocinadores", label: "Sponsorship" },
+    { href: "#ser-presentador", label: "Be a presenter" },
     { href: "#ubicacion", label: "Location" },
     { href: "#faq", label: "FAQ" },
   ],
@@ -76,21 +80,21 @@ export const UI_TEXT = {
     switchLangLabel: "Cambiar a inglés",
     registerBtn: "CONSEGUIR ACCESOS",
     dateLocation: "24 de septiembre, 2026 · Reynosa, Tamaulipas",
-    heroKicker: "EL ENCUENTRO DE SEGURIDAD PARA LA INDUSTRIA",
+    heroKicker: "SUMMIT PRESENCIAL · REYNOSA 2026",
     heroAlt: "Summit de Seguridad en la Cadena de Suministros",
-    heroTitlePrefix: "SUMMIT DE SEGURIDAD EN LA",
-    heroTitleHighlight: "CADENA DE SUMINISTROS",
+    heroTitlePrefix: "Las mejores decisiones comienzan con una",
+    heroTitleHighlight: "mejor formación",
     heroDescription:
-      "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
+      "Programa ejecutivo de formación especializada para profesionales responsables de proteger la seguridad, el cumplimiento y la continuidad de la cadena de suministro.",
     heroUrgency: "Cupo limitado · asegura tu acceso antes del cierre de registro",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
-    whyAttendLabel: "POR QUÉ SER PARTE DEL SUMMIT",
-    whyAttendTitle: "Por Qué Ser Parte del Summit",
+    whyAttendLabel: "NO ES UNA EXPO",
+    whyAttendTitle: "Es formación para quienes protegen la operación",
     whyAttendDesc:
-      "Lidera la integridad de la cadena de suministro. Implementa las mejores prácticas en seguridad para minimizar riesgos y garantizar la eficiencia operativa de tus rutas internacionales.",
+      "La seguridad depende del criterio de las personas que identifican riesgos, aplican controles y toman decisiones cuando las condiciones cambian.",
     purposeLabel: "PROPÓSITO",
     visionMissionTitle: "Visión y Misión",
     missionLabel: "Misión",
@@ -105,22 +109,26 @@ export const UI_TEXT = {
       "Aspiramos a consolidarnos como el evento de referencia para impulsar una cultura de prevención, cumplimiento y excelencia operativa que fortalezca el comercio seguro y eficiente a nivel regional y binacional.",
     aboutText:
       "El 1er Summit de Seguridad en la Cadena de Suministro es un espacio especializado creado para reunir a los principales actores de la industria maquiladora, transporte, aduanas, seguridad y compliance, con el propósito de fortalecer la seguridad, la eficiencia y la competitividad del comercio en la región. A través de conferencias, paneles, workshops y espacios de vinculación comercial como el Business Hub, buscamos impulsar alianzas estratégicas, promover soluciones de alto impacto y contribuir al desarrollo de una cadena de suministro más segura, resiliente y eficiente.",
-    pillarsLabel: "EJES TEMÁTICOS",
-    pillarsTitle: "Tres Pilares, Un Objetivo",
+    pillarsLabel: "COMPETENCIAS",
+    pillarsTitle: "Una jornada para desarrollar competencias",
     pillarsDesc:
-      "Cada eje del Summit fue diseñado para cubrir las necesidades reales de los profesionales de la cadena de suministros.",
-    speakersLabel: "CONFERENCISTAS CONFIRMADOS",
-    speakersTitle: "Especialistas de Primer Nivel",
+      "Competencias para actuar con mayor criterio dentro de tu organización.",
+    speakersLabel: "ESPECIALISTAS CONFIRMADOS",
+    speakersTitle: "Aprende de quienes enfrentan estos desafíos todos los días",
     speakersDesc:
-      "Líderes en estándares internacionales, comercio exterior, cumplimiento operativo e innovación estratégica.",
+      "Especialistas con experiencia directa en seguridad, cumplimiento, transporte, comercio exterior y continuidad operativa.",
     speakersMorePrefix: "Más conferencistas serán anunciados pronto.",
     speakersMoreCTA: "Regístrate para recibirlos primero →",
-    agendaLabel: "PROGRAMA DEL SUMMIT",
-    agendaTitle: "Una Agenda Para Toda Tu Operación",
+    speakerOpportunityTitle: "¿Quieres vincular tu marca con el Summit?",
+    speakerOpportunityDesc:
+      "Conoce las oportunidades para presentar soluciones ante una audiencia especializada.",
+    speakerOpportunityCTA: "Conocer oportunidades",
+    agendaLabel: "PROGRAMA EJECUTIVO",
+    agendaTitle: "Tres dimensiones para fortalecer tu operación",
     agendaDesc:
-      "Cuatro bloques para que cada departamento encuentre contenido aplicable, conexiones de valor y una ruta clara de acción.",
-    valueLabel: "LO QUE OBTENDRÁS",
-    valueTitle: "Valor Real Para Tu Empresa",
+      "Una ruta de aprendizaje que conecta visión, prevención, cumplimiento y aplicación.",
+    valueLabel: "ASÍ SERÁ EL SUMMIT",
+    valueTitle: "Una experiencia completa de formación",
     audienceCardTitle: "Perfil de Asistentes",
     audienceCardDesc:
       "Personal de la industria maquiladora, transportistas, agencias aduanales, compliance y seguridad de cadena de suministro.",
@@ -128,18 +136,18 @@ export const UI_TEXT = {
     eventDayLabel: "Día del evento",
     eventDayValue: "24 de septiembre, 2026",
     eventDayVenue: "Centro de Convenciones · Reynosa, Tamaulipas",
-    participantsLabel: "PARTICIPANTES",
-    participantsTitle: "¿A Quién Va Dirigido?",
+    participantsLabel: "A QUIÉN VA DIRIGIDO",
+    participantsTitle: "Este programa es para ti si...",
     participantsDesc:
       "Para quienes mueven, protegen y fortalecen la cadena de suministro. Un punto de encuentro para líderes y especialistas en áreas clave.",
     providersLabel: "PROVEEDORES",
     providersTitle: "Ecosistema B2B",
     providersDesc:
       "Empresas especializadas en tecnología, seguridad y servicios para la industria y la cadena de suministro.",
-    networkingLabel: "OPORTUNIDAD COMERCIAL",
-    networkingTitle: "Sala de Networking & Business Hub",
+    networkingLabel: "DEL APRENDIZAJE A LA IMPLEMENTACIÓN",
+    networkingTitle: "Un espacio donde la formación se conecta con soluciones reales",
     networkingDesc:
-      "Un espacio físico dedicado al encuentro de negocios. Diseñado para conectar compradores, proveedores y decisores en reuniones de alto valor.",
+      "Conoce servicios y especialistas que pueden ayudarte a aplicar en tu organización los criterios desarrollados durante el programa.",
     networkingFeatures: [
       "Mesas B2B por industria",
       "Directorio de asistentes",
@@ -156,7 +164,7 @@ export const UI_TEXT = {
       { number: "4", label: "SECTORES DE LA CADENA DE SUMINISTROS" },
     ],
     pricingLabel: "TIPOS DE ACCESO",
-    pricingTitle: "Elige Tu Acceso",
+    pricingTitle: "Elige tu experiencia de formación",
     pricingDesc:
       "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
     taxNote: "* Más I.V.A.",
@@ -195,7 +203,7 @@ export const UI_TEXT = {
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contacto",
     faqLabel: "PREGUNTAS FRECUENTES",
-    faqTitle: "¿Tienes Dudas?",
+    faqTitle: "Preguntas frecuentes",
     regLabel: "PASES CORPORATIVOS",
     regTitle: "Capacita a Tu Equipo Completo",
     regDesc:
@@ -216,10 +224,10 @@ export const UI_TEXT = {
       "Has realizado varios intentos. Espera unos minutos antes de volver a intentar.",
     inquiryError:
       "No pudimos enviar tu solicitud en este momento. Escríbenos a hola@scsecuritysummit.com.",
-    finalCTATitlePart1: "Cupo Limitado. ¿Listo para",
-    finalCTATitlePart2: "Fortalecer Tu Cadena?",
+    finalCTATitlePart1: "La seguridad comienza",
+    finalCTATitlePart2: "formando mejores profesionales",
     finalCTADesc:
-      "El registro garantiza tu lugar en el evento de seguridad en cadena de suministros más relevante del norte de México. No te quedes fuera.",
+      "Invierte en desarrollar competencias que fortalecerán tu desempeño y la capacidad de respuesta de tu organización.",
     contactOrg: "CONTACTAR ORGANIZADOR",
     footerDesc:
       "1er Summit de Seguridad en la Cadena de Suministros. 24 de septiembre, 2026. Centro de Convenciones de Reynosa, Tamaulipas, México.",
@@ -228,10 +236,10 @@ export const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos y Condiciones",
-    galleryLabel: "ASÍ SERÁ EL SUMMIT",
-    galleryTitle: "Así Será el Summit",
+    galleryLabel: "LA EXPERIENCIA",
+    galleryTitle: "Diseñada para aprender, no solo para escuchar",
     galleryDesc:
-      "Cuatro áreas de actividad diseñadas para maximizar tu experiencia y el valor que llevas a tu empresa.",
+      "Masterclasses, casos reales y panel técnico en una sola jornada, con el Centro de Conexiones B2B como complemento.",
     galleryTag1: "Expo Comercial",
     galleryTag2: "Registro & Bienvenida",
     galleryTag3: "Conferencia Magistral",
@@ -243,21 +251,21 @@ export const UI_TEXT = {
     switchLangLabel: "Switch to Spanish",
     registerBtn: "GET PASSES",
     dateLocation: "September 24, 2026 · Reynosa, Tamaulipas",
-    heroKicker: "THE INDUSTRY'S SUPPLY CHAIN SECURITY MEETING",
+    heroKicker: "IN-PERSON SUMMIT · REYNOSA 2026",
     heroAlt: "Supply Chain Security Summit",
-    heroTitlePrefix: "SECURITY SUMMIT FOR THE",
-    heroTitleHighlight: "SUPPLY CHAIN",
+    heroTitlePrefix: "Better decisions begin with",
+    heroTitleHighlight: "better training",
     heroDescription:
-      "Where strategic updates, business networking, and technology solutions come together to strengthen northern Mexico's industrial ecosystem.",
+      "An executive specialized training program for professionals responsible for supply chain security, compliance, and continuity.",
     heroUrgency: "Limited capacity · secure your pass before registration closes",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
     presentedBy: "Presented by",
-    whyAttendLabel: "WHY JOIN THE SUMMIT",
-    whyAttendTitle: "What Awaits You",
+    whyAttendLabel: "THIS IS NOT AN EXPO",
+    whyAttendTitle: "Training for those who protect the operation",
     whyAttendDesc:
-      "More than a conference. A training, networking and innovation experience designed to transform your operation.",
+      "Security depends on the judgment of the people who identify risks, apply controls, and make decisions when conditions change.",
     purposeLabel: "PURPOSE",
     visionMissionTitle: "Vision & Mission",
     missionLabel: "Mission",
@@ -272,22 +280,26 @@ export const UI_TEXT = {
       "We aspire to become the reference event that drives a culture of prevention, compliance and operational excellence, strengthening safe and efficient trade at the regional and binational level.",
     aboutText:
       "The 1st Supply Chain Security Summit is a specialized forum created to bring together leading players from the maquiladora industry, transport, customs, security and compliance sectors, with the goal of strengthening the security, efficiency and competitiveness of trade in the region. Through conferences, panels, workshops and business networking spaces such as the Business Hub, we aim to promote strategic alliances, showcase high-impact solutions and contribute to a safer, more resilient and more efficient supply chain.",
-    pillarsLabel: "STRATEGIC PILLARS",
-    pillarsTitle: "Three Pillars, One Goal",
+    pillarsLabel: "CAPABILITIES",
+    pillarsTitle: "One day to build stronger capabilities",
     pillarsDesc:
-      "Every pillar of the Summit was designed to meet the real needs of supply chain professionals.",
-    speakersLabel: "CONFIRMED SPEAKERS",
-    speakersTitle: "Top-Tier Specialists",
+      "Capabilities you can use to act with greater judgment inside your organization.",
+    speakersLabel: "CONFIRMED SPECIALISTS",
+    speakersTitle: "Learn from those who face these challenges every day",
     speakersDesc:
-      "Leaders in international standards, foreign trade, operational compliance and strategic innovation.",
+      "Specialists with direct experience in security, compliance, transportation, foreign trade, and operational continuity.",
     speakersMorePrefix: "More speakers will be announced soon.",
     speakersMoreCTA: "Register to hear about them first →",
-    agendaLabel: "SUMMIT PROGRAM",
-    agendaTitle: "One Agenda For Your Entire Operation",
+    speakerOpportunityTitle: "Would you like to connect your brand with the Summit?",
+    speakerOpportunityDesc:
+      "Explore opportunities to present solutions to a specialized audience.",
+    speakerOpportunityCTA: "Explore opportunities",
+    agendaLabel: "EXECUTIVE PROGRAM",
+    agendaTitle: "Three dimensions to strengthen your operation",
     agendaDesc:
-      "Four blocks so every department can find practical content, valuable connections and a clear path to action.",
-    valueLabel: "WHAT YOU WILL GAIN",
-    valueTitle: "Real Value For Your Company",
+      "A learning path that connects vision, prevention, compliance, and application.",
+    valueLabel: "THE SUMMIT EXPERIENCE",
+    valueTitle: "A complete training experience",
     audienceCardTitle: "Attendee Profile",
     audienceCardDesc:
       "Professionals from the maquiladora industry, carriers, customs brokers, compliance and supply chain security.",
@@ -295,18 +307,18 @@ export const UI_TEXT = {
     eventDayLabel: "Event day",
     eventDayValue: "September 24, 2026",
     eventDayVenue: "Convention Center · Reynosa, Tamaulipas",
-    participantsLabel: "PARTICIPANTS",
-    participantsTitle: "Who Is It For?",
+    participantsLabel: "WHO IT IS FOR",
+    participantsTitle: "This program is for you if...",
     participantsDesc:
       "For those who move, protect and strengthen the supply chain. A meeting point for leaders and specialists in key areas.",
     providersLabel: "PROVIDERS",
     providersTitle: "B2B Ecosystem",
     providersDesc:
       "Companies specialized in technology, security and services for industry and the supply chain.",
-    networkingLabel: "BUSINESS OPPORTUNITY",
-    networkingTitle: "Networking Lounge & Business Hub",
+    networkingLabel: "FROM LEARNING TO IMPLEMENTATION",
+    networkingTitle: "Where training connects with real solutions",
     networkingDesc:
-      "A physical space dedicated to business meetings. Designed to connect buyers, providers and decision makers in high-value conversations.",
+      "Meet services and specialists who can help your organization apply the criteria developed throughout the program.",
     networkingFeatures: [
       "B2B tables by industry",
       "Attendee directory",
@@ -323,7 +335,7 @@ export const UI_TEXT = {
       { number: "4", label: "INDUSTRY SECTORS" },
     ],
     pricingLabel: "ACCESS TYPES",
-    pricingTitle: "Choose Your Pass",
+    pricingTitle: "Choose your training experience",
     pricingDesc:
       "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
     taxNote: "* Plus VAT",
@@ -362,7 +374,7 @@ export const UI_TEXT = {
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contact",
     faqLabel: "FREQUENTLY ASKED QUESTIONS",
-    faqTitle: "Have Questions?",
+    faqTitle: "Frequently asked questions",
     regLabel: "CORPORATE PASSES",
     regTitle: "Train Your Entire Team",
     regDesc:
@@ -383,10 +395,10 @@ export const UI_TEXT = {
       "There have been several attempts. Wait a few minutes before trying again.",
     inquiryError:
       "We could not send your request right now. Email us at hola@scsecuritysummit.com.",
-    finalCTATitlePart1: "Limited Seats. Ready to",
-    finalCTATitlePart2: "Strengthen Your Chain?",
+    finalCTATitlePart1: "Security begins by",
+    finalCTATitlePart2: "training better professionals",
     finalCTADesc:
-      "Registering guarantees your spot at the most relevant supply chain security event in northern Mexico. Don't miss out.",
+      "Invest in capabilities that strengthen your performance and your organization’s ability to respond.",
     contactOrg: "CONTACT ORGANIZER",
     footerDesc:
       "1st Supply Chain Security Summit. September 24, 2026. Reynosa Convention Center, Tamaulipas, Mexico.",
@@ -395,10 +407,10 @@ export const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms and Conditions",
-    galleryLabel: "WHAT AWAITS THE SUMMIT",
-    galleryTitle: "What to Expect",
+    galleryLabel: "THE EXPERIENCE",
+    galleryTitle: "Designed to learn, not just to listen",
     galleryDesc:
-      "Four activity areas designed to maximize your experience and the value you take back to your company.",
+      "Masterclasses, real cases, and a technical panel in one day, complemented by the B2B Connections Center.",
     galleryTag1: "Commercial Expo",
     galleryTag2: "Registration & Welcome",
     galleryTag3: "Keynote Session",
@@ -409,14 +421,179 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: 10, suffix: "", label: "Horas de Capacitación" },
-    { number: 5, suffix: "", label: "Conferencistas Confirmados" },
-    { number: 500, suffix: "+", label: "Lugares Disponibles" },
+    { number: "1 día", suffix: "", label: "de formación especializada" },
+    { number: "Especialistas", suffix: "", label: "con experiencia en la industria" },
+    { number: "Aplicación práctica", suffix: "", label: "para la operación" },
+    { number: "Conexiones", suffix: "", label: "y vinculación" },
   ],
   en: [
-    { number: 10, suffix: "", label: "Training Hours" },
-    { number: 5, suffix: "", label: "Confirmed Speakers" },
-    { number: 500, suffix: "+", label: "Available Seats" },
+    { number: "1 day", suffix: "", label: "of specialized training" },
+    { number: "Specialists", suffix: "", label: "with industry experience" },
+    { number: "Practical application", suffix: "", label: "for your operation" },
+    { number: "Connections", suffix: "", label: "and professional networking" },
+  ],
+} as const;
+
+export const HERO_TOPICS = {
+  es: ["CTPAT", "OEA", "Gestión de riesgos", "Ciberseguridad", "Seguridad en transporte"],
+  en: ["CTPAT", "AEO", "Risk management", "Cybersecurity", "Transportation security"],
+} as const;
+
+export const COMPETENCIES = {
+  es: [
+    "Gestión de riesgos",
+    "Seguridad en transporte",
+    "Criterios de seguridad CTPAT y OEA",
+    "Ciberseguridad",
+    "Continuidad operativa",
+    "Liderazgo y gestión de equipos",
+  ],
+  en: [
+    "Risk management",
+    "Transportation security",
+    "CTPAT and AEO security criteria",
+    "Cybersecurity",
+    "Operational continuity",
+    "Leadership and team management",
+  ],
+} as const;
+
+export const PRESENTERS_COPY = {
+  es: {
+    label: "PRESENTADORES EXCLUSIVOS",
+    title: "Empresas comprometidas con el fortalecimiento de la seguridad",
+    description: "Organizaciones que impulsan el desarrollo profesional de la industria.",
+  },
+  en: {
+    label: "EXCLUSIVE PRESENTERS",
+    title: "Companies committed to strengthening security",
+    description: "Organizations that support professional development across the industry.",
+  },
+} as const;
+
+// Call-for-speakers ("Ser presentador"). This is a mailto-based inquiry — it
+// deliberately does NOT persist to Supabase, keeping the product boundary
+// (only corporate-pass and sponsorship inquiries are stored) intact.
+export const PRESENTER_CFP = {
+  recipient: "contacto@scsecuritysummit.com",
+  es: {
+    label: "Convocatoria",
+    title: "Quiero ser presentador",
+    description:
+      "Buscamos especialistas con experiencia directa en seguridad, cumplimiento, transporte, comercio exterior y continuidad operativa. Déjanos tus datos y te contactamos.",
+    points: [
+      "Sesiones de 50 minutos con caso real.",
+      "Audiencia ejecutiva y operativa de la región.",
+      "Respuesta del comité en 5 días hábiles.",
+    ],
+    formLabel: "Postúlate",
+    formTitle: "Comparte tu propuesta",
+    formDesc:
+      "Cuéntanos qué te gustaría presentar y el comité revisará tu perfil.",
+    firstName: "Nombre(s)",
+    firstNamePlaceholder: "Sandra",
+    lastName: "Apellidos",
+    lastNamePlaceholder: "Romero",
+    email: "Correo corporativo",
+    emailPlaceholder: "nombre@empresa.com",
+    phone: "Teléfono móvil",
+    phonePlaceholder: "+52 899 000 0000",
+    company: "Empresa",
+    companyPlaceholder: "Empresa",
+    role: "Cargo",
+    rolePlaceholder: "Gerente de seguridad",
+    topic: "Tema que te gustaría presentar",
+    topicPlaceholder:
+      "Describe brevemente tu propuesta y el caso que compartirías.",
+    submit: "Enviar propuesta",
+    note: "Se abrirá tu correo con los datos listos para enviar a contacto@scsecuritysummit.com",
+    subject: "Propuesta de presentador — SC Security Summit 2026",
+  },
+  en: {
+    label: "Call for speakers",
+    title: "I want to be a presenter",
+    description:
+      "We're looking for specialists with direct experience in security, compliance, transportation, foreign trade, and operational continuity. Leave your details and we'll reach out.",
+    points: [
+      "50-minute sessions built around a real case.",
+      "Executive and operational audience from the region.",
+      "Committee response within 5 business days.",
+    ],
+    formLabel: "Apply",
+    formTitle: "Share your proposal",
+    formDesc: "Tell us what you'd like to present and the committee will review your profile.",
+    firstName: "First name(s)",
+    firstNamePlaceholder: "Sandra",
+    lastName: "Last name(s)",
+    lastNamePlaceholder: "Romero",
+    email: "Corporate email",
+    emailPlaceholder: "name@company.com",
+    phone: "Mobile phone",
+    phonePlaceholder: "+1 956 000 0000",
+    company: "Company",
+    companyPlaceholder: "Company",
+    role: "Role",
+    rolePlaceholder: "Security manager",
+    topic: "Topic you'd like to present",
+    topicPlaceholder: "Briefly describe your proposal and the case you'd share.",
+    submit: "Send proposal",
+    note: "Your email client will open with the details ready to send to contacto@scsecuritysummit.com",
+    subject: "Speaker proposal — SC Security Summit 2026",
+  },
+} as const;
+
+export const AUDIENCE_PATHS = {
+  es: [
+    {
+      label: "PROFESIONAL",
+      title: "Quieres fortalecer tu perfil",
+      description:
+        "Amplía tu visión, actualiza tus conocimientos y prepárate para asumir mayores responsabilidades.",
+      cta: "Ver acceso recomendado",
+      href: "#accesos",
+    },
+    {
+      label: "LÍDER",
+      title: "Tomas decisiones que afectan la operación",
+      description:
+        "Fortalece el criterio con el que diriges proyectos, equipos, auditorías y procesos de seguridad.",
+      cta: "Obtener accesos",
+      href: "#accesos",
+    },
+    {
+      label: "EMPRESA",
+      title: "Necesitas desarrollar capacidades en varias áreas",
+      description:
+        "Capacita a transporte, comercio exterior, seguridad, sistemas y cumplimiento bajo una misma visión.",
+      cta: "Solicitar pase corporativo",
+      href: "#registro",
+    },
+  ],
+  en: [
+    {
+      label: "PROFESSIONAL",
+      title: "You want to strengthen your profile",
+      description:
+        "Broaden your perspective, update your knowledge, and prepare for greater responsibilities.",
+      cta: "View recommended pass",
+      href: "#accesos",
+    },
+    {
+      label: "LEADER",
+      title: "You make decisions that affect the operation",
+      description:
+        "Strengthen the judgment you use to lead projects, teams, audits, and security processes.",
+      cta: "Get passes",
+      href: "#accesos",
+    },
+    {
+      label: "COMPANY",
+      title: "You need to build capabilities across teams",
+      description:
+        "Train transportation, foreign trade, security, systems, and compliance under one shared vision.",
+      cta: "Request a corporate pass",
+      href: "#registro",
+    },
   ],
 } as const;
 
@@ -1089,46 +1266,46 @@ export const VALUE_HIGHLIGHTS = {
 export const WHY_ATTEND = {
   es: [
     {
-      icon: "book-open",
-      title: "Actualización Estratégica",
-      desc: "Temas actuales y especializados sobre seguridad, logística, comercio exterior y cumplimiento.",
-    },
-    {
-      icon: "mic-2",
-      title: "Expertos del Sector",
-      desc: "Speakers y panelistas con experiencia práctica en operaciones, compliance y estrategia",
-    },
-    {
       icon: "target",
-      title: "Impacto Real",
-      desc: "Ideas, herramientas y contactos que pueden traducirse en mejoras concretas para tu empresa.",
+      title: "Comprender",
+      desc: "Analiza los riesgos que están transformando la seguridad de la cadena de suministro.",
     },
     {
-      icon: "globe",
-      title: "Visión Binacional y Comercial",
-      desc: "Perspectiva binacional para impulsar comercio, colaboración y crecimiento.",
+      icon: "network",
+      title: "Decidir",
+      desc: "Fortalece el criterio con el que evalúas amenazas, cumplimiento y continuidad.",
+    },
+    {
+      icon: "book-open",
+      title: "Aplicar",
+      desc: "Regresa a tu operación con ideas, enfoques y acciones concretas.",
+    },
+    {
+      icon: "layout-grid",
+      title: "No vienes a recorrer stands",
+      desc: "Vienes a desarrollar competencias. La formación es el producto; la vinculación complementa la experiencia.",
     },
   ],
   en: [
     {
-      icon: "book-open",
-      title: "Strategic Update",
-      desc: "Master the standards to anticipate risks before they disrupt your operation",
-    },
-    {
-      icon: "mic-2",
-      title: "Industry Experts",
-      desc: "Speakers and panelists with hands-on experience in operations, compliance and strategy",
-    },
-    {
       icon: "target",
-      title: "Real Impact",
-      desc: "Turn compliance into a competitive advantage that opens new B2B sales channels",
+      title: "Understand",
+      desc: "Analyze the risks transforming supply chain security.",
     },
     {
-      icon: "globe",
-      title: "Binational & Commercial Vision",
-      desc: "Networking with decision-makers who are shaping the future of logistics security and improvements for your company",
+      icon: "network",
+      title: "Decide",
+      desc: "Strengthen the judgment you use to assess threats, compliance, and continuity.",
+    },
+    {
+      icon: "book-open",
+      title: "Apply",
+      desc: "Return to your operation with practical ideas, approaches, and actions.",
+    },
+    {
+      icon: "layout-grid",
+      title: "You are not here to browse booths",
+      desc: "You are here to build capabilities. Training is the product; networking complements the experience.",
     },
   ],
 } as const;

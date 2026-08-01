@@ -9,10 +9,10 @@ export default function NetworkingHub({ language }: { language: Language }) {
   const { ui, providers } = CONTENT[language];
 
   return (
-    <section className="bg-blue-950 py-20 sm:py-28 relative overflow-hidden">
+    <section className="networking-section bg-blue-950 py-20 sm:py-28 relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/photo-logistics-operations.webp"
+          src="/images/gallery-hub.webp"
           alt=""
           fill
           className="object-cover opacity-[0.3]"

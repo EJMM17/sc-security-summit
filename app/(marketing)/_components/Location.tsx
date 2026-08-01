@@ -8,8 +8,8 @@ export default function Location({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
 
   return (
-    <section id="ubicacion" className="py-20 sm:py-28 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+    <section id="ubicacion" className="mock-section mock-location">
+      <div className="mock-container">
         <ScrollReveal>
           <div className="text-center mb-12">
             <span className="section-label flex items-center justify-center gap-2">

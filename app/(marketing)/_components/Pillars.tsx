@@ -1,50 +1,52 @@
+import {
+  Gauge,
+  LockKeyhole,
+  RefreshCw,
+  ShieldCheck,
+  Truck,
+  Users,
+} from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
-import { CONTENT } from "@/lib/content";
+import { COMPETENCIES, CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
-import PremiumCheck from "./_primitives/PremiumCheck";
 import SectionIntro from "./_primitives/SectionIntro";
 
+const ICONS = [Gauge, Truck, ShieldCheck, LockKeyhole, RefreshCw, Users] as const;
+
 export default function Pillars({ language }: { language: Language }) {
-  const { ui, pillars } = CONTENT[language];
+  const { ui } = CONTENT[language];
+  const competencies = COMPETENCIES[language];
 
   return (
-      <section id="enfoque" className="py-20 sm:py-28 bg-slate-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <SectionIntro
-              label={ui.pillarsLabel}
-              title={ui.pillarsTitle}
-              description={ui.pillarsDesc}
-              className="mb-16"
-            />
-          </ScrollReveal>
+    <section id="formacion" className="mock-section bg-slate-50">
+      <div className="mock-container">
+        <ScrollReveal>
+          <SectionIntro
+            label={ui.pillarsLabel}
+            title={ui.pillarsTitle}
+            description={ui.pillarsDesc}
+            align="center"
+            className="mock-section-intro"
+          />
+        </ScrollReveal>
 
-          <div className="pillar-editorial-grid">
-            {pillars.map((pillar, index) => (
-              <ScrollReveal key={index} delay={index * 150}>
-                <div className="pillar-editorial-item">
-                  <h3 className="font-oswald text-xl font-bold text-slate-900 mb-3">
-                    {pillar.title}
-                  </h3>
-                  <p className="text-slate-500 text-sm leading-relaxed mb-5">
-                    {pillar.desc}
-                  </p>
-                  <ul className="space-y-2">
-                    {pillar.bullets.map((bullet, bulletIndex) => (
-                      <li
-                        key={bulletIndex}
-                        className="flex items-start gap-2 text-sm text-slate-600"
-                      >
-                        <PremiumCheck className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
-                        {bullet}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+        <div className="competency-grid">
+          {competencies.map((title, index) => {
+            const CompetencyIcon = ICONS[index];
+
+            return (
+              <ScrollReveal key={title} delay={index * 70}>
+                <article className="competency-card">
+                  <span aria-hidden="true">
+                    <CompetencyIcon />
+                  </span>
+                  <h3>{title}</h3>
+                </article>
               </ScrollReveal>
-            ))}
-          </div>
+            );
+          })}
         </div>
-      </section>
+      </div>
+    </section>
   );
 }

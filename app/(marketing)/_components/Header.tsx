@@ -21,7 +21,7 @@ export default function Header({ language }: { language: Language }) {
       <HeaderScroll>
         <header className="summit-header fixed top-0 w-full z-50 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-3 sm:px-6 h-[62px] sm:h-[68px] flex items-center justify-between gap-2 sm:gap-4">
-            <a href="#" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
+            <a href="#top" className="flex min-w-0 items-center gap-2 sm:gap-3 group">
               <Image
                 src="/images/logo-symbol-blue.png"
                 alt="Security Chain Summit"
@@ -54,7 +54,7 @@ export default function Header({ language }: { language: Language }) {
                 href={EVENTBRITE_URL}
                 external
                 size="sm"
-                className="header-cta hidden md:inline-flex"
+                className="header-cta hidden lg:inline-flex"
               >
                 {content.ui.registerBtn}
               </PrimaryCTA>

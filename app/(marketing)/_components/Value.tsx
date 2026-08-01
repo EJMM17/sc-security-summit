@@ -9,7 +9,7 @@ export default function Value({ language }: { language: Language }) {
   const { ui, attendees, valueHighlights } = CONTENT[language];
 
   return (
-    <section className="rhythm-pause-md bg-slate-50">
+    <section className="mock-value rhythm-pause-md bg-slate-50">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-5 gap-12 items-start">
           <div className="lg:col-span-3">

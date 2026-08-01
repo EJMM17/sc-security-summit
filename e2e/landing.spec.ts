@@ -7,12 +7,12 @@ test.describe("Homepage comercial", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: /summit de seguridad en la cadena de suministros/i,
+        name: /las mejores decisiones comienzan con una mejor formación/i,
       }),
     ).toBeVisible();
-    await expect(page.getByRole("img", { name: "Lanz Logistics" })).toBeVisible();
+    await expect(page.getByRole("img", { name: "Lanz Logistics" }).first()).toBeVisible();
     await expect(
-      page.getByRole("img", { name: "Instituto Internacional de Estudios Superiores" }),
+      page.getByRole("img", { name: "Instituto Internacional de Estudios Superiores" }).first(),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: "Parque Industrial Villa Florida" })).toBeVisible();
 
@@ -24,7 +24,7 @@ test.describe("Homepage comercial", () => {
     await expect(speakers.getByRole("heading", { name: "Fidel Guerrero" })).toBeVisible();
 
     const sectionOrder = await page.evaluate(() =>
-      ["speakers", "agenda", "accesos", "patrocinadores", "registro"].map(
+      ["especialistas", "programa", "accesos", "patrocinadores", "registro"].map(
         (id) => document.getElementById(id)?.offsetTop ?? -1,
       ),
     );

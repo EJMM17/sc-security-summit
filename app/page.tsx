@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import ScrollRevealObserver from "@/components/ScrollRevealObserver";
+import ScrollProgress from "@/components/ScrollProgress";
 import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
 import { BASE_URL, CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import Agenda from "./(marketing)/_components/Agenda";
@@ -14,8 +15,10 @@ import Hero from "./(marketing)/_components/Hero";
 import Location from "./(marketing)/_components/Location";
 import NetworkingHub from "./(marketing)/_components/NetworkingHub";
 import Pillars from "./(marketing)/_components/Pillars";
+import Presenters from "./(marketing)/_components/Presenters";
 import Pricing from "./(marketing)/_components/Pricing";
 import Registro from "./(marketing)/_components/Registro";
+import SerPresentador from "./(marketing)/_components/SerPresentador";
 import Speakers from "./(marketing)/_components/Speakers";
 import Sponsors from "./(marketing)/_components/Sponsors";
 import Value from "./(marketing)/_components/Value";
@@ -209,6 +212,7 @@ export default async function Home({
       <link rel="alternate" hrefLang="en-US" href={`${BASE_URL}/?lang=en`} />
       <link rel="alternate" hrefLang="x-default" href={BASE_URL} />
       <ScrollRevealObserver />
+      <ScrollProgress />
       <Header language={language} />
       <div>
         <Hero language={language} />
@@ -225,6 +229,8 @@ export default async function Home({
         <FinalCTA language={language} />
         <Registro language={language} />
         <Location language={language} />
+        <SerPresentador language={language} />
+        <Presenters language={language} />
         <Faq language={language} />
         <Footer language={language} />
       </div>

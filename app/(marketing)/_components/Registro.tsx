@@ -4,7 +4,6 @@ import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
 import type { Language } from "@/lib/language";
-import WaveSeparator from "./_primitives/WaveSeparator";
 
 export default function Registro({
   language,
@@ -15,9 +14,7 @@ export default function Registro({
   const inquiriesDisabled = isVisualOnlyVercelDeployment();
 
   return (
-    <>
-      <WaveSeparator color="#FFFFFF" flip />
-      <section id="registro" className="py-20 sm:py-28 bg-white">
+      <section id="registro" className="mock-corporate py-20 sm:py-28 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <ScrollReveal>
             <div className="text-center mb-10">
@@ -27,7 +24,7 @@ export default function Registro({
             </div>
           </ScrollReveal>
           <ScrollReveal delay={120}>
-            <div className="corporate-pass-panel">
+            <div id="pase-corporativo" className="corporate-pass-panel">
               <div className="corporate-pass-summary">
                 <UsersRound aria-hidden="true" />
                 <p>{ui.corporateAccessTitle}</p>
@@ -46,6 +43,5 @@ export default function Registro({
           </ScrollReveal>
         </div>
       </section>
-    </>
   );
 }

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { Archivo, Inter } from "next/font/google";
+import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -23,11 +23,11 @@ import {
 } from "@/lib/deployment-environment";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const archivo = Archivo({
+const oswald = Oswald({
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-oswald",
-  display: "optional",
-  preload: false,
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -97,7 +97,7 @@ export default async function RootLayout({
   return (
     <html lang={language} className="scroll-smooth">
       <body
-        className={`${inter.variable} ${archivo.variable} font-sans bg-white text-[#0F172A] antialiased`}
+        className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >
         {/* Consent Mode v2 defaults — must run before GTM / GA / pixels */}
         <ConsentMode nonce={nonce} />

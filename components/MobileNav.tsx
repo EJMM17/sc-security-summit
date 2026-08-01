@@ -1,41 +1,28 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
-import { Menu, X, ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowRight, Menu, X } from "lucide-react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
-import { EVENTBRITE_URL } from "@/lib/content";
+import { EVENTBRITE_URL, NAV_LINKS } from "@/lib/content";
 
 type Language = "es" | "en";
-
-const linksByLanguage: Record<Language, { href: string; label: string }[]> = {
-  es: [
-    { href: "#enfoque", label: "Enfoque" },
-    { href: "#speakers", label: "Conferencistas" },
-    { href: "#audiencia", label: "Audiencia" },
-    { href: "#accesos", label: "Accesos" },
-    { href: "#patrocinadores", label: "Patrocinadores" },
-    { href: "#ubicacion", label: "Ubicación" },
-    { href: "#faq", label: "FAQ" },
-  ],
-  en: [
-    { href: "#enfoque", label: "Focus" },
-    { href: "#speakers", label: "Speakers" },
-    { href: "#audiencia", label: "Audience" },
-    { href: "#accesos", label: "Passes" },
-    { href: "#patrocinadores", label: "Sponsors" },
-    { href: "#ubicacion", label: "Location" },
-    { href: "#faq", label: "FAQ" },
-  ],
-};
 
 export default function MobileNav({ language = "es" }: { language?: Language }) {
   const [open, setOpen] = useState(false);
   const navRef = useFocusTrap(open);
-  const links = linksByLanguage[language];
-  const menuAriaLabel = language === "en" ? (open ? "Close menu" : "Open menu") : (open ? "Cerrar menú" : "Abrir menú");
+  const links = NAV_LINKS[language];
+  const menuAriaLabel =
+    language === "en"
+      ? open
+        ? "Close menu"
+        : "Open menu"
+      : open
+        ? "Cerrar menú"
+        : "Abrir menú";
   const registerLabel = language === "en" ? "Get passes" : "Conseguir accesos";
-  const sponsorLabel = language === "en" ? "Sponsor the event" : "Patrocinar el evento";
+  const sponsorLabel =
+    language === "en" ? "Sponsor the event" : "Patrocinar el evento";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -45,7 +32,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
   }, [open]);
 
   return (
-    <div className="md:hidden">
+    <div className="lg:hidden">
       <button
         onClick={() => setOpen(!open)}
         aria-label={menuAriaLabel}
@@ -59,7 +46,6 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         )}
       </button>
 
-      {/* Overlay */}
       {open && (
         <div
           className="fixed inset-0 z-40 bg-black/30"
@@ -67,7 +53,6 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         />
       )}
 
-      {/* Slide-down panel */}
       <div
         ref={navRef as React.RefObject<HTMLDivElement>}
         role="dialog"
