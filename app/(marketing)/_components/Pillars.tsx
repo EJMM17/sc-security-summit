@@ -18,7 +18,7 @@ export default function Pillars({ language }: { language: Language }) {
   const competencies = COMPETENCIES[language];
 
   return (
-    <section id="formacion" className="mock-section bg-slate-50">
+    <section id="formacion" className="mock-section mock-section--soft">
       <div className="mock-container">
         <ScrollReveal>
           <SectionIntro
@@ -36,7 +36,7 @@ export default function Pillars({ language }: { language: Language }) {
 
             return (
               <ScrollReveal key={title} delay={index * 70}>
-                <article className="competency-card">
+                <article className="surface-card competency-card">
                   <span aria-hidden="true">
                     <CompetencyIcon />
                   </span>

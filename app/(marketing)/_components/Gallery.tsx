@@ -9,7 +9,7 @@ export default function Gallery({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
 
   return (
-    <section className="mock-gallery py-16 sm:py-24 bg-slate-50 overflow-hidden">
+    <section className="mock-section mock-section--tight mock-section--light mock-gallery overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <ScrollReveal>
           <SectionIntro

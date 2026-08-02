@@ -9,7 +9,7 @@ export default function Value({ language }: { language: Language }) {
   const { ui, attendees, valueHighlights } = CONTENT[language];
 
   return (
-    <section className="mock-value rhythm-pause-md bg-slate-50">
+    <section className="mock-section mock-section--soft mock-value">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="grid lg:grid-cols-5 gap-12 items-start">
           <div className="lg:col-span-3">
@@ -38,9 +38,9 @@ export default function Value({ language }: { language: Language }) {
             <ScrollReveal delay={200}>
               <div className="sticky top-24 p-8 rounded-[20px] border border-blue-200 bg-white shadow-md">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center">
-                    <Users className="w-5 h-5 text-blue-400" strokeWidth={1.5} />
-                  </div>
+                  <span className="mock-icon-box" aria-hidden="true">
+                    <Users strokeWidth={1.8} />
+                  </span>
                   <h3 className="font-oswald text-xl font-bold text-slate-900">
                     {ui.audienceCardTitle}
                   </h3>

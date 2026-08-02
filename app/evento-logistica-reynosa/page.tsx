@@ -32,7 +32,7 @@ const COPY = {
     date: "24 de septiembre, 2026 · 8:00 AM — 7:00 PM",
     venue: "Centro de Convenciones de Reynosa · Tamaulipas, México",
     ctaTitle: "Asegura tu lugar en Reynosa",
-    ctaText: "Cupo limitado. Regístrate hoy y forma parte de la primera edición.",
+    ctaText: "Regístrate hoy y forma parte de la primera edición.",
     cta: "Registrarme ahora",
   },
   en: {
@@ -60,7 +60,7 @@ const COPY = {
     date: "September 24, 2026 · 8:00 AM — 7:00 PM",
     venue: "Reynosa Convention Center · Tamaulipas, Mexico",
     ctaTitle: "Secure your spot in Reynosa",
-    ctaText: "Limited seats. Register today and be part of the first edition.",
+    ctaText: "Register today and be part of the first edition.",
     cta: "Register now",
   },
 } as const;

@@ -8,7 +8,7 @@ export default function Agenda({ language }: { language: Language }) {
   const { agenda, ui } = CONTENT[language];
 
   return (
-    <section id="programa" className="agenda-section py-20 sm:py-28">
+    <section id="programa" className="mock-section mock-section--soft agenda-section">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <ScrollReveal>
           <SectionIntro

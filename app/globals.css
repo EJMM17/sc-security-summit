@@ -3383,11 +3383,64 @@ textarea:focus {
    the production forms, privacy controls and server-side architecture.
    ======================================================================== */
 
+/* ── Landing token scale ──────────────────────────────────────────────
+   One vocabulary for the whole page: two light planes, one navy family,
+   four text weights, three radii, three elevations. Every landing rule
+   below draws from these instead of restating a near-identical hex, so
+   sections read as one system rather than as siblings that were styled
+   separately. */
 :root {
+  /* Brand */
   --summit-blue: #1d4ed8;
+  --summit-blue-bright: #2563eb;
   --summit-blue-dark: #1e3a8a;
+  --summit-blue-tint: #eff6ff;
+  --summit-sky: #93c5fd;
   --summit-ink: #0f172a;
-  --summit-soft: #f5f7fb;
+
+  /* Light surfaces — the page alternates between exactly these two */
+  --surface: #ffffff;
+  --surface-soft: #f7f9fd;
+  --summit-soft: var(--surface-soft);
+
+  /* Navy surfaces */
+  --surface-navy: #071a43;
+  --surface-navy-band: #112f72;
+  --surface-navy-deep: #0b1731;
+
+  /* Text on light */
+  --text-strong: #0f172a;
+  --text-title: #172554;
+  --text-body: #475569;
+  --text-muted: #64748b;
+  --text-faint: #94a3b8;
+
+  /* Text on navy */
+  --on-navy-title: #ffffff;
+  --on-navy-body: rgba(219, 234, 254, 0.78);
+  --on-navy-label: #93c5fd;
+  --on-navy-faint: rgba(191, 219, 254, 0.55);
+  --on-navy-line: rgba(191, 219, 254, 0.18);
+
+  /* Hairlines */
+  --line: #e2e8f0;
+  --line-strong: #dbe4f0;
+  --line-accent: #dbeafe;
+
+  /* Radii — three steps, nothing in between */
+  --r-sm: 0.75rem;
+  --r-md: 1rem;
+  --r-lg: 1.25rem;
+
+  /* Elevation — three steps, nothing in between */
+  --elev-1: 0 10px 30px rgba(15, 23, 42, 0.05);
+  --elev-2: 0 16px 44px rgba(15, 23, 42, 0.08);
+  --elev-3: 0 24px 60px rgba(15, 23, 42, 0.12);
+  --elev-hover: 0 18px 42px rgba(30, 64, 175, 0.12);
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur: 200ms;
 }
 
 html {
@@ -3404,12 +3457,59 @@ body {
   padding-inline: 1.5rem;
 }
 
+/* Every landing section shares one vertical rhythm. Two modifiers cover
+   the only legitimate deviations: a shorter interlude and a longer pause
+   before a conversion block. */
 .mock-section {
   padding-block: clamp(4.75rem, 8vw, 7rem);
 }
 
+.mock-section--tight {
+  padding-block: clamp(3.5rem, 6vw, 5.25rem);
+}
+
+.mock-section--tall {
+  padding-block: clamp(5.5rem, 9vw, 8rem);
+}
+
+/* Surface modifiers — sections declare a plane, never a raw colour. */
+.mock-section--light {
+  background: var(--surface);
+}
+
+.mock-section--soft {
+  background: var(--surface-soft);
+}
+
+.mock-section--navy {
+  background: var(--surface-navy);
+  color: var(--on-navy-title);
+}
+
 .mock-section-intro {
   margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+/* Shared card shell. Anything that presents itself as a raised block on a
+   light plane inherits the same border, radius, elevation and hover lift,
+   so cards in different sections no longer drift apart by a few px and a
+   few percent of shadow opacity. */
+.surface-card {
+  height: 100%;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
+  transition:
+    transform var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.surface-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-accent);
+  box-shadow: var(--elev-hover);
 }
 
 .mock-icon-box {
@@ -3418,15 +3518,87 @@ body {
   height: 3rem;
   flex: 0 0 3rem;
   place-items: center;
-  border-radius: 0.8rem;
-  background: #e8efff;
+  border-radius: var(--r-sm);
+  background: var(--summit-blue-tint);
   color: var(--summit-blue);
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+
+.surface-card:hover .mock-icon-box {
+  background: var(--summit-blue);
+  color: #ffffff;
 }
 
 .mock-icon-box svg {
   width: 1.35rem;
   height: 1.35rem;
   stroke-width: 1.8;
+}
+
+/* ── Micro-label motif ────────────────────────────────────────────────
+   One kicker treatment for the whole page: a hairline rule, then wide-
+   tracked uppercase text. The hero mirrors the rule on both sides because
+   it is optically centred at full width; the footer already used this
+   shape, so sections now rhyme with both instead of each inventing its
+   own eyebrow. */
+.section-label,
+.presenters-band-heading > span,
+.networking-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--summit-blue);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.section-label::before,
+.presenters-band-heading > span::before,
+.networking-label::before {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 1px;
+  flex: none;
+  background: linear-gradient(90deg, var(--summit-blue-bright), rgba(37, 99, 235, 0.15));
+}
+
+/* Centred intros mirror the rule so the label stays optically centred. */
+.section-intro--center .section-label::after,
+.section-label--center::after {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 1px;
+  flex: none;
+  background: linear-gradient(90deg, rgba(37, 99, 235, 0.15), var(--summit-blue-bright));
+}
+
+/* On navy the same motif switches to the sky accent. */
+.presenters-band-heading > span,
+.networking-label {
+  color: var(--on-navy-label);
+}
+
+.presenters-band-heading > span::before,
+.networking-label::before {
+  background: linear-gradient(90deg, var(--summit-blue-bright), rgba(147, 197, 253, 0.2));
+}
+
+.presenters-band-heading > span {
+  justify-content: center;
+}
+
+.presenters-band-heading > span::after {
+  content: "";
+  display: block;
+  width: 1.6rem;
+  height: 1px;
+  flex: none;
+  background: linear-gradient(90deg, rgba(147, 197, 253, 0.2), var(--summit-blue-bright));
 }
 
 .summit-header {
@@ -3458,7 +3630,7 @@ body {
 }
 
 .summit-header:not(.header-scrolled) .nav-link {
-  color: #475569;
+  color: var(--text-body);
 }
 
 .summit-header:not(.header-scrolled) .nav-link:hover {
@@ -3490,7 +3662,7 @@ body {
   justify-content: center;
   isolation: isolate;
   text-align: center;
-  background: #071a43;
+  background: var(--surface-navy);
 }
 
 .hero-production .hero-background-image {
@@ -3529,7 +3701,7 @@ body {
   border: 0;
   border-radius: 0;
   background: none;
-  color: #93c5fd;
+  color: var(--summit-sky);
   font-size: 0.645rem;
   font-weight: 700;
   letter-spacing: 0.34em;
@@ -3565,7 +3737,7 @@ body {
 
 .hero-production .hero-title span {
   display: inline;
-  color: #93c5fd;
+  color: var(--summit-sky);
 }
 
 .hero-production .hero-description {
@@ -3586,7 +3758,7 @@ body {
   justify-content: center;
   flex-wrap: wrap;
   gap: 0.6rem 1.45rem;
-  border-block: 1px solid rgba(191, 219, 254, 0.16);
+  border-block: 1px solid var(--on-navy-line);
 }
 
 .hero-topic-rail li {
@@ -3665,7 +3837,7 @@ body {
   margin: 1.2rem auto 0;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border-block: 1px solid rgba(191, 219, 254, 0.14);
+  border-block: 1px solid var(--on-navy-line);
 }
 
 .hero-stat-grid > div {
@@ -3678,7 +3850,7 @@ body {
 }
 
 .hero-stat-grid > div + div {
-  border-left: 1px solid rgba(191, 219, 254, 0.14);
+  border-left: 1px solid var(--on-navy-line);
 }
 
 /* Fixed slot heights keep the four labels on a shared baseline even when a
@@ -3711,14 +3883,6 @@ body {
   line-height: 1.42;
   text-transform: uppercase;
   text-wrap: balance;
-}
-
-.hero-urgency {
-  margin-top: 0.95rem;
-  color: #fcd34d;
-  font-size: 0.7rem;
-  font-weight: 650;
-  letter-spacing: 0.045em;
 }
 
 /* Date/venue stack above a centred countdown — one vertical axis instead of
@@ -3758,7 +3922,7 @@ body {
 
 .hero-event-facts > div + div {
   padding-left: clamp(1.5rem, 4.5vw, 3.25rem);
-  border-left: 1px solid rgba(191, 219, 254, 0.2);
+  border-left: 1px solid var(--on-navy-line);
 }
 
 .hero-event-facts svg {
@@ -3890,7 +4054,7 @@ body {
 
 .hero-secondary-link:hover {
   border-color: #bfdbfe;
-  background: #eff6ff;
+  background: var(--summit-blue-tint);
   color: var(--summit-blue-dark);
 }
 
@@ -3905,14 +4069,9 @@ body {
 }
 
 .why-competency-card {
-  height: 100%;
   display: flex;
   padding: 1.6rem;
   gap: 1.1rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  background: white;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
 }
 
 .why-competency-card h3,
@@ -3928,7 +4087,7 @@ body {
 
 .why-competency-card p {
   margin-top: 0.35rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.86rem;
   line-height: 1.65;
 }
@@ -3940,22 +4099,11 @@ body {
 }
 
 .competency-card {
-  height: 100%;
   display: flex;
   min-height: 7.5rem;
   padding: 1.35rem;
   align-items: center;
   gap: 0.95rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 0.95rem;
-  background: white;
-  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease;
-}
-
-.competency-card:hover {
-  transform: translateY(-3px);
-  border-color: #bfdbfe;
-  box-shadow: 0 14px 30px rgba(30, 64, 175, 0.08);
 }
 
 .competency-card > span {
@@ -3964,9 +4112,15 @@ body {
   height: 2.65rem;
   flex: 0 0 2.65rem;
   place-items: center;
-  border-radius: 0.7rem;
-  background: #eff6ff;
+  border-radius: var(--r-sm);
+  background: var(--summit-blue-tint);
   color: var(--summit-blue);
+  transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
+}
+
+.competency-card:hover > span {
+  background: var(--summit-blue);
+  color: #ffffff;
 }
 
 .competency-card svg {
@@ -3988,9 +4142,9 @@ body {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
   overflow: hidden;
-  border-radius: 1.25rem;
+  border-radius: var(--r-lg);
   background: var(--summit-blue-dark);
-  box-shadow: 0 22px 60px rgba(15, 23, 42, 0.2);
+  box-shadow: var(--elev-3);
 }
 
 .speaker-slide-photo {
@@ -4019,7 +4173,7 @@ body {
 }
 
 .speaker-slide-kicker {
-  color: #93c5fd;
+  color: var(--summit-sky);
 }
 
 .speaker-slide-quote {
@@ -4037,13 +4191,13 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  border: 1px solid #dbeafe;
-  border-radius: 1rem;
-  background: #f8fbff;
+  border: 1px solid var(--line-accent);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
 }
 
 .speaker-opportunity h3 {
-  color: #172554;
+  color: var(--text-title);
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.1rem;
   font-weight: 650;
@@ -4051,13 +4205,17 @@ body {
 
 .speaker-opportunity p {
   margin-top: 0.2rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.83rem;
 }
 
+/* ── Arrow link ── one treatment for every "keep going" link on a light
+   plane, whatever section it lives in. */
 .speaker-opportunity a,
+.audience-path-grid a,
 .text-link-arrow {
   display: inline-flex;
+  width: fit-content;
   align-items: center;
   gap: 0.5rem;
   color: var(--summit-blue);
@@ -4065,21 +4223,31 @@ body {
   font-weight: 800;
   letter-spacing: 0.05em;
   text-transform: uppercase;
+  transition: color var(--dur) var(--ease-out);
+}
+
+.speaker-opportunity a:hover,
+.audience-path-grid a:hover,
+.text-link-arrow:hover {
+  color: var(--summit-blue-dark);
 }
 
 .speaker-opportunity svg,
+.audience-path-grid a svg,
 .text-link-arrow svg {
   width: 1rem;
-  transition: transform 180ms ease;
+  height: 1rem;
+  transition: transform var(--dur) var(--ease-out);
 }
 
 .speaker-opportunity a:hover svg,
+.audience-path-grid a:hover svg,
 .text-link-arrow:hover svg {
   transform: translateX(3px);
 }
 
 .networking-section {
-  background: #071a43;
+  background: var(--surface-navy);
 }
 
 .networking-section > div:nth-child(2) {
@@ -4087,7 +4255,8 @@ body {
 }
 
 .agenda-section {
-  background: #f7f9fd;
+  border-block: 1px solid var(--line);
+  background: var(--surface-soft);
 }
 
 .agenda-editorial-grid {
@@ -4096,22 +4265,25 @@ body {
 
 .agenda-block {
   height: 100%;
-  border-radius: 1rem;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.05);
+  border-color: var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
 }
 
 .gallery-bento {
-  border-radius: 1.15rem;
+  border-radius: var(--r-lg);
 }
 
 .mock-value {
-  padding-block: clamp(4.75rem, 8vw, 7rem);
-  background: white;
+  background: var(--surface-soft);
 }
 
 .mock-value .space-y-3 > div {
-  border-radius: 0.85rem;
-  box-shadow: none;
+  border-color: var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
 }
 
 .audience-path-grid {
@@ -4121,19 +4293,16 @@ body {
 }
 
 .audience-path-grid article {
-  height: 100%;
+  display: flex;
   padding: 1.7rem;
-  border: 1px solid #e2e8f0;
-  border-radius: 1rem;
-  background: white;
-  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.045);
+  flex-direction: column;
 }
 
 .audience-path-grid article > span {
   color: var(--summit-blue);
-  font-size: 0.62rem;
-  font-weight: 800;
-  letter-spacing: 0.13em;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
 }
 
@@ -4148,24 +4317,16 @@ body {
 .audience-path-grid p {
   min-height: 5.2rem;
   margin-top: 0.55rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.86rem;
   line-height: 1.65;
 }
 
+/* Arrow links share the shared rule below; the card variant only pins
+   itself to the bottom of the card so the four CTAs align. */
 .audience-path-grid a {
-  display: inline-flex;
-  margin-top: 1.15rem;
-  align-items: center;
-  gap: 0.45rem;
-  color: var(--summit-blue);
-  font-size: 0.75rem;
-  font-weight: 800;
-  text-transform: uppercase;
-}
-
-.audience-path-grid a svg {
-  width: 1rem;
+  margin-top: auto;
+  padding-top: 1.15rem;
 }
 
 .audience-value-grid {
@@ -4173,8 +4334,8 @@ body {
   display: grid;
   grid-template-columns: 1.3fr 0.7fr;
   overflow: hidden;
-  border-radius: 1rem;
-  background: #eef3ff;
+  border-radius: var(--r-md);
+  background: var(--summit-blue-tint);
 }
 
 .audience-value-grid > div,
@@ -4183,7 +4344,7 @@ body {
 }
 
 .audience-value-grid h3 {
-  color: #172554;
+  color: var(--text-title);
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.5rem;
   font-weight: 650;
@@ -4200,7 +4361,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  color: #475569;
+  color: var(--text-body);
   font-size: 0.8rem;
   line-height: 1.5;
 }
@@ -4233,8 +4394,7 @@ body {
 }
 
 #accesos {
-  padding-block: clamp(4.75rem, 8vw, 7rem);
-  background: #f7f9fd;
+  background: var(--surface-soft);
 }
 
 .pricing-tier-list {
@@ -4242,7 +4402,7 @@ body {
 }
 
 .pricing-tier {
-  background: white;
+  background: var(--surface);
 }
 
 /* Re-assert the featured (VIP) tier's dark surface AFTER the white override
@@ -4255,13 +4415,13 @@ body {
 }
 
 .mock-corporate {
-  background: white;
+  background: var(--surface);
 }
 
 .mock-corporate .corporate-pass-panel {
   overflow: hidden;
-  border-radius: 1.1rem;
-  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.09);
+  border-radius: var(--r-lg);
+  box-shadow: var(--elev-2);
 }
 
 .final-cta-production {
@@ -4269,7 +4429,7 @@ body {
   border: 0;
   background:
     radial-gradient(circle at 15% 50%, rgba(96, 165, 250, 0.22), transparent 34%),
-    linear-gradient(115deg, #071a43, #1e40af 58%, #2563eb);
+    linear-gradient(115deg, var(--surface-navy), #1e40af 58%, var(--summit-blue-bright));
 }
 
 .final-cta-production::before {
@@ -4280,6 +4440,10 @@ body {
     linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
   background-size: 48px 48px;
   mask-image: linear-gradient(90deg, black, transparent 70%);
+}
+
+.final-cta-production h2 span {
+  color: var(--summit-sky);
 }
 
 .final-cta-facts {
@@ -4293,7 +4457,7 @@ body {
 }
 
 .final-cta-facts div + div {
-  border-left: 1px solid rgba(191, 219, 254, 0.2);
+  border-left: 1px solid var(--on-navy-line);
 }
 
 .final-cta-facts dt {
@@ -4312,16 +4476,18 @@ body {
 }
 
 .mock-location {
-  background: #f7f9fd;
+  background: var(--surface-soft);
 }
 
 .mock-location .card-elevated {
-  border-radius: 0.95rem;
-  box-shadow: none;
+  border-color: var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  box-shadow: var(--elev-1);
 }
 
 .mock-sponsors {
-  background: white;
+  background: var(--surface);
 }
 
 .sponsor-production-grid {
@@ -4356,7 +4522,7 @@ body {
 }
 
 .sponsor-tier-summary span {
-  color: #172554;
+  color: var(--text-title);
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.05rem;
   font-weight: 650;
@@ -4364,7 +4530,7 @@ body {
 
 .sponsor-tier-summary strong {
   margin-top: 0.15rem;
-  color: #94a3b8;
+  color: var(--text-faint);
   font-size: 0.65rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -4380,7 +4546,7 @@ body {
   display: flex;
   align-items: flex-start;
   gap: 0.65rem;
-  color: #475569;
+  color: var(--text-body);
   font-size: 0.83rem;
   line-height: 1.55;
 }
@@ -4390,16 +4556,16 @@ body {
   height: 1rem;
   flex: 0 0 1rem;
   margin-top: 0.2rem;
-  color: #2563eb;
+  color: var(--summit-blue-bright);
 }
 
 .sponsor-contact-panel {
   display: block;
   padding: clamp(1.6rem, 4vw, 2.4rem);
-  border: 1px solid #dbe4f0;
-  border-radius: 1.15rem;
-  background: #f8fafc;
-  box-shadow: 0 20px 55px rgba(15, 23, 42, 0.08);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface-soft);
+  box-shadow: var(--elev-2);
 }
 
 .sponsor-form-heading {
@@ -4416,28 +4582,20 @@ body {
 
 .sponsor-form-heading p {
   margin-top: 0.55rem;
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.88rem;
   line-height: 1.6;
 }
 
 .presenters-band {
   padding-block: clamp(3.8rem, 6vw, 5.5rem);
-  background: #112f72;
+  background: var(--surface-navy-band);
 }
 
 .presenters-band-heading {
   max-width: 44rem;
   margin-inline: auto;
   text-align: center;
-}
-
-.presenters-band-heading span {
-  color: #93c5fd;
-  font-size: 0.65rem;
-  font-weight: 800;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
 }
 
 .presenters-band-heading h2 {
@@ -4463,8 +4621,8 @@ body {
   min-height: 6.4rem;
   padding: 1.2rem;
   place-items: center;
-  border: 1px solid rgba(191, 219, 254, 0.18);
-  border-radius: 0.85rem;
+  border: 1px solid var(--on-navy-line);
+  border-radius: var(--r-sm);
   background: rgba(255, 255, 255, 0.96);
 }
 
@@ -4476,7 +4634,7 @@ body {
 }
 
 .mock-faq {
-  background: #f7f9fd;
+  background: var(--surface-soft);
 }
 
 /* Footer mirrors the hero: same navy depth, same editorial micro-labels with
@@ -4486,7 +4644,7 @@ body {
   padding: 5rem 0 2rem;
   background:
     radial-gradient(125% 72% at 50% 0%, rgba(37, 99, 235, 0.15), transparent 62%),
-    #0b1731;
+    var(--surface-navy-deep);
 }
 
 .summit-footer::before {
@@ -4510,7 +4668,7 @@ body {
 
 .summit-footer-brand p {
   max-width: 26rem;
-  color: #94a3b8;
+  color: var(--text-faint);
   font-size: 0.845rem;
   line-height: 1.72;
 }
@@ -4520,7 +4678,7 @@ body {
   margin-bottom: 1.4rem;
   align-items: center;
   gap: 0.65rem;
-  color: #93c5fd;
+  color: var(--summit-sky);
   font-family: var(--font-inter), sans-serif;
   font-size: 0.6rem;
   font-weight: 700;
@@ -4534,7 +4692,7 @@ body {
   width: 1.6rem;
   height: 1px;
   flex: none;
-  background: linear-gradient(90deg, #2563eb, rgba(147, 197, 253, 0.2));
+  background: linear-gradient(90deg, var(--summit-blue-bright), rgba(147, 197, 253, 0.2));
 }
 
 .summit-footer-links {
@@ -4556,13 +4714,13 @@ body {
   width: fit-content;
   align-items: center;
   gap: 0.55rem;
-  color: #94a3b8;
+  color: var(--text-faint);
   font-size: 0.79rem;
   transition: color 160ms ease, transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .summit-footer-links a:hover {
-  color: #93c5fd;
+  color: var(--summit-sky);
   transform: translateX(3px);
 }
 
@@ -4584,7 +4742,7 @@ body {
 
 .summit-footer-bottom,
 .summit-footer-bottom a {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.685rem;
   letter-spacing: 0.015em;
 }
@@ -4675,11 +4833,11 @@ body {
   }
 
   .hero-stat-grid > div:nth-child(even) {
-    border-left: 1px solid rgba(191, 219, 254, 0.16);
+    border-left: 1px solid var(--on-navy-line);
   }
 
   .hero-stat-grid > div:nth-child(n + 3) {
-    border-top: 1px solid rgba(191, 219, 254, 0.16);
+    border-top: 1px solid var(--on-navy-line);
   }
 
   .hero-event-facts {
@@ -4712,7 +4870,7 @@ body {
   .hero-event-facts > div + div {
     padding-top: 1rem;
     padding-left: 0;
-    border-top: 1px solid rgba(191, 219, 254, 0.15);
+    border-top: 1px solid var(--on-navy-line);
     border-left: 0;
   }
 
@@ -4842,11 +5000,11 @@ body {
   }
 
   .hero-stat-grid > div:nth-child(even) {
-    border-left: 1px solid rgba(191, 219, 254, 0.16);
+    border-left: 1px solid var(--on-navy-line);
   }
 
   .hero-stat-grid > div:nth-child(n + 3) {
-    border-top: 1px solid rgba(191, 219, 254, 0.16);
+    border-top: 1px solid var(--on-navy-line);
   }
 
   .hero-stat-grid dt {
@@ -4871,7 +5029,7 @@ body {
     padding-top: 0;
     padding-left: 0.85rem;
     border-top: 0;
-    border-left: 1px solid rgba(191, 219, 254, 0.15);
+    border-left: 1px solid var(--on-navy-line);
   }
 
   .hero-event-facts svg {
@@ -4928,7 +5086,11 @@ body {
     font-size: 0.66rem;
   }
 
-  .final-cta-facts {
+  .final-cta-production h2 span {
+  color: var(--summit-sky);
+}
+
+.final-cta-facts {
     align-items: center;
     flex-direction: column;
     gap: 1rem;
@@ -4940,16 +5102,25 @@ body {
 
   .final-cta-facts div + div {
     padding-top: 1rem;
-    border-top: 1px solid rgba(191, 219, 254, 0.2);
+    border-top: 1px solid var(--on-navy-line);
     border-left: 0;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .surface-card,
+  .surface-card:hover,
+  .mock-icon-box,
   .competency-card,
+  .competency-card > span,
+  .speaker-opportunity a,
   .speaker-opportunity svg,
+  .audience-path-grid a,
+  .audience-path-grid a svg,
+  .text-link-arrow,
   .text-link-arrow svg,
   .hero-secondary-link {
+    transform: none;
     transition: none;
   }
 }

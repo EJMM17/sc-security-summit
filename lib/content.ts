@@ -86,7 +86,6 @@ export const UI_TEXT = {
     heroTitleHighlight: "mejor formación",
     heroDescription:
       "Programa ejecutivo de formación especializada para profesionales responsables de proteger la seguridad, el cumplimiento y la continuidad de la cadena de suministro.",
-    heroUrgency: "Cupo limitado · asegura tu acceso antes del cierre de registro",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
@@ -257,7 +256,6 @@ export const UI_TEXT = {
     heroTitleHighlight: "better training",
     heroDescription:
       "An executive specialized training program for professionals responsible for supply chain security, compliance, and continuity.",
-    heroUrgency: "Limited capacity · secure your pass before registration closes",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
@@ -1010,7 +1008,7 @@ export const PRICING = {
       price: "$650",
       priceValue: 650,
       featured: false,
-      desc: "Perfil de estudiante con credencial vigente / Cupo limitado",
+      desc: "Perfil de estudiante con credencial vigente",
       features: [
         "Acceso a conferencias especializadas",
         "Kit Futuros Líderes",
@@ -1080,7 +1078,7 @@ export const PRICING = {
       price: "$650",
       priceValue: 650,
       featured: false,
-      desc: "Student profile with valid ID / Limited spots",
+      desc: "Student profile with valid ID",
       features: [
         "Access to specialized conferences",
         "Future Leaders kit",

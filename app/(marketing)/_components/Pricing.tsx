@@ -12,7 +12,7 @@ export default function Pricing({ language }: { language: Language }) {
   const completeLabel = language === "es" ? "Experiencia más completa" : "Most complete experience";
 
   return (
-    <section id="accesos" className="rhythm-pause-lg bg-white">
+    <section id="accesos" className="mock-section mock-section--tall">
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <ScrollReveal>
           <SectionIntro

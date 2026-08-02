@@ -95,7 +95,7 @@ export default async function SponsorsPage({
     <PageShell language={language}>
       <section className="px-4 sm:px-6 pt-16 pb-10 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <span className="section-label justify-center">{c.eyebrow}</span>
+          <span className="section-label section-label--center justify-center">{c.eyebrow}</span>
           <h1 className="section-title mt-3">{c.h1}</h1>
           <p className="text-slate-500 max-w-2xl mx-auto mt-4">{c.lead}</p>
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">

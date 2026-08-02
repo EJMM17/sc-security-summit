@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
@@ -34,7 +34,7 @@ export default function Sponsors({ language }: { language: Language }) {
             <ul className="sponsor-benefit-list">
               {sponsor.benefits.slice(0, 5).map((benefit) => (
                 <li key={benefit}>
-                  <CheckCircle2 aria-hidden="true" />
+                  <Check aria-hidden="true" />
                   <span>{benefit}</span>
                 </li>
               ))}
