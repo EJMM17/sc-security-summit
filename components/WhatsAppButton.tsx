@@ -14,10 +14,10 @@ export default function WhatsAppButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label="Contactar por WhatsApp"
-      className="fixed safe-offset-bottom-left z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg transition-transform hover:scale-110 touch-manipulation"
-      style={{ backgroundColor: "#25D366" }}
+      className="whatsapp-fab fixed safe-offset-bottom-left z-50 w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-lg touch-manipulation"
     >
-      <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+      <span className="whatsapp-fab-halo" aria-hidden="true" />
+      <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-white relative" />
     </a>
   );
 }

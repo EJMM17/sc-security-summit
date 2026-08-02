@@ -166,7 +166,7 @@ export const UI_TEXT = {
     pricingTitle: "Elige tu experiencia de formación",
     pricingDesc:
       "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
-    taxNote: "* Más I.V.A.",
+    taxNote: "I.V.A. incluido",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
@@ -195,7 +195,7 @@ export const UI_TEXT = {
     viewOnMaps: "Ver en Google Maps",
     loadInteractiveMap: "Cargar mapa interactivo",
     mapPrivacyNote:
-      "Google Maps se carga solo cuando lo solicitas, evitando conexiones de terceros durante la visita inicial.",
+      "El mapa se muestra a través de Google Maps, por lo que al verlo se establece una conexión con ese servicio.",
     mapTitle: "Mapa del Centro de Convenciones de Reynosa",
     datesLabel: "Fechas",
     datesValue: "24 de septiembre, 2026",
@@ -336,7 +336,7 @@ export const UI_TEXT = {
     pricingTitle: "Choose your training experience",
     pricingDesc:
       "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
-    taxNote: "* Plus VAT",
+    taxNote: "VAT included",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
     sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
@@ -365,7 +365,7 @@ export const UI_TEXT = {
     viewOnMaps: "View on Google Maps",
     loadInteractiveMap: "Load interactive map",
     mapPrivacyNote:
-      "Google Maps loads only when you request it, avoiding third-party connections during the initial visit.",
+      "The map is displayed through Google Maps, so viewing it establishes a connection with that service.",
     mapTitle: "Map of the Reynosa Convention Center",
     datesLabel: "Dates",
     datesValue: "September 24, 2026",

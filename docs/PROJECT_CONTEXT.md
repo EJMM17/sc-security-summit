@@ -255,11 +255,15 @@ Production. La cuenta Vercel continúa vencida por decisión del propietario:
 el deployment actual está activo, pero una suspensión futura sigue siendo un
 riesgo operativo externo.
 
-Google Maps no se descarga durante la visita inicial. La sección de ubicación
-presenta un control bilingüe y crea el iframe únicamente después de una acción
-explícita del visitante. Esta decisión mantiene la carga inicial y el
-presupuesto Lighthouse libres de los scripts del mapa, además de reducir
-conexiones de terceros no solicitadas.
+La sección de ubicación monta el iframe de Google Maps con la página, de modo
+que el mapa forma parte de la composición visual y no de un paso adicional. El
+iframe usa `loading="lazy"`, por lo que la descarga real ocurre cuando la
+sección se acerca al viewport y la carga inicial sigue libre de los scripts del
+mapa. Mientras el embed carga se muestra un esqueleto con los tonos de la
+página; el aviso bilingüe permanece como pie de figura y declara la conexión
+con Google. Reintroducir la carga bajo demanda o condicionarla al
+consentimiento de marketing sigue siendo una decisión válida si el propietario
+de privacidad lo requiere.
 
 El hero se mantiene deliberadamente estático: fecha, sede y métricas se
 renderizan en servidor, sin contadores por segundo ni animaciones que repinten

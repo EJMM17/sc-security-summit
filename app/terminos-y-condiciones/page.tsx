@@ -73,7 +73,7 @@ export default function TerminosCondiciones() {
             <p>
               El pago de los accesos individuales se procesa <strong>directamente en Eventbrite</strong> al
               momento de la compra, con los métodos de pago que dicha plataforma habilite. Los precios
-              indicados en el sitio no incluyen I.V.A.
+              indicados en el sitio ya incluyen I.V.A.
             </p>
             <p className="mt-3">
               Los <strong>pases corporativos</strong> son la excepción: se solicitan a través del formulario
