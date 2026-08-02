@@ -7,12 +7,12 @@ export default function FinalCTA({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
 
   return (
-    <section className="final-cta-photo final-cta-production relative overflow-hidden bg-blue-950 py-20 border-y border-blue-900">
+    <section className="final-cta-photo final-cta-production relative overflow-hidden">
       <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
         <ScrollReveal>
           <h2 className="font-oswald text-3xl sm:text-4xl md:text-5xl font-bold text-white leading-tight">
             {ui.finalCTATitlePart1}{" "}
-            <span className="text-cyan-300">{ui.finalCTATitlePart2}</span>
+            <span>{ui.finalCTATitlePart2}</span>
           </h2>
           <p className="text-blue-100/60 mt-4 max-w-xl mx-auto">{ui.finalCTADesc}</p>
           <dl className="final-cta-facts">

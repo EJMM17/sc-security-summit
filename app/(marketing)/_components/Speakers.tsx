@@ -9,7 +9,7 @@ export default function Speakers({ language }: { language: Language }) {
   const { ui, speakers } = CONTENT[language];
 
   return (
-      <section id="especialistas" className="mock-section bg-white">
+      <section id="especialistas" className="mock-section mock-section--light">
         <div className="mock-container">
           <ScrollReveal>
             <SectionIntro

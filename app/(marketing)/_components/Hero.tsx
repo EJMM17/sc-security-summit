@@ -85,8 +85,6 @@ export default function Hero({ language }: { language: Language }) {
           ))}
         </dl>
 
-        <p className="hero-urgency">{ui.heroUrgency}</p>
-
         <div className="hero-event-cluster">
           <div className="hero-event-facts">
             <div>

@@ -9,7 +9,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
   const { ui, providers } = CONTENT[language];
 
   return (
-    <section className="networking-section bg-blue-950 py-20 sm:py-28 relative overflow-hidden">
+    <section className="mock-section networking-section relative overflow-hidden">
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/gallery-hub.webp"
@@ -26,7 +26,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-3/5">
             <ScrollReveal>
-              <span className="inline-flex items-center gap-2 py-1 text-xs text-white/90 font-semibold tracking-wider uppercase mb-6">
+              <span className="networking-label mb-6">
                 {ui.networkingLabel}
               </span>
               <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-[1.15] mb-4">
@@ -41,7 +41,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
               <div className="grid grid-cols-2 gap-3 mb-8">
                 {ui.networkingFeatures.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 text-sm text-white/80">
-                    <PremiumCheck className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                    <PremiumCheck className="w-4 h-4 text-blue-300 flex-shrink-0" />
                     {item}
                   </div>
                 ))}
@@ -62,7 +62,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
 
           <div className="md:w-2/5">
             <ScrollReveal delay={150}>
-              <span className="inline-block text-[10px] text-white/60 tracking-widest font-semibold uppercase mb-2">
+              <span className="inline-block text-[10px] text-blue-300/70 tracking-widest font-semibold uppercase mb-2">
                 {ui.providersLabel}
               </span>
               <h3 className="font-oswald text-xl font-bold text-white mb-3">
@@ -75,9 +75,9 @@ export default function NetworkingHub({ language }: { language: Language }) {
                 {providers.map((provider, index) => (
                   <div
                     key={index}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-blue-950/70 border border-white/15 text-sm font-medium text-white/80 hover:border-cyan-300/50 transition-colors"
+                    className="flex items-center gap-2 p-3 rounded-xl bg-blue-950/70 border border-white/15 text-sm font-medium text-white/80 hover:border-blue-300/50 transition-colors"
                   >
-                    <PremiumCheck className="w-4 h-4 text-cyan-300 flex-shrink-0" />
+                    <PremiumCheck className="w-4 h-4 text-blue-300 flex-shrink-0" />
                     {provider.title}
                   </div>
                 ))}

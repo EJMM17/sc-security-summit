@@ -10,8 +10,8 @@ export default function Faq({ language }: { language: Language }) {
     <section id="faq" className="mock-section mock-faq">
       <div className="max-w-3xl mx-auto px-4 sm:px-6">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <span className="section-label">{ui.faqLabel}</span>
+          <div className="mock-section-intro text-center">
+            <span className="section-label section-label--center">{ui.faqLabel}</span>
             <h2 className="section-title mt-3">{ui.faqTitle}</h2>
           </div>
         </ScrollReveal>

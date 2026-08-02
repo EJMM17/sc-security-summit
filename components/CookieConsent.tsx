@@ -139,7 +139,7 @@ export default function CookieConsent({
     >
       <div className="mx-auto max-w-3xl rounded-[20px] border border-slate-700 bg-slate-900 p-4 sm:p-5 text-slate-100 shadow-lg">
         <div className="flex items-start gap-3 sm:gap-4">
-          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/15 text-cyan-300">
+          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-300">
             <Cookie className="h-5 w-5" aria-hidden="true" />
           </div>
           <div className="flex-1">
@@ -155,7 +155,7 @@ export default function CookieConsent({
             <p className="mt-1 text-sm leading-relaxed text-slate-300">
               <a
                 href="/aviso-de-privacidad"
-                className="font-semibold text-cyan-300 underline-offset-2 hover:underline"
+                className="font-semibold text-blue-300 underline-offset-2 hover:underline"
               >
                 {t.privacyLabel}
               </a>
@@ -164,7 +164,7 @@ export default function CookieConsent({
               <button
                 type="button"
                 onClick={() => decide("all")}
-                className="rounded-xl bg-cyan-500 px-4 py-2 text-sm font-semibold text-slate-950 transition-colors hover:bg-cyan-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300"
+                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
               >
                 {t.acceptAll}
               </button>

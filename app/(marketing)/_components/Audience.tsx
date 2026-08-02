@@ -9,7 +9,7 @@ export default function Audience({ language }: { language: Language }) {
   const paths = AUDIENCE_PATHS[language];
 
   return (
-    <section id="audiencia" className="mock-section audience-section bg-white">
+    <section id="audiencia" className="mock-section mock-section--light audience-section">
       <div className="mock-container">
         <ScrollReveal>
           <SectionIntro
@@ -24,7 +24,7 @@ export default function Audience({ language }: { language: Language }) {
         <div className="audience-path-grid">
           {paths.map((path, index) => (
             <ScrollReveal key={path.title} delay={index * 80}>
-              <article>
+              <article className="surface-card">
                 <span>{path.label}</span>
                 <h3>{path.title}</h3>
                 <p>{path.description}</p>

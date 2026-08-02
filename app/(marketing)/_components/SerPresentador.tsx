@@ -29,7 +29,7 @@ export default function SerPresentador({ language }: { language: Language }) {
   )}`;
 
   return (
-    <section id="ser-presentador" className="mock-section bg-white">
+    <section id="ser-presentador" className="mock-section mock-section--light">
       <div className="mock-container sponsor-production-grid">
         <ScrollReveal>
           <div className="sponsor-production-copy">

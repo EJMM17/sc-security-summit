@@ -11,8 +11,8 @@ export default function Location({ language }: { language: Language }) {
     <section id="ubicacion" className="mock-section mock-location">
       <div className="mock-container">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <span className="section-label flex items-center justify-center gap-2">
+          <div className="mock-section-intro text-center">
+            <span className="section-label section-label--center">
               <MapPin className="w-4 h-4" /> {ui.locationLabel}
             </span>
             <h2 className="section-title mt-3">{ui.locationTitle}</h2>
@@ -32,9 +32,9 @@ export default function Location({ language }: { language: Language }) {
             <div className="md:col-span-2 space-y-6">
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
-                  </div>
+                  <span className="mock-icon-box" aria-hidden="true">
+                    <MapPin strokeWidth={1.8} />
+                  </span>
                   <div>
                     <h4 className="font-bold text-slate-800 text-sm">{ui.addressLabel}</h4>
                     <p className="text-sm text-slate-700 font-medium mt-1">{ui.addressName}</p>
@@ -53,9 +53,9 @@ export default function Location({ language }: { language: Language }) {
               </div>
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
-                  </div>
+                  <span className="mock-icon-box" aria-hidden="true">
+                    <Calendar strokeWidth={1.8} />
+                  </span>
                   <div>
                     <h4 className="font-bold text-slate-800 text-sm">{ui.datesLabel}</h4>
                     <p className="text-sm text-slate-500 mt-1">{ui.datesValue}</p>
@@ -65,9 +65,9 @@ export default function Location({ language }: { language: Language }) {
               </div>
               <div className="card-elevated p-6">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 flex items-center justify-center flex-shrink-0">
-                    <Phone className="w-5 h-5 text-slate-500" strokeWidth={1.5} />
-                  </div>
+                  <span className="mock-icon-box" aria-hidden="true">
+                    <Phone strokeWidth={1.8} />
+                  </span>
                   <div>
                     <h4 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h4>
                     <p className="text-sm text-slate-500 mt-1">+52 899 112 8755</p>

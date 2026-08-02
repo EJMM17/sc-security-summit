@@ -10,7 +10,7 @@ export default function WhyAttend({ language }: { language: Language }) {
   const { ui, whyAttend } = CONTENT[language];
 
   return (
-    <section className="mock-section bg-white">
+    <section className="mock-section mock-section--light">
       <div className="mock-container">
         <ScrollReveal>
           <SectionIntro
@@ -28,7 +28,7 @@ export default function WhyAttend({ language }: { language: Language }) {
 
             return (
               <ScrollReveal key={item.title} delay={index * 80}>
-                <article className="why-competency-card">
+                <article className="surface-card why-competency-card">
                   <span className="mock-icon-box" aria-hidden="true">
                     <ItemIcon />
                   </span>

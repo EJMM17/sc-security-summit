@@ -14,11 +14,11 @@ export default function Registro({
   const inquiriesDisabled = isVisualOnlyVercelDeployment();
 
   return (
-      <section id="registro" className="mock-corporate py-20 sm:py-28 bg-white">
+      <section id="registro" className="mock-section mock-section--light mock-corporate">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <ScrollReveal>
-            <div className="text-center mb-10">
-              <span className="section-label">{ui.regLabel}</span>
+            <div className="mock-section-intro text-center">
+              <span className="section-label section-label--center">{ui.regLabel}</span>
               <h2 className="section-title mt-3">{ui.regTitle}</h2>
               <p className="text-slate-500 max-w-xl mx-auto mt-4">{ui.regDesc}</p>
             </div>
