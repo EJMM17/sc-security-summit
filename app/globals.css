@@ -5804,3 +5804,529 @@ h3,
     animation: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   FLOATING LAYER — WhatsApp + cookie settings
+   The two persistent controls share the bottom-left corner. The
+   WhatsApp bubble owns the corner; the consent pill stacks above it
+   so neither covers the other on any viewport.
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --fab-size: 3rem;
+  --fab-gap: 0.625rem;
+  --fab-inset-bottom: max(1rem, env(safe-area-inset-bottom));
+  --fab-inset-left: max(1rem, env(safe-area-inset-left));
+}
+
+@media (min-width: 640px) {
+  :root { --fab-size: 3.5rem; }
+}
+
+.whatsapp-fab {
+  position: fixed;
+  background-color: #25d366;
+  transition: transform var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+  will-change: transform;
+}
+
+.whatsapp-fab:hover {
+  transform: scale(1.08);
+  box-shadow: 0 14px 34px rgba(37, 211, 102, 0.38);
+}
+
+.whatsapp-fab:active {
+  transform: scale(0.96);
+}
+
+/* Slow outward ring — signals "live channel" without demanding attention. */
+.whatsapp-fab-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background-color: #25d366;
+  opacity: 0.55;
+  animation: fabHalo 2.8s var(--ease-out) infinite;
+  pointer-events: none;
+}
+
+@keyframes fabHalo {
+  0%   { transform: scale(1);    opacity: 0.5; }
+  70%  { transform: scale(1.65); opacity: 0; }
+  100% { transform: scale(1.65); opacity: 0; }
+}
+
+/* ── Cookie settings pill — stacked above the WhatsApp bubble ── */
+.consent-fab {
+  position: fixed;
+  bottom: calc(var(--fab-inset-bottom) + var(--fab-size) + var(--fab-gap));
+  left: var(--fab-inset-left);
+  z-index: 90;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--text-body);
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  box-shadow: var(--elev-1);
+  backdrop-filter: blur(10px);
+  animation: consentFabIn 420ms var(--ease-out) both;
+  transition: transform var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.consent-fab:hover {
+  transform: translateY(-2px);
+  border-color: var(--summit-sky);
+  color: var(--summit-blue);
+  box-shadow: var(--elev-2);
+}
+
+.consent-fab:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35), var(--elev-1);
+}
+
+.consent-fab-icon {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--summit-blue-bright);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.consent-fab:hover .consent-fab-icon {
+  transform: rotate(-12deg) scale(1.1);
+}
+
+@keyframes consentFabIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.94); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   COOKIE CONSENT PANEL
+   Light neutral surface built from the same tokens as the page
+   cards, so the dialog reads as part of the site rather than as a
+   dark third-party overlay.
+   ═══════════════════════════════════════════════════════════════ */
+
+.consent-dock {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 100;
+  padding: 0 1rem max(1rem, env(safe-area-inset-bottom));
+}
+
+@media (min-width: 640px) {
+  .consent-dock { padding: 0 1.5rem max(1.5rem, env(safe-area-inset-bottom)); }
+}
+
+.consent-panel {
+  max-width: 48rem;
+  margin-inline: auto;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: linear-gradient(180deg, var(--surface) 0%, var(--surface-soft) 100%);
+  box-shadow: var(--elev-3);
+  animation: consentPanelIn 480ms var(--ease-out) both;
+}
+
+/* Brand hairline across the top edge — same accent as section labels. */
+.consent-panel::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--summit-blue-dark),
+    var(--summit-blue-bright) 45%,
+    var(--cyan-400)
+  );
+  transform-origin: left;
+  animation: consentRuleDraw 700ms var(--ease-out) 120ms both;
+}
+
+@keyframes consentPanelIn {
+  from { opacity: 0; transform: translateY(22px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes consentRuleDraw {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
+}
+
+.consent-panel-body {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+@media (min-width: 640px) {
+  .consent-panel-body { gap: 1rem; padding: 1.25rem 1.35rem; }
+}
+
+.consent-panel-icon {
+  display: none;
+  height: 2.5rem;
+  width: 2.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--summit-blue-tint);
+  color: var(--summit-blue-bright);
+  animation: consentIconIn 520ms var(--ease-out) 160ms both;
+}
+
+@media (min-width: 640px) {
+  .consent-panel-icon { display: flex; }
+}
+
+@keyframes consentIconIn {
+  from { opacity: 0; transform: scale(0.6) rotate(-18deg); }
+  to   { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+
+.consent-panel-copy { flex: 1; min-width: 0; }
+
+.consent-panel-title {
+  color: var(--text-title);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+}
+
+.consent-panel-text {
+  margin-top: 0.25rem;
+  color: var(--text-body);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.consent-panel-list {
+  margin-top: 0.25rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.consent-panel-link {
+  color: var(--summit-blue);
+  font-weight: 650;
+  text-underline-offset: 2px;
+}
+
+.consent-panel-link:hover { text-decoration: underline; }
+
+.consent-panel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+
+@media (min-width: 640px) {
+  .consent-panel-actions { flex-direction: row; }
+}
+
+.consent-btn {
+  border-radius: var(--r-sm);
+  padding: 0.6rem 1.1rem;
+  font-size: 0.85rem;
+  font-weight: 650;
+  transition: transform var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out);
+}
+
+.consent-btn:active { transform: translateY(1px); }
+
+.consent-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.32);
+}
+
+.consent-btn--primary {
+  background: linear-gradient(135deg, var(--summit-blue-dark), var(--summit-blue-bright));
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.22);
+}
+
+.consent-btn--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(37, 99, 235, 0.3);
+}
+
+.consent-btn--ghost {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--text-body);
+}
+
+.consent-btn--ghost:hover {
+  border-color: var(--summit-sky);
+  background: var(--summit-blue-tint);
+  color: var(--summit-blue);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   LOCATION MAP — hydrated, framed and toned with the page
+   ═══════════════════════════════════════════════════════════════ */
+
+.summit-map-shell { min-width: 0; }
+
+.summit-map { margin: 0; }
+
+.summit-map-frame {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-soft);
+  box-shadow: var(--elev-1);
+  transition: box-shadow 420ms var(--ease-out),
+    border-color 420ms var(--ease-out),
+    transform 420ms var(--ease-out);
+}
+
+.summit-map-frame:hover {
+  border-color: var(--line-accent);
+  box-shadow: var(--elev-hover);
+  transform: translateY(-2px);
+}
+
+.summit-map-embed {
+  display: block;
+  width: 100%;
+  height: 280px;
+  border: 0;
+  opacity: 0;
+  filter: saturate(0.78) contrast(1.04);
+  transform: scale(1.04);
+  transition: opacity 700ms var(--ease-out), transform 900ms var(--ease-out),
+    filter 500ms var(--ease-out);
+}
+
+@media (min-width: 640px) {
+  .summit-map-embed { height: 350px; }
+}
+
+.summit-map-embed.is-ready {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Restore full colour on interaction so the map stays usable. */
+.summit-map-frame:hover .summit-map-embed.is-ready,
+.summit-map-embed.is-ready:focus-within {
+  filter: saturate(1) contrast(1);
+}
+
+/* Blue wash that ties the third-party tiles to the palette. Pointer
+   events stay off so panning and zooming still reach the iframe. */
+.summit-map-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(7, 26, 67, 0.14) 0%, rgba(7, 26, 67, 0) 32%),
+    radial-gradient(120% 90% at 50% 110%, rgba(37, 99, 235, 0.16), transparent 62%);
+  mix-blend-mode: multiply;
+  transition: opacity 420ms var(--ease-out);
+}
+
+.summit-map-frame:hover .summit-map-wash { opacity: 0.35; }
+
+/* Slow beacon over the venue coordinates. */
+.summit-map-pulse {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: -1.75rem 0 0 -1.75rem;
+  border-radius: var(--radius-full);
+  border: 2px solid rgba(37, 99, 235, 0.5);
+  pointer-events: none;
+  animation: mapBeacon 3.2s var(--ease-out) infinite;
+}
+
+@keyframes mapBeacon {
+  0%   { transform: scale(0.45); opacity: 0; }
+  25%  { opacity: 0.75; }
+  100% { transform: scale(1.5);  opacity: 0; }
+}
+
+/* ── Skeleton shown until the embed reports `load` ── */
+.summit-map-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(160deg, var(--surface) 0%, var(--summit-blue-tint) 100%);
+  transition: opacity 520ms var(--ease-out), visibility 520ms;
+}
+
+.summit-map-skeleton.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.summit-map-skeleton-grid {
+  position: absolute;
+  inset: -20%;
+  background-image:
+    linear-gradient(rgba(37, 99, 235, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(37, 99, 235, 0.09) 1px, transparent 1px);
+  background-size: 42px 42px;
+  animation: mapGridDrift 14s linear infinite;
+}
+
+@keyframes mapGridDrift {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(42px, 42px, 0); }
+}
+
+.summit-map-skeleton-pin {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  height: 3.5rem;
+  width: 3.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--line-accent);
+  background: var(--surface);
+  color: var(--summit-blue);
+  box-shadow: var(--elev-1);
+  animation: mapPinFloat 2.6s var(--ease-out) infinite;
+}
+
+@keyframes mapPinFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+
+.summit-map-retry {
+  position: absolute;
+  z-index: 3;
+  bottom: 0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.5rem 1rem;
+  color: var(--summit-blue);
+  font-size: 0.76rem;
+  font-weight: 650;
+  box-shadow: var(--elev-1);
+  backdrop-filter: blur(8px);
+}
+
+.summit-map-retry:hover { background: #fff; }
+
+.summit-map-note {
+  margin-top: 0.65rem;
+  color: var(--text-faint);
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+/* Location fact cards lift in sequence alongside the map. */
+.location-facts .card-elevated {
+  transition: transform 380ms var(--ease-out), box-shadow 380ms var(--ease-out),
+    border-color 380ms var(--ease-out);
+}
+
+.location-facts .card-elevated:hover {
+  transform: translateY(-3px);
+  border-color: var(--line-accent);
+  box-shadow: var(--elev-2);
+}
+
+.location-facts .card-elevated:hover .mock-icon-box {
+  transform: scale(1.06) rotate(-4deg);
+}
+
+.location-facts .mock-icon-box {
+  transition: transform 380ms var(--ease-out);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PRICING — tier motion
+   ═══════════════════════════════════════════════════════════════ */
+
+.pricing-tier-price strong {
+  display: inline-block;
+  transition: transform 320ms var(--ease-out);
+}
+
+.pricing-tier:hover .pricing-tier-price strong {
+  transform: scale(1.04);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDUCED MOTION — every animation added above resolves to its
+   final, static state.
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .whatsapp-fab-halo,
+  .summit-map-pulse,
+  .summit-map-skeleton-grid,
+  .summit-map-skeleton-pin {
+    animation: none !important;
+  }
+
+  .whatsapp-fab-halo,
+  .summit-map-pulse {
+    opacity: 0;
+  }
+
+  .consent-fab,
+  .consent-panel,
+  .consent-panel::before,
+  .consent-panel-icon {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .summit-map-embed {
+    transition: opacity 1ms linear;
+    transform: none;
+  }
+
+  .whatsapp-fab,
+  .whatsapp-fab:hover,
+  .consent-fab:hover,
+  .consent-btn--primary:hover,
+  .summit-map-frame:hover,
+  .location-facts .card-elevated:hover,
+  .location-facts .card-elevated:hover .mock-icon-box,
+  .pricing-tier:hover .pricing-tier-price strong {
+    transform: none;
+  }
+}

@@ -88,22 +88,26 @@ test.describe("Homepage comercial", () => {
     expect((await response.body()).byteLength).toBeGreaterThan(1_000);
   });
 
-  test("carga Google Maps solo después de una acción explícita", async ({
+  test("monta Google Maps con la sección y difiere la descarga", async ({
     page,
   }) => {
     await page.goto("/?lang=es");
 
     const location = page.locator("#ubicacion");
     const mapFrame = location.locator('iframe[src*="google.com/maps"]');
-    await expect(mapFrame).toHaveCount(0);
 
-    await location
-      .getByRole("button", { name: "Cargar mapa interactivo" })
-      .click();
+    // The embed is part of the section composition, not a click-gated step.
     await expect(mapFrame).toHaveCount(1);
     await expect(mapFrame).toHaveAttribute(
       "title",
       "Mapa del Centro de Convenciones de Reynosa",
+    );
+    // `loading="lazy"` keeps the third-party request off the initial load.
+    await expect(mapFrame).toHaveAttribute("loading", "lazy");
+
+    // The bilingual note stays visible and still declares the Google connection.
+    await expect(location.locator(".summit-map-note")).toContainText(
+      "Google Maps",
     );
   });
 

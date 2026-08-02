@@ -123,9 +123,10 @@ export default function CookieConsent({
       <button
         type="button"
         onClick={() => setVisible(true)}
-        className="fixed bottom-3 left-3 z-[90] rounded-full border border-slate-300 bg-white/95 px-3 py-2 text-xs font-semibold text-slate-700 shadow-md backdrop-blur transition-colors hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+        className="consent-fab"
       >
-        {t.settings}
+        <Cookie className="consent-fab-icon" aria-hidden="true" />
+        <span>{t.settings}</span>
       </button>
     );
   }
@@ -135,43 +136,38 @@ export default function CookieConsent({
       role="dialog"
       aria-live="polite"
       aria-label={t.title}
-      className="fixed inset-x-0 bottom-0 z-[100] px-4 pb-4 sm:px-6 sm:pb-6"
+      className="consent-dock"
     >
-      <div className="mx-auto max-w-3xl rounded-[20px] border border-slate-700 bg-slate-900 p-4 sm:p-5 text-slate-100 shadow-lg">
-        <div className="flex items-start gap-3 sm:gap-4">
-          <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-500/15 text-blue-300">
-            <Cookie className="h-5 w-5" aria-hidden="true" />
+      <div className="consent-panel">
+        <div className="consent-panel-body">
+          <div className="consent-panel-icon" aria-hidden="true">
+            <Cookie className="h-5 w-5" />
           </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold text-white">{t.title}</p>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              {t.essentialCopy}
-            </p>
-            <ul className="mt-1 space-y-0.5 text-sm leading-relaxed text-slate-300">
+          <div className="consent-panel-copy">
+            <p className="consent-panel-title">{t.title}</p>
+            <p className="consent-panel-text">{t.essentialCopy}</p>
+            <ul className="consent-panel-list">
               {t.optionalDetails.map((detail) => (
                 <li key={detail}>{detail}</li>
               ))}
             </ul>
-            <p className="mt-1 text-sm leading-relaxed text-slate-300">
-              <a
-                href="/aviso-de-privacidad"
-                className="font-semibold text-blue-300 underline-offset-2 hover:underline"
-              >
+            <p className="consent-panel-text">
+              <a href="/aviso-de-privacidad" className="consent-panel-link">
                 {t.privacyLabel}
               </a>
             </p>
-            <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+            <div className="consent-panel-actions">
               <button
                 type="button"
                 onClick={() => decide("all")}
-                className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-blue-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300"
+                className="consent-btn consent-btn--primary"
               >
                 {t.acceptAll}
               </button>
               <button
                 type="button"
                 onClick={() => decide("essential")}
-                className="rounded-xl border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-semibold text-slate-100 transition-colors hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-400"
+                className="consent-btn consent-btn--ghost"
               >
                 {t.essential}
               </button>

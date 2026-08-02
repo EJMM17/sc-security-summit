@@ -12,41 +12,59 @@ type OnDemandMapProps = {
   title: string;
 };
 
+/**
+ * The map is part of the section composition, so it mounts with the page
+ * instead of waiting for a click. It fades in over an on-brand skeleton once
+ * the embed reports `load`. The frame is cross-origin, so readiness cannot be
+ * inspected directly — the retry control remounts the iframe for the case
+ * where the third-party request never completes.
+ */
 export default function OnDemandMap({
   buttonLabel,
   privacyNote,
   title,
 }: OnDemandMapProps) {
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  if (isLoaded) {
-    return (
-      <iframe
-        src={MAP_EMBED_URL}
-        className="h-[280px] w-full sm:h-[350px]"
-        style={{ border: 0 }}
-        allowFullScreen
-        referrerPolicy="no-referrer-when-downgrade"
-        title={title}
-      />
-    );
-  }
+  const [isReady, setIsReady] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   return (
-    <div className="flex h-[280px] flex-col items-center justify-center gap-4 bg-slate-50 px-6 text-center sm:h-[350px]">
-      <span className="flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-600 shadow-sm">
-        <MapPin className="h-6 w-6" aria-hidden="true" />
-      </span>
-      <p className="max-w-sm text-sm leading-relaxed text-slate-500">
-        {privacyNote}
-      </p>
-      <button
-        type="button"
-        className="btn-secondary px-5 py-3 text-sm"
-        onClick={() => setIsLoaded(true)}
-      >
-        {buttonLabel}
-      </button>
-    </div>
+    <figure className="summit-map">
+      <div className="summit-map-frame">
+        <div
+          className={`summit-map-skeleton ${isReady ? "is-hidden" : ""}`}
+          aria-hidden="true"
+        >
+          <span className="summit-map-skeleton-pin">
+            <MapPin className="h-6 w-6" />
+          </span>
+          <span className="summit-map-skeleton-grid" />
+        </div>
+
+        <iframe
+          key={attempt}
+          src={MAP_EMBED_URL}
+          className={`summit-map-embed ${isReady ? "is-ready" : ""}`}
+          loading="lazy"
+          allowFullScreen
+          referrerPolicy="no-referrer-when-downgrade"
+          title={title}
+          onLoad={() => setIsReady(true)}
+        />
+
+        <span className="summit-map-wash" aria-hidden="true" />
+        <span className="summit-map-pulse" aria-hidden="true" />
+
+        {!isReady ? (
+          <button
+            type="button"
+            className="summit-map-retry"
+            onClick={() => setAttempt((value) => value + 1)}
+          >
+            {buttonLabel}
+          </button>
+        ) : null}
+      </div>
+      <figcaption className="summit-map-note">{privacyNote}</figcaption>
+    </figure>
   );
 }

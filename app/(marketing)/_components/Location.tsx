@@ -21,7 +21,7 @@ export default function Location({ language }: { language: Language }) {
 
         <ScrollReveal>
           <div className="grid md:grid-cols-5 gap-8 items-start">
-            <div className="md:col-span-3 overflow-hidden rounded-[20px] border border-slate-200 shadow-sm">
+            <div className="md:col-span-3 summit-map-shell">
               <OnDemandMap
                 buttonLabel={ui.loadInteractiveMap}
                 privacyNote={ui.mapPrivacyNote}
@@ -29,8 +29,8 @@ export default function Location({ language }: { language: Language }) {
               />
             </div>
 
-            <div className="md:col-span-2 space-y-6">
-              <div className="card-elevated p-6">
+            <div className="md:col-span-2 space-y-6 location-facts stagger-children">
+              <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
                     <MapPin strokeWidth={1.8} />
@@ -51,7 +51,7 @@ export default function Location({ language }: { language: Language }) {
                   </div>
                 </div>
               </div>
-              <div className="card-elevated p-6">
+              <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
                     <Calendar strokeWidth={1.8} />
@@ -63,7 +63,7 @@ export default function Location({ language }: { language: Language }) {
                   </div>
                 </div>
               </div>
-              <div className="card-elevated p-6">
+              <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
                     <Phone strokeWidth={1.8} />
