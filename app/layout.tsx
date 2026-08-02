@@ -4,6 +4,7 @@ import { Inter, Oswald } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
 import WhatsAppButton from "@/components/WhatsAppButton";
+import PointerSpotlight from "@/components/PointerSpotlight";
 import { BASE_URL } from "@/lib/content";
 import { getRequestLanguage } from "@/lib/language";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -108,6 +109,9 @@ export default async function RootLayout({
           marketingEnabled={marketingDataEnabled}
         />
         {children}
+        {/* Pointer-tracked card edges. Renders nothing; stays inert on touch
+            devices and under prefers-reduced-motion. */}
+        <PointerSpotlight />
         <WhatsAppButton />
         <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
