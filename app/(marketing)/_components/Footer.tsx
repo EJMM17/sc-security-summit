@@ -42,8 +42,8 @@ export default function Footer({
           </div>
 
           <div className="summit-footer-nav">
-            <h4>{ui.footerEvent}</h4>
-            <nav className="summit-footer-links">
+            <h3>{ui.footerEvent}</h3>
+            <nav aria-label={ui.footerEvent} className="summit-footer-links">
               {footerLinks.map((link) => (
                 <a key={link.href} href={sectionHref(link.href)}>
                   {link.label}
@@ -53,7 +53,7 @@ export default function Footer({
           </div>
 
           <div>
-            <h4>{ui.footerContact}</h4>
+            <h3>{ui.footerContact}</h3>
             <div className="summit-footer-links">
               <a href="mailto:hola@scsecuritysummit.com">
                 <Mail aria-hidden="true" /> hola@scsecuritysummit.com

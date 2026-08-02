@@ -40,7 +40,10 @@ export default function Header({ language }: { language: Language }) {
               </div>
             </a>
 
-            <nav className="hidden lg:flex items-center gap-4">
+            <nav
+              aria-label={content.ui.navPrimaryLabel}
+              className="hidden lg:flex items-center gap-4"
+            >
               {content.nav.map((link) => (
                 <a key={link.href} href={link.href} className="nav-link">
                   {link.label}
