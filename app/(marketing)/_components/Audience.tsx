@@ -1,7 +1,8 @@
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { AUDIENCE_PATHS, CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
+import PremiumCheck from "./_primitives/PremiumCheck";
 import SectionIntro from "./_primitives/SectionIntro";
 
 export default function Audience({ language }: { language: Language }) {
@@ -42,9 +43,9 @@ export default function Audience({ language }: { language: Language }) {
             <div>
               <h3>{ui.valueTitle}</h3>
               <ul>
-                {valueHighlights.slice(0, 5).map((highlight) => (
+                {valueHighlights.slice(0, 5).map((highlight, index) => (
                   <li key={highlight}>
-                    <Check aria-hidden="true" />
+                    <PremiumCheck index={index} />
                     {highlight}
                   </li>
                 ))}

@@ -1,8 +1,9 @@
-import { Calendar, ExternalLink, MapPin, Phone } from "lucide-react";
+import { ExternalLink } from "lucide-react";
 import OnDemandMap from "@/components/OnDemandMap";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
+import SummitIcon from "./_primitives/SummitIcon";
 
 export default function Location({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
@@ -13,7 +14,7 @@ export default function Location({ language }: { language: Language }) {
         <ScrollReveal>
           <div className="mock-section-intro text-center">
             <span className="section-label section-label--center">
-              <MapPin className="w-4 h-4" /> {ui.locationLabel}
+              <SummitIcon name="map-pin" className="w-4 h-4" /> {ui.locationLabel}
             </span>
             <h2 className="section-title mt-3">{ui.locationTitle}</h2>
           </div>
@@ -33,7 +34,7 @@ export default function Location({ language }: { language: Language }) {
               <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
-                    <MapPin strokeWidth={1.8} />
+                    <SummitIcon name="map-pin" />
                   </span>
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">{ui.addressLabel}</h3>
@@ -54,7 +55,7 @@ export default function Location({ language }: { language: Language }) {
               <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
-                    <Calendar strokeWidth={1.8} />
+                    <SummitIcon name="calendar" />
                   </span>
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">{ui.datesLabel}</h3>
@@ -68,7 +69,7 @@ export default function Location({ language }: { language: Language }) {
               <div className="reveal card-elevated p-6">
                 <div className="flex items-start gap-4">
                   <span className="mock-icon-box" aria-hidden="true">
-                    <Phone strokeWidth={1.8} />
+                    <SummitIcon name="phone" />
                   </span>
                   <div>
                     <h3 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h3>

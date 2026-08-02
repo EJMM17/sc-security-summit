@@ -1,17 +1,18 @@
-import {
-  Gauge,
-  LockKeyhole,
-  RefreshCw,
-  ShieldCheck,
-  Truck,
-  Users,
-} from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { COMPETENCIES, CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import SectionIntro from "./_primitives/SectionIntro";
+import SummitIcon, { type SummitIconName } from "./_primitives/SummitIcon";
 
-const ICONS = [Gauge, Truck, ShieldCheck, LockKeyhole, RefreshCw, Users] as const;
+/* One glyph per competency, in the order the list declares them. */
+const ICONS: readonly SummitIconName[] = [
+  "gauge",
+  "truck",
+  "shield-check",
+  "lock-keyhole",
+  "cycle",
+  "users",
+];
 
 export default function Pillars({ language }: { language: Language }) {
   const { ui } = CONTENT[language];
@@ -33,21 +34,17 @@ export default function Pillars({ language }: { language: Language }) {
         <ScrollReveal>
           <div className="surface-card competency-panel">
             <ol className="competency-list">
-              {competencies.map((title, index) => {
-                const CompetencyIcon = ICONS[index];
-
-                return (
-                  <li key={title} className="competency-row">
-                    <span className="competency-row-index" aria-hidden="true">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="competency-row-icon" aria-hidden="true">
-                      <CompetencyIcon />
-                    </span>
-                    <h3>{title}</h3>
-                  </li>
-                );
-              })}
+              {competencies.map((title, index) => (
+                <li key={title} className="competency-row">
+                  <span className="competency-row-index" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <span className="competency-row-icon" aria-hidden="true">
+                    <SummitIcon name={ICONS[index]} />
+                  </span>
+                  <h3>{title}</h3>
+                </li>
+              ))}
             </ol>
           </div>
         </ScrollReveal>

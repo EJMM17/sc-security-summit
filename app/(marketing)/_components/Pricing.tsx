@@ -68,9 +68,9 @@ export default function Pricing({ language }: { language: Language }) {
                       {benefitsLabel(plan.features.length)}
                     </p>
                     <ul>
-                      {visibleFeatures.map((feature) => (
+                      {visibleFeatures.map((feature, index) => (
                         <li key={feature}>
-                          <PremiumCheck className="pricing-tier-check" />
+                          <PremiumCheck index={index} className="pricing-tier-check" />
                           <span>{feature}</span>
                         </li>
                       ))}
