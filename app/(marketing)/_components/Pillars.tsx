@@ -30,22 +30,27 @@ export default function Pillars({ language }: { language: Language }) {
           />
         </ScrollReveal>
 
-        <div className="competency-grid">
-          {competencies.map((title, index) => {
-            const CompetencyIcon = ICONS[index];
+        <ScrollReveal>
+          <div className="surface-card competency-panel">
+            <ol className="competency-list">
+              {competencies.map((title, index) => {
+                const CompetencyIcon = ICONS[index];
 
-            return (
-              <ScrollReveal key={title} delay={index * 70}>
-                <article className="surface-card competency-card">
-                  <span aria-hidden="true">
-                    <CompetencyIcon />
-                  </span>
-                  <h3>{title}</h3>
-                </article>
-              </ScrollReveal>
-            );
-          })}
-        </div>
+                return (
+                  <li key={title} className="competency-row">
+                    <span className="competency-row-index" aria-hidden="true">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <span className="competency-row-icon" aria-hidden="true">
+                      <CompetencyIcon />
+                    </span>
+                    <h3>{title}</h3>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );
