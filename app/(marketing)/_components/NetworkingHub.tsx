@@ -41,7 +41,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
               <div className="grid grid-cols-2 gap-3 mb-8">
                 {ui.networkingFeatures.map((item, index) => (
                   <div key={index} className="flex items-center gap-2 text-sm text-white/80">
-                    <PremiumCheck className="w-4 h-4 text-blue-300 flex-shrink-0" />
+                    <PremiumCheck index={index} className="w-4 h-4 text-blue-300 flex-shrink-0" />
                     {item}
                   </div>
                 ))}
@@ -77,7 +77,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
                     key={index}
                     className="flex items-center gap-2 p-3 rounded-xl bg-blue-950/70 border border-white/15 text-sm font-medium text-white/80 hover:border-blue-300/50 transition-colors"
                   >
-                    <PremiumCheck className="w-4 h-4 text-blue-300 flex-shrink-0" />
+                    <PremiumCheck index={index} className="w-4 h-4 text-blue-300 flex-shrink-0" />
                     {provider.title}
                   </div>
                 ))}

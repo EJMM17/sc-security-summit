@@ -6493,3 +6493,357 @@ h3,
     transform: none;
   }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   SUMMIT ICON SET — draw-on entrance + hover micro-interaction
+   ───────────────────────────────────────────────────────────────
+   Companion to app/(marketing)/_components/_primitives/SummitIcon.
+   Two independent animation slots run on every layer:
+
+     slot 1  entrance — armed only once its ScrollReveal wrapper
+             turns `.visible`, so a glyph draws itself the moment
+             the section arrives rather than while it is offscreen.
+     slot 2  hover    — declared always, held `paused` at its rest
+             frame, and set `running` by a pointer. Every hover
+             keyframe starts and ends on the resting appearance, so
+             a paused animation is indistinguishable from no
+             animation at all.
+
+   Outside a reveal wrapper slot 1 resolves to `none` and the icon
+   simply renders finished — an icon is never left invisible by a
+   trigger that did not fire.
+   ═══════════════════════════════════════════════════════════════ */
+
+.summit-icon {
+  --si-dur: 620ms;
+  --si-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --si-lead: 90ms;
+  --si-step: 85ms;
+  overflow: visible;
+}
+
+.summit-icon [data-si] {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation-name: var(--si-entry-name, none), var(--si-hover-name, none);
+  animation-duration: var(--si-dur), var(--si-hover-dur, 900ms);
+  animation-timing-function: var(--si-ease), var(--si-hover-ease, ease-in-out);
+  animation-delay: var(--si-delay, 0ms), var(--si-hover-delay, 0ms);
+  animation-iteration-count: 1, var(--si-hover-count, 1);
+  animation-fill-mode: both, both;
+  animation-play-state: running, var(--si-play, paused);
+}
+
+/* Layer cadence — structure first, details behind it. The deltas are
+   even here because the glyph is small enough that an irregular
+   rhythm reads as a stutter rather than as craft. */
+.summit-icon > :nth-child(1) { --si-delay: var(--si-lead); }
+.summit-icon > :nth-child(2) { --si-delay: calc(var(--si-lead) + var(--si-step)); }
+.summit-icon > :nth-child(3) { --si-delay: calc(var(--si-lead) + 2 * var(--si-step)); }
+.summit-icon > :nth-child(4) { --si-delay: calc(var(--si-lead) + 3 * var(--si-step)); }
+.summit-icon > :nth-child(5) { --si-delay: calc(var(--si-lead) + 4 * var(--si-step)); }
+.summit-icon > :nth-child(6) { --si-delay: calc(var(--si-lead) + 5 * var(--si-step)); }
+.summit-icon > :nth-child(7) { --si-delay: calc(var(--si-lead) + 6 * var(--si-step)); }
+
+/* Resting state while the section is still below the fold. */
+:is(.reveal, .reveal-left, .reveal-right, .reveal-scale):not(.visible)
+  .summit-icon :is([data-si="draw"], [data-si="pop"], [data-si="live"]) {
+  opacity: 0;
+}
+:is(.reveal, .reveal-left, .reveal-right, .reveal-scale):not(.visible)
+  .summit-icon :is([data-si="draw"], [data-si="live"]) {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+:is(.reveal, .reveal-left, .reveal-right, .reveal-scale):not(.visible)
+  .summit-icon [data-si="pop"] {
+  transform: scale(0.4);
+}
+
+/* Arming the entrance. */
+:is(.reveal, .reveal-left, .reveal-right, .reveal-scale).visible
+  .summit-icon :is([data-si="draw"], [data-si="live"]) {
+  --si-entry-name: siDraw;
+}
+:is(.reveal, .reveal-left, .reveal-right, .reveal-scale).visible
+  .summit-icon [data-si="pop"] {
+  --si-entry-name: siPop;
+}
+
+/* stroke-dasharray is repeated in every frame on purpose: the
+   `:not(.visible)` rule stops applying the instant the class lands,
+   so the dash pattern has to live inside the animation itself. */
+@keyframes siDraw {
+  from { opacity: 0; stroke-dasharray: 1; stroke-dashoffset: 1; }
+  20%  { opacity: 1; stroke-dasharray: 1; }
+  to   { opacity: 1; stroke-dasharray: 1; stroke-dashoffset: 0; }
+}
+
+@keyframes siPop {
+  from { opacity: 0; transform: scale(0.35); }
+  65%  { opacity: 1; transform: scale(1.06); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Hover vocabulary ─────────────────────────────────────────────
+   Every one of these returns to its 0% frame, which is also the
+   glyph's resting frame. */
+
+/* A stroke wipes forward off its own end, then redraws from the
+   start — the gesture a pen makes, not a fade. */
+@keyframes siRedraw {
+  0%   { stroke-dasharray: 1; stroke-dashoffset: 0; }
+  42%  { stroke-dasharray: 1; stroke-dashoffset: -1; }
+  43%  { stroke-dasharray: 1; stroke-dashoffset: 1; }
+  100% { stroke-dasharray: 1; stroke-dashoffset: 0; }
+}
+
+/* Signal leaving a node. Invisible at rest — the ring only exists
+   while a pointer is on the glyph. */
+@keyframes siRing {
+  0%   { transform: scale(0.55); stroke-opacity: 0; }
+  30%  { stroke-opacity: 0.5; }
+  100% { transform: scale(1.18); stroke-opacity: 0; }
+}
+
+@keyframes siPulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.26); }
+}
+
+@keyframes siContract {
+  0%, 100% { transform: scale(1); }
+  45%      { transform: scale(0.5); }
+}
+
+@keyframes siNeedle {
+  0%, 100% { transform: rotate(0deg); }
+  45%      { transform: rotate(-34deg); }
+}
+
+@keyframes siSeat {
+  0%, 100% { transform: translateY(0); }
+  30%      { transform: translateY(-1.6px); }
+  65%      { transform: translateY(0.4px); }
+}
+
+@keyframes siTurn {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes siBeam {
+  0%, 100% { transform: translateY(0); }
+  25%      { transform: translateY(-4.6px); }
+  75%      { transform: translateY(4.6px); }
+}
+
+@keyframes siRoad {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -12; }
+}
+
+@keyframes siLevel {
+  0%, 100% { transform: scaleY(1); }
+  50%      { transform: scaleY(1.8); }
+}
+
+@keyframes siHop {
+  0%, 100% { transform: translateY(0); }
+  45%      { transform: translateY(-1.8px); }
+}
+
+@keyframes siRise {
+  0%, 100% { transform: translateY(0) scale(1); }
+  40%      { transform: translateY(-1.6px) scale(1.15); }
+}
+
+@keyframes siDrop {
+  0%, 100% { transform: translateY(0); }
+  45%      { transform: translateY(2.6px); }
+}
+
+@keyframes siFlip {
+  0%, 100% { transform: scaleX(1); }
+  50%      { transform: scaleX(0.14); }
+}
+
+@keyframes siPing {
+  0%, 100% { transform: scale(1); }
+  45%      { transform: scale(1.2); }
+}
+
+/* Hover scope — one rule, so per-icon blocks stay single-selector.
+   The custom property inherits down into every layer. */
+.summit-icon:hover,
+:where(
+  .surface-card,
+  .card-elevated,
+  .competency-row,
+  .why-competency-card,
+  .mock-icon-box,
+  .icon-box,
+  .pricing-tier,
+  .audience-value-aside,
+  a,
+  button
+):hover .summit-icon {
+  --si-play: running;
+}
+
+/* ── Per-glyph behaviour ─────────────────────────────────────────── */
+.summit-icon[data-icon="shield-check"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 900ms; }
+
+.summit-icon[data-icon="network"] [data-si="static"] {
+  --si-hover-name: siRing;
+  --si-hover-dur: 1500ms;
+  --si-hover-count: infinite;
+  --si-hover-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.summit-icon[data-icon="handshake"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 820ms; }
+
+.summit-icon[data-icon="building-2"] [data-si="live"] {
+  --si-hover-name: siPulse;
+  --si-hover-dur: 1000ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="truck"] [data-si="static"] {
+  --si-hover-name: siRoad;
+  --si-hover-dur: 700ms;
+  --si-hover-count: infinite;
+  --si-hover-ease: linear;
+}
+
+.summit-icon[data-icon="globe"] [data-si="live"] {
+  --si-hover-name: siFlip;
+  --si-hover-dur: 1600ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="shopping-cart"] [data-si="live"] {
+  --si-hover-name: siHop;
+  --si-hover-dur: 720ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="monitor"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 1000ms; }
+
+.summit-icon[data-icon="eye"] [data-si="live"] { --si-hover-name: siContract; --si-hover-dur: 900ms; }
+
+.summit-icon[data-icon="satellite"] [data-si="live"] {
+  --si-hover-name: siPing;
+  --si-hover-dur: 1300ms;
+  --si-hover-count: infinite;
+}
+.summit-icon[data-icon="satellite"] [data-si="live"]:last-of-type { --si-hover-delay: 180ms; }
+
+.summit-icon[data-icon="scan-line"] [data-si="live"] {
+  --si-hover-name: siBeam;
+  --si-hover-dur: 2100ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="book-open"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 900ms; }
+
+.summit-icon[data-icon="mic-2"] [data-si="live"] {
+  --si-hover-name: siLevel;
+  --si-hover-dur: 720ms;
+  --si-hover-count: infinite;
+}
+.summit-icon[data-icon="mic-2"] [data-si="live"]:last-of-type { --si-hover-delay: 120ms; }
+
+.summit-icon[data-icon="target"] [data-si="live"] {
+  --si-hover-name: siPulse;
+  --si-hover-dur: 950ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="crown"] [data-si="live"] { --si-hover-name: siRise; --si-hover-dur: 900ms; }
+
+.summit-icon[data-icon="trophy"] [data-si="live"] {
+  --si-hover-name: siTurn;
+  --si-hover-dur: 1600ms;
+  --si-hover-ease: linear;
+}
+
+.summit-icon[data-icon="medal"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 820ms; }
+.summit-icon[data-icon="medal"] [data-si="static"] {
+  --si-hover-name: siRing;
+  --si-hover-dur: 1500ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="gem"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 1000ms; }
+
+.summit-icon[data-icon="ruler"] [data-si="live"] { --si-hover-name: siPulse; --si-hover-dur: 800ms; }
+
+.summit-icon[data-icon="layout-grid"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 900ms; }
+
+.summit-icon[data-icon="users"] [data-si="live"] { --si-hover-name: siRedraw; --si-hover-dur: 820ms; }
+
+.summit-icon[data-icon="gauge"] [data-si="live"] {
+  --si-hover-name: siNeedle;
+  --si-hover-dur: 1100ms;
+  --si-hover-ease: cubic-bezier(0.34, 1.4, 0.5, 1);
+  transform-origin: 0% 100%;
+}
+
+.summit-icon[data-icon="lock-keyhole"] [data-si="live"] { --si-hover-name: siSeat; --si-hover-dur: 760ms; }
+
+.summit-icon[data-icon="cycle"] [data-si="live"] {
+  --si-hover-name: siTurn;
+  --si-hover-dur: 1700ms;
+  --si-hover-ease: linear;
+  --si-hover-count: infinite;
+  transform-box: view-box;
+  transform-origin: 12px 12px;
+}
+
+.summit-icon[data-icon="focus"] [data-si="live"] {
+  --si-hover-name: siPulse;
+  --si-hover-dur: 1200ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="route"] [data-si="live"] {
+  --si-hover-name: siPulse;
+  --si-hover-dur: 950ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="deliver"] [data-si="live"] { --si-hover-name: siDrop; --si-hover-dur: 820ms; }
+.summit-icon[data-icon="deliver"] [data-si="live"]:last-of-type { --si-hover-delay: 40ms; }
+
+.summit-icon[data-icon="map-pin"] [data-si="static"] {
+  --si-hover-name: siRing;
+  --si-hover-dur: 1600ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="calendar"] [data-si="live"] {
+  --si-hover-name: siPulse;
+  --si-hover-dur: 1200ms;
+  --si-hover-count: infinite;
+}
+
+.summit-icon[data-icon="phone"] [data-si="live"] {
+  --si-hover-name: siPing;
+  --si-hover-dur: 1200ms;
+  --si-hover-count: infinite;
+}
+.summit-icon[data-icon="phone"] [data-si="live"]:last-of-type { --si-hover-delay: 150ms; }
+
+/* Reduced motion: every layer is served at its finished frame and
+   both animation slots are disarmed, hover included. */
+@media (prefers-reduced-motion: reduce) {
+  .summit-icon [data-si],
+  :is(.reveal, .reveal-left, .reveal-right, .reveal-scale):not(.visible) .summit-icon [data-si] {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    stroke-dasharray: none !important;
+    stroke-dashoffset: 0 !important;
+  }
+}

@@ -1,57 +1,39 @@
-"use client";
-
-import {
-  BookOpen,
-  Building2,
-  Crown,
-  Eye,
-  Gem,
-  Globe,
-  Handshake,
-  LayoutGrid,
-  Medal,
-  Mic2,
-  Monitor,
-  Network,
-  Ruler,
-  Satellite,
-  ScanLine,
-  ShieldCheck,
-  ShoppingCart,
-  Target,
-  Trophy,
-  Truck,
-  Users,
-  type LucideIcon,
-  type LucideProps,
-} from "lucide-react";
+import type { ComponentProps } from "react";
+import SummitIcon, {
+  type SummitIconName,
+} from "@/app/(marketing)/_components/_primitives/SummitIcon";
 import type { IconKey } from "@/lib/content";
 
-const ICONS: Record<IconKey, LucideIcon> = {
-  "book-open": BookOpen,
-  "building-2": Building2,
-  crown: Crown,
-  eye: Eye,
-  gem: Gem,
-  globe: Globe,
-  handshake: Handshake,
-  "layout-grid": LayoutGrid,
-  medal: Medal,
-  "mic-2": Mic2,
-  monitor: Monitor,
-  network: Network,
-  ruler: Ruler,
-  satellite: Satellite,
-  "scan-line": ScanLine,
-  "shield-check": ShieldCheck,
-  "shopping-cart": ShoppingCart,
-  target: Target,
-  trophy: Trophy,
-  truck: Truck,
-  users: Users,
+/* Content declares its icons by key and the summit set draws every
+   one of them, so the keys map straight through. Kept as an explicit
+   record rather than a cast, so adding an IconKey fails the build
+   until a glyph has actually been drawn for it. */
+const ICONS: Record<IconKey, SummitIconName> = {
+  "book-open": "book-open",
+  "building-2": "building-2",
+  crown: "crown",
+  eye: "eye",
+  gem: "gem",
+  globe: "globe",
+  handshake: "handshake",
+  "layout-grid": "layout-grid",
+  medal: "medal",
+  "mic-2": "mic-2",
+  monitor: "monitor",
+  network: "network",
+  ruler: "ruler",
+  satellite: "satellite",
+  "scan-line": "scan-line",
+  "shield-check": "shield-check",
+  "shopping-cart": "shopping-cart",
+  target: "target",
+  trophy: "trophy",
+  truck: "truck",
+  users: "users",
 };
 
-export default function Icon({ name, ...props }: { name: IconKey } & LucideProps) {
-  const Component = ICONS[name];
-  return <Component {...props} />;
+type IconProps = { name: IconKey } & Omit<ComponentProps<typeof SummitIcon>, "name">;
+
+export default function Icon({ name, ...props }: IconProps) {
+  return <SummitIcon name={ICONS[name]} {...props} />;
 }
