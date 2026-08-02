@@ -3542,7 +3542,6 @@ body {
    shape, so sections now rhyme with both instead of each inventing its
    own eyebrow. */
 .section-label,
-.presenters-band-heading > span,
 .networking-label {
   display: inline-flex;
   align-items: center;
@@ -3556,7 +3555,6 @@ body {
 }
 
 .section-label::before,
-.presenters-band-heading > span::before,
 .networking-label::before {
   content: "";
   display: block;
@@ -3578,27 +3576,12 @@ body {
 }
 
 /* On navy the same motif switches to the sky accent. */
-.presenters-band-heading > span,
 .networking-label {
   color: var(--on-navy-label);
 }
 
-.presenters-band-heading > span::before,
 .networking-label::before {
   background: linear-gradient(90deg, var(--summit-blue-bright), rgba(147, 197, 253, 0.2));
-}
-
-.presenters-band-heading > span {
-  justify-content: center;
-}
-
-.presenters-band-heading > span::after {
-  content: "";
-  display: block;
-  width: 1.6rem;
-  height: 1px;
-  flex: none;
-  background: linear-gradient(90deg, rgba(147, 197, 253, 0.2), var(--summit-blue-bright));
 }
 
 .summit-header {
@@ -4587,52 +4570,6 @@ body {
   line-height: 1.6;
 }
 
-.presenters-band {
-  padding-block: clamp(3.8rem, 6vw, 5.5rem);
-  background: var(--surface-navy-band);
-}
-
-.presenters-band-heading {
-  max-width: 44rem;
-  margin-inline: auto;
-  text-align: center;
-}
-
-.presenters-band-heading h2 {
-  margin-top: 0.65rem;
-  color: white;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(1.8rem, 4vw, 2.7rem);
-  font-weight: 650;
-  line-height: 1.12;
-  text-wrap: balance;
-}
-
-.presenters-logo-grid {
-  width: min(100%, 47rem);
-  margin: 2rem auto 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
-}
-
-.presenters-logo-card {
-  display: grid;
-  min-height: 6.4rem;
-  padding: 1.2rem;
-  place-items: center;
-  border: 1px solid var(--on-navy-line);
-  border-radius: var(--r-sm);
-  background: rgba(255, 255, 255, 0.96);
-}
-
-.presenters-logo-card img {
-  width: auto;
-  max-width: 100%;
-  height: 3.3rem;
-  object-fit: contain;
-}
-
 .mock-faq {
   background: var(--surface-soft);
 }
@@ -4888,7 +4825,6 @@ body {
   .agenda-editorial-grid,
   .audience-path-grid,
   .audience-value-grid,
-  .presenters-logo-grid,
   .summit-footer-grid {
     grid-template-columns: 1fr;
   }
@@ -4922,10 +4858,6 @@ body {
 
   .audience-value-grid ul {
     grid-template-columns: 1fr;
-  }
-
-  .presenters-logo-grid {
-    max-width: 25rem;
   }
 
   .summit-footer-grid {

@@ -456,19 +456,6 @@ export const COMPETENCIES = {
   ],
 } as const;
 
-export const PRESENTERS_COPY = {
-  es: {
-    label: "PRESENTADORES EXCLUSIVOS",
-    title: "Empresas comprometidas con el fortalecimiento de la seguridad",
-    description: "Organizaciones que impulsan el desarrollo profesional de la industria.",
-  },
-  en: {
-    label: "EXCLUSIVE PRESENTERS",
-    title: "Companies committed to strengthening security",
-    description: "Organizations that support professional development across the industry.",
-  },
-} as const;
-
 // Call-for-speakers ("Ser presentador"). This is a mailto-based inquiry — it
 // deliberately does NOT persist to Supabase, keeping the product boundary
 // (only corporate-pass and sponsorship inquiries are stored) intact.
