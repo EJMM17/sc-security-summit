@@ -4057,8 +4057,7 @@ body {
   gap: 1.1rem;
 }
 
-.why-competency-card h3,
-.competency-card h3 {
+.why-competency-card h3 {
   color: var(--summit-ink);
   font-family: var(--font-oswald), sans-serif;
   font-weight: 650;
@@ -4075,44 +4074,134 @@ body {
   line-height: 1.65;
 }
 
-.competency-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0.85rem;
+/* ── Competencies — one panel, read as a list ─────────────────────────
+   Six sibling labels do not need six floating cards; that reads as a
+   scattered grid and competes with the sections that legitimately use
+   cards. They share one surface instead, split by the same hairline the
+   rest of the page uses, with the numbered index motif borrowed from the
+   pillars. The card shell, radius, elevation and icon-box treatment stay
+   identical to every other block, so the section rhymes instead of
+   repeating. */
+.competency-panel {
+  overflow: hidden;
+  padding: 0.35rem 0.5rem;
 }
 
-.competency-card {
+.competency-panel:hover {
+  transform: none;
+}
+
+.competency-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.competency-row {
+  position: relative;
   display: flex;
-  min-height: 7.5rem;
-  padding: 1.35rem;
+  padding: 1.15rem 1.25rem;
   align-items: center;
-  gap: 0.95rem;
+  gap: 1rem;
+  border-radius: var(--r-sm);
+  transition: background var(--dur) var(--ease-out);
 }
 
-.competency-card > span {
+/* Hairlines are drawn as pseudo-elements so the hover tint can round its
+   corners without a border boxing it in. */
+.competency-row:not(:nth-child(-n + 2))::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  right: 1.25rem;
+  left: 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.competency-row:nth-child(even)::after {
+  content: "";
+  position: absolute;
+  top: 0.9rem;
+  bottom: 0.9rem;
+  left: 0;
+  border-left: 1px solid var(--line);
+}
+
+.competency-row:hover {
+  background: var(--summit-blue-tint);
+}
+
+.competency-row-index {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.78rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  transition: color var(--dur) var(--ease-out);
+}
+
+.competency-row:hover .competency-row-index {
+  color: var(--summit-blue);
+}
+
+.competency-row-icon {
   display: grid;
-  width: 2.65rem;
-  height: 2.65rem;
-  flex: 0 0 2.65rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
   place-items: center;
   border-radius: var(--r-sm);
-  background: var(--summit-blue-tint);
+  background: var(--surface-soft);
   color: var(--summit-blue);
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
 
-.competency-card:hover > span {
+.competency-row:hover .competency-row-icon {
   background: var(--summit-blue);
   color: #ffffff;
 }
 
-.competency-card svg {
+.competency-row-icon svg {
   width: 1.2rem;
+  height: 1.2rem;
+  stroke-width: 1.8;
 }
 
-.competency-card h3 {
+.competency-row h3 {
+  color: var(--summit-ink);
+  font-family: var(--font-oswald), sans-serif;
+  font-weight: 650;
   font-size: 1rem;
   line-height: 1.3;
+}
+
+/* One column below the tablet breakpoint: the column rule disappears and
+   every row but the first carries the hairline. */
+@media (max-width: 767px) {
+  .competency-list {
+    grid-template-columns: 1fr;
+  }
+
+  .competency-row {
+    padding: 1rem;
+    gap: 0.85rem;
+  }
+
+  .competency-row:not(:first-child)::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 1rem;
+    left: 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .competency-row:first-child::before,
+  .competency-row:nth-child(even)::after {
+    content: none;
+  }
 }
 
 .speaker-carousel {
@@ -4698,7 +4787,6 @@ body {
     display: none;
   }
 
-  .competency-grid,
   .audience-path-grid {
     grid-template-columns: repeat(2, 1fr);
   }
@@ -4821,7 +4909,6 @@ body {
   }
 
   .why-competency-grid,
-  .competency-grid,
   .agenda-editorial-grid,
   .audience-path-grid,
   .audience-value-grid,
@@ -5043,8 +5130,8 @@ body {
   .surface-card,
   .surface-card:hover,
   .mock-icon-box,
-  .competency-card,
-  .competency-card > span,
+  .competency-row,
+  .competency-row-icon,
   .speaker-opportunity a,
   .speaker-opportunity svg,
   .audience-path-grid a,
