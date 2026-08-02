@@ -36,7 +36,7 @@ export default function Location({ language }: { language: Language }) {
                     <MapPin strokeWidth={1.8} />
                   </span>
                   <div>
-                    <h4 className="font-bold text-slate-800 text-sm">{ui.addressLabel}</h4>
+                    <h3 className="font-bold text-slate-800 text-sm">{ui.addressLabel}</h3>
                     <p className="text-sm text-slate-700 font-medium mt-1">{ui.addressName}</p>
                     <p className="text-sm text-slate-500 mt-0.5">{ui.addressLine1}</p>
                     <p className="text-sm text-slate-500">{ui.addressLine2}</p>
@@ -44,7 +44,7 @@ export default function Location({ language }: { language: Language }) {
                       href="https://maps.google.com/?q=Libramiento+Ote+S/N,+Azteca,+88680+Reynosa,+Tamaulipas,+Mexico"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-2 font-medium"
+                      className="inline-flex min-h-11 items-center gap-1 text-xs text-blue-600 hover:underline mt-1 font-medium"
                     >
                       <ExternalLink className="w-3 h-3" /> {ui.viewOnMaps}
                     </a>
@@ -57,9 +57,11 @@ export default function Location({ language }: { language: Language }) {
                     <Calendar strokeWidth={1.8} />
                   </span>
                   <div>
-                    <h4 className="font-bold text-slate-800 text-sm">{ui.datesLabel}</h4>
+                    <h3 className="font-bold text-slate-800 text-sm">{ui.datesLabel}</h3>
                     <p className="text-sm text-slate-500 mt-1">{ui.datesValue}</p>
-                    <p className="text-xs text-slate-400 mt-1">{ui.datesHours}</p>
+                    {/* slate-400 on white is ~2.8:1 and fails WCAG AA for
+                        body text; slate-500 keeps the muted hierarchy at ~4.8:1. */}
+                    <p className="text-xs text-slate-500 mt-1">{ui.datesHours}</p>
                   </div>
                 </div>
               </div>
@@ -69,11 +71,11 @@ export default function Location({ language }: { language: Language }) {
                     <Phone strokeWidth={1.8} />
                   </span>
                   <div>
-                    <h4 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h4>
+                    <h3 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h3>
                     <p className="text-sm text-slate-500 mt-1">+52 899 112 8755</p>
                     <a
                       href="mailto:hola@scsecuritysummit.com"
-                      className="text-sm text-blue-600 hover:underline"
+                      className="inline-flex min-h-11 items-center text-sm text-blue-600 hover:underline"
                     >
                       hola@scsecuritysummit.com
                     </a>

@@ -64,7 +64,10 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
             : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
         }`}
       >
-        <nav className="p-4 flex flex-col gap-1">
+        <nav
+          aria-label={language === "en" ? "Mobile menu" : "Menú móvil"}
+          className="p-4 flex flex-col gap-1"
+        >
           {links.map((link) => (
             <a
               key={link.href}

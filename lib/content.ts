@@ -77,6 +77,7 @@ export const FOOTER_LINKS = {
 export const UI_TEXT = {
   es: {
     skipToForm: "Ir al formulario de pases corporativos",
+    navPrimaryLabel: "Navegación principal",
     switchLangLabel: "Cambiar a inglés",
     registerBtn: "CONSEGUIR ACCESOS",
     dateLocation: "24 de septiembre, 2026 · Reynosa, Tamaulipas",
@@ -170,12 +171,12 @@ export const UI_TEXT = {
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
-    sponsorsTitle: "Lleva Tu Marca al Siguiente Nivel",
+    sponsorsTitle: "Lleva tu marca al siguiente nivel",
     sponsorsDesc:
       "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con más de 300 tomadores de decisión y maximiza tu visibilidad ante la audiencia que importa.",
-    sponsorRequestInfo: "Quiero Ser Patrocinador",
+    sponsorRequestInfo: "Quiero ser patrocinador",
     sponsorFormLabel: "SOLICITUD DE PATROCINIO",
-    sponsorFormTitle: "Hablemos de Tu Marca",
+    sponsorFormTitle: "Hablemos de tu marca",
     sponsorFormDesc:
       "Déjanos tus datos y un asesor se pondrá en contacto contigo para compartir disponibilidad y beneficios.",
     sponsorFormSubmit: "SOLICITAR INFORMACIÓN",
@@ -247,6 +248,7 @@ export const UI_TEXT = {
   },
   en: {
     skipToForm: "Skip to corporate passes form",
+    navPrimaryLabel: "Primary navigation",
     switchLangLabel: "Switch to Spanish",
     registerBtn: "GET PASSES",
     dateLocation: "September 24, 2026 · Reynosa, Tamaulipas",

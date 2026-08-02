@@ -50,10 +50,13 @@ export default function Audience({ language }: { language: Language }) {
                 ))}
               </ul>
             </div>
-            <aside>
+            {/* A panel nested inside a section is not a page-level
+                complementary landmark; `aside` here produced an
+                axe `landmark-complementary-is-top-level` violation. */}
+            <div className="audience-value-aside">
               <span>{ui.audienceCardTitle}</span>
               <p>{ui.audienceCardDesc}</p>
-            </aside>
+            </div>
           </div>
         </ScrollReveal>
       </div>

@@ -7,8 +7,16 @@ import SectionIntro from "./_primitives/SectionIntro";
 
 export default function Pricing({ language }: { language: Language }) {
   const { ui, pricing } = CONTENT[language];
-  const benefitsLabel = language === "es" ? "beneficios incluidos" : "benefits included";
-  const moreLabel = language === "es" ? "beneficios más" : "more benefits";
+  // Both counts are data-driven, so a hardcoded plural renders "Ver 1
+  // beneficios más" whenever a tier has exactly one hidden benefit.
+  const benefitsLabel = (n: number) =>
+    language === "es"
+      ? `${n} ${n === 1 ? "beneficio incluido" : "beneficios incluidos"}`
+      : `${n} ${n === 1 ? "benefit included" : "benefits included"}`;
+  const moreLabel = (n: number) =>
+    language === "es"
+      ? `Ver ${n} ${n === 1 ? "beneficio más" : "beneficios más"}`
+      : `View ${n} ${n === 1 ? "more benefit" : "more benefits"}`;
   const completeLabel = language === "es" ? "Experiencia más completa" : "Most complete experience";
 
   return (
@@ -57,7 +65,7 @@ export default function Pricing({ language }: { language: Language }) {
 
                   <div className="pricing-tier-benefits">
                     <p className="pricing-tier-benefit-count">
-                      {plan.features.length} {benefitsLabel}
+                      {benefitsLabel(plan.features.length)}
                     </p>
                     <ul>
                       {visibleFeatures.map((feature) => (
@@ -69,10 +77,7 @@ export default function Pricing({ language }: { language: Language }) {
                     </ul>
                     {moreFeatures.length ? (
                       <details>
-                        <summary>
-                          {language === "es" ? "Ver " : "View "}
-                          {moreFeatures.length} {moreLabel}
-                        </summary>
+                        <summary>{moreLabel(moreFeatures.length)}</summary>
                         <ul>
                           {moreFeatures.map((feature) => (
                             <li key={feature}>

@@ -213,7 +213,11 @@ export default async function Home({
       <ScrollRevealObserver />
       <ScrollProgress />
       <Header language={language} />
-      <div>
+      {/* Every other route already exposes a `main` landmark (PageShell, the
+          legal pages, the error boundaries). The landing page was the only one
+          leaving its sections outside any landmark, which left assistive
+          technology without a "skip to content" target. */}
+      <main id="contenido">
         <Hero language={language} />
         <WhyAttend language={language} />
         <Pillars language={language} />
@@ -230,8 +234,8 @@ export default async function Home({
         <Location language={language} />
         <SerPresentador language={language} />
         <Faq language={language} />
-        <Footer language={language} />
-      </div>
+      </main>
+      <Footer language={language} />
 
       {/* ── Consolidated Structured Data (JSON-LD @graph) ── */}
       <script
