@@ -112,7 +112,7 @@ export const UI_TEXT = {
     pillarsTitle: "Una jornada para desarrollar competencias",
     pillarsDesc:
       "Competencias para actuar con mayor criterio dentro de tu organización.",
-    speakersLabel: "ESPECIALISTAS CONFIRMADOS",
+    speakersLabel: "ESPECIALISTAS",
     speakersTitle: "Aprende de quienes enfrentan estos desafíos todos los días",
     speakersDesc:
       "Especialistas con experiencia directa en seguridad, cumplimiento, transporte, comercio exterior y continuidad operativa.",
@@ -282,7 +282,7 @@ export const UI_TEXT = {
     pillarsTitle: "One day to build stronger capabilities",
     pillarsDesc:
       "Capabilities you can use to act with greater judgment inside your organization.",
-    speakersLabel: "CONFIRMED SPECIALISTS",
+    speakersLabel: "SPECIALISTS",
     speakersTitle: "Learn from those who face these challenges every day",
     speakersDesc:
       "Specialists with direct experience in security, compliance, transportation, foreign trade, and operational continuity.",
@@ -659,20 +659,20 @@ export const SPEAKERS = {
   es: [
     {
       name: "Sandra Romero",
-      role: "Directora Lanz Logistics",
+      role: "Directora del SC Security Summit, 100 Mujeres del Transporte y Logística 2026",
       topic: "Cultura de Seguridad",
-      headline: "Certificado, pero sin capitalizar tu OEA",
+      headline: "El peor error que puedes cometer es pensar que a ti no te puede pasar",
       description:
-        "Monitorear tu cadena de suministro no solo es control, es la ventaja competitiva de tu empresa.",
+        "La seguridad comienza cuando dejamos de creer que el riesgo solo les ocurre a otros. Toma la dirección con una nueva forma de pensar la protección de la cadena de suministro.",
       image: "/images/speaker-sandra-4k.webp",
     },
     {
       name: "Fidel Guerrero",
-      role: "Subdirector del Comité Nacional de Comercio Exterior y Aduanas de INDEX Nacional",
+      role: "Subdirector del Comité Nacional de Comercio Exterior y Aduanas de INDEX",
       topic: "Panorama Industrial",
       headline: "Certificado, pero sin capitalizar tu OEA",
       description:
-        "Certificarse y no capitalizarlo es dejar dinero sobre la mesa. El reto no es solo contar con OEA, sino usar esa certificación como argumento de venta activo frente a clientes y socios.",
+        "Obtener la certificación es solo el inicio. Aprende cómo convertir tu OEA en una ventaja competitiva que genere confianza, abra oportunidades y fortalezca tu posición comercial.",
       image: "/images/speaker-fidel-4k.webp",
     },
     {
@@ -681,7 +681,7 @@ export const SPEAKERS = {
       topic: "Aduanas & Compliance",
       headline: "El error de un socio, tu responsabilidad",
       description:
-        "Un socio aduanal no validado es una responsabilidad que hereda tu empresa, aunque el error nunca haya sido tuyo.",
+        "La seguridad de tu operación también depende de quienes forman parte de ella. Aprende cómo evaluar y gestionar el riesgo de terceros antes de que afecte a tu empresa.",
       image: "/images/speaker-isidoro-4k.webp",
     },
     {
@@ -690,36 +690,36 @@ export const SPEAKERS = {
       topic: "Trade Compliance",
       headline: "Apagar incendios en vez de prevenir",
       description:
-        "¿Tu empresa está preparada para el riesgo, o solo lista para reaccionar cuando ya ocurrió?",
+        "Las organizaciones más resilientes no reaccionan mejor; identifican los riesgos antes de que interrumpan la operación.",
       image: "/images/speaker-julio-4k.webp",
     },
     {
       name: "Eduardo Luna",
-      role: "Organización Operativa y Expansión Comercial",
+      role: "Formación de liderazgo y especialista en enseñanza por Harvard — Lanz Logistics",
       topic: "Organización & Expansión",
-      headline: "Visión que nunca baja a operación, o viceversa",
+      headline: "La desconexión entre estrategia y operación",
       description:
-        "Cuando la visión de dirección y la operación diaria no hablan el mismo idioma, cada decisión estratégica se pierde en la ejecución.",
+        "Las mejores estrategias fracasan cuando la operación no las comprende. Aprende cómo convertir la visión en acciones que realmente transformen el desempeño del equipo.",
       image: "/images/speaker-eduardo-4k.webp",
     },
   ],
   en: [
     {
       name: "Sandra Romero",
-      role: "Director, Lanz Logistics",
+      role: "Director of the SC Security Summit, 100 Women in Transport & Logistics 2026",
       topic: "Security Culture",
-      headline: "Certified, but not capitalizing on your AEO",
+      headline: "The worst mistake you can make is thinking it cannot happen to you",
       description:
-        "Monitoring your supply chain is more than control; it is a competitive advantage for your company.",
+        "Security begins when we stop believing that risk only happens to others. Take the lead with a new way of thinking about supply chain protection.",
       image: "/images/speaker-sandra-4k.webp",
     },
     {
       name: "Fidel Guerrero",
-      role: "Deputy Director, National Committee on Foreign Trade & Customs — INDEX Nacional",
+      role: "Deputy Director, National Committee on Foreign Trade & Customs — INDEX",
       topic: "Industrial Overview",
       headline: "Certified, but not capitalizing on your AEO",
       description:
-        "Getting certified and failing to capitalize on it leaves money on the table. The challenge is not merely having AEO status, but using it as an active sales argument with clients and partners.",
+        "Getting certified is only the beginning. Learn how to turn your AEO status into a competitive advantage that builds trust, opens opportunities and strengthens your commercial position.",
       image: "/images/speaker-fidel-4k.webp",
     },
     {
@@ -728,7 +728,7 @@ export const SPEAKERS = {
       topic: "Customs & Compliance",
       headline: "A partner's mistake, your responsibility",
       description:
-        "An unvalidated customs partner becomes a liability your company inherits, even when the original mistake was not yours.",
+        "The security of your operation also depends on everyone who is part of it. Learn how to assess and manage third-party risk before it reaches your company.",
       image: "/images/speaker-isidoro-4k.webp",
     },
     {
@@ -737,16 +737,16 @@ export const SPEAKERS = {
       topic: "Trade Compliance",
       headline: "Putting out fires instead of preventing them",
       description:
-        "Is your company prepared for risk, or only ready to react after it has already happened?",
+        "The most resilient organizations do not react better; they identify risks before those risks disrupt the operation.",
       image: "/images/speaker-julio-4k.webp",
     },
     {
       name: "Eduardo Luna",
-      role: "Operational Organization & Commercial Expansion",
+      role: "Leadership development and teaching specialist, Harvard — Lanz Logistics",
       topic: "Organization & Expansion",
-      headline: "A vision that never reaches operations, or vice versa",
+      headline: "The disconnect between strategy and operations",
       description:
-        "When leadership's vision and daily operations do not speak the same language, every strategic decision gets lost in execution.",
+        "The best strategies fail when the operation does not understand them. Learn how to turn vision into actions that genuinely transform team performance.",
       image: "/images/speaker-eduardo-4k.webp",
     },
   ],

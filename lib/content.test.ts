@@ -19,7 +19,7 @@ describe("content SSOT", () => {
     expect(CONTENT.es.speakers).toHaveLength(5);
     expect(CONTENT.es.speakers[0]).toMatchObject({
       name: "Sandra Romero",
-      role: "Directora Lanz Logistics",
+      role: "Directora del SC Security Summit, 100 Mujeres del Transporte y Logística 2026",
       topic: "Cultura de Seguridad",
       image: "/images/speaker-sandra-4k.webp",
     });
