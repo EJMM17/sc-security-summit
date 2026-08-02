@@ -5143,3 +5143,664 @@ body {
     transition: none;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MOTION SYSTEM — micro-interactions
+   ──────────────────────────────────────────────────────────────────────────
+   The layer below is deliberately last in the file: it refines what the
+   sections above already render instead of restyling them. It adds four
+   things, in this order —
+
+     1. a shared motion vocabulary (registered properties + easing tokens),
+     2. feedback on every interactive element (press, hover, focus),
+     3. scroll-linked and entry choreography built on modern CSS
+        (`animation-timeline`, `@starting-style`, view transitions),
+     4. one master reduced-motion switch that turns all of it off.
+
+   Every effect is progressive: nothing here is required for the page to be
+   legible, usable, or laid out correctly. Browsers without `@property`,
+   scroll-driven animations or view transitions simply get the static page
+   that shipped before this layer existed.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Registered custom properties ─────────────────────────────────────────
+   Plain custom properties are strings, so a gradient stop or a glow radius
+   built from one snaps between values instead of animating. Registering the
+   type and initial value makes them interpolatable, which is what lets the
+   CTA sheen and the card spotlight move rather than blink. */
+@property --sheen-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -140%;
+}
+
+@property --spot-alpha {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --ring-spread {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
+@property --sweep-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+/* ── Motion tokens ────────────────────────────────────────────────────────
+   Four durations and four curves, and nothing in between. `--ease-spring`
+   overshoots slightly and settles; it is reserved for elements the visitor
+   just acted on (a press, a toggle, an arrow that answers a hover). Ambient
+   motion uses `--ease-out-soft` so the page never looks bouncy at rest. */
+:root {
+  --dur-micro: 120ms;
+  --dur-quick: 220ms;
+  --dur-base: 380ms;
+  --dur-slow: 640ms;
+
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* `linear()` expresses a real spring — several oscillations damped to rest —
+   which `cubic-bezier()` cannot describe. Older engines keep the overshooting
+   bezier above, which reads almost the same at these durations. */
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(
+      0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%,
+      0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%,
+      1.015 55%, 1.017 63.9%, 1.001 87.8%, 1
+    );
+  }
+}
+
+/* ── Typographic settling ─────────────────────────────────────────────────
+   Not motion, but the same perceived-quality budget: balanced headline
+   ragging and no orphaned last words. Ignored where unsupported. */
+h1,
+h2,
+h3,
+.section-title,
+.hero-title,
+.faq-trigger span {
+  text-wrap: balance;
+}
+
+.section-intro-copy p,
+.hero-description,
+.why-competency-card p,
+.audience-path-grid p {
+  text-wrap: pretty;
+}
+
+/* ── Focus ────────────────────────────────────────────────────────────────
+   One ring for the whole page, and it blooms outward rather than appearing
+   at full size — the movement is what makes keyboard focus easy to follow
+   when it jumps across a long landing page. */
+/* No `border-radius` here on purpose: the outline already follows whatever
+   radius the element declares, and setting one would flatten the pill CTAs
+   the moment they take focus. */
+:where(a, button, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--summit-blue-bright, #2563eb);
+  outline-offset: 3px;
+  animation: focusBloom var(--dur-quick) var(--ease-out-soft);
+}
+
+@keyframes focusBloom {
+  from {
+    outline-offset: 8px;
+    outline-color: transparent;
+  }
+}
+
+/* ── Press feedback ───────────────────────────────────────────────────────
+   Anything clickable acknowledges the press within a frame or two. The
+   scale is small on purpose: it should register as physical resistance,
+   not as an animation the visitor has to wait out. */
+:where(.primary-cta, .btn-secondary, .feature-pill, .sponsor-cta, .text-link-arrow, .hero-secondary-link):active {
+  transform: scale(0.97);
+  transition-duration: var(--dur-micro);
+}
+
+.faq-trigger:active,
+.pricing-tier-benefits summary:active {
+  transform: scale(0.995);
+}
+
+/* ── Primary CTA ──────────────────────────────────────────────────────────
+   A specular sheen crosses the button once per hover. It is a single
+   `--sheen-x` interpolation on a masked overlay, so it costs one composited
+   layer and stops the moment the pointer leaves — no idle loop running
+   behind the fold. */
+.primary-cta {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The band sits above the label rather than behind the button's opaque
+   fill — that is what makes it read as light crossing the surface. */
+.primary-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.34) 50%,
+    transparent 62%
+  );
+  transform: translateX(var(--sheen-x));
+  pointer-events: none;
+}
+
+.primary-cta:hover::before,
+.primary-cta:focus-visible::before {
+  animation: ctaSheen 900ms var(--ease-emphasized);
+}
+
+@keyframes ctaSheen {
+  from {
+    --sheen-x: -140%;
+  }
+  to {
+    --sheen-x: 140%;
+  }
+}
+
+/* The arrow leads the press: it travels further and settles with the spring
+   while the label stays put, so the button reads as "forward" on hover. */
+.primary-cta-icon {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.primary-cta:hover .primary-cta-icon {
+  transform: translateX(5px);
+}
+
+.primary-cta:active .primary-cta-icon {
+  transform: translateX(2px);
+}
+
+/* ── Card border spotlight ────────────────────────────────────────────────
+   `PointerSpotlight` publishes the pointer position as `--spot-x/--spot-y`
+   and the ring below follows it around the card edge.
+
+   The gradient is masked down to the 1px border ring — `mask-composite`
+   subtracts the content box from a full-bleed mask, leaving only the frame.
+   Lighting the border rather than the surface is what keeps this off the
+   text: no overlay ever sits between the visitor and the copy, so card
+   contrast is exactly what it was before the effect existed.
+
+   The component never mounts on touch or under reduced motion; in that case
+   `--spot-alpha` stays 0 and the ring never paints. */
+@supports ((mask-composite: exclude) or (-webkit-mask-composite: xor)) {
+  .surface-card,
+  .card-elevated,
+  .pricing-tier {
+    position: relative;
+  }
+
+  .surface-card::before,
+  .card-elevated::before,
+  .pricing-tier::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    padding: 1.5px;
+    border-radius: inherit;
+    opacity: var(--spot-alpha);
+    background: radial-gradient(
+      11rem 11rem at var(--spot-x, 50%) var(--spot-y, 0%),
+      rgba(37, 99, 235, 0.95),
+      rgba(6, 182, 212, 0.5) 38%,
+      transparent 68%
+    );
+    /* The prefixed pair must come first: the `-webkit-mask` shorthand resets
+       the composite operator, so a standard `mask-composite` written above it
+       would be wiped out and the gradient would flood the whole card. */
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask-composite: exclude;
+    transition: opacity var(--dur-base) var(--ease-out-soft);
+    pointer-events: none;
+  }
+
+  .surface-card[data-spotlight]:hover::before,
+  .card-elevated[data-spotlight]:hover::before,
+  .pricing-tier[data-spotlight]:hover::before {
+    --spot-alpha: 1;
+  }
+}
+
+/* The lift itself gets the spring curve so cards arrive with a hint of
+   weight instead of gliding to a stop. */
+.surface-card {
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    border-color var(--dur-quick) var(--ease-out-soft),
+    box-shadow var(--dur-base) var(--ease-out-soft);
+}
+
+/* ── Icon boxes ───────────────────────────────────────────────────────────
+   The container tints and the glyph inside lifts a little further than the
+   box does. Two speeds on one gesture is what keeps it from feeling flat. */
+.mock-icon-box,
+.icon-box {
+  transition:
+    transform var(--dur-base) var(--ease-spring),
+    background-color var(--dur-quick) var(--ease-out-soft),
+    color var(--dur-quick) var(--ease-out-soft),
+    box-shadow var(--dur-base) var(--ease-out-soft);
+}
+
+.surface-card:hover .mock-icon-box {
+  transform: translateY(-2px) rotate(-3deg);
+  box-shadow: 0 10px 20px -10px rgba(37, 99, 235, 0.55);
+}
+
+.mock-icon-box svg,
+.icon-box svg {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.surface-card:hover .mock-icon-box svg {
+  transform: scale(1.08);
+}
+
+/* ── Navigation ───────────────────────────────────────────────────────────
+   The underline grows from the left on the way in and retracts to the right
+   on the way out, so a pointer sweeping the nav leaves a trail that follows
+   its direction instead of blinking on and off under each label. */
+.nav-link {
+  position: relative;
+}
+
+/* The design deliberately carries no resting underline, so this one exists
+   only while the link is hovered, focused or current — it is feedback, not
+   decoration, and the nav still reads as plain labels at rest. */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.35rem;
+  height: 1.5px;
+  border-radius: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--dur-base) var(--ease-out-soft);
+}
+
+.nav-link:hover::after,
+.nav-link:focus-visible::after,
+.nav-link.active::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+/* ── Section labels ───────────────────────────────────────────────────────
+   The kicker rule draws itself once the heading enters, which gives every
+   section a small opening beat before its content lands. */
+.reveal.visible .section-label::before,
+.reveal.visible .networking-label::before,
+.reveal.visible .section-intro--center .section-label::after,
+.reveal.visible .section-label--center::after {
+  animation: labelRuleDraw var(--dur-slow) var(--ease-emphasized) both;
+}
+
+@keyframes labelRuleDraw {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Each rule grows away from the label it frames, so a centred intro opens
+   outward from the middle rather than sliding in one direction. */
+.section-label::before,
+.networking-label::before {
+  transform-origin: right center;
+}
+
+.section-intro--center .section-label::after,
+.section-label--center::after {
+  transform-origin: left center;
+}
+
+/* ── Scroll-linked motion ─────────────────────────────────────────────────
+   Scroll-driven animations run on the compositor: no scroll listener, no
+   layout read, nothing on the main thread. Everything in this block is
+   wrapped in `@supports`, so engines without `animation-timeline` keep the
+   static composition. */
+@supports (animation-timeline: view()) {
+  /* The hero recedes as it leaves — a slow drift plus a fade, tied to the
+     scroll position rather than to a timer, so it tracks a flick as
+     faithfully as a slow drag. */
+  .hero-production-inner {
+    animation: heroRecede linear both;
+    animation-timeline: view();
+    animation-range: exit-crossing 0% exit-crossing 90%;
+  }
+
+  @keyframes heroRecede {
+    to {
+      opacity: 0.35;
+      transform: translateY(-2.5rem) scale(0.985);
+    }
+  }
+
+  /* Gallery frames settle from a slight over-scale as they cross the
+     viewport, the way editorial photo grids on Apple and Stripe pages do. */
+  .gallery-photo img {
+    animation: photoSettle linear both;
+    animation-timeline: view();
+    animation-range: entry 10% cover 45%;
+  }
+
+  @keyframes photoSettle {
+    from {
+      transform: scale(1.12);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  /* Navy bands brighten as they take over the viewport, which gives the
+     long scroll a sense of chapters rather than one continuous column. */
+  .mock-section--navy {
+    animation: bandLift linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 85%;
+  }
+
+  @keyframes bandLift {
+    from {
+      background-color: var(--surface-navy-deep);
+    }
+    to {
+      background-color: var(--surface-navy);
+    }
+  }
+
+  /* Countdown and event facts drift at slightly different rates than the
+     hero copy above them — a shallow parallax, capped at a few pixels so it
+     never reads as a gimmick. */
+  .hero-event-cluster {
+    animation: clusterDrift linear both;
+    animation-timeline: view();
+    animation-range: cover 0% exit 100%;
+  }
+
+  @keyframes clusterDrift {
+    to {
+      transform: translateY(-14px);
+    }
+  }
+}
+
+/* ── Entry choreography ───────────────────────────────────────────────────
+   `@starting-style` gives elements that appear from nothing — a form result,
+   an opened menu — a real starting frame, so they animate in on first paint
+   instead of popping. Without it a freshly inserted node has no previous
+   value to transition from. */
+.inquiry-status {
+  transition:
+    opacity var(--dur-base) var(--ease-out-soft),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+@starting-style {
+  .inquiry-status {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ── Details / accordion ──────────────────────────────────────────────────
+   `interpolate-size` lets the answer animate to its intrinsic height, which
+   removes the `max-height` guess that clips long answers and makes short
+   ones feel sluggish. The existing max-height rule stays as the fallback. */
+@supports (interpolate-size: allow-keywords) {
+  :root {
+    interpolate-size: allow-keywords;
+  }
+
+  .faq-content {
+    height: 0;
+    max-height: none;
+    transition:
+      height var(--dur-base) var(--ease-emphasized),
+      padding var(--dur-base) var(--ease-emphasized);
+  }
+
+  .faq-item[open] .faq-content {
+    height: auto;
+    max-height: none;
+  }
+}
+
+.faq-icon {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.faq-item[open] .faq-icon {
+  transform: rotate(135deg);
+}
+
+/* The answer text follows the panel rather than arriving with it, so the
+   accordion opens in two beats instead of one. */
+.faq-item[open] .faq-content p {
+  animation: answerRise var(--dur-base) var(--ease-out-soft) 90ms both;
+}
+
+@keyframes answerRise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+/* ── Countdown ────────────────────────────────────────────────────────────
+   Each digit group re-keys when its value changes, so this animation
+   replays only on the number that actually ticked. */
+.countdown-digit {
+  display: inline-block;
+  animation: digitRoll var(--dur-base) var(--ease-out-soft);
+}
+
+@keyframes digitRoll {
+  from {
+    opacity: 0;
+    transform: translateY(-45%);
+    filter: blur(2px);
+  }
+}
+
+/* ── Form fields ──────────────────────────────────────────────────────────
+   Focus expands a soft ring outward from the field edge and tints the
+   leading icon, so the active row is obvious without a colour-only cue. */
+.inquiry-input-wrap {
+  transition: transform var(--dur-quick) var(--ease-out-soft);
+}
+
+.inquiry-input-wrap:focus-within {
+  transform: translateY(-1px);
+}
+
+.inquiry-input-wrap input,
+.inquiry-input-wrap textarea {
+  transition:
+    border-color var(--dur-quick) var(--ease-out-soft),
+    box-shadow var(--dur-base) var(--ease-out-soft),
+    background-color var(--dur-quick) var(--ease-out-soft);
+}
+
+.inquiry-input-wrap input:focus,
+.inquiry-input-wrap textarea:focus {
+  box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.14);
+}
+
+.inquiry-input-wrap > svg {
+  transition:
+    color var(--dur-quick) var(--ease-out-soft),
+    transform var(--dur-base) var(--ease-spring);
+}
+
+.inquiry-input-wrap:focus-within > svg {
+  color: var(--summit-blue-bright, #2563eb);
+  transform: scale(1.1);
+}
+
+/* `:user-invalid` fires only after the visitor has actually engaged with a
+   field, so nobody gets a red ring for a form they have not filled in yet. */
+.inquiry-input-wrap input:user-invalid,
+.inquiry-input-wrap textarea:user-invalid {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.12);
+}
+
+/* ── Link arrows ──────────────────────────────────────────────────────────
+   Same gesture as the CTA, applied to every inline "read more": the glyph
+   advances on the spring while the label holds. */
+.summit-footer-links a svg,
+.speaker-opportunity svg,
+.audience-path-grid a svg,
+.text-link-arrow svg {
+  transition: transform var(--dur-base) var(--ease-spring);
+}
+
+.summit-footer-links a:hover svg {
+  transform: translateX(3px);
+}
+
+/* ── Marquee edges ────────────────────────────────────────────────────────
+   The ticker fades into the page margins instead of being cut by them. */
+.marquee-strip {
+  mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent,
+    #000 8%,
+    #000 92%,
+    transparent
+  );
+}
+
+/* ── Cross-document view transitions ──────────────────────────────────────
+   Navigating between the landing page and the legal / sponsor pages
+   cross-fades instead of flashing white. The header and footer are named,
+   so they hold still while the content between them changes — the detail
+   that makes a multi-page site feel like one application. */
+@view-transition {
+  navigation: auto;
+}
+
+.summit-header {
+  view-transition-name: summit-header;
+}
+
+.summit-footer {
+  view-transition-name: summit-footer;
+}
+
+::view-transition-old(root) {
+  animation: viewFadeOut var(--dur-quick) var(--ease-exit) both;
+}
+
+::view-transition-new(root) {
+  animation: viewFadeIn var(--dur-base) var(--ease-out-soft) both;
+}
+
+@keyframes viewFadeOut {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes viewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+/* ── Reduced motion ───────────────────────────────────────────────────────
+   One switch for everything above. Interactive elements keep their colour
+   and elevation changes — those carry meaning — but every translation,
+   scale, rotation, sheen and scroll-linked animation is removed, and view
+   transitions are reduced to an instant swap. */
+@media (prefers-reduced-motion: reduce) {
+  .primary-cta::before,
+  .surface-card::before,
+  .card-elevated::before,
+  .pricing-tier::before {
+    display: none;
+  }
+
+  .primary-cta:hover .primary-cta-icon,
+  .primary-cta:active .primary-cta-icon,
+  .surface-card:hover .mock-icon-box,
+  .surface-card:hover .mock-icon-box svg,
+  .inquiry-input-wrap:focus-within,
+  .inquiry-input-wrap:focus-within > svg,
+  .summit-footer-links a:hover svg {
+    transform: none;
+  }
+
+  :where(.primary-cta, .btn-secondary, .feature-pill, .sponsor-cta, .text-link-arrow, .hero-secondary-link):active,
+  .faq-trigger:active,
+  .pricing-tier-benefits summary:active {
+    transform: none;
+  }
+
+  .hero-production-inner,
+  .hero-event-cluster,
+  .gallery-photo img,
+  .mock-section--navy,
+  .countdown-digit,
+  .faq-item[open] .faq-content p,
+  .reveal.visible .section-label::before,
+  .reveal.visible .networking-label::before {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  :where(a, button, summary, [tabindex]):focus-visible {
+    animation: none;
+  }
+
+  .nav-link::after {
+    transition: none;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+  }
+}

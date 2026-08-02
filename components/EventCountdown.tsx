@@ -46,12 +46,24 @@ export default function EventCountdown({ language }: { language: Language }) {
     <div className="event-countdown" aria-label={language === "es" ? "Cuenta regresiva" : "Countdown"}>
       <p>{language === "es" ? "Faltan" : "Time remaining"}</p>
       <div>
-        {values.map((item, index) => (
-          <div key={labels[index]}>
-            <strong>{typeof item === "number" ? String(item).padStart(2, "0") : item}</strong>
-            <span>{labels[index]}</span>
-          </div>
-        ))}
+        {values.map((item, index) => {
+          const digits =
+            typeof item === "number" ? String(item).padStart(2, "0") : item;
+
+          return (
+            <div key={labels[index]}>
+              <strong>
+                {/* Keying on the value remounts the span whenever this unit
+                    ticks, which replays the roll-in on that unit alone —
+                    seconds move every second, days stay still. */}
+                <span key={digits} className="countdown-digit">
+                  {digits}
+                </span>
+              </strong>
+              <span>{labels[index]}</span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
