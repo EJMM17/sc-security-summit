@@ -341,6 +341,38 @@ export const ENV_SPEC = [
     templateValue: "",
   },
   {
+    name: "ADMIN_PASSWORD",
+    scope: "server",
+    secret: true,
+    runtimeRequired: false,
+    previewRequired: false,
+    productionRequired: false,
+    forbiddenTargets: ["preview"],
+    format: "token",
+    placeholderAllowed: false,
+    placeholders: ["change-me", "admin", "password"],
+    group: "Operations panel (server only)",
+    description:
+      "Optional shared secret that unlocks /admin. Without it the panel answers 404; forbidden in Preview.",
+    templateValue: "",
+  },
+  {
+    name: "ADMIN_SESSION_SECRET",
+    scope: "server",
+    secret: true,
+    runtimeRequired: false,
+    previewRequired: false,
+    productionRequired: false,
+    forbiddenTargets: ["preview"],
+    format: "token",
+    placeholderAllowed: false,
+    placeholders: ["change-me", "replace_with_random_secret"],
+    group: "Operations panel (server only)",
+    description:
+      "Optional random key that signs the /admin session cookie; forbidden in Preview.",
+    templateValue: "",
+  },
+  {
     name: "ENFORCE_ENV_VALIDATION",
     scope: "server",
     secret: false,
@@ -378,6 +410,12 @@ export const ENV_GROUP_RULES = [
     mode: "all-or-none",
     description:
       "Sentry server and browser DSNs must be configured together or both omitted.",
+  },
+  {
+    names: ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"],
+    mode: "all-or-none",
+    description:
+      "The operations panel password and session key must be configured together.",
   },
   {
     names: ["SENTRY_ORG", "SENTRY_PROJECT", "SENTRY_AUTH_TOKEN"],

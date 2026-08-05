@@ -17,7 +17,9 @@ Internalize these boundaries before changing code:
 3. Supabase persistence defines receipt. Resend is a recoverable notification
    channel after persistence.
 4. Do not reuse historical `public.registros`, folios, payment fields, or the
-   retired `/admin` architecture.
+   retired `/admin` architecture that was built on them. The current `/admin`
+   is a separate, credential-gated panel over `inquiries` (see Human
+   operation).
 5. The browser never connects to Supabase. All database access is server-only.
 
 ## Stack
@@ -147,6 +149,11 @@ Required in Vercel Production:
 - `ENFORCE_ENV_VALIDATION=1`
 - `CRON_SECRET`
 - `NEXT_PUBLIC_SITE_URL`
+
+Optional in Production, forbidden in Preview, configured together:
+
+- `ADMIN_PASSWORD`
+- `ADMIN_SESSION_SECRET`
 
 Rules:
 
@@ -348,9 +355,28 @@ check/disable the cron separately.
 
 ## Human operation
 
-There is no `/admin` in v1. Operators use Supabase Studio with individual
-accounts and MFA. They may edit only `status`, `owner`, `internal_notes` and
-`next_follow_up_at` in `inquiries`.
+`/admin` is an internal panel over `inquiries`. It lists requests with status,
+kind and search filters, shows one request in detail with the state of its
+email notification, and writes only `status`, `owner`, `internal_notes` and
+`next_follow_up_at`. Submitted data, consent, attribution, hashes and
+timestamps are read-only, and the panel never edits the notification tables.
+
+Rules:
+
+- the panel unlocks only when `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` are
+  both configured; otherwise every `/admin` route answers 404, which keeps it
+  absent from every visual-only Preview;
+- access is a password plus an HMAC-signed, HttpOnly, SameSite=Lax session
+  cookie with an 8-hour lifetime; login attempts pass through the same Upstash
+  limiter as the public forms;
+- Supabase access stays in `server/repositories/admin-inquiry-repository.ts`;
+  client components import shapes from `lib/admin/types.ts` so the elevated key
+  never reaches the browser;
+- `/admin` mounts no analytics, pixels, attribution capture or marketing
+  chrome, and `robots.txt` disallows it.
+
+Supabase Studio with individual accounts and MFA remains valid for anything the
+panel does not cover, under the same field restrictions.
 
 Canonical SOP: `docs/INQUIRY_OPERATIONS.md`.
 

@@ -9,7 +9,8 @@ Read `AGENTS.md` first. Canonical current state:
 - Supabase stores only corporate-pass and sponsorship inquiries.
 - Persistence happens before email and defines receipt.
 - Resend failure queues a notification; it does not lose the inquiry.
-- Do not reuse historical `public.registros` or recreate the retired `/admin`.
+- Do not reuse historical `public.registros`. The legacy `/admin` built on it
+  stays retired; the current `/admin` is a separate panel over `inquiries`.
 
 ## Request flow
 
@@ -138,7 +139,12 @@ only after persistence succeeds.
 
 ## Operations
 
-There is no v1 admin UI. Operators use Supabase Studio with MFA and may edit
-only `status`, `owner`, `internal_notes` and `next_follow_up_at`.
+`/admin` is an internal panel over `inquiries`: list, filters, detail and the
+notification state of each request. It unlocks only when `ADMIN_PASSWORD` and
+`ADMIN_SESSION_SECRET` are both set, and answers 404 otherwise, so Preview
+never exposes it. Its writes are restricted to `status`, `owner`,
+`internal_notes` and `next_follow_up_at` — the same fields Supabase Studio
+allows. Supabase Studio with MFA remains valid for anything the panel does not
+cover.
 
 See `docs/INQUIRY_OPERATIONS.md` and `docs/RUNBOOK.md`.

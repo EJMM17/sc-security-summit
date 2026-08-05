@@ -119,10 +119,19 @@ acumulan eventos antes del opt-in; por tanto, tampoco salen pings sin cookies.
 
 ## 5. Operación
 
-No se reconstruyó `/admin`. La primera versión se opera en Supabase Studio con
-cuentas individuales y MFA.
+`/admin` es un panel interno sobre `inquiries`: listado con filtros por estado
+y tipo, búsqueda por empresa/nombre/correo, detalle de cada solicitud y estado
+de su notificación por correo. Se habilita solo si `ADMIN_PASSWORD` y
+`ADMIN_SESSION_SECRET` están configuradas; si falta cualquiera de las dos, toda
+ruta `/admin` responde 404, por lo que ningún Preview visual lo expone. El
+acceso usa contraseña más cookie de sesión firmada (HMAC, HttpOnly,
+SameSite=Lax, 8 horas) y los intentos de login pasan por el mismo limitador
+Upstash que los formularios públicos.
 
-Operaciones puede cambiar en `inquiries`:
+El panel no reemplaza a Supabase Studio con cuentas individuales y MFA, que
+sigue siendo válido con las mismas restricciones de campos.
+
+Operaciones puede cambiar en `inquiries`, tanto desde el panel como en Studio:
 
 - `status`;
 - `owner`;
