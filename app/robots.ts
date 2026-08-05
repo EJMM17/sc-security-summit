@@ -9,6 +9,7 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/_next/",
+          "/admin", // Internal operations panel
           "/monitoring", // Sentry tunnel route (next.config tunnelRoute)
         ],
       },

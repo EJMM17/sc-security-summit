@@ -48,6 +48,9 @@ export function middleware(request: NextRequest) {
   if (langParam === "es" || langParam === "en") {
     requestHeaders.set("x-lang", langParam);
   }
+  // The root layout cannot read the pathname, and the internal panel must not
+  // mount marketing chrome, analytics or attribution over operator data.
+  requestHeaders.set("x-pathname", request.nextUrl.pathname);
 
   const response = NextResponse.next({
     request: {

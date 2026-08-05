@@ -92,8 +92,24 @@ export default async function RootLayout({
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
   const language = await getRequestLanguage();
-  const marketingDataEnabled = !isVisualOnlyVercelDeployment();
-  const productionTelemetryEnabled = isVercelProductionDeployment();
+  // The internal operations panel renders operator-facing data. It never mounts
+  // marketing chrome, analytics, pixels or attribution capture.
+  const isAdminRoute = (headersList.get("x-pathname") ?? "").startsWith("/admin");
+  const marketingDataEnabled = !isVisualOnlyVercelDeployment() && !isAdminRoute;
+  const productionTelemetryEnabled =
+    isVercelProductionDeployment() && !isAdminRoute;
+
+  if (isAdminRoute) {
+    return (
+      <html lang="es" className="scroll-smooth">
+        <body
+          className={`${inter.variable} font-sans bg-slate-100 text-[#0F172A] antialiased`}
+        >
+          {children}
+        </body>
+      </html>
+    );
+  }
 
   return (
     <html lang={language} className="scroll-smooth">

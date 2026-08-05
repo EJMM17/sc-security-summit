@@ -2,7 +2,7 @@
 
 Última revisión: 2026-07-30.
 Ámbito: pases corporativos y patrocinio.  
-Herramienta inicial: Supabase Studio.
+Herramientas: panel interno `/admin` y Supabase Studio.
 
 Este documento permite que una persona no desarrolladora gestione solicitudes
 sin modificar el esquema ni depender de SQL. Eventbrite sigue siendo la fuente
@@ -10,7 +10,35 @@ de verdad para accesos individuales.
 
 ## 1. Acceso
 
-Cada operador debe usar:
+### Panel interno `/admin`
+
+Es la herramienta diaria. Entra en `https://scsecuritysummit.com/admin` con la
+contraseña de operación. La sesión dura 8 horas y se cierra con el botón
+**Cerrar sesión**.
+
+El panel permite:
+
+- ver todas las solicitudes recibidas, con filtros por estado y por tipo, y
+  búsqueda por empresa, nombre o correo;
+- abrir una solicitud y consultar los datos enviados;
+- asignar `status`, `owner`, `next_follow_up_at` y notas internas;
+- revisar si el correo de aviso salió, cuántos intentos hubo y su ID en Resend.
+
+El panel no permite editar los datos que envió la persona, el consentimiento,
+la atribución ni los estados de notificación: eso es evidencia recibida.
+
+La contraseña es compartida y no identifica a la persona. No la reenvíes por
+chat o correo personal, no la reutilices en otro servicio y pide su rotación
+cuando alguien deje de operar. Para trazabilidad individual usa el campo
+`owner`.
+
+Si `/admin` responde “página no encontrada”, el despliegue no tiene
+configuradas `ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET`; escala al equipo
+técnico, no es una falla de tu sesión.
+
+### Supabase Studio
+
+Sigue siendo válido para lo que el panel no cubre. Cada operador debe usar:
 
 - cuenta individual;
 - MFA habilitado;
@@ -154,6 +182,10 @@ La política aprobada el 2026-07-30 requiere:
 - Orden: `retention_until ASC`
 
 ## 7. Rutina diaria
+
+Desde el panel `/admin`, el equivalente de los filtros anteriores son los
+chips de estado y tipo más el buscador; el estado del correo aparece como
+columna en el listado y con detalle en cada solicitud.
 
 1. Abre el filtro **Nuevas**.
 2. Asigna `owner`.

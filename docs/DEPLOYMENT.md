@@ -179,6 +179,7 @@ El validador lo rechaza en Vercel y fuera de GitHub Actions.
 | `SENTRY_ORG` / `SENTRY_PROJECT` / `SENTRY_AUTH_TOKEN` | prohibidas | prohibidas | opcionales como grupo |
 | `SENTRY_DSN` / `NEXT_PUBLIC_SENTRY_DSN` | prohibidas | prohibidas | opcionales |
 | IDs de analytics de marketing | prohibidos | prohibidos | opcionales |
+| `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET` | opcionales como grupo | prohibidas | opcionales como grupo; habilitan `/admin` |
 | `ENFORCE_ENV_VALIDATION` | `0` o ausente | opcional; strict automático | `1` |
 
 Supabase URL/key, Resend key/contact inbox,
@@ -188,7 +189,16 @@ Production solo se permite Supabase local por loopback. El runtime ignora
 Resend, Upstash, cron, Sentry y marketing fuera de Production aunque alguien
 copie una clave.
 
-`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `KV_REST_API_TOKEN`, `CRON_SECRET` y
+`ADMIN_PASSWORD` y `ADMIN_SESSION_SECRET` son un par indivisible y opcional.
+Con ambas configuradas en Production, `/admin` queda disponible; si falta
+cualquiera de las dos, toda ruta `/admin` responde 404. Están prohibidas en
+Preview, de modo que ningún despliegue visual expone el panel. Genera
+`ADMIN_SESSION_SECRET` al azar (por ejemplo
+`openssl rand -base64 32`) y rota ambas cuando alguien deje de operar; la
+rotación invalida las sesiones abiertas.
+
+`SUPABASE_SECRET_KEY`, `RESEND_API_KEY`, `KV_REST_API_TOKEN`, `CRON_SECRET`,
+`ADMIN_PASSWORD`, `ADMIN_SESSION_SECRET` y
 `SENTRY_AUTH_TOKEN` son server-only. También lo son las salidas sensibles
 provider-managed `KV_URL`, `REDIS_URL` y `KV_REST_API_READ_ONLY_TOKEN`, aunque
 la aplicación no las lea. Ninguna lleva el prefijo `NEXT_PUBLIC_`.
