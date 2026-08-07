@@ -166,7 +166,7 @@ export const UI_TEXT = {
     pricingTitle: "Elige tu experiencia de formación",
     pricingDesc:
       "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
-    taxNote: "I.V.A. incluido",
+    taxNote: "más I.V.A.",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
@@ -338,7 +338,7 @@ export const UI_TEXT = {
     pricingTitle: "Choose your training experience",
     pricingDesc:
       "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
-    taxNote: "VAT included",
+    taxNote: "plus VAT",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
     sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
