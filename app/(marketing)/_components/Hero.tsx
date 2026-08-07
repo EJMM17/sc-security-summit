@@ -47,6 +47,8 @@ export default function Hero({ language }: { language: Language }) {
 
         <p className="hero-description">{ui.heroDescription}</p>
 
+        <p className="hero-topics">{ui.heroTopics}</p>
+
         <div className="hero-presenters" aria-label={ui.presentedBy}>
           <span>{ui.presentedBy}</span>
           <div className="hero-presenter-logos">
