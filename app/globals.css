@@ -4482,7 +4482,7 @@ body {
   background: var(--surface);
 }
 
-/* Re-assert the featured (VIP) tier's dark surface AFTER the white override
+/* Re-assert the featured tier's dark surface AFTER the white override
    above — both are single-class selectors, so the later rule must win or the
    light/cyan text renders illegibly on white. Matches the mockup gradient. */
 .pricing-tier--featured {

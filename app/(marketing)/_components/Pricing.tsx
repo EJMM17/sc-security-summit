@@ -34,16 +34,19 @@ export default function Pricing({ language }: { language: Language }) {
 
         <div className="pricing-tier-list">
           {pricing.map((plan, index) => {
-            const isVip = plan.id === "vip";
+            // The highlighted tier is data-driven: `featured` in lib/content.ts
+            // is the single source of truth, so retiring a tier never leaves a
+            // hardcoded id pointing at a plan that no longer exists.
+            const isFeatured = plan.featured;
             const visibleFeatures = plan.features.slice(0, 3);
             const moreFeatures = plan.features.slice(3);
 
             return (
               <ScrollReveal key={plan.id} delay={index * 90}>
-                <article className={`pricing-tier ${isVip ? "pricing-tier--featured" : ""}`}>
+                <article className={`pricing-tier ${isFeatured ? "pricing-tier--featured" : ""}`}>
                   <div className="pricing-tier-plan">
                     <div className="pricing-tier-heading">
-                      {isVip ? <strong>{completeLabel}</strong> : null}
+                      {isFeatured ? <strong>{completeLabel}</strong> : null}
                     </div>
                     <h3>{plan.label}</h3>
                     <p>{plan.desc}</p>

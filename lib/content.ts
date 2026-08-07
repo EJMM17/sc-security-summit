@@ -56,7 +56,6 @@ export const FOOTER_LINKS = {
     { href: "#accesos", label: "Accesos" },
     { href: "#registro", label: "Pase corporativo" },
     { href: "#patrocinadores", label: "Patrocinio" },
-    { href: "#ser-presentador", label: "Ser presentador" },
     { href: "#ubicacion", label: "Ubicación" },
     { href: "#faq", label: "FAQ" },
   ],
@@ -68,7 +67,6 @@ export const FOOTER_LINKS = {
     { href: "#accesos", label: "Passes" },
     { href: "#registro", label: "Corporate pass" },
     { href: "#patrocinadores", label: "Sponsorship" },
-    { href: "#ser-presentador", label: "Be a presenter" },
     { href: "#ubicacion", label: "Location" },
     { href: "#faq", label: "FAQ" },
   ],
@@ -456,77 +454,6 @@ export const COMPETENCIES = {
     "Operational continuity",
     "Leadership and team management",
   ],
-} as const;
-
-// Call-for-speakers ("Ser presentador"). This is a mailto-based inquiry — it
-// deliberately does NOT persist to Supabase, keeping the product boundary
-// (only corporate-pass and sponsorship inquiries are stored) intact.
-export const PRESENTER_CFP = {
-  recipient: "contacto@scsecuritysummit.com",
-  es: {
-    label: "Convocatoria",
-    title: "Quiero ser presentador",
-    description:
-      "Buscamos especialistas con experiencia directa en seguridad, cumplimiento, transporte, comercio exterior y continuidad operativa. Déjanos tus datos y te contactamos.",
-    points: [
-      "Sesiones de 50 minutos con caso real.",
-      "Audiencia ejecutiva y operativa de la región.",
-      "Respuesta del comité en 5 días hábiles.",
-    ],
-    formLabel: "Postúlate",
-    formTitle: "Comparte tu propuesta",
-    formDesc:
-      "Cuéntanos qué te gustaría presentar y el comité revisará tu perfil.",
-    firstName: "Nombre(s)",
-    firstNamePlaceholder: "Sandra",
-    lastName: "Apellidos",
-    lastNamePlaceholder: "Romero",
-    email: "Correo corporativo",
-    emailPlaceholder: "nombre@empresa.com",
-    phone: "Teléfono móvil",
-    phonePlaceholder: "+52 899 000 0000",
-    company: "Empresa",
-    companyPlaceholder: "Empresa",
-    role: "Cargo",
-    rolePlaceholder: "Gerente de seguridad",
-    topic: "Tema que te gustaría presentar",
-    topicPlaceholder:
-      "Describe brevemente tu propuesta y el caso que compartirías.",
-    submit: "Enviar propuesta",
-    note: "Se abrirá tu correo con los datos listos para enviar a contacto@scsecuritysummit.com",
-    subject: "Propuesta de presentador — SC Security Summit 2026",
-  },
-  en: {
-    label: "Call for speakers",
-    title: "I want to be a presenter",
-    description:
-      "We're looking for specialists with direct experience in security, compliance, transportation, foreign trade, and operational continuity. Leave your details and we'll reach out.",
-    points: [
-      "50-minute sessions built around a real case.",
-      "Executive and operational audience from the region.",
-      "Committee response within 5 business days.",
-    ],
-    formLabel: "Apply",
-    formTitle: "Share your proposal",
-    formDesc: "Tell us what you'd like to present and the committee will review your profile.",
-    firstName: "First name(s)",
-    firstNamePlaceholder: "Sandra",
-    lastName: "Last name(s)",
-    lastNamePlaceholder: "Romero",
-    email: "Corporate email",
-    emailPlaceholder: "name@company.com",
-    phone: "Mobile phone",
-    phonePlaceholder: "+1 956 000 0000",
-    company: "Company",
-    companyPlaceholder: "Company",
-    role: "Role",
-    rolePlaceholder: "Security manager",
-    topic: "Topic you'd like to present",
-    topicPlaceholder: "Briefly describe your proposal and the case you'd share.",
-    submit: "Send proposal",
-    note: "Your email client will open with the details ready to send to contacto@scsecuritysummit.com",
-    subject: "Speaker proposal — SC Security Summit 2026",
-  },
 } as const;
 
 export const AUDIENCE_PATHS = {
@@ -938,32 +865,11 @@ export const PROVEEDORES = {
 export const PRICING = {
   es: [
     {
-      id: "vip",
-      label: "Acceso VIP",
-      price: "$4,800",
-      priceValue: 4800,
-      featured: true,
-      desc: "Ejecutivos y tomadores de decisión",
-      features: [
-        "Acceso a conferencias especializadas",
-        "Acceso a workshops estratégicos y sesiones especiales dentro del Business Hub",
-        "Participación prioritaria en Q&A de conferencias y paneles de expertos",
-        "Acceso al Business Hub para networking empresarial, previo registro",
-        "Asesoría especializada durante el evento en temas CTPAT/OEA",
-        "Asiento preferente en sesiones principales",
-        "Constancia de participación",
-        "Material descargable, recursos y plantillas de trabajo",
-        "Coffee break durante el evento",
-        "Kit de bienvenida premium",
-        "Gafete y pulsera de acceso",
-      ],
-    },
-    {
       id: "plus",
       label: "Acceso Plus",
       price: "$2,500",
       priceValue: 2500,
-      featured: false,
+      featured: true,
       desc: "Líderes de certificación y puntos de contacto",
       recommended: "Especialista CTPAT / OEA",
       features: [
@@ -1008,32 +914,11 @@ export const PRICING = {
   ],
   en: [
     {
-      id: "vip",
-      label: "VIP Pass",
-      price: "$4,800",
-      priceValue: 4800,
-      featured: true,
-      desc: "Executives and decision makers",
-      features: [
-        "Access to specialized conferences",
-        "Access to strategic workshops and special sessions within the Business Hub",
-        "Priority participation in Q&A at conferences and expert panels",
-        "Business Hub access for corporate networking (pre-registration required)",
-        "Specialized advisory during the event on CTPAT/OEA topics",
-        "Priority seating at main sessions",
-        "Certificate of participation",
-        "Downloadable materials, resources, and work templates",
-        "Coffee break during the event",
-        "Premium welcome kit",
-        "Access badge and wristband",
-      ],
-    },
-    {
       id: "plus",
       label: "Plus Pass",
       price: "$2,500",
       priceValue: 2500,
-      featured: false,
+      featured: true,
       desc: "Certification leaders and key points of contact",
       recommended: "CTPAT / AEO Specialist",
       features: [
@@ -1080,7 +965,6 @@ export const PRICING = {
 
 export const PRICING_STRIPE = {
   general: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
-  vip: "bg-gradient-to-r from-blue-800 via-cyan-400 to-blue-800",
   plus: "bg-gradient-to-r from-blue-500 via-cyan-400 to-blue-500",
   estudiante: "bg-gradient-to-r from-slate-300 via-slate-200 to-slate-300",
 } as const;
@@ -1321,7 +1205,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué incluye cada tipo de acceso?",
     answer:
-      "El acceso Estudiante incluye conferencias especializadas, kit Futuros Líderes y gafete. El acceso General agrega paneles con expertos de la industria, constancia digital de participación y kit básico. El acceso Plus suma constancia de participación, kit de bienvenida ejecutivo y material descargable con plantillas de trabajo. El acceso VIP incluye todo lo anterior más workshops estratégicos y sesiones especiales en el Business Hub, participación prioritaria en Q&A, asesoría CTPAT/OEA durante el evento, asiento preferente, coffee break y kit de bienvenida premium.",
+      "El acceso Estudiante incluye conferencias especializadas, kit Futuros Líderes y gafete. El acceso General agrega paneles con expertos de la industria, constancia digital de participación y kit básico. El acceso Plus suma constancia de participación, kit de bienvenida ejecutivo y material descargable con plantillas de trabajo.",
   },
   {
     question: "¿Puedo comprar accesos para mi equipo?",
@@ -1364,7 +1248,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "What is included with each access type?",
     answer:
-      "Student access includes the specialized conferences, the Future Leaders kit, and a badge. General access adds panels with industry experts, a digital certificate of participation, and a basic kit. Plus access adds a printed certificate of participation, an executive welcome kit, and downloadable materials with work templates. VIP includes all of the above plus strategic workshops and special Business Hub sessions, priority Q&A participation, CTPAT/AEO advisory during the event, preferred seating, coffee break, and a premium welcome kit.",
+      "Student access includes the specialized conferences, the Future Leaders kit, and a badge. General access adds panels with industry experts, a digital certificate of participation, and a basic kit. Plus access adds a printed certificate of participation, an executive welcome kit, and downloadable materials with work templates.",
   },
   {
     question: "Can I buy passes for my team?",

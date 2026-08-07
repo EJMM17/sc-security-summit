@@ -17,7 +17,6 @@ import NetworkingHub from "./(marketing)/_components/NetworkingHub";
 import Pillars from "./(marketing)/_components/Pillars";
 import Pricing from "./(marketing)/_components/Pricing";
 import Registro from "./(marketing)/_components/Registro";
-import SerPresentador from "./(marketing)/_components/SerPresentador";
 import Speakers from "./(marketing)/_components/Speakers";
 import Sponsors from "./(marketing)/_components/Sponsors";
 import Value from "./(marketing)/_components/Value";
@@ -232,7 +231,6 @@ export default async function Home({
         <FinalCTA language={language} />
         <Registro language={language} />
         <Location language={language} />
-        <SerPresentador language={language} />
         <Faq language={language} />
       </main>
       <Footer language={language} />
