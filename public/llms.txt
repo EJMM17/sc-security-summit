@@ -10,7 +10,7 @@ Datos clave:
 - Fecha: 24 de septiembre de 2026, 8:00 AM – 7:00 PM (hora local de Reynosa)
 - Sede: Centro de Convenciones de Reynosa, Libramiento Ote S/N, Azteca, C.P. 88680, Reynosa, Tamaulipas, México
 - Idiomas del sitio: español e inglés (parámetro ?lang=en)
-- Accesos: Estudiante $650 MXN · General $900 MXN · Plus $2,500 MXN · VIP $4,800 MXN
+- Accesos: Estudiante $650 MXN · General $900 MXN · Plus $2,500 MXN
 - Compra individual: Eventbrite, desde los botones de acceso del sitio
 - Pase corporativo: https://scsecuritysummit.com/#registro
 - Contacto: hola@scsecuritysummit.com · +52 899 112 8755
@@ -30,5 +30,5 @@ Datos clave:
 2026 (8:00 AM – 7:00 PM) at the Reynosa Convention Center, Tamaulipas, Mexico.
 CTPAT/AEO regulatory updates, B2B networking, and technology solutions for
 northern Mexico's maquiladora industry. Passes: Student $650 MXN, General
-$900 MXN, Plus $2,500 MXN, VIP $4,800 MXN. Individual checkout is handled by
+$900 MXN, Plus $2,500 MXN. Individual checkout is handled by
 Eventbrite from the site's access buttons.

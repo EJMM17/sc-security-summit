@@ -30,7 +30,7 @@ test.describe("Homepage comercial", () => {
     );
     expect(sectionOrder).toEqual([...sectionOrder].sort((a, b) => a - b));
 
-    for (const price of ["$4,800", "$2,500", "$900", "$650"]) {
+    for (const price of ["$2,500", "$900", "$650"]) {
       await expect(page.getByText(price, { exact: true })).toBeVisible();
     }
 

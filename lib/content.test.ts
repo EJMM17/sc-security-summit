@@ -28,9 +28,8 @@ describe("content SSOT", () => {
     );
   });
 
-  it("publishes the four requested access tiers and agenda blocks", () => {
+  it("publishes the three requested access tiers and agenda blocks", () => {
     expect(CONTENT.es.pricing.map(({ id, priceValue }) => ({ id, priceValue }))).toStrictEqual([
-      { id: "vip", priceValue: 4800 },
       { id: "plus", priceValue: 2500 },
       { id: "general", priceValue: 900 },
       { id: "estudiante", priceValue: 650 },
@@ -61,13 +60,16 @@ describe("content SSOT", () => {
     }
   });
 
-  it("describes all four access tiers in the FAQ", () => {
+  it("describes all three access tiers in the FAQ", () => {
     const accessAnswer = CONTENT.es.faq.find((item) =>
       item.question.includes("¿Qué incluye cada tipo de acceso?"),
     )?.answer;
     expect(accessAnswer).toBeDefined();
-    for (const tier of ["Estudiante", "General", "Plus", "VIP"]) {
+    for (const tier of ["Estudiante", "General", "Plus"]) {
       expect(accessAnswer).toContain(tier);
     }
+    // The VIP tier was retired: the FAQ must not advertise a pass that no
+    // longer exists in PRICING.
+    expect(accessAnswer).not.toContain("VIP");
   });
 });
