@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Clock } from "lucide-react";
 import type { Language } from "@/lib/language";
 
 const EVENT_START = new Date("2026-09-24T08:00:00-05:00").getTime();
@@ -36,15 +37,18 @@ export default function EventCountdown({ language }: { language: Language }) {
 
   const labels =
     language === "es"
-      ? ["Días", "Horas", "Minutos", "Segundos"]
-      : ["Days", "Hours", "Minutes", "Seconds"];
+      ? ["Días", "Horas", "Min", "Seg"]
+      : ["Days", "Hours", "Min", "Sec"];
   const values = value
     ? [value.days, value.hours, value.minutes, value.seconds]
     : ["--", "--", "--", "--"];
 
   return (
     <div className="event-countdown" aria-label={language === "es" ? "Cuenta regresiva" : "Countdown"}>
-      <p>{language === "es" ? "Faltan" : "Time remaining"}</p>
+      <p>
+        <Clock aria-hidden="true" />
+        {language === "es" ? "Faltan" : "Time remaining"}
+      </p>
       <div>
         {values.map((item, index) => {
           const digits =

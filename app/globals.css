@@ -2024,20 +2024,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   flex-direction: column;
   align-items: center;
 }
-.hero-eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-  color: #A5F3FC;
-  font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-}
-.hero-eyebrow::before {
-  content: none;
-}
 .hero-title {
   max-width: 22ch;
   color: #FFFFFF;
@@ -2269,24 +2255,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   min-width: 0;
   text-align: left;
 }
-.hero-event-facts small {
-  display: block;
-  margin-bottom: 0.28rem;
-  color: #A5F3FC;
-  font-size: 0.58rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-.hero-event-facts span {
-  display: block;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 1.38rem;
-  font-weight: 780;
-  line-height: 1.08;
-  text-wrap: balance;
-}
 @keyframes heroSignalPulse {
   0%, 100% {
     transform: scale(1);
@@ -2334,12 +2302,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
     font-size: 2.35rem;
     line-height: 1.02;
   }
-  .hero-eyebrow {
-    max-width: 20rem;
-    margin-bottom: 0.8rem;
-    font-size: 0.66rem;
-    line-height: 1.45;
-  }
   .hero-description {
     margin-top: 0.85rem;
     font-size: 0.92rem;
@@ -2374,9 +2336,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   }
   .hero-event-facts > div > div {
     text-align: left;
-  }
-  .hero-event-facts span {
-    font-size: 1.08rem;
   }
   .hero-event-facts > div + div {
     border-top: 0;
@@ -3679,95 +3638,36 @@ body {
   color: white;
 }
 
-/* Editorial rule–label–rule marker instead of a chip/pill: reads as an
-   institutional kicker rather than a generic badge. */
-.hero-production .hero-eyebrow {
-  display: inline-flex;
-  margin-bottom: var(--hero-stack-gap);
-  padding: 0;
-  align-items: center;
-  gap: 0.9rem;
-  border: 0;
-  border-radius: 0;
-  background: none;
-  color: var(--summit-sky);
-  font-size: 0.645rem;
-  font-weight: 700;
-  letter-spacing: 0.34em;
-  text-indent: 0.34em;
-  text-transform: uppercase;
-}
-
-.hero-production .hero-eyebrow::before,
-.hero-production .hero-eyebrow::after {
-  content: "";
-  display: block;
-  width: clamp(1.75rem, 4.5vw, 3.25rem);
-  height: 1px;
-  flex: none;
-  background: linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.8));
-}
-
-.hero-production .hero-eyebrow::after {
-  background: linear-gradient(90deg, rgba(147, 197, 253, 0.8), transparent);
-}
-
+/* Display headline as the first thing in the stack: no kicker above it, so
+   the claim itself opens the page at full display scale. */
 .hero-production .hero-title {
-  max-width: 22.2ch;
+  max-width: 24ch;
   margin: 0;
   color: white;
   font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(2.1rem, 4.3vw, 3.25rem);
+  font-size: clamp(2.1rem, 5.2vw, 4.15rem);
   font-weight: 700;
   line-height: 1.02;
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 
+/* The highlight always opens its own line so the headline reads as two
+   deliberate bands — white claim over the coloured subject — instead of
+   breaking wherever the measure happens to run out. */
 .hero-production .hero-title span {
-  display: inline;
+  display: block;
   color: var(--summit-sky);
 }
 
 .hero-production .hero-description {
-  max-width: 42rem;
-  margin: var(--hero-stack-gap) auto 0;
-  color: rgba(219, 234, 254, 0.78);
-  font-size: clamp(0.96rem, 1.4vw, 1.13rem);
-  line-height: 1.55;
-  text-wrap: balance;
-}
-
-.hero-topic-rail {
-  display: flex;
-  max-width: 56rem;
-  margin: var(--hero-stack-gap) auto 0;
-  padding-block: 0.45rem;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.6rem 1.45rem;
-  border-block: 1px solid var(--on-navy-line);
-}
-
-.hero-topic-rail li {
-  position: relative;
+  max-width: 38rem;
+  margin: calc(var(--hero-stack-gap) * 1.35) auto 0;
   color: rgba(219, 234, 254, 0.82);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.hero-topic-rail li:not(:last-child)::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  right: -0.78rem;
-  width: 3px;
-  height: 3px;
-  border-radius: 99px;
-  background: #60a5fa;
+  font-size: clamp(0.98rem, 1.45vw, 1.18rem);
+  line-height: 1.65;
+  text-wrap: pretty;
 }
 
 .hero-presenters {
@@ -3818,58 +3718,62 @@ body {
   opacity: 0.95;
 }
 
-/* Four value props as visual peers. The old rule mixed a huge display size
-   with multi-word labels, so "Aplicación práctica" wrapped and broke the row;
-   a smaller shared scale plus balanced wrapping keeps the baseline even. */
+/* Three numeric proof points read as display figures, not as a table: no
+   rules or cells around them, just the numeral over a tracked caption. */
 .hero-stat-grid {
-  width: min(100%, 54rem);
-  margin: calc(var(--hero-stack-gap) * 1.15) auto 0;
+  width: min(100%, 48rem);
+  margin: calc(var(--hero-stack-gap) * 1.6) auto 0;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  border-block: 1px solid var(--on-navy-line);
+  grid-template-columns: repeat(3, 1fr);
+  border: 0;
 }
 
 .hero-stat-grid > div {
   display: flex;
-  padding: 0.65rem 1rem;
+  padding: 0.25rem 0.75rem;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .hero-stat-grid > div + div {
-  border-left: 1px solid var(--on-navy-line);
+  border-left: 0;
 }
 
-/* Fixed slot heights keep the four labels on a shared baseline even when a
-   term or its caption wraps, so the row never looks ragged. */
 .hero-stat-grid dt {
   display: flex;
-  min-height: 2.35em;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
+  gap: 0.02em;
   color: white;
   font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(1rem, 1.5vw, 1.24rem);
+  font-size: clamp(2.1rem, 4.1vw, 3.15rem);
   font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: 0.002em;
-  text-wrap: balance;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The unit that qualifies the figure (the "+" of 500+) stays subordinate to
+   the numeral instead of competing with it. */
+.hero-stat-grid dt span {
+  color: var(--summit-sky);
+  font-size: 0.62em;
+  font-weight: 700;
 }
 
 .hero-stat-grid dd {
   display: flex;
-  max-width: 19ch;
-  min-height: 2.6em;
+  max-width: 17ch;
   margin-top: 0;
   align-items: flex-start;
   justify-content: center;
-  color: rgba(191, 219, 254, 0.55);
-  font-size: 0.565rem;
+  color: rgba(191, 219, 254, 0.62);
+  font-size: 0.6rem;
   font-weight: 700;
-  letter-spacing: 0.11em;
-  line-height: 1.42;
+  letter-spacing: 0.13em;
+  line-height: 1.4;
   text-transform: uppercase;
   text-wrap: balance;
 }
@@ -3905,41 +3809,36 @@ body {
   min-width: 0;
   padding: 0;
   align-items: center;
-  gap: 1rem;
+  gap: 0.55rem;
   text-align: left;
 }
 
 .hero-event-facts > div + div {
-  padding-left: clamp(1.5rem, 4.5vw, 3.25rem);
+  padding-left: clamp(1.25rem, 3.5vw, 2.25rem);
   border-left: 1px solid var(--on-navy-line);
 }
 
+/* Bare glyphs, not the legacy filled blue discs: at this size the icon is a
+   marker for the line of text beside it, so it drops the pill treatment the
+   earlier two-line fact cards used. */
 .hero-event-facts svg {
-  width: 2.6rem;
-  height: 2.6rem;
-  color: #FFFFFF;
-}
-
-.hero-event-facts span {
-  display: grid;
-  gap: 0.3rem;
-}
-
-.hero-event-facts small {
-  color: rgba(147, 197, 253, 0.72);
-  font-size: 0.575rem;
-  font-weight: 700;
-  letter-spacing: 0.19em;
-  text-transform: uppercase;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex: none;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+  color: var(--summit-sky);
 }
 
 .hero-event-facts strong {
-  color: white;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(1.2rem, 2vw, 1.62rem);
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.005em;
+  color: rgba(226, 240, 255, 0.95);
+  font-family: inherit;
+  font-size: clamp(0.92rem, 1.3vw, 1.06rem);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.002em;
 }
 
 /* Centred, box-free countdown: bare numerals separated by colons so the
@@ -3955,12 +3854,22 @@ body {
 }
 
 .event-countdown > p {
-  color: rgba(147, 197, 253, 0.68);
-  font-size: 0.585rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--summit-sky);
+  font-size: 0.615rem;
   font-weight: 700;
   letter-spacing: 0.3em;
   text-indent: 0.3em;
   text-transform: uppercase;
+}
+
+.event-countdown > p svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  flex: none;
+  text-indent: 0;
 }
 
 .event-countdown > div {
@@ -4004,7 +3913,10 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.event-countdown span {
+/* Scoped to the unit's own child: a bare `span` here also caught the span the
+   digit is wrapped in for its roll-in animation, which shrank the numerals to
+   caption size and drained their colour. */
+.event-countdown > div > div > span {
   display: block;
   margin-top: 0.5rem;
   color: rgba(191, 219, 254, 0.5);
@@ -4832,10 +4744,6 @@ body {
     font-size: clamp(2.4rem, 12.5vw, 3.75rem);
   }
 
-  .hero-topic-rail li:not(:last-child)::after {
-    display: none;
-  }
-
   .hero-presenter-logos {
     gap: 0.75rem 1.15rem;
   }
@@ -4854,26 +4762,10 @@ body {
     width: 9.2rem;
   }
 
-  .hero-stat-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .hero-stat-grid > div + div {
-    border-left: 0;
-  }
-
-  .hero-stat-grid > div:nth-child(even) {
-    border-left: 1px solid var(--on-navy-line);
-  }
-
-  .hero-stat-grid > div:nth-child(n + 3) {
-    border-top: 1px solid var(--on-navy-line);
-  }
-
   .hero-event-facts {
     width: 100%;
     flex-direction: column;
-    gap: 1rem;
+    gap: 0.75rem;
   }
 
   .hero-event-cluster {
@@ -4895,12 +4787,12 @@ body {
   .hero-event-facts > div {
     width: 100%;
     min-width: 0;
+    justify-content: center;
   }
 
   .hero-event-facts > div + div {
-    padding-top: 1rem;
+    padding-top: 0;
     padding-left: 0;
-    border-top: 1px solid var(--on-navy-line);
     border-left: 0;
   }
 
@@ -4968,24 +4860,15 @@ body {
   }
 
   .hero-production .hero-title {
-    max-width: 11.5ch;
-    font-size: clamp(2.65rem, 13vw, 3.15rem);
-    line-height: 0.96;
+    max-width: 15ch;
+    font-size: clamp(2.15rem, 10vw, 2.75rem);
+    line-height: 0.98;
   }
 
   .hero-production .hero-description {
     margin-top: 0.8rem;
     font-size: 0.92rem;
     line-height: 1.5;
-  }
-
-  .hero-topic-rail {
-    display: none;
-  }
-
-  .hero-topic-rail li {
-    font-size: 0.58rem;
-    letter-spacing: 0.055em;
   }
 
   .hero-presenter-logos {
@@ -5010,70 +4893,35 @@ body {
     width: 7.1rem;
   }
 
-  .hero-stat-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .hero-stat-grid > div {
-    padding: 0.65rem 0.25rem;
-  }
-
-  .hero-stat-grid > div + div,
-  .hero-stat-grid > div:nth-child(odd) {
-    border-left: 0;
-  }
-
-  .hero-stat-grid > div:nth-child(even) {
-    border-left: 1px solid var(--on-navy-line);
-  }
-
-  .hero-stat-grid > div:nth-child(n + 3) {
-    border-top: 1px solid var(--on-navy-line);
+    padding: 0.35rem 0.2rem;
   }
 
   .hero-stat-grid dt {
-    font-size: 1.25rem;
+    font-size: 2rem;
   }
 
   .hero-stat-grid dd {
-    font-size: 0.46rem;
-    letter-spacing: 0.045em;
+    font-size: 0.5rem;
+    letter-spacing: 0.075em;
   }
 
-  /* Date and venue wrap to different line counts on a narrow phone. Centring
-     each block on its own height drops the two overline labels onto different
-     baselines, so align the tops instead. */
-  .hero-event-facts {
-    align-items: flex-start;
-    flex-direction: row;
-  }
-
+  /* The venue string wraps on a narrow phone, so the two facts stay stacked
+     and each one keeps its icon beside the first line of its own text. */
   .hero-event-facts > div {
     padding: 0;
     align-items: flex-start;
-    gap: 0.6rem;
-  }
-
-  .hero-event-facts > div + div {
-    padding-top: 0;
-    padding-left: 0.85rem;
-    border-top: 0;
-    border-left: 1px solid var(--on-navy-line);
+    gap: 0.5rem;
   }
 
   .hero-event-facts svg {
-    width: 2rem;
-    height: 2rem;
-  }
-
-  .hero-event-facts small {
-    font-size: 0.5rem;
-    letter-spacing: 0.14em;
+    margin-top: 0.15em;
   }
 
   .hero-event-facts strong {
-    font-size: 0.92rem;
-    line-height: 1.2;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    text-align: left;
   }
 
   /* Keep the countdown on phones — it is the urgency driver. Compact rather
@@ -5096,7 +4944,7 @@ body {
     font-size: 1.95rem;
   }
 
-  .event-countdown span {
+  .event-countdown > div > div > span {
     margin-top: 0.35rem;
     font-size: 0.46rem;
     letter-spacing: 0.1em;
@@ -5137,22 +4985,20 @@ body {
 }
 
 /* ═══ HERO STACK ORDER ON PHONES ═══
-   On a 390×844 viewport the four-cell value grid sits between the venue block
-   and the buttons, pushing the primary CTA to y=1032 — roughly 190px below the
-   fold, so the main conversion control was only reachable by scrolling.
-   The grid is supporting detail, not a decision driver, so it moves below the
-   buttons while the narrative above them stays intact: claim → who presents it
-   → when and where → act. `order` reorders the visual flow only; none of the
-   moved blocks contain focusable elements, so DOM and tab order still agree. */
+   On a 390×844 viewport the value figures sit between the venue block and the
+   buttons, pushing the primary CTA well below the fold, so the main conversion
+   control was only reachable by scrolling. The figures are supporting detail,
+   not a decision driver, so they move below the buttons while the narrative
+   above them stays intact: claim → who presents it → when and where → act.
+   `order` reorders the visual flow only; none of the moved blocks contain
+   focusable elements, so DOM and tab order still agree. */
 @media (max-width: 767px) {
-  .hero-production-inner > .hero-eyebrow      { order: 1; }
-  .hero-production-inner > .hero-title        { order: 2; }
-  .hero-production-inner > .hero-description  { order: 3; }
-  .hero-production-inner > .hero-topic-rail   { order: 4; }
-  .hero-production-inner > .hero-presenters   { order: 5; }
-  .hero-production-inner > .hero-event-cluster{ order: 6; }
-  .hero-production-inner > .hero-actions      { order: 7; }
-  .hero-production-inner > .hero-stat-grid    { order: 8; }
+  .hero-production-inner > .hero-title        { order: 1; }
+  .hero-production-inner > .hero-description  { order: 2; }
+  .hero-production-inner > .hero-presenters   { order: 3; }
+  .hero-production-inner > .hero-event-cluster{ order: 4; }
+  .hero-production-inner > .hero-actions      { order: 5; }
+  .hero-production-inner > .hero-stat-grid    { order: 6; }
 }
 
 /* ═══ SHORT-VIEWPORT HERO TIERS ═══
@@ -5168,16 +5014,12 @@ body {
   }
 
   .hero-production .hero-title {
-    font-size: clamp(1.9rem, 3.4vw, 2.5rem);
+    font-size: clamp(1.9rem, 4vw, 3rem);
   }
 
   .hero-production .hero-description {
     font-size: clamp(0.9rem, 1.2vw, 1rem);
-    line-height: 1.5;
-  }
-
-  .hero-topic-rail {
-    padding-block: 0.3rem;
+    line-height: 1.55;
   }
 
   .hero-presenters > span {
@@ -5193,21 +5035,16 @@ body {
   }
 
   .hero-stat-grid > div {
-    padding-block: 0.45rem;
+    padding-block: 0.25rem;
   }
 
   .hero-stat-grid dt {
-    min-height: 2em;
-    font-size: clamp(0.92rem, 1.3vw, 1.1rem);
-  }
-
-  .hero-stat-grid dd {
-    min-height: 2.2em;
+    font-size: clamp(1.75rem, 3.2vw, 2.5rem);
   }
 
   .hero-event-facts svg {
-    width: 2.1rem;
-    height: 2.1rem;
+    width: 1rem;
+    height: 1rem;
   }
 
   .event-countdown strong {
@@ -5226,7 +5063,11 @@ body {
   }
 
   .hero-production .hero-title {
-    font-size: clamp(1.7rem, 3vw, 2.15rem);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+  }
+
+  .hero-stat-grid dt {
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
   }
 
   .hero-presenter-logo,
