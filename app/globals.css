@@ -1752,20 +1752,21 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-weight: 700;
   line-height: 1.1;
 }
-.agenda-block-time {
+.agenda-block-badge {
   display: inline-flex;
   flex: none;
   align-items: center;
-  gap: 0.4rem;
-  padding-top: 0.1rem;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgba(37, 99, 235, 0.22);
+  border-radius: 999px;
+  background: rgba(37, 99, 235, 0.08);
   color: #2563EB;
-  font-size: 0.72rem;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.85rem;
   font-weight: 700;
-  white-space: nowrap;
-}
-.agenda-block-time svg {
-  width: 0.85rem;
-  height: 0.85rem;
+  line-height: 1;
 }
 .agenda-block-audience {
   display: flex;
@@ -1792,20 +1793,21 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .agenda-block li {
   display: grid;
-  grid-template-columns: 5.4rem minmax(0, 1fr);
-  gap: 0.8rem;
+  grid-template-columns: 0.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.9rem;
   padding: 1rem 0;
   border-bottom: 1px solid #E2E8F0;
 }
 .agenda-block li:last-child {
   border-bottom: 0;
 }
-.agenda-block time {
-  color: var(--blue-700);
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.78rem;
-  font-weight: 700;
-  white-space: nowrap;
+.agenda-session-marker {
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.45rem;
+  border-radius: 999px;
+  background: var(--blue-600);
 }
 .agenda-block li p {
   color: #334155;
@@ -1820,12 +1822,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-weight: 800;
 }
 @media (max-width: 480px) {
-  .agenda-block header {
-    flex-direction: column;
+  .agenda-block-badge {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.78rem;
   }
   .agenda-block li {
-    grid-template-columns: 1fr;
-    gap: 0.25rem;
+    gap: 0.7rem;
   }
 }
 @media (max-width: 767px) {

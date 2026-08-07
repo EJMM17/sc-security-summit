@@ -1,4 +1,4 @@
-import { Clock3, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
@@ -31,9 +31,8 @@ export default function Agenda({ language }: { language: Language }) {
                     </p>
                     <h3>{block.title.replace(/^Bloque \d+ — |^Block \d+ — /, "")}</h3>
                   </div>
-                  <span className="agenda-block-time">
-                    <Clock3 aria-hidden="true" />
-                    {block.time}
+                  <span className="agenda-block-badge" aria-hidden="true">
+                    {String(blockIndex + 1).padStart(2, "0")}
                   </span>
                 </header>
 
@@ -43,9 +42,9 @@ export default function Agenda({ language }: { language: Language }) {
                 </p>
 
                 <ol>
-                  {block.sessions.map((session) => (
-                    <li key={`${session.time}-${session.title}`}>
-                      <time>{session.time}</time>
+                  {block.sessions.map((session, sessionIndex) => (
+                    <li key={`${session.title}-${sessionIndex}`}>
+                      <span className="agenda-session-marker" aria-hidden="true" />
                       <div>
                         <p>{session.title}</p>
                         {"speaker" in session && session.speaker ? (
