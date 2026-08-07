@@ -7,7 +7,7 @@ test.describe("Homepage comercial", () => {
     await expect(
       page.getByRole("heading", {
         level: 1,
-        name: /las mejores decisiones comienzan con una mejor formación/i,
+        name: /summit de seguridad en la cadena de suministros/i,
       }),
     ).toBeVisible();
     await expect(page.getByRole("img", { name: "Lanz Logistics" }).first()).toBeVisible();

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import EventCountdown from "@/components/EventCountdown";
-import { CONTENT, EVENTBRITE_URL, HERO_TOPICS } from "@/lib/content";
+import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
 
@@ -25,7 +25,6 @@ const PRESENTER_LOGOS = [
 
 export default function Hero({ language }: { language: Language }) {
   const { ui, heroStats } = CONTENT[language];
-  const topics = HERO_TOPICS[language];
 
   return (
     <section id="top" className="hero-section hero-production">
@@ -42,19 +41,11 @@ export default function Hero({ language }: { language: Language }) {
       <div className="hero-image-overlay" aria-hidden="true" />
 
       <div className="hero-production-inner">
-        <p className="hero-eyebrow">{ui.heroKicker}</p>
-
         <h1 className="hero-title">
           {ui.heroTitlePrefix} <span>{ui.heroTitleHighlight}</span>
         </h1>
 
         <p className="hero-description">{ui.heroDescription}</p>
-
-        <ul className="hero-topic-rail" aria-label={language === "es" ? "Temas principales" : "Key topics"}>
-          {topics.map((topic) => (
-            <li key={topic}>{topic}</li>
-          ))}
-        </ul>
 
         <div className="hero-presenters" aria-label={ui.presentedBy}>
           <span>{ui.presentedBy}</span>
@@ -78,7 +69,7 @@ export default function Hero({ language }: { language: Language }) {
             <div key={stat.number}>
               <dt>
                 {stat.number}
-                {stat.suffix}
+                {stat.suffix ? <span>{stat.suffix}</span> : null}
               </dt>
               <dd>{stat.label}</dd>
             </div>
@@ -86,20 +77,23 @@ export default function Hero({ language }: { language: Language }) {
         </dl>
 
         <div className="hero-event-cluster">
+          {/* Single inline fact line: the labels that used to sit above each
+              value are redundant next to a calendar and a pin, so they stay
+              only as accessible names for screen readers. */}
           <div className="hero-event-facts">
             <div>
               <Calendar aria-hidden="true" />
-              <span>
-                <small>{ui.eventDayLabel}</small>
-                <strong>{ui.eventDayValue}</strong>
-              </span>
+              <strong>
+                <span className="sr-only">{ui.eventDayLabel}: </span>
+                {ui.eventDayValue}
+              </strong>
             </div>
             <div>
               <MapPin aria-hidden="true" />
-              <span>
-                <small>{ui.locationLabel}</small>
-                <strong>{ui.eventDayVenue}</strong>
-              </span>
+              <strong>
+                <span className="sr-only">{ui.locationLabel}: </span>
+                {ui.eventDayVenue}
+              </strong>
             </div>
           </div>
 

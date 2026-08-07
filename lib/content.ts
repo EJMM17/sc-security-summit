@@ -79,12 +79,11 @@ export const UI_TEXT = {
     switchLangLabel: "Cambiar a inglés",
     registerBtn: "CONSEGUIR ACCESOS",
     dateLocation: "24 de septiembre, 2026 · Reynosa, Tamaulipas",
-    heroKicker: "SUMMIT PRESENCIAL · REYNOSA 2026",
     heroAlt: "Summit de Seguridad en la Cadena de Suministros",
-    heroTitlePrefix: "Las mejores decisiones comienzan con una",
-    heroTitleHighlight: "mejor formación",
+    heroTitlePrefix: "Summit de seguridad en la",
+    heroTitleHighlight: "cadena de suministros",
     heroDescription:
-      "Programa ejecutivo de formación especializada para profesionales responsables de proteger la seguridad, el cumplimiento y la continuidad de la cadena de suministro.",
+      "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
@@ -250,12 +249,11 @@ export const UI_TEXT = {
     switchLangLabel: "Switch to Spanish",
     registerBtn: "GET PASSES",
     dateLocation: "September 24, 2026 · Reynosa, Tamaulipas",
-    heroKicker: "IN-PERSON SUMMIT · REYNOSA 2026",
     heroAlt: "Supply Chain Security Summit",
-    heroTitlePrefix: "Better decisions begin with",
-    heroTitleHighlight: "better training",
+    heroTitlePrefix: "Security summit for the",
+    heroTitleHighlight: "supply chain",
     heroDescription:
-      "An executive specialized training program for professionals responsible for supply chain security, compliance, and continuity.",
+      "The strategic meeting point to shield your operation: access the security and compliance solutions that keep your trade flowing, and connect with key partners to unlock new B2B opportunities.",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
@@ -419,22 +417,15 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: "1 día", suffix: "", label: "de formación especializada" },
-    { number: "Especialistas", suffix: "", label: "con experiencia en la industria" },
-    { number: "Aplicación práctica", suffix: "", label: "para la operación" },
-    { number: "Conexiones", suffix: "", label: "y vinculación" },
+    { number: "10", suffix: "", label: "Horas de capacitación" },
+    { number: "4", suffix: "", label: "Conferencistas confirmados" },
+    { number: "500", suffix: "+", label: "Lugares disponibles" },
   ],
   en: [
-    { number: "1 day", suffix: "", label: "of specialized training" },
-    { number: "Specialists", suffix: "", label: "with industry experience" },
-    { number: "Practical application", suffix: "", label: "for your operation" },
-    { number: "Connections", suffix: "", label: "and professional networking" },
+    { number: "10", suffix: "", label: "Hours of training" },
+    { number: "4", suffix: "", label: "Confirmed speakers" },
+    { number: "500", suffix: "+", label: "Available seats" },
   ],
-} as const;
-
-export const HERO_TOPICS = {
-  es: ["CTPAT", "OEA", "Gestión de riesgos", "Ciberseguridad", "Seguridad en transporte"],
-  en: ["CTPAT", "AEO", "Risk management", "Cybersecurity", "Transportation security"],
 } as const;
 
 export const COMPETENCIES = {
