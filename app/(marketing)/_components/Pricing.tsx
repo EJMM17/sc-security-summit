@@ -45,9 +45,11 @@ export default function Pricing({ language }: { language: Language }) {
               <ScrollReveal key={plan.id} delay={index * 90}>
                 <article className={`pricing-tier ${isFeatured ? "pricing-tier--featured" : ""}`}>
                   <div className="pricing-tier-plan">
-                    <div className="pricing-tier-heading">
-                      {isFeatured ? <strong>{completeLabel}</strong> : null}
-                    </div>
+                    {isFeatured ? (
+                      <div className="pricing-tier-heading">
+                        <strong>{completeLabel}</strong>
+                      </div>
+                    ) : null}
                     <h3>{plan.label}</h3>
                     <p>{plan.desc}</p>
                     {"recommended" in plan && plan.recommended ? (
