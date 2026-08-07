@@ -83,7 +83,9 @@ export const UI_TEXT = {
     heroTitlePrefix: "Summit de seguridad en la",
     heroTitleHighlight: "cadena de suministros",
     heroDescription:
-      "El punto de encuentro estratégico para blindar tu operación, accede a las soluciones de seguridad y cumplimiento que garantizan tu flujo comercial y conecta con socios clave para generar nuevas oportunidades B2B.",
+      "Programa ejecutivo de formación especializada para profesionales responsables de proteger la seguridad, el cumplimiento y la continuidad de la cadena de suministro.",
+    heroTopics:
+      "CTPAT · OEA · Gestión de riesgos · Ciberseguridad · Seguridad en transporte",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
@@ -253,7 +255,9 @@ export const UI_TEXT = {
     heroTitlePrefix: "Security summit for the",
     heroTitleHighlight: "supply chain",
     heroDescription:
-      "The strategic meeting point to shield your operation: access the security and compliance solutions that keep your trade flowing, and connect with key partners to unlock new B2B opportunities.",
+      "Executive specialized training program for professionals responsible for protecting the security, compliance and continuity of the supply chain.",
+    heroTopics:
+      "CTPAT · AEO · Risk management · Cybersecurity · Transportation security",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
@@ -417,13 +421,13 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: "10", suffix: "", label: "Horas de capacitación" },
-    { number: "4", suffix: "", label: "Conferencistas confirmados" },
+    { number: "1", suffix: "", label: "Día de formación especializada" },
+    { number: "5", suffix: "", label: "Especialistas con experiencia en la industria" },
     { number: "500", suffix: "+", label: "Lugares disponibles" },
   ],
   en: [
-    { number: "10", suffix: "", label: "Hours of training" },
-    { number: "4", suffix: "", label: "Confirmed speakers" },
+    { number: "1", suffix: "", label: "Day of specialized training" },
+    { number: "5", suffix: "", label: "Specialists with industry experience" },
     { number: "500", suffix: "+", label: "Available seats" },
   ],
 } as const;

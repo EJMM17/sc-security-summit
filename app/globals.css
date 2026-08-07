@@ -3670,6 +3670,19 @@ body {
   text-wrap: pretty;
 }
 
+/* The topic line is a scannable index of the program, not prose: it sits
+   tighter to the description and reads a step quieter and wider-tracked so
+   the two paragraphs never compete. */
+.hero-topics {
+  max-width: 42rem;
+  margin: calc(var(--hero-stack-gap) * 0.55) auto 0;
+  color: rgba(219, 234, 254, 0.66);
+  font-size: clamp(0.78rem, 1.05vw, 0.9rem);
+  line-height: 1.6;
+  letter-spacing: 0.04em;
+  text-wrap: pretty;
+}
+
 .hero-presenters {
   margin-top: calc(var(--hero-stack-gap) * 1.15);
 }
@@ -4871,6 +4884,12 @@ body {
     line-height: 1.5;
   }
 
+  .hero-topics {
+    margin-top: 0.55rem;
+    font-size: 0.74rem;
+    line-height: 1.55;
+  }
+
   .hero-presenter-logos {
     width: 100%;
     display: flex;
@@ -4995,10 +5014,11 @@ body {
 @media (max-width: 767px) {
   .hero-production-inner > .hero-title        { order: 1; }
   .hero-production-inner > .hero-description  { order: 2; }
-  .hero-production-inner > .hero-presenters   { order: 3; }
-  .hero-production-inner > .hero-event-cluster{ order: 4; }
-  .hero-production-inner > .hero-actions      { order: 5; }
-  .hero-production-inner > .hero-stat-grid    { order: 6; }
+  .hero-production-inner > .hero-topics       { order: 3; }
+  .hero-production-inner > .hero-presenters   { order: 4; }
+  .hero-production-inner > .hero-event-cluster{ order: 5; }
+  .hero-production-inner > .hero-actions      { order: 6; }
+  .hero-production-inner > .hero-stat-grid    { order: 7; }
 }
 
 /* ═══ SHORT-VIEWPORT HERO TIERS ═══
