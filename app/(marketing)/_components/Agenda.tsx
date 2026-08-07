@@ -25,15 +25,10 @@ export default function Agenda({ language }: { language: Language }) {
             <ScrollReveal key={block.title} delay={blockIndex * 80}>
               <article className="agenda-block">
                 <header>
-                  <div>
-                    <p className="agenda-block-number">
-                      {language === "es" ? "Bloque" : "Block"} {blockIndex + 1}
-                    </p>
-                    <h3>{block.title.replace(/^Bloque \d+ — |^Block \d+ — /, "")}</h3>
-                  </div>
-                  <span className="agenda-block-badge" aria-hidden="true">
-                    {String(blockIndex + 1).padStart(2, "0")}
-                  </span>
+                  <p className="agenda-block-number">
+                    {language === "es" ? "Bloque" : "Block"} {blockIndex + 1}
+                  </p>
+                  <h3>{block.title.replace(/^Bloque \d+ — |^Block \d+ — /, "")}</h3>
                 </header>
 
                 <p className="agenda-block-audience">

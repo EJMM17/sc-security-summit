@@ -1296,8 +1296,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   align-items: center;
   overflow: hidden;
   padding: 1.4rem;
-  border: 1px solid #DCE5F0;
-  border-radius: 1.5rem;
+  border: 1px solid #DCE6F3;
+  border-radius: var(--radius-xl);
   background: #FFFFFF;
   box-shadow: 0 16px 42px -34px rgba(15, 23, 42, 0.42);
   transition: transform 360ms cubic-bezier(0.22, 1, 0.36, 1),
@@ -1318,9 +1318,11 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   color: #FFFFFF;
   box-shadow: 0 24px 54px -34px rgba(15, 23, 42, 0.82);
 }
+/* Only the featured tier renders this row: each tier is a full-width row, so
+   reserving the space on the others left a phantom gap above their title. */
 .pricing-tier-heading {
   display: flex;
-  min-height: 1.4rem;
+  margin-bottom: 0.65rem;
   align-items: center;
   gap: 0.6rem;
 }
@@ -1334,7 +1336,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   text-transform: uppercase;
 }
 .pricing-tier-plan h3 {
-  margin-top: 0.65rem;
   color: #0F172A;
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.35rem;
@@ -1469,16 +1470,26 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .pricing-tier {
     grid-template-columns: minmax(0, 1fr) minmax(9rem, 0.55fr);
   }
-  .pricing-tier-benefits {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    padding: 1rem 0 0;
-    border-top: 1px solid #E2E8F0;
-    border-inline: 0;
+  .pricing-tier-plan {
+    grid-column: 1;
+    grid-row: 1;
   }
   .pricing-tier-action {
     grid-column: 2;
     grid-row: 1;
+  }
+  /* Explicit placement keeps the reading order price → benefits; with
+     auto-placement the price fell below the benefits list on tablet. */
+  .pricing-tier-price {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+  .pricing-tier-benefits {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    padding: 1rem 0 0;
+    border-top: 1px solid #E2E8F0;
+    border-inline: 0;
   }
   .pricing-tier--featured .pricing-tier-benefits {
     border-color: rgba(255, 255, 255, 0.12);
@@ -1729,9 +1740,8 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .agenda-block header {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  flex-direction: column;
+  justify-content: center;
   min-height: 8.75rem;
   padding: 2rem;
   border-bottom: 1px solid #CBD5E1;
@@ -1751,22 +1761,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-size: 1.35rem;
   font-weight: 700;
   line-height: 1.1;
-}
-.agenda-block-badge {
-  display: inline-flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: 1px solid rgba(37, 99, 235, 0.22);
-  border-radius: 999px;
-  background: rgba(37, 99, 235, 0.08);
-  color: #2563EB;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.85rem;
-  font-weight: 700;
-  line-height: 1;
 }
 .agenda-block-audience {
   display: flex;
@@ -1822,11 +1816,6 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-weight: 800;
 }
 @media (max-width: 480px) {
-  .agenda-block-badge {
-    width: 2rem;
-    height: 2rem;
-    font-size: 0.78rem;
-  }
   .agenda-block li {
     gap: 0.7rem;
   }
