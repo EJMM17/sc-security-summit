@@ -6562,6 +6562,7 @@ h3,
   justify-content: center;
   width: clamp(9.5rem, 20vw, 13rem);
   min-height: 6.5rem;
+  box-sizing: border-box;
   padding: 1.25rem 1.5rem;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
@@ -6594,6 +6595,19 @@ h3,
   letter-spacing: 0.01em;
   text-align: center;
   text-wrap: balance;
+}
+
+/* The five presenters read as one lineup, so on desktop they share a single
+   row of equal cells rather than wrapping four-plus-one orphan. */
+@media (min-width: 1024px) {
+  .presenter-logo-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .presenter-logo-card {
+    width: 100%;
+  }
 }
 
 @media (max-width: 640px) {

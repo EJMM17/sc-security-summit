@@ -51,7 +51,9 @@ Cada ponente tiene una imagen web optimizada y una fuente de mayor resolución:
 
 Las versiones en blanco (`presenter-*.png`) que usaba el hero quedaron
 retiradas. La sección `#presentadores` usa los logos a color, en
-`public/images/presenters/`, con fondo transparente:
+`public/images/presenters/`, con fondo blanco plano y sin margen sobrante
+(el fondo original venía en `#f7f7f7` con ruido de compresión; se normalizó
+a blanco puro para que la caja del logo se funda con la tarjeta):
 
 - `lanz-logistics.png`
 - `villa-florida.png`

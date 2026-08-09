@@ -591,7 +591,9 @@ export const PILARES = {
  *
  * Brand names are not translated, so the list is shared by both languages.
  * `logo` points at the full-color asset in `public/images/presenters/`; the
- * previous white-knockout versions used by the hero are retired. A presenter
+ * previous white-knockout versions used by the hero are retired. `ratio` is
+ * the trimmed asset's own width / height, so each mark keeps its proportions
+ * inside a shared frame instead of needing per-brand sizing rules. A presenter
  * with `logo: null` renders as a typographic wordmark, so a pending asset
  * never ships as a broken image. */
 export type Presenter = {
@@ -602,15 +604,31 @@ export type Presenter = {
 };
 
 export const PRESENTERS: readonly Presenter[] = [
-  { name: "Lanz Logistics", logo: null, ratio: 1.78 },
-  { name: "Parque Industrial Villa Florida", logo: null, ratio: 3.08 },
+  {
+    name: "Lanz Logistics",
+    logo: "/images/presenters/lanz-logistics.png",
+    ratio: 1.76,
+  },
+  {
+    name: "Parque Industrial Villa Florida",
+    logo: "/images/presenters/villa-florida.png",
+    ratio: 3.29,
+  },
   {
     name: "Instituto Internacional de Estudios Superiores",
-    logo: null,
-    ratio: 1.66,
+    logo: "/images/presenters/iies.png",
+    ratio: 1.97,
   },
-  { name: "Blanquita Agua Purificada", logo: null, ratio: 2.84 },
-  { name: "Laboratorios Eloisa", logo: null, ratio: 3.06 },
+  {
+    name: "Blanquita Agua Purificada",
+    logo: "/images/presenters/blanquita.png",
+    ratio: 2.77,
+  },
+  {
+    name: "Laboratorios Eloisa",
+    logo: "/images/presenters/laboratorios-eloisa.png",
+    ratio: 3.18,
+  },
 ] as const;
 
 export const SPEAKERS = {
