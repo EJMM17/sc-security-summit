@@ -1011,7 +1011,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .speaker-slide-identity p {
   margin-top: 0.65rem;
-  color: #93C5FD;
+  color: var(--on-navy-accent);
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1.45;
@@ -1025,13 +1025,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   justify-content: center;
   min-width: 0;
   padding: clamp(2rem, 5vw, 4.5rem);
-  color: #FFFFFF;
-  background: #123F8E;
+  color: var(--on-navy-title);
+  background: var(--surface-navy-panel);
 }
 .speaker-slide-quote {
   display: block;
   height: 3rem;
-  color: rgba(103, 232, 249, 0.55);
+  color: var(--on-navy-faint);
   font-family: Georgia, serif;
   font-size: 5rem;
   line-height: 0.85;
@@ -1039,7 +1039,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .speaker-slide-kicker {
   margin-top: 1.5rem;
-  color: #A5F3FC;
+  color: var(--on-navy-accent);
   font-size: 0.7rem;
   font-weight: 800;
   text-transform: uppercase;
@@ -1312,11 +1312,12 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   box-shadow: 0 28px 60px -38px rgba(15, 23, 42, 0.54);
   transform: translateY(-3px);
 }
+/* Surface is declared once, further down, where it has to out-specify the
+   white `.pricing-tier` override. */
 .pricing-tier--featured {
-  border-color: #1D4ED8;
-  background: #0F172A;
-  color: #FFFFFF;
-  box-shadow: 0 24px 54px -34px rgba(15, 23, 42, 0.82);
+  border-color: var(--summit-blue);
+  color: var(--on-navy-title);
+  box-shadow: 0 24px 54px -34px rgba(7, 26, 67, 0.9);
 }
 /* Only the featured tier renders this row: each tier is a full-width row, so
    reserving the space on the others left a phantom gap above their title. */
@@ -1326,13 +1327,16 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   align-items: center;
   gap: 0.6rem;
 }
+/* Solid chip, same shape as the speaker card's topic tag: a badge that has
+   to survive on a dark plane cannot be an outline at 25% opacity. */
 .pricing-tier-heading > strong {
-  padding: 0.3rem 0.55rem;
-  border: 1px solid rgba(103, 232, 249, 0.25);
+  padding: 0.34rem 0.7rem;
   border-radius: 999px;
-  color: #A5F3FC;
+  background: var(--on-navy-accent);
+  color: var(--surface-navy);
   font-size: 0.58rem;
   font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .pricing-tier-plan h3 {
@@ -1451,20 +1455,23 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 .pricing-tier--featured .pricing-tier-plan > small,
 .pricing-tier--featured .pricing-tier-benefits summary,
 .pricing-tier--featured .pricing-tier-check {
-  color: #67E8F9;
+  color: var(--on-navy-accent);
 }
 .pricing-tier--featured .pricing-tier-plan h3,
 .pricing-tier--featured .pricing-tier-price strong {
-  color: #FFFFFF;
+  color: var(--on-navy-title);
 }
 .pricing-tier--featured .pricing-tier-plan > p,
 .pricing-tier--featured .pricing-tier-price span,
 .pricing-tier--featured .pricing-tier-benefits li {
-  color: #CBD5E1;
+  color: var(--on-navy-body);
+}
+.pricing-tier--featured .pricing-tier-price > p {
+  color: var(--on-navy-faint);
 }
 .pricing-tier--featured .pricing-tier-benefits,
 .pricing-tier--featured .pricing-tier-benefits details {
-  border-color: rgba(255, 255, 255, 0.12);
+  border-color: var(--on-navy-line);
 }
 @media (max-width: 1023px) {
   .pricing-tier {
@@ -1492,7 +1499,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
     border-inline: 0;
   }
   .pricing-tier--featured .pricing-tier-benefits {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--on-navy-line);
   }
 }
 @media (max-width: 640px) {
@@ -1516,7 +1523,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
     border-top: 0;
   }
   .pricing-tier--featured .pricing-tier-price {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: var(--on-navy-line);
   }
 }
 
@@ -2357,13 +2364,13 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   flex-direction: column;
   justify-content: center;
   padding: clamp(2rem, 5vw, 3.5rem);
-  color: #FFFFFF;
-  background: #0B3B8F;
+  color: var(--on-navy-title);
+  background: var(--surface-navy-panel);
 }
 .corporate-pass-summary > svg {
   width: 2.75rem;
   height: 2.75rem;
-  color: #67E8F9;
+  color: var(--on-navy-accent);
   stroke-width: 1.5;
 }
 .corporate-pass-summary > p {
@@ -2378,7 +2385,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   align-items: center;
   gap: 0.55rem;
   margin-top: 1.5rem;
-  color: rgba(255, 255, 255, 0.78);
+  color: var(--on-navy-body);
   font-size: 0.85rem;
   line-height: 1.5;
 }
@@ -2386,7 +2393,7 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   width: 1.1rem;
   height: 1.1rem;
   flex: none;
-  color: #A5F3FC;
+  color: var(--on-navy-accent);
 }
 .corporate-pass-form {
   padding: clamp(1.5rem, 4vw, 3rem);
@@ -3293,10 +3300,18 @@ textarea:focus {
   --surface-soft: #f7f9fd;
   --summit-soft: var(--surface-soft);
 
-  /* Navy surfaces */
+  /* Navy surfaces. One ramp, four steps: the deep base the footer and the
+     featured tier sit on, the page navy, the brand-blue panel used by every
+     split card (speaker quote, corporate pass) and the band. `raised` is the
+     only plane allowed for a block that must read as lifted *above* navy —
+     it is opaque on purpose, so chips never depend on whatever image or
+     gradient happens to be behind them. */
   --surface-navy: #071a43;
   --surface-navy-band: #112f72;
   --surface-navy-deep: #0b1731;
+  --surface-navy-panel: #0e357f;
+  --surface-navy-raised: #0d2456;
+  --surface-navy-raised-hover: #133064;
 
   /* Text on light */
   --text-strong: #0f172a;
@@ -3305,12 +3320,18 @@ textarea:focus {
   --text-muted: #64748b;
   --text-faint: #94a3b8;
 
-  /* Text on navy */
+  /* Text on navy. The accent on a dark plane is the sky ramp — the same blue
+     the hero highlight and the speaker role line already use. Cyan stays a
+     gradient ingredient (progress bar, hero mesh, marquee) and is never a
+     flat text or icon colour, otherwise dark surfaces read as a second,
+     competing accent family. */
   --on-navy-title: #ffffff;
   --on-navy-body: rgba(219, 234, 254, 0.78);
   --on-navy-label: #93c5fd;
   --on-navy-faint: rgba(191, 219, 254, 0.55);
   --on-navy-line: rgba(191, 219, 254, 0.18);
+  --on-navy-accent: #93c5fd;
+  --on-navy-accent-soft: #bfdbfe;
 
   /* Hairlines */
   --line: #e2e8f0;
@@ -4136,8 +4157,97 @@ body {
   background: var(--surface-navy);
 }
 
-.networking-section > div:nth-child(2) {
+.networking-overlay {
   background: linear-gradient(90deg, rgba(7, 26, 67, 0.96), rgba(17, 58, 136, 0.84));
+}
+
+/* Copy on the navy plane goes through the same three roles the rest of the
+   page uses — title, body, accent — instead of ad-hoc white/blue opacities. */
+.networking-lead {
+  color: var(--on-navy-body);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.networking-lead--sm {
+  font-size: 0.875rem;
+}
+
+.networking-subtitle {
+  margin-bottom: 0.75rem;
+  color: var(--on-navy-title);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+/* Subordinate column: same kicker motif as every other label on the page,
+   one step down in size so it does not compete with the section label. */
+.networking-label--sub {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+}
+
+.networking-label--sub::before {
+  width: 1.1rem;
+}
+
+.networking-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--on-navy-body);
+  font-size: 0.875rem;
+}
+
+.networking-feature-check,
+.provider-chip-check {
+  width: 1rem;
+  height: 0.85rem;
+  flex: none;
+  color: var(--on-navy-accent);
+}
+
+/* Provider chips are opaque tiles on the navy ramp, not translucent glass:
+   they sit over a photo, so any alpha let the background through and the
+   whole grid read as unfinished. Border, radius and hover lift come from
+   the same card language as the light sections. */
+.provider-chip-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.provider-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--on-navy-line);
+  border-radius: var(--r-sm);
+  background: var(--surface-navy-raised);
+  color: var(--on-navy-title);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.3;
+  box-shadow: 0 10px 24px -18px rgba(2, 8, 28, 0.9);
+  transition:
+    transform var(--dur) var(--ease-out),
+    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out);
+}
+
+.provider-chip:hover {
+  transform: translateY(-2px);
+  border-color: var(--on-navy-accent);
+  background: var(--surface-navy-raised-hover);
+}
+
+@media (max-width: 480px) {
+  .provider-chip-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .agenda-section {
@@ -4292,11 +4402,13 @@ body {
 
 /* Re-assert the featured tier's dark surface AFTER the white override
    above — both are single-class selectors, so the later rule must win or the
-   light/cyan text renders illegibly on white. Matches the mockup gradient. */
+   sky text renders illegibly on white. The ramp is the shared navy family
+   (page navy → brand-blue panel), not a separate near-black, so the tier
+   belongs to the same dark plane as the hero, the B2B band and the footer. */
 .pricing-tier--featured {
   background:
-    radial-gradient(900px 420px at 20% -10%, rgba(96, 165, 250, 0.16), transparent 55%),
-    linear-gradient(150deg, #0B1220 0%, #0F172A 55%, #101E3F 100%);
+    radial-gradient(110% 160% at 0% 0%, rgba(37, 99, 235, 0.3), transparent 60%),
+    linear-gradient(112deg, var(--surface-navy-panel) 0%, #0a2358 48%, var(--surface-navy) 100%);
 }
 
 .mock-corporate {

@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
+import PrimaryCTA from "./_primitives/PrimaryCTA";
 
 export default function NetworkingHub({ language }: { language: Language }) {
   const { ui, providers } = CONTENT[language];
@@ -20,7 +20,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
           aria-hidden="true"
         />
       </div>
-      <div className="absolute inset-0 z-[1] bg-blue-950/85" />
+      <div className="networking-overlay absolute inset-0 z-[1]" aria-hidden="true" />
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12">
@@ -32,16 +32,14 @@ export default function NetworkingHub({ language }: { language: Language }) {
               <h2 className="font-oswald text-3xl sm:text-4xl font-bold text-white leading-[1.15] mb-4">
                 {ui.networkingTitle}
               </h2>
-              <p className="text-blue-100/80 max-w-lg text-base leading-relaxed mb-6">
-                {ui.networkingDesc}
-              </p>
+              <p className="networking-lead max-w-lg mb-6">{ui.networkingDesc}</p>
             </ScrollReveal>
 
             <ScrollReveal delay={100}>
               <div className="grid grid-cols-2 gap-3 mb-8">
                 {ui.networkingFeatures.map((item, index) => (
-                  <div key={index} className="flex items-center gap-2 text-sm text-white/80">
-                    <PremiumCheck index={index} className="w-4 h-4 text-blue-300 flex-shrink-0" />
+                  <div key={index} className="networking-feature">
+                    <PremiumCheck index={index} className="networking-feature-check" />
                     {item}
                   </div>
                 ))}
@@ -49,35 +47,25 @@ export default function NetworkingHub({ language }: { language: Language }) {
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <a
-                href={EVENTBRITE_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-white text-blue-800 px-6 py-3 rounded-full font-bold text-sm hover:bg-blue-50 transition-colors shadow-md"
-              >
-                {ui.networkingCTA} <ArrowRight className="w-4 h-4" />
-              </a>
+              <PrimaryCTA href={EVENTBRITE_URL} external size="md">
+                {ui.networkingCTA}
+              </PrimaryCTA>
             </ScrollReveal>
           </div>
 
           <div className="md:w-2/5">
             <ScrollReveal delay={150}>
-              <span className="inline-block text-[10px] text-blue-300/70 tracking-widest font-semibold uppercase mb-2">
+              <span className="networking-label networking-label--sub mb-2">
                 {ui.providersLabel}
               </span>
-              <h3 className="font-oswald text-xl font-bold text-white mb-3">
-                {ui.providersTitle}
-              </h3>
-              <p className="text-blue-100/70 text-sm leading-relaxed mb-5">
+              <h3 className="networking-subtitle">{ui.providersTitle}</h3>
+              <p className="networking-lead networking-lead--sm mb-5">
                 {ui.providersDesc}
               </p>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="provider-chip-grid">
                 {providers.map((provider, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center gap-2 p-3 rounded-xl bg-blue-950/70 border border-white/15 text-sm font-medium text-white/80 hover:border-blue-300/50 transition-colors"
-                  >
-                    <PremiumCheck index={index} className="w-4 h-4 text-blue-300 flex-shrink-0" />
+                  <div key={index} className="provider-chip">
+                    <PremiumCheck index={index} className="provider-chip-check" />
                     {provider.title}
                   </div>
                 ))}
