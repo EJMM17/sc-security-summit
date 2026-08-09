@@ -429,13 +429,13 @@ export const UI_TEXT = {
 
 export const HERO_STATS = {
   es: [
-    { number: "1", suffix: "", label: "Día de formación especializada" },
-    { number: "5", suffix: "", label: "Especialistas con experiencia en la industria" },
+    { number: "1", suffix: "", label: "Día de formación" },
+    { number: "5", suffix: "", label: "Especialistas de la industria" },
     { number: "500", suffix: "+", label: "Lugares disponibles" },
   ],
   en: [
-    { number: "1", suffix: "", label: "Day of specialized training" },
-    { number: "5", suffix: "", label: "Specialists with industry experience" },
+    { number: "1", suffix: "", label: "Day of training" },
+    { number: "5", suffix: "", label: "Industry specialists" },
     { number: "500", suffix: "+", label: "Available seats" },
   ],
 } as const;

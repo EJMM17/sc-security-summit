@@ -3565,9 +3565,15 @@ body {
   background: var(--surface-navy);
 }
 
+/* The photograph is a trade-show floor: booth signage inside it ("Pasillo B",
+   exhibitor names) renders as readable text and competed with the headline for
+   the same reading attention. A small blur turns it back into texture without
+   losing the sense of place. The slight scale hides the transparent edge the
+   blur kernel samples at the frame border. */
 .hero-production .hero-background-image {
   z-index: -2;
-  filter: saturate(0.82) contrast(1.04);
+  filter: saturate(0.78) contrast(1.02) blur(3px);
+  transform: scale(1.05);
 }
 
 .hero-production .hero-image-overlay {
@@ -3576,6 +3582,9 @@ body {
   z-index: -1;
   background:
     radial-gradient(115% 75% at 50% 12%, rgba(37, 99, 235, 0.2), transparent 58%),
+    /* Central scrim: keeps the type column on a calm field while the photo
+       stays visible toward the edges. */
+    radial-gradient(70% 58% at 50% 46%, rgba(4, 17, 46, 0.62), transparent 78%),
     linear-gradient(180deg, rgba(4, 19, 53, 0.95), rgba(9, 38, 93, 0.9) 48%, rgba(5, 21, 55, 0.97)),
     radial-gradient(95% 62% at 50% 104%, rgba(3, 12, 35, 0.8), transparent 72%);
 }
@@ -3616,7 +3625,7 @@ body {
 .hero-production .hero-description {
   max-width: 38rem;
   margin: calc(var(--hero-stack-gap) * 1.35) auto 0;
-  color: rgba(219, 234, 254, 0.82);
+  color: rgba(226, 240, 254, 0.9);
   font-size: clamp(0.98rem, 1.45vw, 1.18rem);
   line-height: 1.65;
   text-wrap: pretty;
@@ -3627,9 +3636,9 @@ body {
    the two paragraphs never compete. */
 .hero-topics {
   max-width: 42rem;
-  margin: calc(var(--hero-stack-gap) * 0.55) auto 0;
-  color: rgba(219, 234, 254, 0.66);
-  font-size: clamp(0.78rem, 1.05vw, 0.9rem);
+  margin: calc(var(--hero-stack-gap) * 0.75) auto 0;
+  color: rgba(219, 234, 254, 0.78);
+  font-size: clamp(0.8rem, 1.05vw, 0.92rem);
   line-height: 1.6;
   letter-spacing: 0.04em;
   text-wrap: pretty;
@@ -3680,31 +3689,56 @@ body {
   font-weight: 700;
 }
 
+/* Captions are short enough to hold one or two lines, so the three columns
+   share a baseline instead of running 3/3/1 lines and reading as a ragged
+   block. `min-height` reserves the two-line box so the numerals above stay on
+   one optical row whatever the language does. */
 .hero-stat-grid dd {
   display: flex;
-  max-width: 17ch;
+  min-height: 2.9em;
+  max-width: 15ch;
   margin-top: 0;
   align-items: flex-start;
   justify-content: center;
-  color: rgba(191, 219, 254, 0.62);
-  font-size: 0.6rem;
+  color: rgba(203, 225, 255, 0.74);
+  font-size: 0.655rem;
   font-weight: 700;
-  letter-spacing: 0.13em;
-  line-height: 1.4;
+  letter-spacing: 0.1em;
+  line-height: 1.45;
   text-transform: uppercase;
   text-wrap: balance;
 }
 
 /* Date/venue stack above a centred countdown — one vertical axis instead of
-   two competing glass boxes side by side. */
+   two competing glass boxes side by side.
+   The cluster opens the logistics band, so it carries the separator that
+   divides "what this is" (claim, description, proof figures) from "when and
+   where". Without it the tracked stat captions sat ~15px under the venue line
+   and the two unrelated groups read as one crowded paragraph. */
 .hero-event-cluster {
   display: flex;
   width: min(100%, 60rem);
-  margin-top: calc(var(--hero-stack-gap) * 1.25);
+  margin-top: calc(var(--hero-stack-gap) * 2.1);
   flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: clamp(0.7rem, 1.5vh, 1.15rem);
+}
+
+/* A hairline that fades at both ends, rather than a hard rule: it marks the
+   band without drawing a box across the composition. */
+.hero-event-cluster::before {
+  content: "";
+  width: min(100%, 30rem);
+  height: 1px;
+  margin-bottom: calc(var(--hero-stack-gap) * 0.6);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(147, 197, 253, 0.3) 22%,
+    rgba(147, 197, 253, 0.3) 78%,
+    transparent
+  );
 }
 
 .hero-event-facts {
@@ -4849,10 +4883,12 @@ body {
     padding: 2.25rem 1rem 2.75rem;
   }
 
+  /* 15ch forced "SECURITY" onto a line of its own; the prefix now holds two
+     balanced lines above the coloured subject. */
   .hero-production .hero-title {
-    max-width: 15ch;
-    font-size: clamp(2.15rem, 10vw, 2.75rem);
-    line-height: 0.98;
+    max-width: 19ch;
+    font-size: clamp(2.1rem, 9.8vw, 2.7rem);
+    line-height: 1;
   }
 
   .hero-production .hero-description {
@@ -4875,9 +4911,14 @@ body {
     font-size: 2rem;
   }
 
+  /* 0.5rem uppercase was below comfortable reading size on a phone. The `ch`
+     cap is dropped here so the grid column governs the measure — at 13ch the
+     Spanish "ESPECIALISTAS DE LA INDUSTRIA" balanced onto three lines and
+     broke the shared caption height the other two columns keep. */
   .hero-stat-grid dd {
-    font-size: 0.5rem;
-    letter-spacing: 0.075em;
+    max-width: none;
+    font-size: 0.575rem;
+    letter-spacing: 0.07em;
   }
 
   /* The venue string wraps on a narrow phone, so the two facts stay stacked
@@ -4929,12 +4970,19 @@ body {
     gap: 0.55rem;
   }
 
+  /* The two buttons share the row, so the label has to survive the longer
+     Spanish string ("CONSEGUIR ACCESOS") on one line — at 0.66rem it wrapped
+     and only one of the pair grew a second line. */
+  /* `flex: 1 1 auto` rather than `1 1 0`: the basis is the label's own width,
+     so neither button can be squeezed narrower than its text and the pair
+     still divides the leftover width between them. */
   .hero-actions > * {
     width: auto;
-    min-width: 0;
-    flex: 1 1 0;
-    padding-inline: 0.75rem;
-    font-size: 0.66rem;
+    flex: 1 1 auto;
+    padding-inline: 0.7rem;
+    font-size: 0.615rem;
+    letter-spacing: 0.045em;
+    white-space: nowrap;
   }
 
   .final-cta-production h2 span {
