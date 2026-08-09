@@ -49,9 +49,21 @@ Cada ponente tiene una imagen web optimizada y una fuente de mayor resolución:
 
 ### Presentadores
 
-- `presenter-lanz-logistics.png`
-- `presenter-iies.png`
-- `presenter-villa-florida.png`
+Las versiones en blanco (`presenter-*.png`) que usaba el hero quedaron
+retiradas. La sección `#presentadores` usa los logos a color, en
+`public/images/presenters/`, con fondo blanco plano y sin margen sobrante
+(el fondo original venía en `#f7f7f7` con ruido de compresión; se normalizó
+a blanco puro para que la caja del logo se funda con la tarjeta):
+
+- `lanz-logistics.png`
+- `villa-florida.png`
+- `iies.png`
+- `blanquita.png`
+- `laboratorios-eloisa.png`
+
+Cada archivo se enlaza desde `PRESENTERS` en `lib/content.ts`. Un presentador
+con `logo: null` se muestra como wordmark tipográfico hasta que su archivo
+exista, para no publicar imágenes rotas.
 
 ## Reglas para reemplazos
 

@@ -5,24 +5,6 @@ import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
 
-const PRESENTER_LOGOS = [
-  {
-    src: "/images/presenter-lanz-logistics.png",
-    alt: "Lanz Logistics",
-    className: "is-standard",
-  },
-  {
-    src: "/images/presenter-iies.png",
-    alt: "Instituto Internacional de Estudios Superiores",
-    className: "is-iies",
-  },
-  {
-    src: "/images/presenter-villa-florida.png",
-    alt: "Parque Industrial Villa Florida",
-    className: "is-wide",
-  },
-] as const;
-
 export default function Hero({ language }: { language: Language }) {
   const { ui, heroStats } = CONTENT[language];
 
@@ -48,23 +30,6 @@ export default function Hero({ language }: { language: Language }) {
         <p className="hero-description">{ui.heroDescription}</p>
 
         <p className="hero-topics">{ui.heroTopics}</p>
-
-        <div className="hero-presenters" aria-label={ui.presentedBy}>
-          <span>{ui.presentedBy}</span>
-          <div className="hero-presenter-logos">
-            {PRESENTER_LOGOS.map((logo) => (
-              <div key={logo.src} className={`hero-presenter-logo ${logo.className}`}>
-                <Image
-                  src={logo.src}
-                  alt={logo.alt}
-                  fill
-                  sizes="(max-width: 640px) 150px, 220px"
-                  className="object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        </div>
 
         <dl className="hero-stat-grid">
           {heroStats.map((stat) => (

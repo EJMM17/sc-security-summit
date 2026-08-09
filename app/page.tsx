@@ -15,6 +15,7 @@ import Hero from "./(marketing)/_components/Hero";
 import Location from "./(marketing)/_components/Location";
 import NetworkingHub from "./(marketing)/_components/NetworkingHub";
 import Pillars from "./(marketing)/_components/Pillars";
+import Presenters from "./(marketing)/_components/Presenters";
 import Pricing from "./(marketing)/_components/Pricing";
 import Registro from "./(marketing)/_components/Registro";
 import Speakers from "./(marketing)/_components/Speakers";
@@ -220,6 +221,7 @@ export default async function Home({
         <Hero language={language} />
         <WhyAttend language={language} />
         <Pillars language={language} />
+        <Presenters language={language} />
         <Speakers language={language} />
         <NetworkingHub language={language} />
         <Agenda language={language} />
