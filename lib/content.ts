@@ -90,6 +90,10 @@ export const UI_TEXT = {
     heroAgendaBtn: "VER PROGRAMA",
     sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
+    presentersLabel: "PRESENTADORES",
+    presentersTitle: "Las organizaciones que hacen posible el Summit",
+    presentersDesc:
+      "Empresas e instituciones de la región que presentan el 1er Summit de Seguridad en la Cadena de Suministros.",
     whyAttendLabel: "NO ES UNA EXPO",
     whyAttendTitle: "Es formación para quienes protegen la operación",
     whyAttendDesc:
@@ -262,6 +266,10 @@ export const UI_TEXT = {
     heroAgendaBtn: "VIEW PROGRAM",
     sponsorBtn: "SPONSOR THE EVENT",
     presentedBy: "Presented by",
+    presentersLabel: "PRESENTERS",
+    presentersTitle: "The organizations that make the Summit possible",
+    presentersDesc:
+      "Companies and institutions from the region presenting the 1st Supply Chain Security Summit.",
     whyAttendLabel: "THIS IS NOT AN EXPO",
     whyAttendTitle: "Training for those who protect the operation",
     whyAttendDesc:
@@ -578,6 +586,32 @@ export const PILARES = {
     },
   ],
 } as const;
+
+/** Organizations presenting the Summit.
+ *
+ * Brand names are not translated, so the list is shared by both languages.
+ * `logo` points at the full-color asset in `public/images/presenters/`; the
+ * previous white-knockout versions used by the hero are retired. A presenter
+ * with `logo: null` renders as a typographic wordmark, so a pending asset
+ * never ships as a broken image. */
+export type Presenter = {
+  readonly name: string;
+  readonly logo: string | null;
+  /** Aspect ratio (width / height) used to size the logo box. */
+  readonly ratio: number;
+};
+
+export const PRESENTERS: readonly Presenter[] = [
+  { name: "Lanz Logistics", logo: null, ratio: 1.78 },
+  { name: "Parque Industrial Villa Florida", logo: null, ratio: 3.08 },
+  {
+    name: "Instituto Internacional de Estudios Superiores",
+    logo: null,
+    ratio: 1.66,
+  },
+  { name: "Blanquita Agua Purificada", logo: null, ratio: 2.84 },
+  { name: "Laboratorios Eloisa", logo: null, ratio: 3.06 },
+] as const;
 
 export const SPEAKERS = {
   es: [
@@ -1269,6 +1303,7 @@ export const CONTENT = {
     ui: UI_TEXT.es,
     heroStats: HERO_STATS.es,
     pillars: PILARES.es,
+    presenters: PRESENTERS,
     speakers: SPEAKERS.es,
     agenda: AGENDA.es,
     attendees: ASISTENTES.es,
@@ -1287,6 +1322,7 @@ export const CONTENT = {
     ui: UI_TEXT.en,
     heroStats: HERO_STATS.en,
     pillars: PILARES.en,
+    presenters: PRESENTERS,
     speakers: SPEAKERS.en,
     agenda: AGENDA.en,
     attendees: ASISTENTES.en,
