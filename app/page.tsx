@@ -220,8 +220,8 @@ export default async function Home({
         <Hero language={language} />
         <WhyAttend language={language} />
         <Pillars language={language} />
-        <NetworkingHub language={language} />
         <Speakers language={language} />
+        <NetworkingHub language={language} />
         <Agenda language={language} />
         <Gallery language={language} />
         <Value language={language} />
