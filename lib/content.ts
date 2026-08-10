@@ -188,30 +188,6 @@ export const UI_TEXT = {
     sponsorSlotsLabel: "cupos exclusivos",
     sponsorBenefitsLabel: "beneficios incluidos",
     sponsorExclusiveBadge: "Experiencia Élite",
-    sponsorImpactLabel: "PRESENCIA DE MARCA 360°",
-    sponsorImpactTitle: "Tu marca presente en cada momento clave",
-    sponsorImpactMoments: [
-      {
-        title: "Antes",
-        detail:
-          "Campaña de difusión en redes y mailing, más tu marca en flyers, banners, señalética y sitio web.",
-      },
-      {
-        title: "Durante",
-        detail:
-          "Presentación comercial de 10 minutos en el Business Hub, stand con coffee break y reel en pantallas oficiales.",
-      },
-      {
-        title: "Después",
-        detail:
-          "Directorio de contactos autorizados para seguimiento y capacitación in company de 4 horas con constancias DC-3.",
-      },
-    ],
-    sponsorImpactStats: [
-      { number: "10 min", label: "presentación exclusiva" },
-      { number: "10", label: "accesos VIP" },
-      { number: "4 h", label: "capacitación in company" },
-    ],
     sponsorRecommendedBadge: "Más Solicitado",
     sponsorStandLabel: "Stand",
     locationLabel: "SEDE DEL EVENTO",
@@ -388,30 +364,6 @@ export const UI_TEXT = {
     sponsorSlotsLabel: "exclusive slots",
     sponsorBenefitsLabel: "benefits included",
     sponsorExclusiveBadge: "Elite Experience",
-    sponsorImpactLabel: "360° BRAND PRESENCE",
-    sponsorImpactTitle: "Your brand at every key moment",
-    sponsorImpactMoments: [
-      {
-        title: "Before",
-        detail:
-          "Social media and email campaign, plus your brand on flyers, banners, signage and the event website.",
-      },
-      {
-        title: "During",
-        detail:
-          "A 10-minute commercial presentation in the Business Hub, a booth with coffee break service and your reel on official screens.",
-      },
-      {
-        title: "After",
-        detail:
-          "Authorized contact directory for follow-up and 4 hours of in-company training with DC-3 certificates.",
-      },
-    ],
-    sponsorImpactStats: [
-      { number: "10 min", label: "exclusive presentation" },
-      { number: "10", label: "VIP passes" },
-      { number: "4 h", label: "in-company training" },
-    ],
     sponsorRecommendedBadge: "Most Requested",
     sponsorStandLabel: "Booth",
     locationLabel: "EVENT VENUE",

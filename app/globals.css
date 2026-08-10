@@ -4575,116 +4575,6 @@ body {
   max-width: 31rem;
 }
 
-.sponsor-impact-block {
-  margin-top: 2rem;
-  padding: clamp(1.25rem, 3vw, 1.75rem);
-  border: 1px solid color-mix(in srgb, var(--summit-blue-bright) 18%, var(--line));
-  border-radius: var(--r-lg);
-  background: linear-gradient(145deg, #f8fbff, #eef5ff);
-}
-
-.sponsor-impact-heading {
-  display: flex;
-  align-items: center;
-  gap: 0.9rem;
-}
-
-.sponsor-impact-heading small,
-.sponsor-impact-heading strong {
-  display: block;
-}
-
-.sponsor-impact-heading small {
-  color: var(--text-faint);
-  font-size: 0.62rem;
-  font-weight: 750;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.sponsor-impact-heading strong {
-  margin-top: 0.2rem;
-  color: var(--text-title);
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 1.1rem;
-  font-weight: 650;
-  line-height: 1.2;
-}
-
-/* One column at every width: the block lives in the narrow copy column of
-   `.sponsor-production-grid`, so three columns left each moment about 130px and
-   broke the sentences into eight-line slivers on desktop. */
-.sponsor-moment-track {
-  display: grid;
-  margin-top: 1.35rem;
-  border-top: 1px solid var(--line);
-}
-
-.sponsor-moment-track li {
-  padding: 1rem 0 0.9rem;
-}
-
-.sponsor-moment-track li:last-child {
-  padding-bottom: 0.25rem;
-}
-
-.sponsor-moment-track li + li {
-  border-top: 1px solid var(--line);
-}
-
-.sponsor-moment-track li > span {
-  color: var(--summit-blue-bright);
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-}
-
-.sponsor-moment-track h3 {
-  margin-top: 0.2rem;
-  color: var(--text-title);
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 1rem;
-  font-weight: 650;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-
-.sponsor-moment-track p {
-  margin-top: 0.4rem;
-  color: var(--text-body);
-  font-size: 0.8rem;
-  line-height: 1.5;
-}
-
-.sponsor-impact-stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  margin-top: 1rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-}
-
-.sponsor-impact-stats div {
-  padding: 0.9rem 0.65rem;
-  text-align: center;
-}
-
-.sponsor-impact-stats div + div { border-left: 1px solid var(--line); }
-.sponsor-impact-stats dt {
-  color: var(--summit-blue);
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-.sponsor-impact-stats dd {
-  margin-top: 0.15rem;
-  color: var(--text-faint);
-  font-size: 0.62rem;
-  line-height: 1.25;
-}
-
 .sponsor-tier-summary {
   display: flex;
   margin-top: 1.7rem;
@@ -5021,14 +4911,6 @@ body {
     align-items: flex-start;
     flex-direction: column;
   }
-
-  .sponsor-impact-stats div {
-    padding: 0.85rem 0.5rem;
-  }
-
-  .sponsor-impact-stats dd {
-    font-size: 0.7rem;
-  }
 }
 
 @media (max-width: 480px) {
@@ -5162,17 +5044,6 @@ body {
   .final-cta-facts div + div {
     padding-top: 1rem;
     border-top: 1px solid var(--on-navy-line);
-    border-left: 0;
-  }
-
-  /* Three columns forced "capacitación in company" onto three cramped lines at
-     this width, so the sponsorship figures stack and each keeps one measure. */
-  .sponsor-impact-stats {
-    grid-template-columns: 1fr;
-  }
-
-  .sponsor-impact-stats div + div {
-    border-top: 1px solid var(--line);
     border-left: 0;
   }
 }

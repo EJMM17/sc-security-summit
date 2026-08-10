@@ -1,4 +1,4 @@
-import { ArrowRight, Check, Sparkles, Zap } from "lucide-react";
+import { ArrowRight, Check, Sparkles } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
@@ -18,36 +18,6 @@ export default function Sponsors({ language }: { language: Language }) {
             <span className="section-label">{ui.sponsorsLabel}</span>
             <h2 className="section-title mt-3">{ui.sponsorsTitle}</h2>
             <p className="section-desc mt-5">{ui.sponsorsDesc}</p>
-
-            <div className="sponsor-impact-block">
-              <div className="sponsor-impact-heading">
-                <span className="mock-icon-box" aria-hidden="true">
-                  <Zap />
-                </span>
-                <div>
-                  <small>{ui.sponsorImpactLabel}</small>
-                  <strong>{ui.sponsorImpactTitle}</strong>
-                </div>
-              </div>
-              <ol className="sponsor-moment-track">
-                {ui.sponsorImpactMoments.map((moment, index) => (
-                  <li key={moment.title}>
-                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
-                    <h3>{moment.title}</h3>
-                    <p>{moment.detail}</p>
-                  </li>
-                ))}
-              </ol>
-            </div>
-
-            <dl className="sponsor-impact-stats">
-              {ui.sponsorImpactStats.map((stat) => (
-                <div key={stat.label}>
-                  <dt>{stat.number}</dt>
-                  <dd>{stat.label}</dd>
-                </div>
-              ))}
-            </dl>
 
             <div className="sponsor-tier-summary">
               <div className="mock-icon-box" aria-hidden="true">
