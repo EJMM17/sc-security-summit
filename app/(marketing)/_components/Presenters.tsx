@@ -26,30 +26,41 @@ export default function Presenters({ language }: { language: Language }) {
         </ScrollReveal>
 
         <ScrollReveal delay={120}>
-          <ul className="presenter-logo-grid" aria-label={ui.presentedBy}>
-            {presenters.map((presenter) => (
-              <li key={presenter.name} className="presenter-logo-card">
-                {presenter.logo ? (
-                  <div
-                    className="presenter-logo-frame"
-                    style={{ aspectRatio: presenter.ratio }}
-                  >
-                    <Image
-                      src={presenter.logo}
-                      alt={presenter.name}
-                      fill
-                      sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
-                      className="object-contain"
-                    />
-                  </div>
-                ) : (
-                  /* Full-colour asset still pending: a wordmark keeps the
+          <div className="presenter-logo-stage">
+            <span
+              className="presenter-stage-glow presenter-stage-glow--left"
+              aria-hidden="true"
+            />
+            <span
+              className="presenter-stage-glow presenter-stage-glow--right"
+              aria-hidden="true"
+            />
+            <ul className="presenter-logo-grid" aria-label={ui.presentedBy}>
+              {presenters.map((presenter, index) => (
+                <li
+                  key={presenter.name}
+                  className="presenter-logo-card"
+                  data-featured={index === 0 ? "true" : undefined}
+                >
+                  {presenter.logo ? (
+                    <div className="presenter-logo-frame">
+                      <Image
+                        src={presenter.logo}
+                        alt={presenter.name}
+                        fill
+                        sizes="(max-width: 640px) 45vw, (max-width: 1024px) 30vw, 220px"
+                        className="object-contain"
+                      />
+                    </div>
+                  ) : (
+                    /* Full-colour asset still pending: a wordmark keeps the
                      lineup complete instead of shipping a broken image. */
-                  <span className="presenter-wordmark">{presenter.name}</span>
-                )}
-              </li>
-            ))}
-          </ul>
+                    <span className="presenter-wordmark">{presenter.name}</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
         </ScrollReveal>
       </div>
     </section>
