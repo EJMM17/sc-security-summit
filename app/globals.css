@@ -6955,25 +6955,78 @@ h3,
 }
 
 /* ═══ PRESENTADORES ═══
-   The presenting organizations used to sit inside the hero as white-knockout
-   marks, which forced every brand into a single colour and competed with the
-   headline. They now own a compact band of their own just before the
-   specialists, where the full-colour logos can be read as themselves. Each
-   logo keeps its native aspect ratio inside a fixed-height frame, so a wide
-   wordmark and a squarer emblem carry the same optical weight without any
-   per-brand sizing rules. */
+   One shared, softly branded stage lets five very different full-colour marks
+   coexist as a single group. The cells use separators rather than five
+   unrelated floating cards, while a fixed logo canvas gives every mark equal
+   optical weight without distorting it. */
+.presenters-section {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      circle at 8% 72%,
+      color-mix(in srgb, var(--cyan) 8%, transparent) 0,
+      transparent 25rem
+    ),
+    radial-gradient(
+      circle at 92% 18%,
+      color-mix(in srgb, var(--blue) 7%, transparent) 0,
+      transparent 27rem
+    ),
+    var(--surface);
+}
+
 .presenters-section .mock-section-intro {
   margin-bottom: clamp(2rem, 4vw, 3rem);
 }
 
+.presenter-logo-stage {
+  position: relative;
+  isolation: isolate;
+  max-width: 74rem;
+  margin-inline: auto;
+  padding: clamp(0.45rem, 1vw, 0.7rem);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--blue) 14%, var(--line));
+  border-radius: clamp(1.25rem, 3vw, 2rem);
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow:
+    0 1.5rem 4rem rgba(15, 35, 72, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.presenter-stage-glow {
+  position: absolute;
+  z-index: -1;
+  width: 12rem;
+  aspect-ratio: 1;
+  border-radius: 999px;
+  opacity: 0.14;
+  filter: blur(3rem);
+  pointer-events: none;
+}
+
+.presenter-stage-glow--left {
+  bottom: -7rem;
+  left: -5rem;
+  background: var(--cyan);
+}
+
+.presenter-stage-glow--right {
+  top: -8rem;
+  right: -4rem;
+  background: var(--blue);
+}
+
 .presenter-logo-grid {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(1rem, 2.5vw, 1.75rem);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
   margin: 0;
   padding: 0;
+  overflow: hidden;
+  border-radius: calc(clamp(1.25rem, 3vw, 2rem) - 0.45rem);
+  background: color-mix(in srgb, var(--blue) 11%, var(--line));
   list-style: none;
 }
 
@@ -6981,29 +7034,31 @@ h3,
   display: flex;
   align-items: center;
   justify-content: center;
-  width: clamp(9.5rem, 20vw, 13rem);
-  min-height: 6.5rem;
+  min-width: 0;
+  min-height: clamp(7rem, 20vw, 8.25rem);
   box-sizing: border-box;
-  padding: 1.25rem 1.5rem;
-  border: 1px solid var(--line);
-  border-radius: var(--r-md);
-  background: var(--surface);
-  box-shadow: var(--elev-1);
+  padding: clamp(1.15rem, 3vw, 1.75rem);
+  background: color-mix(in srgb, var(--surface) 97%, var(--blue));
   transition:
-    transform var(--dur) var(--ease-out),
-    border-color var(--dur) var(--ease-out),
+    background-color var(--dur) var(--ease-out),
     box-shadow var(--dur) var(--ease-out);
 }
 
 .presenter-logo-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--line-accent);
+  z-index: 1;
+  background: var(--surface);
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--cyan) 70%, var(--blue));
 }
 
 .presenter-logo-frame {
   position: relative;
   width: 100%;
-  max-height: 4rem;
+  height: clamp(3.75rem, 10vw, 4.75rem);
+  transition: transform var(--dur) var(--ease-out);
+}
+
+.presenter-logo-card:hover .presenter-logo-frame {
+  transform: scale(1.035);
 }
 
 /* Fallback while a full-colour asset is pending: a typographic mark keeps the
@@ -7018,28 +7073,38 @@ h3,
   text-wrap: balance;
 }
 
-/* The five presenters read as one lineup, so on desktop they share a single
-   row of equal cells rather than wrapping four-plus-one orphan. */
-@media (min-width: 1024px) {
+/* Lanz opens the mobile composition as its visual anchor; the remaining four
+   marks then form a balanced two-by-two matrix instead of leaving an orphan. */
+@media (max-width: 639px) {
+  .presenter-logo-card[data-featured="true"] {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023px) {
   .presenter-logo-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 
   .presenter-logo-card {
-    width: 100%;
+    grid-column: span 2;
+  }
+
+  .presenter-logo-card:nth-child(4) {
+    grid-column: 2 / span 2;
+  }
+}
+
+@media (min-width: 1024px) {
+  .presenter-logo-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 640px) {
-  .presenter-logo-grid {
-    gap: 0.75rem;
-  }
-
   .presenter-logo-card {
-    width: calc(50% - 0.375rem);
-    min-height: 5.5rem;
-    padding: 1rem;
+    min-height: 7rem;
+    padding: 1rem 1.1rem;
   }
 
   .presenter-wordmark {
@@ -7053,6 +7118,10 @@ h3,
   }
 
   .presenter-logo-card:hover {
+    box-shadow: none;
+  }
+
+  .presenter-logo-card:hover .presenter-logo-frame {
     transform: none;
   }
 }
