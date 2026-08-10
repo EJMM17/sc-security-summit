@@ -4575,103 +4575,86 @@ body {
   max-width: 31rem;
 }
 
-.sponsor-impact-stage {
-  position: relative;
-  display: grid;
-  min-height: 17rem;
+.sponsor-impact-block {
   margin-top: 2rem;
-  place-items: center;
-  overflow: hidden;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
   border: 1px solid color-mix(in srgb, var(--summit-blue-bright) 18%, var(--line));
   border-radius: var(--r-lg);
-  background:
-    radial-gradient(circle at 50% 50%, rgba(37, 99, 235, 0.13), transparent 31%),
-    linear-gradient(145deg, #f8fbff, #eef5ff);
-  isolation: isolate;
+  background: linear-gradient(145deg, #f8fbff, #eef5ff);
 }
 
-.sponsor-impact-stage::before,
-.sponsor-impact-stage::after {
-  position: absolute;
-  content: "";
-  border: 1px solid rgba(37, 99, 235, 0.15);
-  border-radius: 50%;
-}
-
-.sponsor-impact-stage::before {
-  width: 15rem;
-  aspect-ratio: 1;
-}
-
-.sponsor-impact-stage::after {
-  width: 10.5rem;
-  aspect-ratio: 1;
-  border-style: dashed;
-  animation: sponsor-orbit-spin 24s linear infinite reverse;
-}
-
-.sponsor-impact-core {
-  position: relative;
-  z-index: 2;
+.sponsor-impact-heading {
   display: flex;
-  width: 8.4rem;
-  aspect-ratio: 1;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  border-radius: 50%;
-  color: white;
-  text-align: center;
-  background: linear-gradient(145deg, var(--summit-ink), var(--summit-blue));
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22), 0 0 0 8px rgba(255, 255, 255, 0.74);
+  gap: 0.9rem;
 }
 
-.sponsor-impact-core svg {
-  width: 1.15rem;
-  margin-bottom: 0.45rem;
-  color: var(--cyan-400);
+.sponsor-impact-heading small,
+.sponsor-impact-heading strong {
+  display: block;
 }
 
-.sponsor-impact-core small {
-  font-size: 0.53rem;
+.sponsor-impact-heading small {
+  color: var(--text-faint);
+  font-size: 0.62rem;
   font-weight: 750;
   letter-spacing: 0.1em;
-}
-
-.sponsor-impact-core strong {
-  margin-top: 0.25rem;
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.82rem;
-  line-height: 1.15;
-}
-
-.sponsor-impact-orbit {
-  position: absolute;
-  z-index: 3;
-  width: 13rem;
-  aspect-ratio: 1;
-  animation: sponsor-orbit-spin 24s linear infinite;
-}
-
-.sponsor-impact-orbit span {
-  --impact-angle: calc(var(--impact-index) * 120deg - 90deg);
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  padding: 0.42rem 0.7rem;
-  border: 1px solid rgba(37, 99, 235, 0.22);
-  border-radius: 999px;
-  color: var(--summit-blue);
-  font-size: 0.65rem;
-  font-weight: 750;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
-  white-space: nowrap;
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: var(--elev-1);
-  transform: translate(-50%, -50%) rotate(var(--impact-angle)) translateX(6.5rem) rotate(calc(-1 * var(--impact-angle)));
-  animation: sponsor-orbit-counter-spin 24s linear infinite;
+}
+
+.sponsor-impact-heading strong {
+  margin-top: 0.2rem;
+  color: var(--text-title);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.1rem;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+/* One column at every width: the block lives in the narrow copy column of
+   `.sponsor-production-grid`, so three columns left each moment about 130px and
+   broke the sentences into eight-line slivers on desktop. */
+.sponsor-moment-track {
+  display: grid;
+  margin-top: 1.35rem;
+  border-top: 1px solid var(--line);
+}
+
+.sponsor-moment-track li {
+  padding: 1rem 0 0.9rem;
+}
+
+.sponsor-moment-track li:last-child {
+  padding-bottom: 0.25rem;
+}
+
+.sponsor-moment-track li + li {
+  border-top: 1px solid var(--line);
+}
+
+.sponsor-moment-track li > span {
+  color: var(--summit-blue-bright);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.sponsor-moment-track h3 {
+  margin-top: 0.2rem;
+  color: var(--text-title);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1rem;
+  font-weight: 650;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.sponsor-moment-track p {
+  margin-top: 0.4rem;
+  color: var(--text-body);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .sponsor-impact-stats {
@@ -4701,9 +4684,6 @@ body {
   font-size: 0.62rem;
   line-height: 1.25;
 }
-
-@keyframes sponsor-orbit-spin { to { transform: rotate(360deg); } }
-@keyframes sponsor-orbit-counter-spin { to { rotate: -360deg; } }
 
 .sponsor-tier-summary {
   display: flex;
@@ -5041,13 +5021,13 @@ body {
     align-items: flex-start;
     flex-direction: column;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .sponsor-impact-stage::after,
-  .sponsor-impact-orbit,
-  .sponsor-impact-orbit span {
-    animation: none;
+  .sponsor-impact-stats div {
+    padding: 0.85rem 0.5rem;
+  }
+
+  .sponsor-impact-stats dd {
+    font-size: 0.7rem;
   }
 }
 
@@ -5182,6 +5162,17 @@ body {
   .final-cta-facts div + div {
     padding-top: 1rem;
     border-top: 1px solid var(--on-navy-line);
+    border-left: 0;
+  }
+
+  /* Three columns forced "capacitación in company" onto three cramped lines at
+     this width, so the sponsorship figures stack and each keeps one measure. */
+  .sponsor-impact-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .sponsor-impact-stats div + div {
+    border-top: 1px solid var(--line);
     border-left: 0;
   }
 }
