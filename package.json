@@ -70,7 +70,7 @@
     "eslint-config-next": "15.5.22",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.10",
-    "supabase": "2.110.0",
+    "supabase": "2.112.0",
     "typescript": "^5",
     "vitest": "4.1.10"
   }
