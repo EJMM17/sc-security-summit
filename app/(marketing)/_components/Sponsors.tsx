@@ -1,5 +1,4 @@
 import { ArrowRight, Check, Sparkles, Zap } from "lucide-react";
-import type { CSSProperties } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
@@ -20,19 +19,25 @@ export default function Sponsors({ language }: { language: Language }) {
             <h2 className="section-title mt-3">{ui.sponsorsTitle}</h2>
             <p className="section-desc mt-5">{ui.sponsorsDesc}</p>
 
-            <div className="sponsor-impact-stage" aria-label={ui.sponsorImpactTitle}>
-              <div className="sponsor-impact-orbit" aria-hidden="true">
-                {ui.sponsorImpactPoints.map((point, index) => (
-                  <span key={point} style={{ "--impact-index": index } as CSSProperties}>
-                    {point}
-                  </span>
+            <div className="sponsor-impact-block">
+              <div className="sponsor-impact-heading">
+                <span className="mock-icon-box" aria-hidden="true">
+                  <Zap />
+                </span>
+                <div>
+                  <small>{ui.sponsorImpactLabel}</small>
+                  <strong>{ui.sponsorImpactTitle}</strong>
+                </div>
+              </div>
+              <ol className="sponsor-moment-track">
+                {ui.sponsorImpactMoments.map((moment, index) => (
+                  <li key={moment.title}>
+                    <span aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+                    <h3>{moment.title}</h3>
+                    <p>{moment.detail}</p>
+                  </li>
                 ))}
-              </div>
-              <div className="sponsor-impact-core">
-                <Zap aria-hidden="true" />
-                <small>{ui.sponsorImpactLabel}</small>
-                <strong>{ui.sponsorImpactTitle}</strong>
-              </div>
+              </ol>
             </div>
 
             <dl className="sponsor-impact-stats">

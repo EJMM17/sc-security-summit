@@ -176,7 +176,7 @@ export const UI_TEXT = {
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
     sponsorsTitle: "Lleva tu marca al siguiente nivel",
     sponsorsDesc:
-      "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con más de 300 tomadores de decisión y maximiza tu visibilidad ante la audiencia que importa.",
+      "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con tomadores de decisión de maquila, transporte, aduanas y compliance, y maximiza tu visibilidad ante la audiencia que importa.",
     sponsorRequestInfo: "Quiero ser patrocinador",
     sponsorFormLabel: "SOLICITUD DE PATROCINIO",
     sponsorFormTitle: "Hablemos de tu marca",
@@ -190,11 +190,27 @@ export const UI_TEXT = {
     sponsorExclusiveBadge: "Experiencia Élite",
     sponsorImpactLabel: "PRESENCIA DE MARCA 360°",
     sponsorImpactTitle: "Tu marca presente en cada momento clave",
-    sponsorImpactPoints: ["Antes", "Durante", "Después"],
+    sponsorImpactMoments: [
+      {
+        title: "Antes",
+        detail:
+          "Campaña de difusión en redes y mailing, más tu marca en flyers, banners, señalética y sitio web.",
+      },
+      {
+        title: "Durante",
+        detail:
+          "Presentación comercial de 10 minutos en el Business Hub, stand con coffee break y reel en pantallas oficiales.",
+      },
+      {
+        title: "Después",
+        detail:
+          "Directorio de contactos autorizados para seguimiento y capacitación in company de 4 horas con constancias DC-3.",
+      },
+    ],
     sponsorImpactStats: [
-      { number: "300+", label: "tomadores de decisión" },
       { number: "10 min", label: "presentación exclusiva" },
       { number: "10", label: "accesos VIP" },
+      { number: "4 h", label: "capacitación in company" },
     ],
     sponsorRecommendedBadge: "Más Solicitado",
     sponsorStandLabel: "Stand",
@@ -360,7 +376,7 @@ export const UI_TEXT = {
     sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
     sponsorsTitle: "Take Your Brand to the Next Level",
     sponsorsDesc:
-      "Position your company as a leader in supply chain security. Connect directly with over 300 decision makers and maximize your visibility before the audience that matters.",
+      "Position your company as a leader in supply chain security. Connect directly with decision makers from the maquiladora industry, transport, customs and compliance, and maximize your visibility before the audience that matters.",
     sponsorRequestInfo: "Become a Sponsor",
     sponsorFormLabel: "SPONSORSHIP REQUEST",
     sponsorFormTitle: "Let's Talk About Your Brand",
@@ -374,11 +390,27 @@ export const UI_TEXT = {
     sponsorExclusiveBadge: "Elite Experience",
     sponsorImpactLabel: "360° BRAND PRESENCE",
     sponsorImpactTitle: "Your brand at every key moment",
-    sponsorImpactPoints: ["Before", "During", "After"],
+    sponsorImpactMoments: [
+      {
+        title: "Before",
+        detail:
+          "Social media and email campaign, plus your brand on flyers, banners, signage and the event website.",
+      },
+      {
+        title: "During",
+        detail:
+          "A 10-minute commercial presentation in the Business Hub, a booth with coffee break service and your reel on official screens.",
+      },
+      {
+        title: "After",
+        detail:
+          "Authorized contact directory for follow-up and 4 hours of in-company training with DC-3 certificates.",
+      },
+    ],
     sponsorImpactStats: [
-      { number: "300+", label: "decision makers" },
       { number: "10 min", label: "exclusive presentation" },
       { number: "10", label: "VIP passes" },
+      { number: "4 h", label: "in-company training" },
     ],
     sponsorRecommendedBadge: "Most Requested",
     sponsorStandLabel: "Booth",
