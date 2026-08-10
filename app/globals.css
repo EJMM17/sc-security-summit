@@ -4903,8 +4903,10 @@ body {
     line-height: 1.55;
   }
 
+  /* Every pixel of column padding comes straight out of the caption's measure,
+     which is what decides whether it holds two lines or three. */
   .hero-stat-grid > div {
-    padding: 0.35rem 0.2rem;
+    padding: 0.35rem 0.1rem;
   }
 
   .hero-stat-grid dt {
@@ -4914,11 +4916,16 @@ body {
   /* 0.5rem uppercase was below comfortable reading size on a phone. The `ch`
      cap is dropped here so the grid column governs the measure — at 13ch the
      Spanish "ESPECIALISTAS DE LA INDUSTRIA" balanced onto three lines and
-     broke the shared caption height the other two columns keep. */
+     broke the shared caption height the other two columns keep.
+     `balance` is also dropped here: it minimises the longest line, so in a
+     column this narrow it preferred three short lines over two full ones and
+     the middle caption grew past the height its neighbours share. Natural
+     wrapping always yields the fewest lines. */
   .hero-stat-grid dd {
     max-width: none;
     font-size: 0.575rem;
-    letter-spacing: 0.07em;
+    letter-spacing: 0.05em;
+    text-wrap: pretty;
   }
 
   /* The venue string wraps on a narrow phone, so the two facts stay stacked
@@ -5023,14 +5030,21 @@ body {
   .hero-production-inner > .hero-stat-grid    { order: 7; }
 }
 
-/* ═══ SHORT-VIEWPORT HERO TIERS ═══
-   Width queries alone cannot keep the hero in frame: a 1366×768 laptop and a
-   375×667 phone are wide enough to miss the phone rules but too short to fit
-   the full stack, so the primary CTA landed 50–152px below the fold. These
-   tiers scale the fixed-size furniture — display type, partner logos, countdown
-   digits, value grid — by available height. Nothing is hidden; the same content
-   is simply proportioned to the viewport it has. */
-@media (max-height: 800px) {
+/* ═══ SHORT-VIEWPORT HERO TIERS (LANDSCAPE-ISH SCREENS ONLY) ═══
+   Width queries alone cannot keep the hero in frame: a 1366×768 laptop is wide
+   enough to miss the phone rules but too short to fit the full stack, so the
+   primary CTA landed below the fold. These tiers scale the fixed-size
+   furniture — display type, countdown digits, value grid — by available
+   height. Nothing is hidden; the same content is simply proportioned to the
+   viewport it has.
+
+   They are scoped to `min-width: 768px` because their type sizes are driven by
+   `vw`: on a 375×667 phone `clamp(1.7rem, 3.4vw, 2.5rem)` resolved to the
+   1.7rem floor, collapsing the headline to 27px — barely larger than the 14px
+   body copy running under it, which inverted the hierarchy and left the hero
+   with no display voice. Phones get their own short tier below, which
+   compresses the supporting stack instead of the headline. */
+@media (min-width: 768px) and (max-height: 800px) {
   .hero-production-inner {
     padding-block: clamp(0.6rem, 1.3vh, 1.1rem);
   }
@@ -5062,7 +5076,7 @@ body {
   }
 }
 
-@media (max-height: 700px) {
+@media (min-width: 768px) and (max-height: 700px) {
   .hero-production {
     --hero-stack-gap: clamp(0.4rem, 1.1vh, 0.8rem);
   }
@@ -5082,6 +5096,80 @@ body {
 
   .event-countdown strong {
     font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+  }
+}
+
+/* ═══ SHORT PHONES (375×667, 360×640) ═══
+   The same problem the laptop tiers solve, but the budget has to come from
+   somewhere else. On a phone the headline is the only element carrying display
+   weight, so shrinking it first is what broke the hierarchy. Here the headline
+   keeps a real display size and the space is reclaimed from the supporting
+   stack instead: frame padding, body measure, countdown furniture and the
+   rhythm token. The primary CTA stays above the fold in both languages. */
+@media (max-width: 767px) and (max-height: 720px) {
+  .hero-production {
+    --hero-stack-gap: clamp(0.35rem, 1vh, 0.7rem);
+  }
+
+  .hero-production-inner {
+    padding: 1.1rem 1rem 1.4rem;
+  }
+
+  .hero-production .hero-title {
+    font-size: clamp(1.9rem, 8.6vw, 2.35rem);
+  }
+
+  /* The two buttons stack in Spanish, so their height is the last 20px
+     standing between the primary CTA and the fold on a 360×640 screen.
+     3.05rem is 48.8px — still clear of the 44px touch-target floor the
+     coarse-pointer rules hold everything else to. */
+  .hero-actions {
+    gap: 0.45rem;
+  }
+
+  .hero-actions .primary-cta,
+  .hero-actions .hero-secondary-link {
+    min-height: 3.05rem;
+  }
+
+  .hero-production .hero-description {
+    margin-top: 0.6rem;
+    font-size: 0.855rem;
+    line-height: 1.45;
+  }
+
+  .hero-topics {
+    margin-top: 0.4rem;
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
+  .hero-event-cluster {
+    gap: 0.5rem;
+  }
+
+  .hero-event-cluster::before {
+    margin-bottom: 0.2rem;
+  }
+
+  .event-countdown {
+    gap: 0.3rem;
+  }
+
+  .event-countdown strong {
+    font-size: 1.6rem;
+  }
+
+  .event-countdown > div > div + div::before {
+    font-size: 1.15rem;
+  }
+
+  .event-countdown > div > div > span {
+    margin-top: 0.25rem;
+  }
+
+  .hero-stat-grid dt {
+    font-size: 1.7rem;
   }
 }
 
