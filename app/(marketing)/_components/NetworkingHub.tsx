@@ -4,6 +4,7 @@ import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
+import SummitIcon from "./_primitives/SummitIcon";
 
 export default function NetworkingHub({ language }: { language: Language }) {
   const { ui, providers } = CONTENT[language];
@@ -65,8 +66,13 @@ export default function NetworkingHub({ language }: { language: Language }) {
               <div className="provider-chip-grid">
                 {providers.map((provider, index) => (
                   <div key={index} className="provider-chip">
-                    <PremiumCheck index={index} className="provider-chip-check" />
-                    {provider.title}
+                    <span className="provider-chip-icon" aria-hidden="true">
+                      <SummitIcon name={provider.icon} />
+                    </span>
+                    <span>
+                      <small>{String(index + 1).padStart(2, "0")}</small>
+                      {provider.title}
+                    </span>
                   </div>
                 ))}
               </div>

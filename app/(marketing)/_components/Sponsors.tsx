@@ -1,4 +1,5 @@
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Sparkles, Zap } from "lucide-react";
+import type { CSSProperties } from "react";
 import ScrollReveal from "@/components/ScrollReveal";
 import SponsorInquiryForm from "@/components/SponsorInquiryForm";
 import { CONTENT } from "@/lib/content";
@@ -18,6 +19,30 @@ export default function Sponsors({ language }: { language: Language }) {
             <span className="section-label">{ui.sponsorsLabel}</span>
             <h2 className="section-title mt-3">{ui.sponsorsTitle}</h2>
             <p className="section-desc mt-5">{ui.sponsorsDesc}</p>
+
+            <div className="sponsor-impact-stage" aria-label={ui.sponsorImpactTitle}>
+              <div className="sponsor-impact-orbit" aria-hidden="true">
+                {ui.sponsorImpactPoints.map((point, index) => (
+                  <span key={point} style={{ "--impact-index": index } as CSSProperties}>
+                    {point}
+                  </span>
+                ))}
+              </div>
+              <div className="sponsor-impact-core">
+                <Zap aria-hidden="true" />
+                <small>{ui.sponsorImpactLabel}</small>
+                <strong>{ui.sponsorImpactTitle}</strong>
+              </div>
+            </div>
+
+            <dl className="sponsor-impact-stats">
+              {ui.sponsorImpactStats.map((stat) => (
+                <div key={stat.label}>
+                  <dt>{stat.number}</dt>
+                  <dd>{stat.label}</dd>
+                </div>
+              ))}
+            </dl>
 
             <div className="sponsor-tier-summary">
               <div className="mock-icon-box" aria-hidden="true">

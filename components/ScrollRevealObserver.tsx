@@ -36,10 +36,18 @@ export default function ScrollRevealObserver() {
       ),
     );
 
+    if (!("IntersectionObserver" in window)) {
+      for (const element of elements) element.classList.add("visible");
+      return;
+    }
+
     for (const element of elements) {
       if (element.classList.contains("visible")) continue;
 
-      const threshold = 0.15;
+      const configuredThreshold = Number(element.dataset.revealThreshold);
+      const threshold = Number.isFinite(configuredThreshold)
+        ? Math.min(1, Math.max(0, configuredThreshold))
+        : 0.15;
       const observer = getObserver(threshold);
 
       callbackMap.set(element, () => element.classList.add("visible"));
@@ -48,7 +56,10 @@ export default function ScrollRevealObserver() {
 
     return () => {
       for (const element of elements) {
-        const threshold = 0.15;
+        const configuredThreshold = Number(element.dataset.revealThreshold);
+        const threshold = Number.isFinite(configuredThreshold)
+          ? Math.min(1, Math.max(0, configuredThreshold))
+          : 0.15;
         const observer = observerMap.get(threshold);
         if (observer) observer.unobserve(element);
         callbackMap.delete(element);

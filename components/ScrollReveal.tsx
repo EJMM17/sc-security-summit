@@ -14,6 +14,7 @@ export default function ScrollReveal({
   className = "",
   direction = "up",
   delay = 0,
+  threshold = 0.15,
   stagger = false,
 }: ScrollRevealProps) {
   const dirClass =
@@ -28,6 +29,7 @@ export default function ScrollReveal({
   return (
     <div
       className={`${dirClass} ${stagger ? "stagger-children" : ""} ${className}`}
+      data-reveal-threshold={threshold}
       style={{ transitionDelay: delay ? `${delay}ms` : undefined }}
     >
       {children}
