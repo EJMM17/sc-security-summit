@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
+import ScrollRevealObserver from "@/components/ScrollRevealObserver";
 import Footer from "@/app/(marketing)/_components/Footer";
 import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
 import type { Language } from "@/lib/language";
@@ -25,6 +26,7 @@ export default function PageShell({
 
   return (
     <>
+      <ScrollRevealObserver />
       <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/90 backdrop-blur">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-[62px] sm:h-[68px] flex items-center justify-between gap-3">
           <Link href={home} className="flex min-w-0 items-center gap-2 sm:gap-3 group">
