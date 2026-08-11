@@ -33,19 +33,16 @@ export default function Pillars({ language }: { language: Language }) {
 
         <ScrollReveal>
           <div className="surface-card competency-panel">
-            <ol className="competency-list">
+            <ul className="competency-list">
               {competencies.map((title, index) => (
                 <li key={title} className="competency-row">
-                  <span className="competency-row-index" aria-hidden="true">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
                   <span className="competency-row-icon" aria-hidden="true">
                     <SummitIcon name={ICONS[index]} />
                   </span>
                   <h3>{title}</h3>
                 </li>
               ))}
-            </ol>
+            </ul>
           </div>
         </ScrollReveal>
       </div>

@@ -23,7 +23,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
       </div>
       <div className="networking-overlay absolute inset-0 z-[1]" aria-hidden="true" />
 
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
+      <div className="mock-container relative z-10">
         <div className="flex flex-col md:flex-row items-center gap-12">
           <div className="md:w-3/5">
             <ScrollReveal>
@@ -64,15 +64,12 @@ export default function NetworkingHub({ language }: { language: Language }) {
                 {ui.providersDesc}
               </p>
               <div className="provider-chip-grid">
-                {providers.map((provider, index) => (
-                  <div key={index} className="provider-chip">
+                {providers.map((provider) => (
+                  <div key={provider.title} className="provider-chip">
                     <span className="provider-chip-icon" aria-hidden="true">
                       <SummitIcon name={provider.icon} />
                     </span>
-                    <span>
-                      <small>{String(index + 1).padStart(2, "0")}</small>
-                      {provider.title}
-                    </span>
+                    <span className="provider-chip-label">{provider.title}</span>
                   </div>
                 ))}
               </div>
