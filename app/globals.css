@@ -3947,10 +3947,10 @@ body {
    Six sibling labels do not need six floating cards; that reads as a
    scattered grid and competes with the sections that legitimately use
    cards. They share one surface instead, split by the same hairline the
-   rest of the page uses, with the numbered index motif borrowed from the
-   pillars. The card shell, radius, elevation and icon-box treatment stay
-   identical to every other block, so the section rhymes instead of
-   repeating. */
+   rest of the page uses. The list has no rank, so no index prefixes it: the
+   icon opens every row. The card shell, radius, elevation and icon box are
+   the same primitives as every other block, so the section rhymes instead
+   of repeating. */
 .competency-panel {
   overflow: hidden;
   padding: 0.35rem 0.5rem;
@@ -3973,7 +3973,7 @@ body {
   display: flex;
   padding: 1.15rem 1.25rem;
   align-items: center;
-  gap: 1rem;
+  gap: 1.1rem;
   border-radius: var(--r-sm);
   transition: background var(--dur) var(--ease-out);
 }
@@ -4002,27 +4002,18 @@ body {
   background: var(--summit-blue-tint);
 }
 
-.competency-row-index {
-  font-family: var(--font-oswald), sans-serif;
-  font-size: 0.78rem;
-  font-weight: 650;
-  letter-spacing: 0.08em;
-  color: var(--text-muted);
-  transition: color var(--dur) var(--ease-out);
-}
-
-.competency-row:hover .competency-row-index {
-  color: var(--summit-blue);
-}
-
+/* Same geometry and palette as `.mock-icon-box`, kept under its own class on
+   purpose: the panel is itself a `.surface-card`, so reusing that class would
+   let a hover anywhere in the panel invert all six boxes at once. Here the
+   tint follows the row the pointer is actually on. */
 .competency-row-icon {
   display: grid;
-  width: 2.5rem;
-  height: 2.5rem;
-  flex: 0 0 2.5rem;
+  width: 3rem;
+  height: 3rem;
+  flex: 0 0 3rem;
   place-items: center;
   border-radius: var(--r-sm);
-  background: var(--surface-soft);
+  background: var(--summit-blue-tint);
   color: var(--summit-blue);
   transition: background var(--dur) var(--ease-out), color var(--dur) var(--ease-out);
 }
@@ -4033,8 +4024,8 @@ body {
 }
 
 .competency-row-icon svg {
-  width: 1.2rem;
-  height: 1.2rem;
+  width: 1.35rem;
+  height: 1.35rem;
   stroke-width: 1.8;
 }
 
@@ -4257,13 +4248,13 @@ body {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  min-height: 4.4rem;
+  min-height: 3.9rem;
   padding: 0.75rem;
   border: 1px solid var(--on-navy-line);
   border-radius: var(--r-sm);
   background: var(--surface-navy-raised);
   color: var(--on-navy-title);
-  font-size: 0.82rem;
+  font-size: 0.875rem;
   font-weight: 600;
   line-height: 1.3;
   box-shadow: 0 10px 24px -18px rgba(2, 8, 28, 0.9);
@@ -4275,12 +4266,12 @@ body {
 
 .provider-chip-icon {
   display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  flex: 0 0 2.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  flex: 0 0 2.5rem;
   place-items: center;
   border: 1px solid color-mix(in srgb, var(--on-navy-accent) 30%, transparent);
-  border-radius: 0.65rem;
+  border-radius: var(--r-sm);
   color: var(--on-navy-accent);
   background: color-mix(in srgb, var(--on-navy-accent) 9%, transparent);
   transition: transform var(--dur) var(--ease-out), background-color var(--dur) var(--ease-out);
@@ -4288,18 +4279,8 @@ body {
 
 .provider-chip-icon .summit-icon { width: 1.25rem; height: 1.25rem; }
 
-.provider-chip > span:last-child {
-  display: flex;
+.provider-chip-label {
   min-width: 0;
-  flex-direction: column;
-  gap: 0.15rem;
-}
-
-.provider-chip small {
-  color: var(--on-navy-muted);
-  font-size: 0.55rem;
-  font-weight: 750;
-  letter-spacing: 0.12em;
 }
 
 .provider-chip:hover {
