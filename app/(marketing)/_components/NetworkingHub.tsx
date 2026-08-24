@@ -1,6 +1,6 @@
 import Image from "next/image";
 import ScrollReveal from "@/components/ScrollReveal";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
@@ -48,7 +48,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
             </ScrollReveal>
 
             <ScrollReveal delay={200}>
-              <PrimaryCTA href={EVENTBRITE_URL} external size="md">
+              <PrimaryCTA href={checkoutHref(language)} size="md">
                 {ui.networkingCTA}
               </PrimaryCTA>
             </ScrollReveal>

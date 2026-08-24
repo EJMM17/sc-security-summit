@@ -5,12 +5,48 @@ Read `AGENTS.md` first. Canonical current state:
 
 ## Product boundary
 
-- Eventbrite owns all individual tickets, payments, refunds and check-in.
-- Supabase stores only corporate-pass and sponsorship inquiries.
-- Persistence happens before email and defines receipt.
+- Individual tickets are sold on site with MercadoPago Checkout Pro. See
+  `docs/PAYMENTS.md`. Eventbrite is retired: no link, no `EVENTBRITE_URL`, no
+  `NEXT_PUBLIC_EVENTBRITE_URL`. Tickets sold there before the cut stay valid
+  and are operated from Eventbrite's own panel.
+- Supabase stores corporate-pass and sponsorship inquiries, and ticket orders.
+- Persistence happens before email and before MercadoPago; it defines receipt.
 - Resend failure queues a notification; it does not lose the inquiry.
 - Do not reuse historical `public.registros`. The legacy `/admin` built on it
   stays retired; the current `/admin` is a separate panel over `inquiries`.
+
+## Payments and IVA
+
+Published prices are the IVA-exclusive taxable base; 16% is added on top.
+`lib/payments/catalog.ts` is the single source of truth for money and the
+browser never sends an amount — it sends a tier and a quantity. All arithmetic
+is integer cents with half-up rounding, and the tax is computed once over the
+whole line, never per unit.
+
+Fiscal data is captured only when the buyer requests a CFDI, validated against
+the RFC person type, and stored in its own table. The site does not stamp the
+CFDI; the team issues it manually within 72 hours.
+
+The webhook verifies the MercadoPago HMAC signature, rejects notifications
+older than five minutes, re-reads the payment from the API rather than trusting
+the body, and is idempotent. `MERCADOPAGO_ACCESS_TOKEN` accepts a live
+`APP_USR-` token only in Vercel Production and a `TEST-` token everywhere else.
+
+Seat capacity (`public.ticket_capacity`) is opt-in: a scope with no row is
+unlimited. `create_ticket_order` takes an advisory lock before checking it and
+answers `sold_out` without storing an order; a replay is answered before the
+check so a sold-out event never rejects an existing buyer.
+
+An order becoming `paid` enqueues a buyer receipt and an internal notice in
+`ticket_order_notifications`, an outbox with the same lease, attempt and
+idempotency contract as the inquiry one. One cron drains both queues.
+
+`/admin/ordenes` lists and details orders. Its writes are restricted to
+`invoice_status`, `cfdi_uuid`, `owner` and `internal_notes`; capacity is
+read-only there and configured in Studio.
+
+Never log buyer identity, RFC, legal name or postal code, and never put fiscal
+identifiers in an email.
 
 ## Request flow
 
@@ -115,10 +151,13 @@ idempotency. Do not log PII or return it from the route.
 ## Privacy
 
 `INQUIRY_CONSENT_VERSION` in `lib/inquiries/constants.ts` is canonical.
-Consent version `2026-07-30`, 18-month retention, the ARCO process and the
-deletion/anonymization procedure were approved by the privacy owner on
-2026-07-30. Production remains gated independently on backup, database
-verification, Vercel billing, migrations and deployment checks.
+Consent version `2026-08-24` covers on-site payments, the fiscal-data
+category and a five-year retention for purchase records (CFF art. 30);
+inquiries keep 18 months. **This version is not yet approved by the privacy
+owner** — that approval is a blocking gate before selling. The previous
+`2026-07-30` version and its approval remain the record for inquiries
+submitted before the cut. Production remains gated independently on backup,
+database verification, Vercel billing, migrations and deployment checks.
 
 Never place names, email, phone, interest, notes, recipient, subject or email
 body in Sentry, Vercel logs, attempts or events.
@@ -147,4 +186,4 @@ never exposes it. Its writes are restricted to `status`, `owner`,
 allows. Supabase Studio with MFA remains valid for anything the panel does not
 cover.
 
-See `docs/INQUIRY_OPERATIONS.md` and `docs/RUNBOOK.md`.
+See `docs/INQUIRY_OPERATIONS.md`, `docs/PAYMENTS.md` and `docs/RUNBOOK.md`.

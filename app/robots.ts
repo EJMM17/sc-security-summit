@@ -10,6 +10,7 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/_next/",
           "/admin", // Internal operations panel
+          "/checkout", // Transactional pages; order state must not be indexed
           "/monitoring", // Sentry tunnel route (next.config tunnelRoute)
         ],
       },

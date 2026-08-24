@@ -4,10 +4,17 @@ vi.mock("@/server/services/inquiry-notifier", () => ({
   processDueInquiryNotifications: vi.fn(),
 }));
 
+vi.mock("@/server/services/ticket-order-notifier", () => ({
+  processDueTicketOrderNotifications: vi.fn(),
+}));
+
 import { GET } from "@/app/api/cron/inquiry-notifications/route";
 import { processDueInquiryNotifications } from "@/server/services/inquiry-notifier";
+import { processDueTicketOrderNotifications } from "@/server/services/ticket-order-notifier";
 
 const mockedProcess = vi.mocked(processDueInquiryNotifications);
+const mockedTicketProcess = vi.mocked(processDueTicketOrderNotifications);
+const EMPTY_BATCH = { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 };
 
 function request(authorization?: string): Request {
   return new Request("https://example.com/api/cron/inquiry-notifications", {
@@ -23,6 +30,8 @@ describe("inquiry notification cron", () => {
     delete process.env.CRON_SECRET;
     delete process.env.INQUIRY_NOTIFICATION_BATCH_SIZE;
     mockedProcess.mockReset();
+    mockedTicketProcess.mockReset();
+    mockedTicketProcess.mockResolvedValue({ ...EMPTY_BATCH });
   });
 
   afterEach(() => {
@@ -73,6 +82,8 @@ describe("inquiry notification cron", () => {
     const response = await GET(request("Bearer correct-secret"));
     expect(response.status).toBe(200);
     expect(mockedProcess).toHaveBeenCalledWith(25);
+    // Both outboxes share this schedule and the same bounded batch size.
+    expect(mockedTicketProcess).toHaveBeenCalledWith(25);
     expect(await response.json()).toEqual({
       ok: true,
       claimed: 2,
@@ -80,6 +91,31 @@ describe("inquiry notification cron", () => {
       queued: 1,
       dead: 0,
       failed: 0,
+      ticketOrders: { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 },
+    });
+  });
+
+  it("drains the ticket queue even when the inquiry queue fails", async () => {
+    process.env.CRON_SECRET = "correct-secret";
+    mockedProcess.mockRejectedValue(new Error("inquiry outbox down"));
+    mockedTicketProcess.mockResolvedValue({ ...EMPTY_BATCH });
+
+    const response = await GET(request("Bearer correct-secret"));
+    // The run is still reported as failed so the cron failure stays visible.
+    expect(response.status).toBe(500);
+    expect(mockedTicketProcess).toHaveBeenCalledTimes(1);
+  });
+
+  it("fails the run when only the ticket queue fails", async () => {
+    process.env.CRON_SECRET = "correct-secret";
+    mockedProcess.mockResolvedValue({ ...EMPTY_BATCH });
+    mockedTicketProcess.mockRejectedValue(new Error("ticket outbox down"));
+
+    const response = await GET(request("Bearer correct-secret"));
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({
+      ok: false,
+      reason: "processing_unavailable",
     });
   });
 

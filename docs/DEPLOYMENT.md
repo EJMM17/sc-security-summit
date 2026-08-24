@@ -21,6 +21,18 @@ histórica de snapshots Preview. Ninguno se marca como resuelto:
 
 - [x] El aviso final `2026-07-30` fue revisado y aprobado por la persona
       responsable legal/privacidad el 2026-07-30.
+- [ ] **Cobros con MercadoPago.** El aviso `2026-08-24` (pagos en sitio,
+      categoría de datos fiscales, retención de cinco años por CFF art. 30) y
+      los Términos reescritos NO han sido aprobados. Bloqueante para vender un
+      acceso en Production. Ver `docs/PAYMENTS.md`.
+- [ ] **Migraciones de pagos.** `20260824120000_add_ticket_orders.sql` y
+      `20260824130000_add_ticket_capacity_and_notifications.sql` no se han
+      aplicado a Supabase. Validadas contra PostgreSQL 16 local con pgTAP en
+      verde, pero falta `supabase db reset --local` con el historial completo,
+      `db lint`, backup verificado y regenerar `lib/database.types.ts`.
+- [ ] **Credenciales de MercadoPago.** `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-) y
+      `MERCADOPAGO_WEBHOOK_SECRET` en Vercel Production, y el webhook
+      `payment` registrado en el panel de MercadoPago.
 - [x] El plazo de retención de 18 meses, el proceso ARCO y el procedimiento de
       eliminación/anonimización fueron aprobados el 2026-07-30.
 - [x] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing

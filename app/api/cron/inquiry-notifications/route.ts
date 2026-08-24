@@ -2,6 +2,7 @@ import { timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
 import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 import { processDueInquiryNotifications } from "@/server/services/inquiry-notifier";
+import { processDueTicketOrderNotifications } from "@/server/services/ticket-order-notifier";
 
 export const dynamic = "force-dynamic";
 const DEFAULT_BATCH_SIZE = 10;
@@ -44,8 +45,27 @@ export async function GET(request: Request) {
   }
 
   try {
-    const result = await processDueInquiryNotifications(notificationBatchSize());
-    return NextResponse.json({ ok: true, ...result });
+    // Both outboxes share this schedule: Vercel Pro allows a five-minute cron,
+    // and a second schedule would double the invocations for no benefit.
+    // allSettled rather than all, so a failing inquiry queue still lets the
+    // ticket queue drain before the run is reported as failed.
+    const batchSize = notificationBatchSize();
+    const [inquiries, ticketOrders] = await Promise.allSettled([
+      processDueInquiryNotifications(batchSize),
+      processDueTicketOrderNotifications(batchSize),
+    ]);
+
+    // Both queues are always attempted, but a failure in either one still
+    // fails the run: a cron that silently reports success is a cron nobody
+    // notices has stopped working.
+    if (inquiries.status === "rejected") throw inquiries.reason;
+    if (ticketOrders.status === "rejected") throw ticketOrders.reason;
+
+    return NextResponse.json({
+      ok: true,
+      ...inquiries.value,
+      ticketOrders: ticketOrders.value,
+    });
   } catch {
     return NextResponse.json(
       { ok: false, reason: "processing_unavailable" },

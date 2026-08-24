@@ -24,6 +24,14 @@ export default defineConfig({
         "lib/deployment-environment.ts",
         "lib/health-readiness.ts",
         "lib/inquiries/**/*.ts",
+        "app/actions/checkout.ts",
+        "app/api/webhooks/mercadopago/route.ts",
+        "lib/payments/**/*.ts",
+        "server/services/mercadopago-client.ts",
+        "server/services/mercadopago-signature.ts",
+        "server/services/ticket-order-notifier.ts",
+        "server/services/payment-observability.ts",
+        "server/use-cases/create-ticket-checkout.ts",
         "lib/supabase-server.ts",
         "server/repositories/inquiry-repository.ts",
         "server/services/inquiry-notifier.ts",
@@ -33,6 +41,7 @@ export default defineConfig({
       exclude: [
         "lib/**/*.test.ts",
         "lib/inquiries/result.ts",
+        "lib/payments/result.ts",
       ],
       thresholds: {
         statements: 85,

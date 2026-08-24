@@ -182,21 +182,6 @@ export const ENV_SPEC = [
     templateValue: "https://scsecuritysummit.com",
   },
   {
-    name: "NEXT_PUBLIC_EVENTBRITE_URL",
-    scope: "public",
-    secret: false,
-    runtimeRequired: false,
-    previewRequired: false,
-    productionRequired: false,
-    format: "https-url",
-    placeholderAllowed: true,
-    placeholders: [],
-    group: "Public site configuration",
-    description:
-      "Optional Eventbrite override. This value is exposed to the browser.",
-    templateValue: "",
-  },
-  {
     name: "SENTRY_DSN",
     scope: "server",
     secret: false,
@@ -341,6 +326,42 @@ export const ENV_SPEC = [
     templateValue: "",
   },
   {
+    name: "MERCADOPAGO_ACCESS_TOKEN",
+    scope: "server",
+    secret: true,
+    runtimeRequired: false,
+    previewRequired: false,
+    productionRequired: false,
+    forbiddenTargets: ["preview"],
+    format: "mercadopago-token",
+    placeholderAllowed: false,
+    placeholders: [
+      "APP_USR-PLACEHOLDER",
+      "TEST-PLACEHOLDER",
+      "your_mercadopago_access_token",
+    ],
+    group: "Payments (server only)",
+    description:
+      "MercadoPago access token. Production requires a live APP_USR- token; every other environment requires a TEST- sandbox token. Forbidden in Preview.",
+    templateValue: "",
+  },
+  {
+    name: "MERCADOPAGO_WEBHOOK_SECRET",
+    scope: "server",
+    secret: true,
+    runtimeRequired: false,
+    previewRequired: false,
+    productionRequired: false,
+    forbiddenTargets: ["preview"],
+    format: "token",
+    placeholderAllowed: false,
+    placeholders: ["change-me", "replace_with_random_secret"],
+    group: "Payments (server only)",
+    description:
+      "Signing secret from the MercadoPago webhook panel. Without it every notification is rejected; forbidden in Preview.",
+    templateValue: "",
+  },
+  {
     name: "ADMIN_PASSWORD",
     scope: "server",
     secret: true,
@@ -410,6 +431,12 @@ export const ENV_GROUP_RULES = [
     mode: "all-or-none",
     description:
       "Sentry server and browser DSNs must be configured together or both omitted.",
+  },
+  {
+    names: ["MERCADOPAGO_ACCESS_TOKEN", "MERCADOPAGO_WEBHOOK_SECRET"],
+    mode: "all-or-none",
+    description:
+      "The MercadoPago access token and webhook signing secret must be configured together; a checkout without a verified webhook never confirms a payment.",
   },
   {
     names: ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"],

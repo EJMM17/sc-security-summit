@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Calendar, MapPin } from "lucide-react";
 import EventCountdown from "@/components/EventCountdown";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
 
@@ -68,7 +68,7 @@ export default function Hero({ language }: { language: Language }) {
         </div>
 
         <div className="hero-actions">
-          <PrimaryCTA href={EVENTBRITE_URL} external size="lg">
+          <PrimaryCTA href={checkoutHref(language)} size="lg">
             {ui.registerNowBtn}
           </PrimaryCTA>
           <a href="#programa" className="hero-secondary-link">

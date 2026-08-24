@@ -55,7 +55,7 @@ export default function InteractionTracker() {
       const base = { cta_location: ctaLocation, page_path: path, language };
 
       // ── Registration intent ───────────────────────────────────────
-      if (href.includes("#registro") || href.includes("eventbrite.")) {
+      if (href.includes("#registro") || href.startsWith("/checkout")) {
         pushEvent("click_register", base);
         return;
       }

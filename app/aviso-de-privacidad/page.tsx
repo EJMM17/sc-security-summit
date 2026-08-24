@@ -101,9 +101,25 @@ export default function AvisoPrivacidad() {
               dirección IP ni el user-agent en el registro de la solicitud.
             </p>
             <p className="mt-3">
-              La <strong>compra de accesos individuales se realiza en Eventbrite</strong>. Los datos de compra
-              y de pago se proporcionan directamente a esa plataforma, que los trata bajo su propio aviso de
-              privacidad; este sitio no los recaba ni los almacena.
+              Cuando el titular <strong>compra un acceso individual</strong> en
+              este sitio, el Responsable recaba además su nombre, correo
+              electrónico, teléfono, empresa (opcional), el tipo y la cantidad
+              de accesos, el importe con el IVA desglosado y el estado del pago.
+            </p>
+            <p className="mt-3">
+              El Responsable <strong>no recaba ni almacena datos de tarjetas
+              bancarias ni credenciales de pago</strong>. Esos datos se
+              capturan directamente en el entorno de{" "}
+              <strong>MercadoPago</strong>, que actúa como procesador de pagos
+              bajo su propio aviso de privacidad. Este sitio sólo conserva el
+              identificador del pago y su estado.
+            </p>
+            <p className="mt-3">
+              Únicamente si el titular <strong>solicita factura (CFDI)</strong>{" "}
+              se recaban sus datos fiscales: RFC, razón social, régimen fiscal,
+              uso del CFDI, código postal y, opcionalmente, un correo de
+              facturación. Si no solicita factura, ninguno de estos datos se
+              recaba ni se almacena.
             </p>
             <p className="mt-3">
               El Responsable <strong>no recaba datos personales sensibles</strong> en el sentido del artículo 3, fracción VI de la LFPDPPP.
@@ -115,6 +131,16 @@ export default function AvisoPrivacidad() {
             <p><strong>Finalidades primarias</strong> (necesarias para la relación jurídica entre el Responsable y el titular):</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
               <li>Atender las solicitudes de pase corporativo y de patrocinio recibidas a través del sitio.</li>
+              <li>
+                Procesar la compra de accesos individuales, cobrar el importe
+                correspondiente a través de MercadoPago y emitir el
+                comprobante de compra.
+              </li>
+              <li>
+                Emitir el CFDI cuando el titular lo solicite, y cumplir las
+                obligaciones fiscales y contables asociadas.
+              </li>
+              <li>Acreditar el acceso del titular al Evento el día de su celebración.</li>
               <li>Contactar al titular para dar seguimiento a su solicitud, compartir cotizaciones, disponibilidad y beneficios.</li>
               <li>Atender consultas relacionadas con el 1er Summit de Seguridad en la Cadena de Suministros 2026.</li>
               <li>
@@ -160,10 +186,19 @@ export default function AvisoPrivacidad() {
               la legislación aplicable.
             </p>
             <p className="mt-3">
-              Adicionalmente, <strong>Eventbrite</strong> opera la venta de accesos al Evento. Cuando el
-              titular compra un acceso, proporciona sus datos directamente a esa plataforma, la cual actúa
-              como responsable independiente del tratamiento conforme a su propio aviso de privacidad. Lanz
-              Logistics recibe de Eventbrite la información necesaria para gestionar la asistencia al Evento.
+              Adicionalmente, <strong>MercadoPago</strong> procesa los pagos de
+              los accesos individuales. El titular captura sus datos de pago
+              directamente en el entorno de esa plataforma, la cual actúa como
+              responsable independiente conforme a su propio aviso de
+              privacidad. El Responsable recibe de MercadoPago únicamente el
+              identificador y el estado del pago, no los datos bancarios.
+            </p>
+            <p className="mt-3">
+              Los datos fiscales de quienes solicitan CFDI se comunican al{" "}
+              <strong>proveedor autorizado de certificación (PAC)</strong> y a
+              la <strong>autoridad fiscal</strong> en la medida necesaria para
+              emitir el comprobante. Esta comunicación es una obligación legal
+              y no requiere el consentimiento del titular.
             </p>
           </section>
 
@@ -247,13 +282,27 @@ export default function AvisoPrivacidad() {
               8. Conservación y Eliminación
             </h2>
             <p>
-              Cada solicitud se conserva durante 18 meses desde su creación,
-              salvo que exista una relación contractual, una solicitud ARCO en
-              trámite o una obligación jurídica que justifique otro plazo. Al
-              vencer, una persona autorizada elimina los datos personales o
-              los anonimiza de forma irreversible, documentando únicamente la
-              fecha, el responsable, el número de registros y el resultado,
-              sin duplicar datos personales en la evidencia operativa.
+              Cada solicitud de pase corporativo o patrocinio se conserva
+              durante <strong>18 meses</strong> desde su creación, salvo que
+              exista una relación contractual, una solicitud ARCO en trámite o
+              una obligación jurídica que justifique otro plazo.
+            </p>
+            <p className="mt-3">
+              Las <strong>órdenes de compra de accesos</strong> y, en su caso,
+              los datos fiscales asociados se conservan durante{" "}
+              <strong>cinco años</strong>, porque son parte de la contabilidad
+              y de los comprobantes fiscales cuya conservación exige el
+              artículo 30 del Código Fiscal de la Federación. Este plazo no
+              puede acortarse a petición del titular mientras la obligación
+              fiscal subsista; una solicitud de cancelación se atiende
+              bloqueando los datos hasta que el plazo venza.
+            </p>
+            <p className="mt-3">
+              Al vencer el plazo que corresponda, una persona autorizada
+              elimina los datos personales o los anonimiza de forma
+              irreversible, documentando únicamente la fecha, el responsable,
+              el número de registros y el resultado, sin duplicar datos
+              personales en la evidencia operativa.
             </p>
           </section>
 

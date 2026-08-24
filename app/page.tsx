@@ -3,7 +3,9 @@ import { headers } from "next/headers";
 import ScrollRevealObserver from "@/components/ScrollRevealObserver";
 import ScrollProgress from "@/components/ScrollProgress";
 import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
-import { BASE_URL, CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { BASE_URL, CHECKOUT_URL, CONTENT } from "@/lib/content";
+import { quoteTicketOrder } from "@/lib/payments/catalog";
+import { centsToAmount } from "@/lib/payments/tax";
 import Agenda from "./(marketing)/_components/Agenda";
 import Audience from "./(marketing)/_components/Audience";
 import Faq from "./(marketing)/_components/Faq";
@@ -140,16 +142,28 @@ function buildStructuredData(lang: "es" | "en") {
           jobTitle: s.role,
           image: `${BASE_URL}${s.image}`,
         })),
-        offers: content.pricing.map((plan) => ({
-          "@type": "Offer",
-          name: plan.label,
-          price: String(plan.priceValue),
-          priceCurrency: "MXN",
-          url: EVENTBRITE_URL,
-          availability: "https://schema.org/InStock",
-          validFrom: "2026-04-01",
-          validThrough: "2026-09-24",
-        })),
+        // Published prices are IVA-exclusive, but a rich result must show what
+        // the buyer actually pays, so the offer carries the gross amount and
+        // declares the tax as included in it.
+        offers: content.pricing.map((plan) => {
+          const quote = quoteTicketOrder(plan.id, 1);
+          return {
+            "@type": "Offer",
+            name: plan.label,
+            price: String(centsToAmount(quote.totalCents)),
+            priceCurrency: "MXN",
+            priceSpecification: {
+              "@type": "UnitPriceSpecification",
+              price: String(centsToAmount(quote.totalCents)),
+              priceCurrency: "MXN",
+              valueAddedTaxIncluded: true,
+            },
+            url: CHECKOUT_URL,
+            availability: "https://schema.org/InStock",
+            validFrom: "2026-04-01",
+            validThrough: "2026-09-24",
+          };
+        }),
       },
 
       // ── FAQPage ──

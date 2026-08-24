@@ -1,9 +1,17 @@
 export const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
   "https://scsecuritysummit.com";
-export const EVENTBRITE_URL =
-  process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
-  "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
+/**
+ * Every "buy" call to action on the site. Individual accesses are sold here
+ * with MercadoPago, so the destination is the on-site checkout, not an
+ * external ticketing page.
+ */
+export function checkoutHref(language: "es" | "en" = "es"): string {
+  return language === "en" ? "/checkout?lang=en" : "/checkout";
+}
+
+/** Absolute checkout URL for structured data and emails. */
+export const CHECKOUT_URL = `${BASE_URL}/checkout`;
 
 export type IconKey =
   | "shield-check"
@@ -1240,7 +1248,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo compro mi acceso?",
     answer:
-      "Desde cualquier botón de acceso del sitio llegas a Eventbrite, donde eliges tu tipo de acceso y realizas el pago. Eventbrite te envía por correo tu boleto y el comprobante de compra; ese boleto es el que presentas el día del evento.",
+      "Desde cualquier botón de acceso del sitio llegas al checkout, donde eliges tu tipo de acceso y la cantidad. El pago se procesa con MercadoPago: tarjeta, transferencia SPEI o efectivo. Al confirmarse el pago te enviamos por correo tu comprobante de compra, que es el que presentas el día del evento.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -1255,7 +1263,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Puedo obtener factura (CFDI)?",
     answer:
-      "Sí. Una vez completada tu compra en Eventbrite, escríbenos a hola@scsecuritysummit.com con tu número de orden y tus datos fiscales. El CFDI se emite dentro de las 72 horas posteriores a la confirmación de tu pago.",
+      "Sí. Marca la casilla \"Necesito factura (CFDI)\" al comprar tu acceso en el sitio y captura tu RFC, razón social, régimen fiscal, uso del CFDI y código postal. El CFDI se emite dentro de las 72 horas posteriores a la confirmación de tu pago. Los precios publicados no incluyen IVA; el 16% se desglosa antes de pagar.",
   },
   {
     question: "¿El acceso estudiantil requiere credencial?",
@@ -1283,7 +1291,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How do I buy my pass?",
     answer:
-      "Any access button on the site takes you to Eventbrite, where you pick your access type and pay. Eventbrite emails you the ticket and the receipt; that ticket is what you present on the day of the event.",
+      "Any access button on the site takes you to the checkout, where you pick your access type and quantity. Payment is processed by MercadoPago: card, SPEI transfer or cash. Once the payment clears we email your proof of purchase, which is what you present on the day of the event.",
   },
   {
     question: "What is included with each access type?",
@@ -1298,7 +1306,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Can I request an invoice (CFDI)?",
     answer:
-      "Yes. Once your purchase is complete on Eventbrite, email us at hola@scsecuritysummit.com with your order number and tax details. The CFDI is issued within 72 hours after payment confirmation.",
+      "Yes. Tick the \"I need a Mexican tax invoice (CFDI)\" box when you buy your pass on the site and enter your RFC, legal name, tax regime, CFDI use and postal code. The CFDI is issued within 72 hours after payment confirmation. Published prices exclude VAT; the 16% is itemized before you pay.",
   },
   {
     question: "Does the student pass require an ID?",
@@ -1306,6 +1314,164 @@ export const FAQ_ITEMS_EN = [
       "Yes, you must present a valid student ID from your institution during event check-in. This pass is only for active undergraduate students.",
   },
 ] as const;
+
+export const CHECKOUT = {
+  es: {
+    label: "COMPRA EN LÍNEA",
+    title: "Reserva tu acceso",
+    desc:
+      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. Los precios publicados no incluyen IVA; el impuesto se desglosa antes de pagar.",
+    tierLegend: "Tipo de acceso",
+    quantity: "Cantidad",
+    quantityHint: "Máximo {max} por compra.",
+    buyerLegend: "Datos del comprador",
+    firstName: "Nombre(s)",
+    lastName: "Apellidos",
+    email: "Correo electrónico",
+    phone: "Teléfono móvil",
+    company: "Empresa (opcional)",
+    firstNamePlaceholder: "Ej. María",
+    lastNamePlaceholder: "Ej. González López",
+    emailPlaceholder: "nombre@empresa.com",
+    phonePlaceholder: "+52 899 123 4567",
+    companyPlaceholder: "Nombre de la empresa",
+    invoiceToggle: "Necesito factura (CFDI)",
+    invoiceHint:
+      "Si no marcas esta casilla no emitimos CFDI para esta compra. El IVA se cobra de todas formas.",
+    invoiceLegend: "Datos fiscales",
+    rfc: "RFC",
+    rfcPlaceholder: "XAXX010101XXX",
+    legalName: "Razón social",
+    legalNamePlaceholder: "Como aparece en tu Constancia de Situación Fiscal",
+    taxRegime: "Régimen fiscal",
+    cfdiUse: "Uso del CFDI",
+    postalCode: "Código postal fiscal",
+    postalCodePlaceholder: "88680",
+    billingEmail: "Correo para la factura (opcional)",
+    billingEmailPlaceholder: "facturacion@empresa.com",
+    selectPlaceholder: "Selecciona una opción",
+    summaryTitle: "Resumen",
+    summarySubtotal: "Subtotal",
+    summaryTax: "IVA 16%",
+    summaryTotal: "Total a pagar",
+    submit: "PAGAR CON MERCADOPAGO",
+    submitSending: "REDIRIGIENDO...",
+    redirectNote:
+      "Te llevamos al checkout seguro de MercadoPago para completar el pago.",
+    privacy:
+      "Al continuar aceptas que usemos tus datos para procesar esta compra, emitir tu acceso y, si lo solicitaste, tu CFDI.",
+    privacyLink: "Consulta el Aviso de Privacidad.",
+    invalid: "Revisa los campos e inténtalo de nuevo.",
+    invalidInvoice:
+      "Revisa tus datos fiscales: el RFC, el régimen o el uso de CFDI no son válidos para el tipo de persona.",
+    rateLimited:
+      "Has realizado varios intentos. Espera unos minutos antes de volver a intentar.",
+    conflict:
+      "Ya existe una compra con estos datos pero con un importe distinto. Recarga la página para empezar de nuevo.",
+    soldOut:
+      "Ya no quedan lugares suficientes para ese acceso y esa cantidad. Prueba con menos accesos o escríbenos a hola@scsecuritysummit.com.",
+    providerUnavailable:
+      "MercadoPago no está disponible en este momento. Tu solicitud quedó registrada; inténtalo de nuevo en unos minutos.",
+    error:
+      "No pudimos iniciar el pago. Escríbenos a hola@scsecuritysummit.com.",
+    previewDisabled:
+      "Vista previa: el checkout está desactivado y no procesa pagos. Usa el sitio de producción.",
+    previewDisabledButton: "NO DISPONIBLE EN VISTA PREVIA",
+    successTitle: "¡Pago confirmado!",
+    successDesc:
+      "Recibimos tu pago. En unos minutos te llega el comprobante y tu acceso por correo.",
+    successInvoice:
+      "Solicitaste CFDI: lo emitimos dentro de las 72 horas siguientes a la confirmación del pago.",
+    pendingTitle: "Pago pendiente",
+    pendingDesc:
+      "Tu pago está en proceso. Si pagaste con SPEI o en efectivo puede tardar hasta 48 horas en acreditarse. Te avisamos por correo en cuanto se confirme.",
+    failureTitle: "No se completó el pago",
+    failureDesc:
+      "El pago no se realizó y no se te hizo ningún cargo. Puedes intentarlo de nuevo o escribirnos a hola@scsecuritysummit.com.",
+    backToCheckout: "VOLVER A INTENTAR",
+    backToHome: "IR AL INICIO",
+    orderReference: "Referencia de tu orden",
+    statusUnknown:
+      "No encontramos esa orden. Si ya pagaste, escríbenos a hola@scsecuritysummit.com con tu comprobante.",
+  },
+  en: {
+    label: "ONLINE PURCHASE",
+    title: "Reserve your pass",
+    desc:
+      "Pay by card, SPEI transfer or cash through MercadoPago. Published prices exclude VAT; the tax is itemized before you pay.",
+    tierLegend: "Pass type",
+    quantity: "Quantity",
+    quantityHint: "Up to {max} per purchase.",
+    buyerLegend: "Buyer details",
+    firstName: "First name",
+    lastName: "Last name",
+    email: "Email",
+    phone: "Mobile phone",
+    company: "Company (optional)",
+    firstNamePlaceholder: "e.g. Maria",
+    lastNamePlaceholder: "e.g. Gonzalez Lopez",
+    emailPlaceholder: "name@company.com",
+    phonePlaceholder: "+1 956 123 4567",
+    companyPlaceholder: "Company name",
+    invoiceToggle: "I need a Mexican tax invoice (CFDI)",
+    invoiceHint:
+      "Leave this unchecked and no CFDI is issued for this purchase. VAT is charged either way.",
+    invoiceLegend: "Tax details",
+    rfc: "RFC (Mexican tax ID)",
+    rfcPlaceholder: "XAXX010101XXX",
+    legalName: "Legal name",
+    legalNamePlaceholder: "Exactly as shown on your SAT tax status certificate",
+    taxRegime: "Tax regime",
+    cfdiUse: "CFDI use",
+    postalCode: "Tax postal code",
+    postalCodePlaceholder: "88680",
+    billingEmail: "Billing email (optional)",
+    billingEmailPlaceholder: "billing@company.com",
+    selectPlaceholder: "Select an option",
+    summaryTitle: "Summary",
+    summarySubtotal: "Subtotal",
+    summaryTax: "VAT 16%",
+    summaryTotal: "Total due",
+    submit: "PAY WITH MERCADOPAGO",
+    submitSending: "REDIRECTING...",
+    redirectNote:
+      "You will be taken to MercadoPago's secure checkout to complete the payment.",
+    privacy:
+      "By continuing you agree that we use your data to process this purchase, issue your pass and, if requested, your CFDI.",
+    privacyLink: "Read the Privacy Notice.",
+    invalid: "Please review the fields and try again.",
+    invalidInvoice:
+      "Check your tax details: the RFC, regime or CFDI use are not valid for that taxpayer type.",
+    rateLimited:
+      "You have made several attempts. Please wait a few minutes before trying again.",
+    conflict:
+      "A purchase already exists with these details but a different amount. Reload the page to start again.",
+    soldOut:
+      "There are not enough seats left for that pass and quantity. Try fewer passes or email hola@scsecuritysummit.com.",
+    providerUnavailable:
+      "MercadoPago is unavailable right now. Your request was recorded; please try again in a few minutes.",
+    error: "We could not start the payment. Email us at hola@scsecuritysummit.com.",
+    previewDisabled:
+      "Preview: checkout is disabled and processes no payments. Use the production site.",
+    previewDisabledButton: "NOT AVAILABLE IN PREVIEW",
+    successTitle: "Payment confirmed",
+    successDesc:
+      "We received your payment. Your receipt and pass arrive by email in a few minutes.",
+    successInvoice:
+      "You requested a CFDI: we issue it within 72 hours of payment confirmation.",
+    pendingTitle: "Payment pending",
+    pendingDesc:
+      "Your payment is being processed. SPEI transfers and cash payments can take up to 48 hours to clear. We will email you as soon as it is confirmed.",
+    failureTitle: "Payment not completed",
+    failureDesc:
+      "The payment did not go through and you were not charged. You can try again or email us at hola@scsecuritysummit.com.",
+    backToCheckout: "TRY AGAIN",
+    backToHome: "GO TO HOME",
+    orderReference: "Your order reference",
+    statusUnknown:
+      "We could not find that order. If you already paid, email hola@scsecuritysummit.com with your receipt.",
+  },
+} as const;
 
 export const CONTENT = {
   es: {
@@ -1320,6 +1486,7 @@ export const CONTENT = {
     attendees: ASISTENTES.es,
     providers: PROVEEDORES.es,
     pricing: PRICING.es,
+    checkout: CHECKOUT.es,
     forms: INQUIRY_FORMS.es,
     sponsorTierMeta: SPONSOR_TIER_META,
     sponsors: SPONSORS.es,
@@ -1339,6 +1506,7 @@ export const CONTENT = {
     attendees: ASISTENTES.en,
     providers: PROVEEDORES.en,
     pricing: PRICING.en,
+    checkout: CHECKOUT.en,
     forms: INQUIRY_FORMS.en,
     sponsorTierMeta: SPONSOR_TIER_META,
     sponsors: SPONSORS.en,

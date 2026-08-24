@@ -34,14 +34,12 @@ test.describe("Homepage comercial", () => {
       await expect(page.getByText(price, { exact: true })).toBeVisible();
     }
 
-    const eventbriteLinks = page.locator('a[href*="eventbrite.com"]');
-    const visibleEventbriteLink = page.locator('a[href*="eventbrite.com"]:visible').first();
-    await expect(visibleEventbriteLink).toBeVisible();
-    expect(await eventbriteLinks.count()).toBeGreaterThan(1);
-    await expect(visibleEventbriteLink).toHaveAttribute(
-      "href",
-      "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile",
-    );
+    // Individual accesses are sold on site now: no call to action may leave
+    // for an external ticketing page.
+    await expect(page.locator('a[href*="eventbrite.com"]')).toHaveCount(0);
+    const checkoutLinks = page.locator('a[href^="/checkout"]');
+    await expect(page.locator('a[href^="/checkout"]:visible').first()).toBeVisible();
+    expect(await checkoutLinks.count()).toBeGreaterThan(1);
 
     const corporate = page.locator("#registro");
     await expect(corporate.getByRole("heading", { name: /capacita a tu equipo completo/i })).toBeVisible();

@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
 import ScrollRevealObserver from "@/components/ScrollRevealObserver";
 import Footer from "@/app/(marketing)/_components/Footer";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 
 /**
@@ -51,9 +51,7 @@ export default function PageShell({
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <LanguageSwitcher current={language} />
             <a
-              href={EVENTBRITE_URL}
-              target="_blank"
-              rel="noreferrer"
+              href={checkoutHref(language)}
               className="btn-primary hidden sm:inline-flex text-sm"
             >
               {ui.registerBtn} <ArrowRight className="w-4 h-4" />

@@ -247,6 +247,14 @@ function isValidFormat(variable, value, target) {
       const number = Number(value);
       return Number.isInteger(number) && number >= 1 && number <= 25;
     }
+    case "mercadopago-token":
+      // MercadoPago issues `TEST-…` credentials for the sandbox and `APP_USR-…`
+      // for live ones. Production must never carry a sandbox token, and no
+      // other environment may hold a credential that can move real money.
+      if (target === "production") {
+        return /^APP_USR-[A-Za-z0-9_-]{16,}$/.test(value);
+      }
+      return /^TEST-[A-Za-z0-9_-]{16,}$/.test(value);
     case "numeric-id":
       return /^\d{3,30}$/.test(value);
     case "resend-key":
@@ -342,6 +350,10 @@ function describeFormat(format, target) {
     "gtm-id": "a GTM ID such as GTM-ABC1234",
     "https-url": "an HTTPS URL",
     "integer-1-25": "an integer from 1 to 25",
+    "mercadopago-token":
+      target === "production"
+        ? "a live MercadoPago access token beginning with APP_USR-"
+        : "a MercadoPago sandbox access token beginning with TEST-",
     "numeric-id": "a numeric identifier",
     "resend-key": "a Resend key beginning with re_",
     "sentry-dsn":
