@@ -170,6 +170,9 @@ export async function createTicketCheckoutUseCase(
         {
           id: `${order.tier}`,
           title: tierLabel,
+          // MercadoPago's industry-data guidance: a category on the item feeds
+          // the risk model the payment is approved against.
+          category_id: "tickets",
           description:
             order.language === "es"
               ? "SC Security Summit 2026 — 24 de septiembre, Reynosa"
@@ -181,6 +184,7 @@ export async function createTicketCheckoutUseCase(
         {
           id: "iva",
           title: taxLabel,
+          category_id: "tickets",
           quantity: 1,
           currency_id: quote.currency,
           unit_price: centsToAmount(quote.taxCents),

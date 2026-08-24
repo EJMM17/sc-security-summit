@@ -126,10 +126,31 @@ export type PreferenceItem = {
   id: string;
   title: string;
   description?: string;
+  /**
+   * MercadoPago's industry-data guidance: sending a category improves the
+   * risk score the payment is approved against.
+   */
+  category_id?: string;
   quantity: number;
   currency_id: "MXN";
   unit_price: number;
 };
+
+/**
+ * Payment methods the checkout refuses.
+ *
+ * `ticket` (OXXO and friends) and `atm` are offline: the buyer leaves with a
+ * voucher and pays hours or days later. Seat capacity holds a pending order
+ * for `hold_minutes` and the preference itself expires in
+ * `CHECKOUT_EXPIRY_MINUTES`, so an offline voucher would either be dead on
+ * arrival or settle after its seats were already released to someone else.
+ * Accepting them requires raising both windows past the voucher's due date
+ * first — see `docs/PAYMENTS.md`.
+ */
+export const EXCLUDED_PAYMENT_TYPES = ["ticket", "atm"] as const;
+
+/** Card installments the buyer may choose. Cost is borne by the buyer. */
+export const MAX_INSTALLMENTS = 12;
 
 export type CreatePreferenceInput = {
   externalReference: string;
@@ -163,6 +184,10 @@ export async function createCheckoutPreference(
     notification_url: input.notificationUrl,
     statement_descriptor: input.statementDescriptor,
     binary_mode: false,
+    payment_methods: {
+      excluded_payment_types: EXCLUDED_PAYMENT_TYPES.map((id) => ({ id })),
+      installments: MAX_INSTALLMENTS,
+    },
   };
 
   if (input.expiresAt) {
@@ -223,6 +248,30 @@ export type MercadoPagoPayment = {
   dateApproved: string | null;
 };
 
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+function readPayment(payment: Record<string, unknown>): MercadoPagoPayment {
+  const readString = (key: string): string | null => {
+    const value = payment[key];
+    return typeof value === "string" && value.length > 0 ? value : null;
+  };
+
+  const id = payment.id;
+  return {
+    id: typeof id === "number" || typeof id === "string" ? String(id) : "",
+    status: readString("status") ?? "unknown",
+    statusDetail: readString("status_detail"),
+    externalReference: readString("external_reference"),
+    transactionAmount:
+      typeof payment.transaction_amount === "number"
+        ? payment.transaction_amount
+        : null,
+    currencyId: readString("currency_id"),
+    dateApproved: readString("date_approved"),
+  };
+}
+
 export async function getPayment(paymentId: string): Promise<MercadoPagoPayment> {
   if (!/^[0-9]{1,32}$/.test(paymentId)) {
     throw new MercadoPagoApiError("get_payment", 0, "invalid_payment_id");
@@ -234,24 +283,59 @@ export async function getPayment(paymentId: string): Promise<MercadoPagoPayment>
     { method: "GET" },
   );
 
-  const readString = (key: string): string | null => {
-    const value = payment[key];
-    return typeof value === "string" && value.length > 0 ? value : null;
-  };
+  const parsed = readPayment(payment);
+  return { ...parsed, id: parsed.id || paymentId };
+}
 
-  const id = payment.id;
-  return {
-    id: typeof id === "number" || typeof id === "string" ? String(id) : paymentId,
-    status: readString("status") ?? "unknown",
-    statusDetail: readString("status_detail"),
-    externalReference: readString("external_reference"),
-    transactionAmount:
-      typeof payment.transaction_amount === "number"
-        ? payment.transaction_amount
-        : null,
-    currencyId: readString("currency_id"),
-    dateApproved: readString("date_approved"),
-  };
+/**
+ * Payments recorded against one order, newest first.
+ *
+ * `GET /v1/payments/search` is how an order is reconciled when its webhook
+ * never arrived — a misconfigured notification URL, a provider outage, or a
+ * notification dropped while the site was down. Without it a paid order can
+ * sit `pending` forever and the buyer never receives a receipt.
+ *
+ * An order can accumulate several payment attempts (a rejected card, then an
+ * approved one), so an approved payment wins over any other regardless of
+ * order; otherwise the most recent attempt is returned.
+ */
+export async function findPaymentByExternalReference(
+  externalReference: string,
+): Promise<MercadoPagoPayment | null> {
+  if (!UUID_PATTERN.test(externalReference)) {
+    throw new MercadoPagoApiError("search_payments", 0, "invalid_reference");
+  }
+
+  const query = new URLSearchParams({
+    external_reference: externalReference,
+    sort: "date_created",
+    criteria: "desc",
+    limit: "10",
+  });
+
+  const response = await request<{ results?: unknown }>(
+    "search_payments",
+    `/v1/payments/search?${query.toString()}`,
+    { method: "GET" },
+  );
+
+  const results = Array.isArray(response.results) ? response.results : [];
+  const payments = results
+    .filter(
+      (entry): entry is Record<string, unknown> =>
+        typeof entry === "object" && entry !== null,
+    )
+    .map(readPayment)
+    // The filter is applied by the API, but the result drives a write against
+    // our own order id: a payment belonging to another order must never reach
+    // it, whatever the provider returns.
+    .filter(
+      (payment) =>
+        payment.id !== "" && payment.externalReference === externalReference,
+    );
+
+  if (payments.length === 0) return null;
+  return payments.find((payment) => payment.status === "approved") ?? payments[0];
 }
 
 /** Maps a MercadoPago payment status onto the stored order status. */

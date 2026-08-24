@@ -4,7 +4,7 @@ import PageShell from "@/components/PageShell";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import { formatMxn } from "@/lib/payments/tax";
-import { getTicketOrderSummary } from "@/server/repositories/ticket-order-repository";
+import { reconcileTicketOrder } from "@/server/use-cases/reconcile-ticket-order";
 
 export type CheckoutOutcomeKind = "success" | "pending" | "failure";
 
@@ -21,6 +21,9 @@ const UUID_PATTERN =
  * The status shown is the stored one, not the one MercadoPago put in the query
  * string. A buyer who edits `?status=approved` sees whatever the webhook
  * actually recorded.
+ *
+ * An order still `pending` is reconciled against MercadoPago first, so a buyer
+ * whose webhook never arrived is not shown a stale status forever.
  */
 export default async function CheckoutOutcome({
   kind,
@@ -35,7 +38,7 @@ export default async function CheckoutOutcome({
 
   const summary =
     orderId && UUID_PATTERN.test(orderId)
-      ? await getTicketOrderSummary(orderId).catch(() => null)
+      ? await reconcileTicketOrder(orderId).catch(() => null)
       : null;
 
   const presentation = {

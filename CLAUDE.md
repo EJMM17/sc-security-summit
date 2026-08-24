@@ -32,6 +32,16 @@ older than five minutes, re-reads the payment from the API rather than trusting
 the body, and is idempotent. `MERCADOPAGO_ACCESS_TOKEN` accepts a live
 `APP_USR-` token only in Vercel Production and a `TEST-` token everywhere else.
 
+The webhook stays authoritative, but a return page reconciles an order still
+`pending` against `GET /v1/payments/search`, so a notification that never
+arrived cannot strand a paid order. Reconciliation never re-reads a terminal
+order and is throttled per order id.
+
+The preference excludes the offline payment types (`ticket`, `atm`): they
+settle long after the seat hold and the preference expiry. Accepting them
+requires widening `hold_minutes`, `expiration_date_to` and
+`CHECKOUT_EXPIRY_MINUTES` first.
+
 Seat capacity (`public.ticket_capacity`) is opt-in: a scope with no row is
 unlimited. `create_ticket_order` takes an advisory lock before checking it and
 answers `sold_out` without storing an order; a replay is answered before the

@@ -1,6 +1,7 @@
 import "server-only";
 
 import { z } from "zod";
+import type { Database } from "@/lib/database.types";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import {
   INVOICE_STATUS_VALUES,
@@ -93,8 +94,17 @@ const capacitySchema = z.object({
   hold_minutes: z.coerce.number().int().min(0),
 });
 
-function table(name: string) {
-  return getSupabaseServerClient().from(name as never);
+type TicketTableName = Extract<
+  keyof Database["public"]["Tables"],
+  `ticket_${string}`
+>;
+
+/**
+ * The generated types now describe the ticket tables, so the panel's reads and
+ * its one write are checked against the real schema instead of being cast away.
+ */
+function table<Name extends TicketTableName>(name: Name) {
+  return getSupabaseServerClient().from(name);
 }
 
 export type ListTicketOrdersFilters = {
@@ -276,8 +286,8 @@ export async function listCapacity(): Promise<AdminTicketCapacity[]> {
   return Promise.all(
     parsed.data.map(async (row) => {
       const { data: remaining, error: remainingError } = await client.rpc(
-        "remaining_ticket_seats" as never,
-        { p_scope: row.scope } as never,
+        "remaining_ticket_seats",
+        { p_scope: row.scope },
       );
       if (remainingError) {
         throw new AdminTicketOrderRepositoryError(
@@ -314,7 +324,7 @@ export async function updateTicketOrderOperations(input: {
         input.invoiceStatus === "issued" ? new Date().toISOString() : null,
       owner: input.owner,
       internal_notes: input.internalNotes,
-    } as never)
+    })
     .eq("id", input.id);
 
   if (error) {

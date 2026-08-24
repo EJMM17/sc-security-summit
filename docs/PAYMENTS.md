@@ -1,9 +1,13 @@
 # Pagos con MercadoPago e IVA
 
-> Estado: implementado y validado contra un PostgreSQL 16 local (migraciones
-> aplicadas desde cero + 56 aserciones pgTAP en verde). **No desplegado**: las
-> migraciones no se han aplicado a Supabase. Antes de vender un solo acceso hay
-> que completar la sección *Puesta en producción*.
+> Estado: implementado y validado contra un PostgreSQL 16 local. El historial
+> **completo** de migraciones (21 archivos, incluidas las heredadas) aplica
+> desde cero, y las seis suites pgTAP pasan con 135 aserciones en verde.
+> `lib/database.types.ts` ya está regenerado desde ese esquema, así que el
+> contrato local `TicketOrderDatabase` desapareció y el repositorio se
+> typechequea contra las tablas reales. **No desplegado**: las migraciones no se
+> han aplicado a Supabase. Antes de vender un solo acceso hay que completar la
+> sección *Puesta en producción*.
 
 ## Qué cambia en el producto
 
@@ -103,6 +107,48 @@ que hace seguro el webhook: una notificación sólo puede llegar para una orden
 que ya existe, así que el webhook nunca tiene que inventar una fila a partir de
 datos del proveedor.
 
+### Medios de pago
+
+La preferencia declara `payment_methods` de forma explícita:
+
+- `excluded_payment_types: ["ticket", "atm"]`. Son medios **offline**: el
+  comprador se lleva un comprobante y paga horas o días después, en OXXO o en
+  una ventanilla. El cupo retiene un pedido `pending` durante `hold_minutes`
+  (30 min) y la preferencia expira en el mismo plazo, así que un comprobante
+  offline nace muerto o se liquida cuando sus lugares ya se liberaron a otra
+  persona. **Habilitarlos exige primero subir las dos ventanas** por encima del
+  vencimiento del comprobante (p. ej. tres días en `hold_minutes`, en
+  `expiration_date_to` y en `CHECKOUT_EXPIRY_MINUTES`); no basta con quitar la
+  exclusión.
+- `installments: 12`. El costo de las parcialidades lo asume el comprador.
+
+Los ítems declaran `category_id: "tickets"`: es el dato de industria que
+MercadoPago usa para puntuar el riesgo de la operación y aprobarla.
+
+### Reconciliación cuando el webhook no llega
+
+El webhook es el camino principal y sigue siendo la autoridad, pero no es el
+único. Si la notificación nunca llega —URL mal registrada en el panel, caída
+del proveedor, entrega perdida mientras el sitio estaba abajo— un pedido pagado
+se quedaría `pending` para siempre: sin comprobante para el comprador, sin
+lugar comprometido y sin nada en `/admin` que delate el problema.
+
+`server/use-cases/reconcile-ticket-order.ts` cierra ese hueco desde las páginas
+de retorno. Sólo actúa sobre un pedido `pending`: consulta
+`GET /v1/payments/search?external_reference=<order_id>`, y si encuentra un pago
+en estado terminal lo aplica con el mismo `record_ticket_order_payment`
+idempotente y dispara los correos pendientes.
+
+- Un pedido en estado terminal **no** se vuelve a leer: una notificación tardía
+  en `pending` nunca puede degradar un pedido ya `paid`.
+- Un pedido puede acumular varios intentos (una tarjeta rechazada y luego una
+  aprobada); el pago aprobado gana sobre cualquier otro.
+- La reconciliación está limitada por `reconcile:<order_id>` en la misma
+  ventana de Upstash, así que refrescar la página de retorno no se convierte en
+  una ráfaga de llamadas al proveedor. Quedar limitado no es un error: se
+  muestra el estado almacenado y el webhook o la siguiente visita se ponen al
+  día.
+
 ### Idempotencia
 
 Tres capas, todas necesarias:
@@ -174,30 +220,42 @@ desde cero y las 56 aserciones de `004_`, `005_` y `006_` pasan. Eso encontró y
 corrigió dos defectos reales (`pg_catalog.coalesce` y `pg_catalog.greatest`, que
 son construcciones SQL y no funciones del catálogo).
 
+Ya hecho:
+
+- El historial **completo** de migraciones aplica desde cero sobre PostgreSQL
+  16 con los roles `anon`/`authenticated`/`service_role`: los 21 archivos, no
+  sólo los dos nuevos.
+- Las seis suites pgTAP pasan: 135 aserciones, cero fallos de aplicación.
+  Ninguna función de `public` es ejecutable por `anon` ni por `authenticated`.
+- `lib/database.types.ts` regenerado desde ese esquema. El contrato local
+  `TicketOrderDatabase` y los `as never` de los repositorios de órdenes se
+  eliminaron: ahora el acceso a las tablas nuevas se typechequea de verdad.
+- `npm run typecheck`, `npm run lint`, `npm test` (366) y `npm run build` en
+  verde.
+
 Falta, y en este orden:
 
-1. `npx supabase db start && npx supabase db reset --local` — validar el
-   historial completo de migraciones, incluidas las heredadas, con el CLI
-   fijado. La validación local se hizo aplicando sólo las dos migraciones
-   nuevas, que son autocontenidas.
-2. `npx supabase test db --local` — confirmar `004_`, `005_` y `006_` con el
-   runner oficial.
-3. `npx supabase db lint --local --level error --fail-on error`.
-4. `npm run db:types` y borrar el contrato local `TicketOrderDatabase` de
-   `server/repositories/ticket-order-repository.ts`, que existe sólo mientras
-   `lib/database.types.ts` no conozca las tablas nuevas.
-5. Backup verificado y aplicación de la migración en Production, siguiendo
+1. `npx supabase db reset --local` y `npx supabase test db --local` con el CLI
+   fijado y Docker, para confirmar lo anterior con el runner oficial en lugar
+   de un PostgreSQL levantado a mano.
+2. `npx supabase db lint --local --level error --fail-on error`.
+3. Backup verificado y aplicación de la migración en Production, siguiendo
    `docs/DEPLOYMENT.md`. Revisar Security y Performance Advisors.
-6. Configurar en Vercel Production `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-) y
-   `MERCADOPAGO_WEBHOOK_SECRET`.
-7. En el panel de MercadoPago: registrar el webhook
+4. Configurar en Vercel Production `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-) y
+   `MERCADOPAGO_WEBHOOK_SECRET`, ambos **sólo** en el target Production.
+5. En el panel de MercadoPago: registrar el webhook
    `https://scsecuritysummit.com/api/webhooks/mercadopago` para el tópico
-   `payment` y copiar el secreto de firma.
-8. Desplegar y hacer una compra controlada de prueba: una con CFDI y una sin
+   `payment` y copiar el secreto de firma. El botón *Simular notificación* del
+   panel envía un `data.id` inventado; el webhook lo autentica, no lo encuentra
+   en la API y responde 500 a propósito, porque un 500 es lo que hace que
+   MercadoPago reintente un fallo real. **Una simulación fallida no significa
+   que la integración esté mal**: la prueba válida es el pago controlado del
+   paso siguiente.
+6. Desplegar y hacer una compra controlada de prueba: una con CFDI y una sin
    CFDI. Verificar orden, evento, importe, estado y correo.
-9. Confirmar con el responsable fiscal el proceso de timbrado a 72 horas y
+7. Confirmar con el responsable fiscal el proceso de timbrado a 72 horas y
    quién opera `invoice_status` / `cfdi_uuid`.
-10. **Aprobación de privacidad del aviso `2026-08-24`.** El Aviso de
+8. **Aprobación de privacidad del aviso `2026-08-24`.** El Aviso de
     Privacidad y los Términos ya se reescribieron para cubrir pagos en sitio,
     la categoría de datos fiscales y la retención de cinco años, y
     `INQUIRY_CONSENT_VERSION` se subió a `2026-08-24`. Esa versión **todavía no
