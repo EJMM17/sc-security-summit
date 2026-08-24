@@ -4,12 +4,16 @@ type PaymentEvent =
   | "ticket_order_persisted"
   | "ticket_order_replayed"
   | "ticket_order_persistence_failed"
+  | "ticket_order_sold_out"
   | "ticket_order_preference_created"
   | "ticket_order_preference_failed"
   | "ticket_payment_recorded"
   | "ticket_payment_ignored"
   | "ticket_webhook_rejected"
-  | "ticket_webhook_failed";
+  | "ticket_webhook_failed"
+  | "ticket_order_notification_sent"
+  | "ticket_order_notification_retry"
+  | "ticket_order_notification_dead";
 
 type PaymentEventContext = {
   orderId?: string;
@@ -21,6 +25,10 @@ type PaymentEventContext = {
   outcome?: string;
   code?: string;
   totalCents?: number;
+  notificationId?: string;
+  template?: string;
+  attempt?: number;
+  durationMs?: number;
 };
 
 /**
@@ -42,7 +50,8 @@ export function recordPaymentEvent(
   if (
     event === "ticket_order_persistence_failed" ||
     event === "ticket_order_preference_failed" ||
-    event === "ticket_webhook_failed"
+    event === "ticket_webhook_failed" ||
+    event === "ticket_order_notification_dead"
   ) {
     console.error(JSON.stringify(entry));
   } else {

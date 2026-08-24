@@ -24,6 +24,18 @@ type TicketOrderRpc = {
     Args: Record<string, unknown>;
     Returns: unknown;
   };
+  claim_ticket_order_notification: {
+    Args: Record<string, unknown>;
+    Returns: unknown;
+  };
+  claim_ticket_order_notifications: {
+    Args: Record<string, unknown>;
+    Returns: unknown;
+  };
+  complete_ticket_order_notification: {
+    Args: Record<string, unknown>;
+    Returns: unknown;
+  };
   attach_ticket_order_preference: {
     Args: Record<string, unknown>;
     Returns: unknown;
@@ -72,8 +84,9 @@ function firstRpcRow(data: unknown): unknown {
 }
 
 const createOrderRowSchema = z.object({
-  order_id: z.string().uuid(),
-  outcome: z.enum(["created", "replayed", "conflict"]),
+  // `sold_out` carries no order because none was created.
+  order_id: z.string().uuid().nullable(),
+  outcome: z.enum(["created", "replayed", "conflict", "sold_out"]),
   total_cents: z.coerce.number().int().nonnegative().nullable(),
 });
 
@@ -106,7 +119,8 @@ const storedOrderRowSchema = z.object({
 
 export type PersistTicketOrderResult =
   | { outcome: "created" | "replayed"; orderId: string; totalCents: number }
-  | { outcome: "conflict"; orderId: string };
+  | { outcome: "conflict"; orderId: string }
+  | { outcome: "sold_out" };
 
 export type StoredTicketOrder = z.infer<typeof storedOrderRowSchema>;
 
@@ -193,6 +207,14 @@ export async function persistTicketOrder(
   }
 
   const row = parsed.data;
+  if (row.outcome === "sold_out") {
+    return { outcome: "sold_out" };
+  }
+  if (!row.order_id) {
+    throw new TicketOrderRepositoryError("create_ticket_order_response", {
+      code: "missing_order_id",
+    });
+  }
   if (row.outcome === "conflict") {
     return { outcome: "conflict", orderId: row.order_id };
   }
@@ -294,4 +316,220 @@ export async function getTicketOrderSummary(
     });
   }
   return parsed.data;
+}
+
+// ---------------------------------------------------------------------------
+// Notification outbox
+// ---------------------------------------------------------------------------
+
+const claimedNotificationRowSchema = z.object({
+  notification_id: z.string().uuid(),
+  order_id: z.string().uuid(),
+  attempt_number: z.coerce.number().int().min(1),
+  template: z.string().min(1).max(120),
+});
+
+const notificationStatusRowSchema = z.object({
+  status: z.enum(["pending", "processing", "sent", "retry", "dead"]),
+});
+
+export type TicketNotificationStatus = z.infer<
+  typeof notificationStatusRowSchema
+>["status"];
+
+export type ClaimedTicketOrderNotification = {
+  notificationId: string;
+  orderId: string;
+  attemptNumber: number;
+  template: string;
+};
+
+function parseNotificationClaims(
+  data: unknown,
+  operation: string,
+): ClaimedTicketOrderNotification[] {
+  if (!Array.isArray(data)) {
+    throw new TicketOrderRepositoryError(operation, { code: "invalid_response" });
+  }
+
+  return data.map((value) => {
+    const parsed = claimedNotificationRowSchema.safeParse(value);
+    if (!parsed.success) {
+      throw new TicketOrderRepositoryError(operation, {
+        code: "invalid_response",
+      });
+    }
+    return {
+      notificationId: parsed.data.notification_id,
+      orderId: parsed.data.order_id,
+      attemptNumber: parsed.data.attempt_number,
+      template: parsed.data.template,
+    };
+  });
+}
+
+export async function claimTicketOrderNotification(
+  notificationId: string,
+): Promise<ClaimedTicketOrderNotification | null> {
+  const { data, error } = await rpcClient().rpc(
+    "claim_ticket_order_notification",
+    { p_notification_id: notificationId },
+  );
+  if (error) {
+    throw new TicketOrderRepositoryError("claim_ticket_order_notification", error);
+  }
+  return (
+    parseNotificationClaims(data, "claim_ticket_order_notification_response")[0] ??
+    null
+  );
+}
+
+export async function claimDueTicketOrderNotifications(
+  limit: number,
+): Promise<ClaimedTicketOrderNotification[]> {
+  const boundedLimit = Math.max(1, Math.min(Math.trunc(limit), 25));
+  const { data, error } = await rpcClient().rpc(
+    "claim_ticket_order_notifications",
+    { p_limit: boundedLimit },
+  );
+  if (error) {
+    throw new TicketOrderRepositoryError("claim_ticket_order_notifications", error);
+  }
+  return parseNotificationClaims(
+    data,
+    "claim_ticket_order_notifications_response",
+  );
+}
+
+export async function completeTicketOrderNotification(input: {
+  notificationId: string;
+  attemptNumber: number;
+  result: "sent" | "retry" | "dead";
+  durationMs: number;
+  providerMessageId?: string;
+  errorCode?: string;
+  nextAttemptAt?: string;
+}): Promise<TicketNotificationStatus> {
+  const { data, error } = await rpcClient().rpc(
+    "complete_ticket_order_notification",
+    {
+      p_notification_id: input.notificationId,
+      p_attempt_number: input.attemptNumber,
+      p_result: input.result,
+      p_duration_ms: Math.max(0, Math.min(Math.trunc(input.durationMs), 900_000)),
+      p_provider_message_id: input.providerMessageId?.slice(0, 255),
+      p_error_code: input.errorCode?.slice(0, 120),
+      p_next_attempt_at: input.nextAttemptAt,
+    },
+  );
+
+  if (error) {
+    throw new TicketOrderRepositoryError(
+      "complete_ticket_order_notification",
+      error,
+    );
+  }
+
+  const parsed = notificationStatusRowSchema.safeParse(firstRpcRow(data));
+  if (!parsed.success) {
+    throw new TicketOrderRepositoryError(
+      "complete_ticket_order_notification_response",
+      { code: "invalid_response" },
+    );
+  }
+  return parsed.data.status;
+}
+
+export async function getTicketNotificationStatus(
+  notificationId: string,
+): Promise<TicketNotificationStatus> {
+  const { data, error } = await getSupabaseServerClient()
+    .from("ticket_order_notifications" as never)
+    .select("status")
+    .eq("id", notificationId)
+    .single();
+
+  if (error) {
+    throw new TicketOrderRepositoryError("get_notification_status", error);
+  }
+  const parsed = notificationStatusRowSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new TicketOrderRepositoryError("get_notification_status_response", {
+      code: "invalid_response",
+    });
+  }
+  return parsed.data.status;
+}
+
+const notifiableOrderRowSchema = z.object({
+  id: z.string().uuid(),
+  status: z.enum(
+    TICKET_ORDER_STATUSES as unknown as [TicketOrderStatus, ...TicketOrderStatus[]],
+  ),
+  tier: z.enum(["plus", "general", "estudiante"]),
+  quantity: z.coerce.number().int().min(1),
+  subtotal_cents: z.coerce.number().int().nonnegative(),
+  tax_cents: z.coerce.number().int().nonnegative(),
+  total_cents: z.coerce.number().int().nonnegative(),
+  tax_rate_basis_points: z.coerce.number().int().nonnegative(),
+  buyer_name: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  company: z.string().nullable(),
+  language: z.enum(["es", "en"]),
+  requires_invoice: z.boolean(),
+});
+
+export type NotifiableTicketOrder = z.infer<typeof notifiableOrderRowSchema>;
+
+/**
+ * Reads the fields the confirmation emails need. Fiscal data is deliberately
+ * not joined: the receipt states that a CFDI was requested, never the RFC.
+ */
+export async function getNotifiableTicketOrder(
+  orderId: string,
+): Promise<NotifiableTicketOrder> {
+  const { data, error } = await getSupabaseServerClient()
+    .from("ticket_orders" as never)
+    .select(
+      "id,status,tier,quantity,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,language,requires_invoice",
+    )
+    .eq("id", orderId)
+    .single();
+
+  if (error) throw new TicketOrderRepositoryError("get_notifiable_order", error);
+  const parsed = notifiableOrderRowSchema.safeParse(data);
+  if (!parsed.success) {
+    throw new TicketOrderRepositoryError("get_notifiable_order_response", {
+      code: "invalid_response",
+    });
+  }
+  return parsed.data;
+}
+
+const notificationIdRowSchema = z.object({ id: z.string().uuid() });
+
+/**
+ * Notification ids enqueued for an order and not yet delivered. The webhook
+ * uses this to attempt an immediate send; anything it misses is picked up by
+ * cron from the same outbox.
+ */
+export async function listDeliverableTicketOrderNotificationIds(
+  orderId: string,
+): Promise<string[]> {
+  const { data, error } = await getSupabaseServerClient()
+    .from("ticket_order_notifications" as never)
+    .select("id")
+    .eq("order_id", orderId)
+    .in("status", ["pending", "retry"]);
+
+  if (error) {
+    throw new TicketOrderRepositoryError("list_order_notifications", error);
+  }
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = notificationIdRowSchema.safeParse(row);
+    return parsed.success ? [parsed.data.id] : [];
+  });
 }

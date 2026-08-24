@@ -56,11 +56,17 @@ export default function TerminosCondiciones() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">2. Compra de Accesos</h2>
             <p>
-              La compra de accesos individuales se realiza a través de <strong>Eventbrite</strong>, la
-              plataforma de boletaje del Evento, a la que se llega desde cualquier botón de acceso del sitio.
-              Al completar la compra, Eventbrite envía al participante su <strong>boleto</strong> y el
-              comprobante correspondiente por correo electrónico. Dicho boleto es el documento que acredita
-              el acceso al Evento y deberá presentarse el día de su celebración.
+              La compra de accesos individuales se realiza <strong>en este
+              sitio</strong>, desde cualquier botón de acceso. El participante
+              elige el tipo y la cantidad de accesos y completa el pago en el
+              entorno seguro de <strong>MercadoPago</strong>.
+            </p>
+            <p className="mt-3">
+              Al confirmarse el pago, Lanz Logistics envía por correo
+              electrónico el <strong>comprobante de compra</strong>, que
+              incluye el desglose del I.V.A. y la referencia de la orden. Ese
+              comprobante es el documento que acredita el acceso al Evento y
+              deberá presentarse el día de su celebración.
             </p>
             <p className="mt-3">
               Lanz Logistics se reserva el derecho de rechazar o cancelar accesos en caso de datos
@@ -71,9 +77,25 @@ export default function TerminosCondiciones() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">3. Proceso de Pago</h2>
             <p>
-              El pago de los accesos individuales se procesa <strong>directamente en Eventbrite</strong> al
-              momento de la compra, con los métodos de pago que dicha plataforma habilite. Los precios
-              indicados en el sitio ya incluyen I.V.A.
+              El pago de los accesos individuales se procesa a través de{" "}
+              <strong>MercadoPago</strong> al momento de la compra, con los
+              métodos que dicha plataforma habilite: tarjeta de crédito o
+              débito, transferencia SPEI y pago en efectivo. Lanz Logistics no
+              recibe ni almacena datos de tarjetas bancarias.
+            </p>
+            <p className="mt-3">
+              Los precios publicados en el sitio{" "}
+              <strong>no incluyen I.V.A.</strong> El impuesto del{" "}
+              <strong>16%</strong> se calcula y se muestra desglosado antes de
+              confirmar el pago, y el importe total es el que se cobra. El
+              I.V.A. se causa con independencia de que el participante solicite
+              o no factura.
+            </p>
+            <p className="mt-3">
+              Los pagos con SPEI o en efectivo pueden tardar hasta{" "}
+              <strong>48 horas</strong> en acreditarse. El acceso no se
+              considera confirmado hasta que MercadoPago reporta el pago como
+              aprobado.
             </p>
             <p className="mt-3">
               Los <strong>pases corporativos</strong> son la excepción: se solicitan a través del formulario
@@ -94,16 +116,19 @@ export default function TerminosCondiciones() {
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
                 hola@scsecuritysummit.com
               </a>{" "}
-              indicando el <strong>número de orden de Eventbrite</strong>, con al menos{" "}
+              indicando la <strong>referencia de su orden</strong>, con al menos{" "}
               <strong>15 días naturales de anticipación</strong> a la fecha del Evento para ser
               elegibles a un reembolso del 80% del monto pagado. Cancelaciones con menos de 15 días de
               anticipación no son elegibles para reembolso; sin embargo, el participante podrá designar a
               un sustituto previo aviso al organizador.
             </p>
             <p className="mt-3">
-              El reembolso se procesa a través de Eventbrite, por el mismo medio de pago utilizado en la
-              compra. La transacción se rige adicionalmente por los términos y condiciones de dicha
-              plataforma.
+              El reembolso se procesa a través de MercadoPago, por el mismo
+              medio de pago utilizado en la compra, y comprende el importe
+              reembolsable junto con el I.V.A. proporcional. Si se emitió un
+              CFDI, se cancelará o se emitirá la nota de crédito que
+              corresponda. La transacción se rige adicionalmente por los
+              términos y condiciones de MercadoPago.
             </p>
             <p className="mt-3">
               Lanz Logistics se reserva el derecho de cancelar o reprogramar el Evento por causas de fuerza
@@ -125,14 +150,24 @@ export default function TerminosCondiciones() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">6. Facturación (CFDI)</h2>
             <p>
-              Para solicitar factura, el participante deberá enviar sus datos fiscales y su número de orden
-              de Eventbrite a{" "}
+              Para solicitar factura, el participante deberá marcar la casilla{" "}
+              <strong>&ldquo;Necesito factura (CFDI)&rdquo;</strong> durante la
+              compra y capturar su RFC, razón social, régimen fiscal, uso del
+              CFDI y código postal fiscal. El CFDI se emitirá dentro de las{" "}
+              <strong>72 horas hábiles</strong> posteriores a la confirmación
+              del pago, con los datos fiscales así proporcionados. No se
+              emitirán facturas con datos distintos a los capturados en la
+              compra.
+            </p>
+            <p className="mt-3">
+              Si el participante no solicita factura durante la compra, podrá
+              pedirla escribiendo a{" "}
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">
                 hola@scsecuritysummit.com
-              </a>
-              . La factura CFDI se emitirá dentro de las <strong>72 horas hábiles</strong> posteriores a la
-              confirmación del pago, con los datos fiscales así proporcionados. No se emitirán facturas con
-              datos distintos a los recibidos por esa vía.
+              </a>{" "}
+              con la referencia de su orden, siempre{" "}
+              <strong>dentro del mismo mes calendario</strong> en que se
+              realizó el pago. Vencido ese plazo no es posible emitir el CFDI.
             </p>
           </section>
 

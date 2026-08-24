@@ -120,6 +120,15 @@ export async function createTicketCheckoutUseCase(
     return { ok: false, reason: "storage_unavailable" };
   }
 
+  if (persisted.outcome === "sold_out") {
+    recordPaymentEvent("ticket_order_sold_out", {
+      tier: order.tier,
+      quantity: order.quantity,
+      language: order.language,
+    });
+    return { ok: false, reason: "sold_out" };
+  }
+
   if (persisted.outcome === "conflict") {
     recordPaymentEvent("ticket_order_persistence_failed", {
       orderId: persisted.orderId,

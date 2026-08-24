@@ -10,11 +10,20 @@ vi.mock("@/server/services/mercadopago-client", async () => {
 
 vi.mock("@/server/repositories/ticket-order-repository", () => ({
   recordPayment: vi.fn(),
+  listDeliverableTicketOrderNotificationIds: vi.fn(),
+}));
+
+vi.mock("@/server/services/ticket-order-notifier", () => ({
+  tryImmediateTicketOrderNotification: vi.fn(),
 }));
 
 import { POST } from "@/app/api/webhooks/mercadopago/route";
 import { getPayment } from "@/server/services/mercadopago-client";
-import { recordPayment } from "@/server/repositories/ticket-order-repository";
+import {
+  listDeliverableTicketOrderNotificationIds,
+  recordPayment,
+} from "@/server/repositories/ticket-order-repository";
+import { tryImmediateTicketOrderNotification } from "@/server/services/ticket-order-notifier";
 import { buildSignatureManifest } from "@/server/services/mercadopago-signature";
 
 const SECRET = "webhook-secret-value";
@@ -25,6 +34,8 @@ const URL_STRING = "https://scsecuritysummit.com/api/webhooks/mercadopago";
 
 const mockedGetPayment = vi.mocked(getPayment);
 const mockedRecordPayment = vi.mocked(recordPayment);
+const mockedListNotifications = vi.mocked(listDeliverableTicketOrderNotificationIds);
+const mockedNotify = vi.mocked(tryImmediateTicketOrderNotification);
 
 function signedRequest(options: {
   dataId?: string;
@@ -79,6 +90,10 @@ describe("POST /api/webhooks/mercadopago", () => {
       status: "paid",
       outcome: "updated",
     });
+    mockedListNotifications.mockReset();
+    mockedNotify.mockReset();
+    mockedListNotifications.mockResolvedValue(["a1b2c3d4-1111-4222-8333-444455556666"]);
+    mockedNotify.mockResolvedValue("sent");
   });
 
   afterEach(() => {
@@ -188,5 +203,31 @@ describe("POST /api/webhooks/mercadopago", () => {
     const logged = info.mock.calls.map((call) => String(call[0])).join("\n");
     expect(logged).toContain(ORDER_ID);
     expect(logged).not.toContain("@");
+  });
+
+  it("dispatches the queued confirmation emails once an order is paid", async () => {
+    await POST(signedRequest());
+    expect(mockedListNotifications).toHaveBeenCalledWith(ORDER_ID);
+    expect(mockedNotify).toHaveBeenCalledWith(
+      "a1b2c3d4-1111-4222-8333-444455556666",
+    );
+  });
+
+  it("still acknowledges the payment when the email dispatch fails", async () => {
+    mockedListNotifications.mockRejectedValue(new Error("outbox unavailable"));
+    const response = await POST(signedRequest());
+    // The payment was recorded; making MercadoPago retry would re-apply a
+    // notification that already succeeded.
+    expect(response.status).toBe(200);
+  });
+
+  it("does not dispatch emails for a duplicate delivery", async () => {
+    mockedRecordPayment.mockResolvedValue({
+      orderId: ORDER_ID,
+      status: "paid",
+      outcome: "duplicate",
+    });
+    await POST(signedRequest());
+    expect(mockedNotify).not.toHaveBeenCalled();
   });
 });

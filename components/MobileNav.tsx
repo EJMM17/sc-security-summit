@@ -4,7 +4,7 @@ import type React from "react";
 import { useEffect, useState } from "react";
 import { ArrowRight, Menu, X } from "lucide-react";
 import { useFocusTrap } from "@/hooks/use-focus-trap";
-import { EVENTBRITE_URL, NAV_LINKS } from "@/lib/content";
+import { checkoutHref, NAV_LINKS } from "@/lib/content";
 
 type Language = "es" | "en";
 
@@ -80,9 +80,7 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
           ))}
           <hr className="my-2 border-[var(--border-lighter)]" />
           <a
-            href={EVENTBRITE_URL}
-            target="_blank"
-            rel="noreferrer"
+            href={checkoutHref(language)}
             onClick={() => setOpen(false)}
             className="btn-primary mt-1 text-sm"
           >

@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import Icon from "@/components/icon";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
 import SummitIcon from "./_primitives/SummitIcon";
@@ -65,9 +65,7 @@ export default function Value({ language }: { language: Language }) {
                   ))}
                 </div>
                 <a
-                  href={EVENTBRITE_URL}
-                  target="_blank"
-                  rel="noreferrer"
+                  href={checkoutHref(language)}
                   className="btn-primary w-full mt-8 py-3 text-sm justify-center"
                 >
                   {ui.audienceCardCTA} <ArrowRight className="w-4 h-4" />

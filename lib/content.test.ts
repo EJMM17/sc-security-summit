@@ -51,7 +51,8 @@ describe("content SSOT", () => {
   });
 
   it("keeps the FAQ free of the retired registration flow", () => {
-    // Ticketing lives in Eventbrite: no on-site form, no folio, no bank transfer.
+    // The retired 2025 registration flow: no folio, no manual registration
+    // form, no bank transfer. Tickets are now paid with MercadoPago.
     const retired = /folio|formulario de registro|transferencia bancaria|confirmation code|bank transfer/i;
     for (const language of ["es", "en"] as const) {
       for (const { question, answer } of CONTENT[language].faq) {

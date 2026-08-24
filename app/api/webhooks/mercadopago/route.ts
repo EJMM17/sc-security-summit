@@ -9,7 +9,11 @@ import {
   getWebhookSecret,
   verifyWebhookSignature,
 } from "@/server/services/mercadopago-signature";
-import { recordPayment } from "@/server/repositories/ticket-order-repository";
+import {
+  listDeliverableTicketOrderNotificationIds,
+  recordPayment,
+} from "@/server/repositories/ticket-order-repository";
+import { tryImmediateTicketOrderNotification } from "@/server/services/ticket-order-notifier";
 import { recordPaymentEvent } from "@/server/services/payment-observability";
 
 export const runtime = "nodejs";
@@ -123,6 +127,29 @@ export async function POST(request: Request): Promise<NextResponse> {
         outcome: result.outcome,
       },
     );
+
+    // Becoming paid enqueues the receipt and the internal notice through a
+    // database trigger. Try to deliver them now; anything that fails here
+    // stays in the outbox and cron retries it. A failure must not turn a
+    // recorded payment into a 500, which would make MercadoPago redeliver a
+    // notification that was already applied.
+    if (result.outcome === "updated" && result.status === "paid") {
+      try {
+        const notificationIds = await listDeliverableTicketOrderNotificationIds(
+          result.orderId,
+        );
+        await Promise.all(
+          notificationIds.map((id) =>
+            tryImmediateTicketOrderNotification(id).catch(() => "queued"),
+          ),
+        );
+      } catch {
+        recordPaymentEvent("ticket_order_notification_retry", {
+          orderId: result.orderId,
+          code: "immediate_dispatch_failed",
+        });
+      }
+    }
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (error) {

@@ -93,17 +93,25 @@ export default async function AdminDashboard({
           </h1>
           <p className="mt-1 text-sm text-slate-600">
             Pases corporativos y patrocinios enviados desde los formularios del
-            sitio. Los tickets individuales viven en Eventbrite.
+            sitio. Las compras de accesos individuales están en Órdenes.
           </p>
         </div>
-        <form action={logout}>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/admin/ordenes"
+            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+          >
+            Órdenes de accesos
+          </Link>
+          <form action={logout}>
           <button
             type="submit"
             className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
           >
             Cerrar sesión
           </button>
-        </form>
+          </form>
+        </div>
       </header>
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">

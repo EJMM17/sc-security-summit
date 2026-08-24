@@ -23,7 +23,7 @@ export default async function AdminLoginPage() {
         <LoginForm />
       </div>
       <p className="mt-6 text-center text-xs text-slate-500">
-        Los tickets individuales se gestionan en Eventbrite.
+        Las compras de accesos individuales están en Órdenes.
       </p>
     </main>
   );

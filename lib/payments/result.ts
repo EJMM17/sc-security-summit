@@ -4,6 +4,7 @@ export type CheckoutFailureReason =
   | "rate_limited"
   | "storage_unavailable"
   | "idempotency_conflict"
+  | "sold_out"
   | "provider_unavailable"
   | "unexpected";
 
@@ -40,3 +41,10 @@ export const TICKET_ORDER_STATUSES: readonly TicketOrderStatus[] = [
   "refunded",
   "charged_back",
 ];
+
+export type TicketOrderNotificationTemplate =
+  | "ticket_buyer_receipt_v1"
+  | "ticket_order_internal_v1";
+
+export const TICKET_ORDER_NOTIFICATION_TEMPLATES: readonly TicketOrderNotificationTemplate[] =
+  ["ticket_buyer_receipt_v1", "ticket_order_internal_v1"];

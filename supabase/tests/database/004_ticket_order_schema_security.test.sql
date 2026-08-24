@@ -123,10 +123,17 @@ select ok(
 );
 
 -- Every function must pin an empty search_path so a hostile schema on the
--- caller's path cannot shadow a referenced object.
+-- caller's path cannot shadow a referenced object. Postgres normalizes the
+-- stored setting to search_path="", so both spellings are accepted.
 select ok(
   (
-    select bool_and(p.proconfig @> array['search_path='])
+    select bool_and(
+      exists (
+        select 1
+        from unnest(p.proconfig) as setting
+        where setting ~ '^search_path=("")?$'
+      )
+    )
     from pg_proc as p
     join pg_namespace as n on n.oid = p.pronamespace
     where n.nspname = 'public'

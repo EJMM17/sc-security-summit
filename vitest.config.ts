@@ -29,6 +29,7 @@ export default defineConfig({
         "lib/payments/**/*.ts",
         "server/services/mercadopago-client.ts",
         "server/services/mercadopago-signature.ts",
+        "server/services/ticket-order-notifier.ts",
         "server/services/payment-observability.ts",
         "server/use-cases/create-ticket-checkout.ts",
         "lib/supabase-server.ts",

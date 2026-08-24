@@ -427,6 +427,7 @@ export function checkoutErrorMessage(
     invalidInvoice: string;
     rateLimited: string;
     conflict: string;
+    soldOut: string;
     providerUnavailable: string;
     error: string;
   },
@@ -440,6 +441,8 @@ export function checkoutErrorMessage(
       return copy.rateLimited;
     case "idempotency_conflict":
       return copy.conflict;
+    case "sold_out":
+      return copy.soldOut;
     case "provider_unavailable":
       return copy.providerUnavailable;
     default:

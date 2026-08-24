@@ -1,9 +1,9 @@
 # Pagos con MercadoPago e IVA
 
-> Estado: implementado en código, **no desplegado**. La migración
-> `20260824120000_add_ticket_orders.sql` no se ha aplicado a ningún entorno.
-> Antes de vender un solo acceso hay que completar la sección
-> *Puesta en producción*.
+> Estado: implementado y validado contra un PostgreSQL 16 local (migraciones
+> aplicadas desde cero + 56 aserciones pgTAP en verde). **No desplegado**: las
+> migraciones no se han aplicado a Supabase. Antes de vender un solo acceso hay
+> que completar la sección *Puesta en producción*.
 
 ## Qué cambia en el producto
 
@@ -12,17 +12,20 @@ esta integración el sitio vende directamente los tres accesos publicados
 (`plus`, `general`, `estudiante`), los cobra con MercadoPago Checkout Pro,
 desglosa el IVA y captura datos fiscales para quien solicite CFDI.
 
+**Eventbrite quedó retirado del sitio.** No queda ningún enlace: todos los
+CTAs (Header, Hero, Value, NetworkingHub, FinalCTA, MobileNav, sección de
+accesos y las landings de SEO) apuntan a `/checkout`. Se eliminaron la
+constante `EVENTBRITE_URL` y la variable `NEXT_PUBLIC_EVENTBRITE_URL`, y los
+Términos y el Aviso de Privacidad ya no lo mencionan. Los boletos vendidos en
+Eventbrite **antes** de este cambio siguen siendo válidos y se operan desde el
+panel de Eventbrite; el sitio ya no los referencia.
+
 Lo que **no** cambia:
 
 - los pases corporativos y los patrocinios siguen siendo `inquiries`
   (cotización por correo, sin cobro en línea);
 - el CFDI se timbra manualmente. El sitio captura, valida y almacena los datos
-  fiscales; no hay PAC integrado;
-- los CTAs genéricos de "comprar boleto" del resto del sitio (Header, Hero,
-  Value, NetworkingHub, FinalCTA, MobileNav, landings de SEO) siguen apuntando
-  a Eventbrite. **Sólo los botones de la sección de accesos apuntan a
-  `/checkout`.** Decidir si Eventbrite se retira por completo es una decisión
-  de negocio pendiente.
+  fiscales; no hay PAC integrado.
 
 ## Reglas de IVA
 
@@ -165,13 +168,20 @@ Bricks en el navegador, que exigirán además ampliar la CSP del middleware.
 
 ## Puesta en producción
 
-Pendiente y en este orden:
+Las migraciones y sus pruebas **ya se ejecutaron** contra un PostgreSQL 16
+local con roles `anon`/`authenticated`/`service_role` y pgTAP: ambas aplican
+desde cero y las 56 aserciones de `004_`, `005_` y `006_` pasan. Eso encontró y
+corrigió dos defectos reales (`pg_catalog.coalesce` y `pg_catalog.greatest`, que
+son construcciones SQL y no funciones del catálogo).
 
-1. `npx supabase db start && npx supabase db reset --local` — validar que la
-   migración aplica.
-2. `npx supabase test db --local` — pgTAP `004_` y `005_` deben pasar.
-   **Esto no se ha podido ejecutar todavía**: falta Docker en el entorno donde
-   se escribió la migración.
+Falta, y en este orden:
+
+1. `npx supabase db start && npx supabase db reset --local` — validar el
+   historial completo de migraciones, incluidas las heredadas, con el CLI
+   fijado. La validación local se hizo aplicando sólo las dos migraciones
+   nuevas, que son autocontenidas.
+2. `npx supabase test db --local` — confirmar `004_`, `005_` y `006_` con el
+   runner oficial.
 3. `npx supabase db lint --local --level error --fail-on error`.
 4. `npm run db:types` y borrar el contrato local `TicketOrderDatabase` de
    `server/repositories/ticket-order-repository.ts`, que existe sólo mientras
@@ -187,16 +197,79 @@ Pendiente y en este orden:
    CFDI. Verificar orden, evento, importe, estado y correo.
 9. Confirmar con el responsable fiscal el proceso de timbrado a 72 horas y
    quién opera `invoice_status` / `cfdi_uuid`.
-10. Confirmar con el responsable de privacidad la retención de 5 años y la
-    nueva categoría de datos fiscales en el Aviso de Privacidad — el aviso
-    aprobado el 2026-07-30 **no** contempla datos fiscales ni pagos.
+10. **Aprobación de privacidad del aviso `2026-08-24`.** El Aviso de
+    Privacidad y los Términos ya se reescribieron para cubrir pagos en sitio,
+    la categoría de datos fiscales y la retención de cinco años, y
+    `INQUIRY_CONSENT_VERSION` se subió a `2026-08-24`. Esa versión **todavía no
+    está aprobada** por la persona responsable de privacidad. El texto describe
+    con precisión lo que hace el sistema; la aprobación formal es un trámite
+    aparte y es bloqueante para vender.
+
+## Cupo
+
+`public.ticket_capacity` limita cuántos asientos pueden comprometerse, en
+total y por tipo de acceso. **Es opt-in**: un ámbito sin fila es ilimitado, así
+que nada bloquea una venta hasta que operaciones configure un número real.
+Mientras la tabla esté vacía, el control existe pero no restringe nada.
+
+Para activarlo, inserta filas desde Supabase Studio:
+
+```sql
+insert into public.ticket_capacity (scope, total_seats, hold_minutes)
+values ('total', 300, 30), ('estudiante', 40, 30);
+```
+
+Cuentan como comprometidos los pedidos `paid` e `in_process`, más los
+`pending` cuya ventana de reserva (`hold_minutes`) sigue viva. Un checkout
+abandonado libera sus lugares al vencer esa ventana, que debe ser igual o mayor
+que la expiración de la preferencia de MercadoPago (30 minutos).
+
+`create_ticket_order` toma un advisory lock antes de verificar el cupo, así que
+dos compradores concurrentes no pueden pasar ambos un chequeo en el que sólo
+cabe uno. Un pedido que no cabe devuelve `sold_out` y **no** almacena orden. Un
+replay se responde antes del chequeo de cupo: un evento agotado nunca rechaza a
+alguien que ya tiene su orden.
+
+## Correos de confirmación
+
+Cuando una orden pasa a `paid`, un trigger encola dos correos en
+`public.ticket_order_notifications`: el comprobante para el comprador y el
+aviso interno para el buzón de operaciones. El outbox replica el contrato del
+de `inquiries`: lease de 15 minutos, cinco intentos, backoff 1/5/15/60 minutos
+y registro append-only de cada intento.
+
+El webhook intenta el envío inmediato; lo que falle se queda en el outbox y lo
+reintenta el cron. El cron `/api/cron/inquiry-notifications` drena **ambas**
+colas en la misma corrida de cinco minutos; si cualquiera falla, la corrida se
+reporta con 500 para que el fallo sea visible.
+
+El comprobante del comprador incluye el desglose base/IVA/total y si se
+solicitó CFDI, pero **nunca repite el RFC, la razón social ni el código
+postal**: un buzón de correo no es lugar para duplicar la identidad fiscal de
+alguien.
+
+## Operación en /admin
+
+`/admin/ordenes` lista las compras con filtros por estado y por estado de
+factura, un buscador y el resumen de cobrado con IVA. El detalle
+(`/admin/ordenes/[id]`) muestra la compra, el comprador, el pago, los datos
+fiscales y el estado de cada correo.
+
+La superficie de escritura del panel es mínima y deliberada: sólo
+`invoice_status`, `cfdi_uuid`, `owner` e `internal_notes`. Importes, datos del
+comprador, identificadores fiscales, estado del pago y consentimiento son
+evidencia recibida y son de sólo lectura. No se puede marcar una factura como
+emitida sin capturar su UUID fiscal, ni operar el flujo de factura en una orden
+cuyo comprador no la pidió.
+
+El cupo se muestra en el panel pero **no se edita desde ahí**: `service_role`
+sólo tiene `select` sobre `ticket_capacity`. Se configura en Studio.
 
 ## Pendientes conocidos
 
-- El `/admin` todavía no lista órdenes; hoy se consultan en Supabase Studio.
-- No hay correo de confirmación de compra: el webhook registra el pago pero no
-  dispara ninguna notificación. Reutilizar el outbox de `inquiry_notifications`
-  es el siguiente paso natural.
-- No hay control de cupo: nada impide vender más accesos que asientos.
+- No hay timbrado automático: el CFDI lo emite el equipo dentro de 72 horas.
 - Reembolsos y contracargos se registran si MercadoPago los notifica, pero se
-  operan desde el panel de MercadoPago.
+  operan desde el panel de MercadoPago; la cancelación del CFDI o la nota de
+  crédito es manual.
+- No hay check-in digital: el comprobante de compra es el documento que se
+  presenta el día del evento.

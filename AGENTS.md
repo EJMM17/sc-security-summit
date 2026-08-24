@@ -12,11 +12,10 @@ September 24, 2026 event in Reynosa, Mexico.
 Internalize these boundaries before changing code:
 
 1. Individual tickets are sold on site with MercadoPago Checkout Pro
-   (`docs/PAYMENTS.md`). The app prices, stores and confirms those orders. It
-   does not refund or check in: refunds are operated from the MercadoPago
-   panel and Eventbrite still owns check-in for tickets sold there. Only the
-   pricing section links to `/checkout`; the generic CTAs still link to
-   Eventbrite.
+   (`docs/PAYMENTS.md`). The app prices, stores, confirms and receipts those
+   orders. It does not refund and does not check in: refunds are operated from
+   the MercadoPago panel. Eventbrite is retired from the site entirely — no
+   link, no constant, no env var.
 2. Supabase stores corporate-pass and sponsorship inquiries, and ticket
    orders. Published prices are the IVA-exclusive taxable base.
 3. Supabase persistence defines receipt. Resend is a recoverable notification
@@ -222,6 +221,9 @@ New tables:
 - `public.ticket_orders`
 - `public.ticket_order_invoice_details`
 - `public.ticket_order_events`
+- `public.ticket_capacity`
+- `public.ticket_order_notifications`
+- `public.ticket_order_notification_attempts`
 - `public.inquiries`
 - `public.inquiry_notifications`
 - `public.inquiry_notification_attempts`
@@ -232,6 +234,9 @@ Internal RPCs:
 - `create_ticket_order`
 - `attach_ticket_order_preference`
 - `record_ticket_order_payment`
+- `committed_ticket_seats` / `remaining_ticket_seats`
+- `claim_ticket_order_notification` / `claim_ticket_order_notifications`
+- `complete_ticket_order_notification`
 - `create_inquiry`
 - `claim_inquiry_notification`
 - `claim_inquiry_notifications`
@@ -312,6 +317,10 @@ The privacy owner approved consent version `2026-07-30`, the 18-month
 retention period, the ARCO process and the deletion/anonymization procedure on
 2026-07-30. This approval does not satisfy the independent backup, database,
 Vercel billing, migration, merge or Production deployment gates.
+
+Consent version `2026-08-24` adds on-site payments, the fiscal-data category
+and a five-year retention for purchase records (CFF art. 30). **It has not been
+approved yet.** Do not sell a ticket in Production until it is.
 
 PII rules:
 

@@ -1,5 +1,5 @@
 import ScrollReveal from "@/components/ScrollReveal";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
 
@@ -29,8 +29,7 @@ export default function FinalCTA({ language }: { language: Language }) {
         <ScrollReveal delay={200}>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
             <PrimaryCTA
-              href={EVENTBRITE_URL}
-              external
+              href={checkoutHref(language)}
               size="lg"
             >
               {ui.registerNowBtn}

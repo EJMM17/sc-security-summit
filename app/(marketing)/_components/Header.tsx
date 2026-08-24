@@ -2,7 +2,7 @@ import Image from "next/image";
 import HeaderScroll from "@/components/HeaderScroll";
 import MobileNav from "@/components/MobileNav";
 import LanguageSwitcher from "@/components/LanguageSwitcher";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT, checkoutHref } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
 
@@ -54,8 +54,7 @@ export default function Header({ language }: { language: Language }) {
             <div className="flex items-center gap-2 sm:gap-3 shrink-0">
               <LanguageSwitcher current={language} />
               <PrimaryCTA
-                href={EVENTBRITE_URL}
-                external
+                href={checkoutHref(language)}
                 size="sm"
                 className="header-cta hidden lg:inline-flex"
               >

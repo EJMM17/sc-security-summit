@@ -80,3 +80,48 @@ export function toDateTimeLocalValue(value: string | null): string {
     parts.find((part) => part.type === type)?.value ?? "";
   return `${value_("year")}-${value_("month")}-${value_("day")}T${value_("hour")}:${value_("minute")}`;
 }
+
+import type {
+  AdminInvoiceStatus,
+  AdminTicketOrderStatus,
+} from "@/lib/admin/types";
+
+export const ORDER_STATUS_LABELS: Record<AdminTicketOrderStatus, string> = {
+  pending: "Pendiente",
+  in_process: "En proceso",
+  paid: "Pagada",
+  rejected: "Rechazada",
+  cancelled: "Cancelada",
+  refunded: "Reembolsada",
+  charged_back: "Contracargo",
+};
+
+export const ORDER_STATUS_STYLES: Record<AdminTicketOrderStatus, string> = {
+  pending: "bg-slate-100 text-slate-600",
+  in_process: "bg-sky-100 text-sky-800",
+  paid: "bg-emerald-100 text-emerald-800",
+  rejected: "bg-red-100 text-red-800",
+  cancelled: "bg-slate-200 text-slate-700",
+  refunded: "bg-amber-100 text-amber-800",
+  charged_back: "bg-red-200 text-red-900",
+};
+
+export const INVOICE_STATUS_LABELS: Record<AdminInvoiceStatus, string> = {
+  not_requested: "No solicitada",
+  requested: "Solicitada",
+  issued: "Emitida",
+  cancelled: "Cancelada",
+};
+
+export const INVOICE_STATUS_STYLES: Record<AdminInvoiceStatus, string> = {
+  not_requested: "bg-slate-100 text-slate-500",
+  requested: "bg-amber-100 text-amber-800",
+  issued: "bg-emerald-100 text-emerald-800",
+  cancelled: "bg-slate-200 text-slate-700",
+};
+
+export const TIER_LABELS: Record<"plus" | "general" | "estudiante", string> = {
+  plus: "Acceso Plus",
+  general: "Acceso General",
+  estudiante: "Acceso Estudiante",
+};

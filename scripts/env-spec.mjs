@@ -182,21 +182,6 @@ export const ENV_SPEC = [
     templateValue: "https://scsecuritysummit.com",
   },
   {
-    name: "NEXT_PUBLIC_EVENTBRITE_URL",
-    scope: "public",
-    secret: false,
-    runtimeRequired: false,
-    previewRequired: false,
-    productionRequired: false,
-    format: "https-url",
-    placeholderAllowed: true,
-    placeholders: [],
-    group: "Public site configuration",
-    description:
-      "Optional Eventbrite override. This value is exposed to the browser.",
-    templateValue: "",
-  },
-  {
     name: "SENTRY_DSN",
     scope: "server",
     secret: false,

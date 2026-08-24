@@ -1,9 +1,17 @@
 export const BASE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
   "https://scsecuritysummit.com";
-export const EVENTBRITE_URL =
-  process.env.NEXT_PUBLIC_EVENTBRITE_URL?.trim() ||
-  "https://www.eventbrite.com.mx/e/supply-chain-security-summit-tickets-1994843949954?aff=ebdsoporgprofile";
+/**
+ * Every "buy" call to action on the site. Individual accesses are sold here
+ * with MercadoPago, so the destination is the on-site checkout, not an
+ * external ticketing page.
+ */
+export function checkoutHref(language: "es" | "en" = "es"): string {
+  return language === "en" ? "/checkout?lang=en" : "/checkout";
+}
+
+/** Absolute checkout URL for structured data and emails. */
+export const CHECKOUT_URL = `${BASE_URL}/checkout`;
 
 export type IconKey =
   | "shield-check"
@@ -1240,7 +1248,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Cómo compro mi acceso?",
     answer:
-      "Desde cualquier botón de acceso del sitio llegas a Eventbrite, donde eliges tu tipo de acceso y realizas el pago. Eventbrite te envía por correo tu boleto y el comprobante de compra; ese boleto es el que presentas el día del evento.",
+      "Desde cualquier botón de acceso del sitio llegas al checkout, donde eliges tu tipo de acceso y la cantidad. El pago se procesa con MercadoPago: tarjeta, transferencia SPEI o efectivo. Al confirmarse el pago te enviamos por correo tu comprobante de compra, que es el que presentas el día del evento.",
   },
   {
     question: "¿Qué incluye cada tipo de acceso?",
@@ -1283,7 +1291,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "How do I buy my pass?",
     answer:
-      "Any access button on the site takes you to Eventbrite, where you pick your access type and pay. Eventbrite emails you the ticket and the receipt; that ticket is what you present on the day of the event.",
+      "Any access button on the site takes you to the checkout, where you pick your access type and quantity. Payment is processed by MercadoPago: card, SPEI transfer or cash. Once the payment clears we email your proof of purchase, which is what you present on the day of the event.",
   },
   {
     question: "What is included with each access type?",
@@ -1360,6 +1368,8 @@ export const CHECKOUT = {
       "Has realizado varios intentos. Espera unos minutos antes de volver a intentar.",
     conflict:
       "Ya existe una compra con estos datos pero con un importe distinto. Recarga la página para empezar de nuevo.",
+    soldOut:
+      "Ya no quedan lugares suficientes para ese acceso y esa cantidad. Prueba con menos accesos o escríbenos a hola@scsecuritysummit.com.",
     providerUnavailable:
       "MercadoPago no está disponible en este momento. Tu solicitud quedó registrada; inténtalo de nuevo en unos minutos.",
     error:
@@ -1436,6 +1446,8 @@ export const CHECKOUT = {
       "You have made several attempts. Please wait a few minutes before trying again.",
     conflict:
       "A purchase already exists with these details but a different amount. Reload the page to start again.",
+    soldOut:
+      "There are not enough seats left for that pass and quantity. Try fewer passes or email hola@scsecuritysummit.com.",
     providerUnavailable:
       "MercadoPago is unavailable right now. Your request was recorded; please try again in a few minutes.",
     error: "We could not start the payment. Email us at hola@scsecuritysummit.com.",

@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(20);
+select plan(21);
 
 -- ---------------------------------------------------------------------------
 -- create_ticket_order: pricing guards
