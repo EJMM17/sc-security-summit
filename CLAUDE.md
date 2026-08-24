@@ -5,12 +5,33 @@ Read `AGENTS.md` first. Canonical current state:
 
 ## Product boundary
 
-- Eventbrite owns all individual tickets, payments, refunds and check-in.
-- Supabase stores only corporate-pass and sponsorship inquiries.
-- Persistence happens before email and defines receipt.
+- Individual tickets are sold on site with MercadoPago Checkout Pro. See
+  `docs/PAYMENTS.md`. Eventbrite is still linked from the generic CTAs and
+  still owns check-in; only the pricing section points at `/checkout`.
+- Supabase stores corporate-pass and sponsorship inquiries, and ticket orders.
+- Persistence happens before email and before MercadoPago; it defines receipt.
 - Resend failure queues a notification; it does not lose the inquiry.
 - Do not reuse historical `public.registros`. The legacy `/admin` built on it
   stays retired; the current `/admin` is a separate panel over `inquiries`.
+
+## Payments and IVA
+
+Published prices are the IVA-exclusive taxable base; 16% is added on top.
+`lib/payments/catalog.ts` is the single source of truth for money and the
+browser never sends an amount — it sends a tier and a quantity. All arithmetic
+is integer cents with half-up rounding, and the tax is computed once over the
+whole line, never per unit.
+
+Fiscal data is captured only when the buyer requests a CFDI, validated against
+the RFC person type, and stored in its own table. The site does not stamp the
+CFDI; the team issues it manually within 72 hours.
+
+The webhook verifies the MercadoPago HMAC signature, rejects notifications
+older than five minutes, re-reads the payment from the API rather than trusting
+the body, and is idempotent. `MERCADOPAGO_ACCESS_TOKEN` accepts a live
+`APP_USR-` token only in Vercel Production and a `TEST-` token everywhere else.
+
+Never log buyer identity, RFC, legal name or postal code.
 
 ## Request flow
 
@@ -147,4 +168,4 @@ never exposes it. Its writes are restricted to `status`, `owner`,
 allows. Supabase Studio with MFA remains valid for anything the panel does not
 cover.
 
-See `docs/INQUIRY_OPERATIONS.md` and `docs/RUNBOOK.md`.
+See `docs/INQUIRY_OPERATIONS.md`, `docs/PAYMENTS.md` and `docs/RUNBOOK.md`.

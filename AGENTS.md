@@ -11,9 +11,14 @@ September 24, 2026 event in Reynosa, Mexico.
 
 Internalize these boundaries before changing code:
 
-1. Individual ticketing is off-site in Eventbrite. The app does not sell,
-   price-check, refund, confirm, or store individual orders.
-2. Supabase stores only corporate-pass and sponsorship inquiries.
+1. Individual tickets are sold on site with MercadoPago Checkout Pro
+   (`docs/PAYMENTS.md`). The app prices, stores and confirms those orders. It
+   does not refund or check in: refunds are operated from the MercadoPago
+   panel and Eventbrite still owns check-in for tickets sold there. Only the
+   pricing section links to `/checkout`; the generic CTAs still link to
+   Eventbrite.
+2. Supabase stores corporate-pass and sponsorship inquiries, and ticket
+   orders. Published prices are the IVA-exclusive taxable base.
 3. Supabase persistence defines receipt. Resend is a recoverable notification
    channel after persistence.
 4. Do not reuse historical `public.registros`, folios, payment fields, or the
@@ -155,6 +160,16 @@ Optional in Production, forbidden in Preview, configured together:
 - `ADMIN_PASSWORD`
 - `ADMIN_SESSION_SECRET`
 
+Also optional and forbidden in Preview, configured together:
+
+- `MERCADOPAGO_ACCESS_TOKEN` — live `APP_USR-` token in Vercel Production, a
+  `TEST-` sandbox token in every other environment
+- `MERCADOPAGO_WEBHOOK_SECRET`
+
+Without both, the checkout fails closed with `provider_unavailable` and every
+webhook notification is rejected. The MercadoPago public key is not part of the
+contract: Checkout Pro only needs the server access token.
+
 Rules:
 
 - Every non-Production Vercel deployment is visual-only and fail-closed.
@@ -204,6 +219,9 @@ contract.
 
 New tables:
 
+- `public.ticket_orders`
+- `public.ticket_order_invoice_details`
+- `public.ticket_order_events`
 - `public.inquiries`
 - `public.inquiry_notifications`
 - `public.inquiry_notification_attempts`
@@ -211,6 +229,9 @@ New tables:
 
 Internal RPCs:
 
+- `create_ticket_order`
+- `attach_ticket_order_preference`
+- `record_ticket_order_payment`
 - `create_inquiry`
 - `claim_inquiry_notification`
 - `claim_inquiry_notifications`
@@ -385,6 +406,7 @@ Canonical SOP: `docs/INQUIRY_OPERATIONS.md`.
 - `docs/PROJECT_CONTEXT.md` — current architecture
 - `docs/DEPLOYMENT.md` — gates and deployment
 - `docs/INQUIRY_OPERATIONS.md` — Studio operation
+- `docs/PAYMENTS.md` — MercadoPago checkout, IVA and CFDI capture
 - `docs/RUNBOOK.md` — incidents and continuity
 - `docs/TROUBLESHOOTING.md` — symptom diagnosis
 - `docs/TRACKING.md` — analytics/attribution

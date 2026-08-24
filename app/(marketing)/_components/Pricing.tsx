@@ -1,5 +1,5 @@
 import ScrollReveal from "@/components/ScrollReveal";
-import { CONTENT, EVENTBRITE_URL } from "@/lib/content";
+import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
@@ -96,9 +96,15 @@ export default function Pricing({ language }: { language: Language }) {
                   </div>
 
                   <div className="pricing-tier-action">
+                    {/* Individual accesses are now sold on site through
+                        MercadoPago; the tier travels in the query string so
+                        the checkout opens on the plan the visitor clicked. */}
                     <PrimaryCTA
-                      href={EVENTBRITE_URL}
-                      external
+                      href={
+                        language === "en"
+                          ? `/checkout?lang=en&tier=${plan.id}`
+                          : `/checkout?tier=${plan.id}`
+                      }
                       size="md"
                       className="pricing-tier-cta"
                     >
