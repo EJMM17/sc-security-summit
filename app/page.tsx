@@ -243,9 +243,9 @@ export default async function Home({
         <Value language={language} />
         <Audience language={language} />
         <Pricing language={language} />
+        <Registro language={language} />
         <Sponsors language={language} />
         <FinalCTA language={language} />
-        <Registro language={language} />
         <Location language={language} />
         <Faq language={language} />
       </main>
