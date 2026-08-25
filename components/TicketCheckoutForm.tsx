@@ -373,18 +373,20 @@ export default function TicketCheckoutForm({
             <h3>{copy.summaryTitle}</h3>
             <dl>
               <div>
-                <dt>{copy.summarySubtotal}</dt>
-                <dd>{formatMxn(quote.subtotalCents, language)}</dd>
-              </div>
-              <div>
-                <dt>{copy.summaryTax}</dt>
-                <dd>{formatMxn(quote.taxCents, language)}</dd>
+                <dt>{copy.summaryAccesses}</dt>
+                <dd>
+                  {quote.quantity} × {formatMxn(quote.unitPriceCents, language)}
+                </dd>
               </div>
               <div className="checkout-summary-total">
                 <dt>{copy.summaryTotal}</dt>
                 <dd>{formatMxn(quote.totalCents, language)} MXN</dd>
               </div>
             </dl>
+            {/* The IVA is inside the published price, so the buyer sees one
+                final number. The base and the tax still travel to the order
+                row and the CFDI; they are just not a checkout decision. */}
+            <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
           </div>
         )}
 

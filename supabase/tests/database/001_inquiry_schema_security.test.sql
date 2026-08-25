@@ -3,7 +3,7 @@ begin;
 create extension if not exists pgtap with schema extensions;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(25);
+select plan(26);
 
 select ok(
   to_regclass('public.inquiries') is not null,
@@ -21,6 +21,10 @@ select ok(
   to_regclass('public.inquiry_events') is not null,
   'inquiry_events table exists'
 );
+select ok(
+  to_regclass('public.inquiry_attendees') is not null,
+  'inquiry_attendees table exists'
+);
 
 select ok(
   (
@@ -32,7 +36,8 @@ select ok(
         'inquiries',
         'inquiry_notifications',
         'inquiry_notification_attempts',
-        'inquiry_events'
+        'inquiry_events',
+        'inquiry_attendees'
       )
   ),
   'RLS is enabled on every inquiry table'
@@ -47,7 +52,8 @@ select is(
         'inquiries',
         'inquiry_notifications',
         'inquiry_notification_attempts',
-        'inquiry_events'
+        'inquiry_events',
+        'inquiry_attendees'
       )
   ),
   0,
@@ -62,7 +68,8 @@ select ok(
         ('inquiries'),
         ('inquiry_notifications'),
         ('inquiry_notification_attempts'),
-        ('inquiry_events')
+        ('inquiry_events'),
+        ('inquiry_attendees')
     ) as tables(table_name)
     cross join (
       values
@@ -91,7 +98,8 @@ select ok(
         ('inquiries'),
         ('inquiry_notifications'),
         ('inquiry_notification_attempts'),
-        ('inquiry_events')
+        ('inquiry_events'),
+        ('inquiry_attendees')
     ) as tables(table_name)
     cross join (
       values
@@ -131,7 +139,8 @@ select ok(
         ('inquiries'),
         ('inquiry_notifications'),
         ('inquiry_notification_attempts'),
-        ('inquiry_events')
+        ('inquiry_events'),
+        ('inquiry_attendees')
     ) as tables(table_name)
   ),
   'service_role has only the required read and insert foundation'
@@ -153,6 +162,12 @@ select ok(
     'service_role',
     'public.inquiry_events',
     'UPDATE'
+  )
+  -- A roster is submitted evidence: the panel reads it, nothing rewrites it.
+  and not has_table_privilege(
+    'service_role',
+    'public.inquiry_attendees',
+    'UPDATE'
   ),
   'only mutable inquiry and outbox tables allow application updates'
 );
@@ -165,7 +180,8 @@ select ok(
         ('inquiries'),
         ('inquiry_notifications'),
         ('inquiry_notification_attempts'),
-        ('inquiry_events')
+        ('inquiry_events'),
+        ('inquiry_attendees')
     ) as tables(table_name)
     cross join (
       values

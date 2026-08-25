@@ -178,7 +178,7 @@ export const UI_TEXT = {
     pricingTitle: "Elige tu experiencia de formación",
     pricingDesc:
       "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
-    taxNote: "más I.V.A.",
+    taxNote: "IVA incluido",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
     sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
@@ -219,8 +219,10 @@ export const UI_TEXT = {
     regTitle: "Capacita a Tu Equipo Completo",
     regDesc:
       "Un solo pase, cobertura completa. Acceso para tu equipo a cualquier hora del día: cada departamento asiste al bloque que le corresponde.",
-    corporateAccessTitle: "Hasta 10 Accesos Plus",
+    corporateAccessTitle: "Accesos Plus con descuento por volumen",
     corporateAccessNote: "DC-3 incluido para cada participante.",
+    corporateAccessDiscount:
+      "25% de descuento desde 5 accesos, sin límite superior.",
     corporateSubmit: "SOLICITAR PASE CORPORATIVO",
     corporateSuccess: "Recibimos tu solicitud de pase corporativo. Te contactaremos muy pronto.",
     inquiryPrivacy:
@@ -354,7 +356,7 @@ export const UI_TEXT = {
     pricingTitle: "Choose your training experience",
     pricingDesc:
       "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
-    taxNote: "plus VAT",
+    taxNote: "VAT included",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
     sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
@@ -395,8 +397,10 @@ export const UI_TEXT = {
     regTitle: "Train Your Entire Team",
     regDesc:
       "One pass, complete coverage. Your team can attend at any time of day, with each department joining the block that fits their role.",
-    corporateAccessTitle: "Up to 10 Plus Passes",
+    corporateAccessTitle: "Plus Passes with a volume discount",
     corporateAccessNote: "DC-3 training certificate included for each participant.",
+    corporateAccessDiscount:
+      "25% off from five passes up, with no upper limit.",
     corporateSubmit: "REQUEST A CORPORATE PASS",
     corporateSuccess: "We received your corporate pass request. We will contact you shortly.",
     inquiryPrivacy:
@@ -1033,6 +1037,21 @@ export const INQUIRY_FORMS = {
       companyPlaceholder: "Nombre de la empresa",
       rolePlaceholder: "Ej. Directora de Logística",
       phonePlaceholder: "+52 899 123 4567",
+      seatsHint: "Desde 2 accesos. Sin límite superior.",
+      attendeesLegend: "Participantes",
+      attendeesHint:
+        "Un nombre por acceso. El DC-3 se emite a nombre de cada participante.",
+      attendeeLabel: "Participante {n}",
+      attendeePlaceholder: "Nombre y apellidos",
+      quoteTitle: "COTIZACIÓN ESTIMADA",
+      quoteDiscountBadge: "25% aplicado",
+      quoteLine: "{seats} × {price}",
+      quoteDiscount: "Descuento corporativo (25%)",
+      quoteTotal: "Total",
+      quoteTaxNote: "Precio final por acceso. Incluye IVA del 16%.",
+      quoteHint: "Agrega un acceso más para llegar a 5 y obtener 25% de descuento.",
+      quoteDisclaimer:
+        "Estimación informativa. Un asesor confirma la cotización formal por correo.",
       subject: "Solicitud de pase corporativo — Summit 2026",
     },
     sponsor: {
@@ -1064,6 +1083,21 @@ export const INQUIRY_FORMS = {
       companyPlaceholder: "Company name",
       rolePlaceholder: "e.g. Logistics Director",
       phonePlaceholder: "+1 956 123 4567",
+      seatsHint: "From 2 passes. No upper limit.",
+      attendeesLegend: "Participants",
+      attendeesHint:
+        "One name per pass. The DC-3 certificate is issued to each participant by name.",
+      attendeeLabel: "Participant {n}",
+      attendeePlaceholder: "First and last name",
+      quoteTitle: "ESTIMATED QUOTE",
+      quoteDiscountBadge: "25% applied",
+      quoteLine: "{seats} × {price}",
+      quoteDiscount: "Corporate discount (25%)",
+      quoteTotal: "Total",
+      quoteTaxNote: "Final price per pass. Includes 16% VAT.",
+      quoteHint: "Add one more pass to reach 5 and unlock the 25% discount.",
+      quoteDisclaimer:
+        "Informative estimate. An advisor confirms the formal quote by email.",
       subject: "Corporate pass request — Summit 2026",
     },
     sponsor: {
@@ -1263,7 +1297,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Puedo obtener factura (CFDI)?",
     answer:
-      "Sí. Marca la casilla \"Necesito factura (CFDI)\" al comprar tu acceso en el sitio y captura tu RFC, razón social, régimen fiscal, uso del CFDI y código postal. El CFDI se emite dentro de las 72 horas posteriores a la confirmación de tu pago. Los precios publicados no incluyen IVA; el 16% se desglosa antes de pagar.",
+      "Sí. Marca la casilla \"Necesito factura (CFDI)\" al comprar tu acceso en el sitio y captura tu RFC, razón social, régimen fiscal, uso del CFDI y código postal. El CFDI se emite dentro de las 72 horas posteriores a la confirmación de tu pago. Los precios publicados ya incluyen IVA; el CFDI desglosa el 16% que va dentro de ese total.",
   },
   {
     question: "¿El acceso estudiantil requiere credencial?",
@@ -1306,7 +1340,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Can I request an invoice (CFDI)?",
     answer:
-      "Yes. Tick the \"I need a Mexican tax invoice (CFDI)\" box when you buy your pass on the site and enter your RFC, legal name, tax regime, CFDI use and postal code. The CFDI is issued within 72 hours after payment confirmation. Published prices exclude VAT; the 16% is itemized before you pay.",
+      "Yes. Tick the \"I need a Mexican tax invoice (CFDI)\" box when you buy your pass on the site and enter your RFC, legal name, tax regime, CFDI use and postal code. The CFDI is issued within 72 hours after payment confirmation. Published prices already include VAT; the CFDI itemizes the 16% contained in that total.",
   },
   {
     question: "Does the student pass require an ID?",
@@ -1320,7 +1354,7 @@ export const CHECKOUT = {
     label: "COMPRA EN LÍNEA",
     title: "Reserva tu acceso",
     desc:
-      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. Los precios publicados no incluyen IVA; el impuesto se desglosa antes de pagar.",
+      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. El precio publicado es el total final: ya incluye IVA y no se suma nada al pagar.",
     tierLegend: "Tipo de acceso",
     quantity: "Cantidad",
     quantityHint: "Máximo {max} por compra.",
@@ -1337,7 +1371,7 @@ export const CHECKOUT = {
     companyPlaceholder: "Nombre de la empresa",
     invoiceToggle: "Necesito factura (CFDI)",
     invoiceHint:
-      "Si no marcas esta casilla no emitimos CFDI para esta compra. El IVA se cobra de todas formas.",
+      "Si no marcas esta casilla no emitimos CFDI para esta compra. El precio no cambia: el IVA ya está incluido.",
     invoiceLegend: "Datos fiscales",
     rfc: "RFC",
     rfcPlaceholder: "XAXX010101XXX",
@@ -1351,9 +1385,9 @@ export const CHECKOUT = {
     billingEmailPlaceholder: "facturacion@empresa.com",
     selectPlaceholder: "Selecciona una opción",
     summaryTitle: "Resumen",
-    summarySubtotal: "Subtotal",
-    summaryTax: "IVA 16%",
+    summaryAccesses: "Accesos",
     summaryTotal: "Total a pagar",
+    summaryTaxIncluded: "Precio final. Incluye IVA del 16%.",
     submit: "PAGAR CON MERCADOPAGO",
     submitSending: "REDIRIGIENDO...",
     redirectNote:
@@ -1398,7 +1432,7 @@ export const CHECKOUT = {
     label: "ONLINE PURCHASE",
     title: "Reserve your pass",
     desc:
-      "Pay by card, SPEI transfer or cash through MercadoPago. Published prices exclude VAT; the tax is itemized before you pay.",
+      "Pay by card, SPEI transfer or cash through MercadoPago. The published price is the final total: VAT is already included and nothing is added at checkout.",
     tierLegend: "Pass type",
     quantity: "Quantity",
     quantityHint: "Up to {max} per purchase.",
@@ -1415,7 +1449,7 @@ export const CHECKOUT = {
     companyPlaceholder: "Company name",
     invoiceToggle: "I need a Mexican tax invoice (CFDI)",
     invoiceHint:
-      "Leave this unchecked and no CFDI is issued for this purchase. VAT is charged either way.",
+      "Leave this unchecked and no CFDI is issued for this purchase. The price does not change: VAT is already included.",
     invoiceLegend: "Tax details",
     rfc: "RFC (Mexican tax ID)",
     rfcPlaceholder: "XAXX010101XXX",
@@ -1429,9 +1463,9 @@ export const CHECKOUT = {
     billingEmailPlaceholder: "billing@company.com",
     selectPlaceholder: "Select an option",
     summaryTitle: "Summary",
-    summarySubtotal: "Subtotal",
-    summaryTax: "VAT 16%",
+    summaryAccesses: "Passes",
     summaryTotal: "Total due",
+    summaryTaxIncluded: "Final price. Includes 16% VAT.",
     submit: "PAY WITH MERCADOPAGO",
     submitSending: "REDIRECTING...",
     redirectNote:

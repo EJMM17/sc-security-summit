@@ -19,9 +19,9 @@ select throws_ok(
       p_tier => 'plus',
       p_quantity => 2::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 500000,
+      p_subtotal_cents => 431034,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 80000,
+      p_tax_cents => 68966,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -58,7 +58,7 @@ select throws_ok(
   $$,
   '22023',
   'invalid_subtotal',
-  'a subtotal that is not unit price times quantity is rejected'
+  'amounts whose base plus tax is not the gross line total are rejected'
 );
 
 select throws_ok(
@@ -69,9 +69,9 @@ select throws_ok(
       p_tier => 'plus',
       p_quantity => 2::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 500000,
+      p_subtotal_cents => 431035,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 1,
+      p_tax_cents => 68965,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -83,7 +83,7 @@ select throws_ok(
   $$,
   '22023',
   'invalid_tax_amount',
-  'a tax amount that does not match the declared rate is rejected'
+  'a base that is not the half-up extraction from the gross line is rejected'
 );
 
 select throws_ok(
@@ -94,9 +94,9 @@ select throws_ok(
       p_tier => 'plus',
       p_quantity => 1::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 250000,
+      p_subtotal_cents => 215517,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 40000,
+      p_tax_cents => 34483,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -120,9 +120,9 @@ select throws_ok(
       p_tier => 'plus',
       p_quantity => 1::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 250000,
+      p_subtotal_cents => 215517,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 40000,
+      p_tax_cents => 34483,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -152,9 +152,9 @@ select results_eq(
       p_tier => 'plus',
       p_quantity => 2::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 500000,
+      p_subtotal_cents => 431034,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 80000,
+      p_tax_cents => 68966,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ADA@Example.com',
       p_phone => '+52 899 123 4567',
@@ -164,7 +164,7 @@ select results_eq(
       p_retention_until => (now() + interval '5 years')::date
     )
   $$,
-  $$ values ('created'::text, 580000) $$,
+  $$ values ('created'::text, 500000) $$,
   'a new order is created and totals subtotal plus tax'
 );
 
@@ -197,9 +197,9 @@ select results_eq(
       p_tier => 'plus',
       p_quantity => 2::smallint,
       p_unit_price_cents => 250000,
-      p_subtotal_cents => 500000,
+      p_subtotal_cents => 431034,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 80000,
+      p_tax_cents => 68966,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -209,7 +209,7 @@ select results_eq(
       p_retention_until => (now() + interval '5 years')::date
     )
   $$,
-  $$ values ('replayed'::text, 580000) $$,
+  $$ values ('replayed'::text, 500000) $$,
   'an identical resubmission replays instead of creating a second order'
 );
 
@@ -222,9 +222,9 @@ select results_eq(
       p_tier => 'general',
       p_quantity => 1::smallint,
       p_unit_price_cents => 90000,
-      p_subtotal_cents => 90000,
+      p_subtotal_cents => 77586,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 14400,
+      p_tax_cents => 12414,
       p_buyer_name => 'Ada Lovelace',
       p_email => 'ada@example.com',
       p_phone => '+52 899 123 4567',
@@ -254,7 +254,7 @@ select is(
     from public.ticket_orders
     where submission_id = '20000000-0000-4000-8000-000000000010'::uuid
   ),
-  580000,
+  500000,
   'the original amount survives the conflicting resubmission'
 );
 
@@ -270,9 +270,9 @@ select lives_ok(
       p_tier => 'general',
       p_quantity => 1::smallint,
       p_unit_price_cents => 90000,
-      p_subtotal_cents => 90000,
+      p_subtotal_cents => 77586,
       p_tax_rate_basis_points => 1600,
-      p_tax_cents => 14400,
+      p_tax_cents => 12414,
       p_buyer_name => 'Grace Hopper',
       p_email => 'grace@example.com',
       p_phone => '+52 899 765 4321',

@@ -2395,8 +2395,77 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   flex: none;
   color: var(--on-navy-accent);
 }
+.corporate-pass-summary > span + span {
+  margin-top: 0.75rem;
+}
 .corporate-pass-form {
   padding: clamp(1.5rem, 4vw, 3rem);
+}
+
+.inquiry-field-hint {
+  display: block;
+  margin-top: 0.4rem;
+  color: #64748B;
+  font-size: 0.72rem;
+}
+
+.corporate-quote {
+  padding: 1.1rem 1.25rem;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-sm);
+  background: #EFF6FF;
+}
+.corporate-quote-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.corporate-quote-head h3 {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #1D4ED8;
+}
+.corporate-quote-badge {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #BBF7D0;
+  color: #166534;
+  font-size: 0.68rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.corporate-quote dl {
+  display: grid;
+  gap: 0.4rem;
+}
+.corporate-quote dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.88rem;
+  color: #475569;
+}
+.corporate-quote .corporate-quote-discount {
+  color: #166534;
+}
+.corporate-quote .corporate-quote-total {
+  margin-top: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid #BFDBFE;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #0F172A;
+}
+.corporate-quote-note {
+  margin-top: 0.55rem;
+  color: #64748B;
+  font-size: 0.72rem;
+  line-height: 1.5;
 }
 .inquiry-form {
   width: 100%;
@@ -7064,4 +7133,9 @@ h3,
   font-size: 1rem;
   font-weight: 700;
   color: #0F172A;
+}
+.checkout-summary-note {
+  margin-top: 0.55rem;
+  font-size: 0.76rem;
+  color: #64748B;
 }

@@ -32,7 +32,7 @@ export class AdminRepositoryError extends Error {
 }
 
 const LIST_COLUMNS =
-  "id, kind, status, contact_name, email, phone, company, job_title, requested_seats, interest, language, owner, internal_notes, next_follow_up_at, created_at, updated_at, consent_version, consented_at, retention_until";
+  "id, kind, status, contact_name, email, phone, company, job_title, requested_seats, interest, language, owner, internal_notes, next_follow_up_at, created_at, updated_at, consent_version, consented_at, retention_until, inquiry_attendees(seat_number, full_name)";
 
 const notificationSchema = z.object({
   inquiry_id: z.string().uuid(),
@@ -56,6 +56,14 @@ const inquirySchema = z.object({
   job_title: z.string().nullable(),
   requested_seats: z.number().int().nullable(),
   interest: z.string().nullable(),
+  inquiry_attendees: z
+    .array(
+      z.object({
+        seat_number: z.coerce.number().int().min(1),
+        full_name: z.string(),
+      }),
+    )
+    .default([]),
   language: z.enum(["es", "en"]),
   owner: z.string().nullable(),
   internal_notes: z.string().nullable(),
@@ -66,6 +74,24 @@ const inquirySchema = z.object({
   consented_at: z.string(),
   retention_until: z.string(),
 });
+
+/**
+ * PostgREST returns the embedded roster as an unordered array of rows; the
+ * panel only ever wants the names, in seat order.
+ */
+function toAdminInquiry(
+  row: z.infer<typeof inquirySchema>,
+  notification: AdminInquiry["notification"],
+): AdminInquiry {
+  const { inquiry_attendees: roster, ...rest } = row;
+  return {
+    ...rest,
+    attendees: [...roster]
+      .sort((a, b) => a.seat_number - b.seat_number)
+      .map((attendee) => attendee.full_name),
+    notification,
+  };
+}
 
 export type InquiryFilters = {
   status?: InquiryStatus | "all";
@@ -141,10 +167,7 @@ export async function listInquiries(
   });
 
   const notifications = await notificationsFor(rows.map((row) => row.id));
-  return rows.map((row) => ({
-    ...row,
-    notification: notifications.get(row.id) ?? null,
-  }));
+  return rows.map((row) => toAdminInquiry(row, notifications.get(row.id) ?? null));
 }
 
 export async function getInquiry(id: string): Promise<AdminInquiry | null> {
@@ -161,10 +184,7 @@ export async function getInquiry(id: string): Promise<AdminInquiry | null> {
   if (!parsed.success) throw new AdminRepositoryError("get_inquiry", { code: "invalid_row" });
 
   const notifications = await notificationsFor([parsed.data.id]);
-  return {
-    ...parsed.data,
-    notification: notifications.get(parsed.data.id) ?? null,
-  };
+  return toAdminInquiry(parsed.data, notifications.get(parsed.data.id) ?? null);
 }
 
 export async function countInquiries(): Promise<InquiryCounts> {

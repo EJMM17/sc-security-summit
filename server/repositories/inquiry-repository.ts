@@ -35,6 +35,8 @@ export type StoredInquiry = {
   jobTitle: string | null;
   requestedSeats: number | null;
   interest: string | null;
+  /** Named participants of a corporate block, in seat order. */
+  attendees: string[];
 };
 
 export type NotificationStatus = "pending" | "processing" | "sent" | "retry" | "dead";
@@ -74,6 +76,14 @@ const storedInquiryRowSchema = z.object({
   job_title: z.string().nullable(),
   requested_seats: z.number().int().nullable(),
   interest: z.string().nullable(),
+  inquiry_attendees: z
+    .array(
+      z.object({
+        seat_number: z.coerce.number().int().min(1),
+        full_name: z.string(),
+      }),
+    )
+    .default([]),
 });
 
 const notificationStatusRowSchema = z.object({
@@ -134,6 +144,7 @@ export async function persistInquiry(
     p_job_title: inquiry.kind === "corporate" ? inquiry.role : undefined,
     p_requested_seats:
       inquiry.kind === "corporate" ? inquiry.requestedSeats : undefined,
+    p_attendees: inquiry.kind === "corporate" ? inquiry.attendees : undefined,
     p_interest: inquiry.kind === "sponsor" ? inquiry.interest : undefined,
     p_utm_source: attribution.utm_source,
     p_utm_medium: attribution.utm_medium,
@@ -218,7 +229,7 @@ export async function getStoredInquiry(inquiryId: string): Promise<StoredInquiry
   const { data, error } = await getSupabaseServerClient()
     .from("inquiries")
     .select(
-      "id,kind,contact_name,email,phone,company,language,job_title,requested_seats,interest",
+      "id,kind,contact_name,email,phone,company,language,job_title,requested_seats,interest,inquiry_attendees(seat_number,full_name)",
     )
     .eq("id", inquiryId)
     .single();
@@ -242,6 +253,11 @@ export async function getStoredInquiry(inquiryId: string): Promise<StoredInquiry
     jobTitle: parsed.data.job_title,
     requestedSeats: parsed.data.requested_seats,
     interest: parsed.data.interest,
+    // PostgREST does not promise an order on an embedded relation, and the
+    // roster is only meaningful in seat order.
+    attendees: [...parsed.data.inquiry_attendees]
+      .sort((a, b) => a.seat_number - b.seat_number)
+      .map((attendee) => attendee.full_name),
   };
 }
 

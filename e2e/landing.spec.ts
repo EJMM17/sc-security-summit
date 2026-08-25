@@ -49,8 +49,23 @@ test.describe("Homepage comercial", () => {
     await expect(corporate.getByLabel(/empresa/i)).toBeVisible();
     await expect(corporate.getByLabel(/cargo/i)).toBeVisible();
     await expect(corporate.getByLabel(/teléfono/i)).toBeVisible();
-    await expect(corporate.getByLabel(/número de accesos/i)).toHaveAttribute("min", "2");
-    await expect(corporate.getByLabel(/número de accesos/i)).toHaveAttribute("max", "10");
+    const seats = corporate.getByLabel(/número de accesos/i);
+    await expect(seats).toHaveAttribute("min", "2");
+    await expect(seats).toHaveAttribute("max", "200");
+
+    // One roster input per access, and the quote follows the seat count.
+    await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(2);
+    const quote = corporate.getByRole("region", { name: /cotización estimada/i });
+    await expect(quote).toContainText("5,000.00");
+    await expect(quote).not.toContainText("25% aplicado");
+
+    await seats.fill("5");
+    await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(5);
+    await expect(quote).toContainText("25% aplicado");
+    // 5 x $2,500 = $12,500 less 25% = $9,375.
+    await expect(quote).toContainText("12,500.00");
+    await expect(quote).toContainText("3,125.00");
+    await expect(quote).toContainText("9,375.00");
     await expect(
       corporate.getByRole("link", { name: /aviso de privacidad/i }),
     ).toHaveAttribute("href", "/aviso-de-privacidad");
@@ -119,7 +134,11 @@ test.describe("Homepage comercial", () => {
     await expect(corporate.getByLabel("First name")).toBeVisible();
     await expect(corporate.getByLabel("Last name")).toBeVisible();
     await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("min", "2");
-    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("max", "10");
+    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("max", "200");
+    await expect(corporate.getByLabel(/participant \d+/i)).toHaveCount(2);
+    await expect(
+      corporate.getByRole("region", { name: /estimated quote/i }),
+    ).toBeVisible();
     await expect(
       corporate.getByRole("link", { name: /privacy notice/i }),
     ).toHaveAttribute("href", "/aviso-de-privacidad");

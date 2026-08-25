@@ -51,6 +51,7 @@ const CORPORATE: StoredInquiry = {
   language: "es",
   jobTitle: "Director",
   requestedSeats: 6,
+  attendees: ["Ana Ruiz", "Luis Paz"],
   interest: null,
 };
 

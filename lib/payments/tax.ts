@@ -1,10 +1,12 @@
 /**
  * Mexican VAT (IVA) arithmetic for the ticket checkout.
  *
- * Published prices are IVA-exclusive: the catalog stores the taxable base and
- * the tax is added on top. Every amount is an integer number of cents so the
- * value charged by MercadoPago, the value stored in Postgres and the value
- * printed on the CFDI are the same number, with no floating point drift.
+ * Published prices are IVA-inclusive: the price on the site is the whole
+ * amount the buyer pays, and the 16% lives inside it. The catalog stores that
+ * gross price and this module splits it into the taxable base the CFDI needs
+ * and the tax the seller absorbs. Every amount is an integer number of cents
+ * so the value charged by MercadoPago, the value stored in Postgres and the
+ * value printed on the CFDI are the same number, with no floating point drift.
  */
 
 /** IVA general rate expressed in basis points (16.00%). */
@@ -16,8 +18,9 @@ export const IVA_BORDER_RATE_BASIS_POINTS = 800;
 export const BASIS_POINT_SCALE = 10_000;
 
 export type TaxBreakdown = {
-  /** Taxable base: unit price times quantity. */
+  /** IVA-exclusive taxable base extracted from the gross line total. */
   subtotalCents: number;
+  /** IVA-inclusive published price of one unit. */
   unitPriceCents: number;
   quantity: number;
   taxRateBasisPoints: number;
@@ -56,47 +59,44 @@ export function applyRateHalfUp(
 /**
  * Builds the full breakdown for a line of `quantity` identical tickets.
  *
- * The tax is computed once over the whole taxable base rather than per unit,
- * which is what the SAT expects on a single CFDI concept line and avoids the
- * per-unit rounding drift that would otherwise make the CFDI total differ from
- * the amount actually captured by MercadoPago.
+ * The published price already contains the tax, so the line total is an exact
+ * multiple of the unit price and the base is extracted from it once, over the
+ * whole line, rather than per unit. Splitting per unit and multiplying would
+ * make the sum of the CFDI concept differ from the amount MercadoPago actually
+ * captured whenever the per-unit base does not land on a whole cent.
  */
-export function computeTaxBreakdown(
+export function computeInclusiveTaxBreakdown(
   unitPriceCents: number,
   quantity: number,
   taxRateBasisPoints: number = IVA_RATE_BASIS_POINTS,
 ): TaxBreakdown {
   assertNonNegativeInteger(unitPriceCents, "unitPriceCents");
   assertNonNegativeInteger(quantity, "quantity");
-  assertNonNegativeInteger(taxRateBasisPoints, "taxRateBasisPoints");
 
   if (quantity < 1) {
     throw new RangeError("quantity must be at least 1");
   }
 
-  const subtotalCents = unitPriceCents * quantity;
-  if (!Number.isSafeInteger(subtotalCents)) {
-    throw new RangeError("Subtotal exceeds safe integer precision");
+  const totalCents = unitPriceCents * quantity;
+  if (!Number.isSafeInteger(totalCents)) {
+    throw new RangeError("Total exceeds safe integer precision");
   }
 
-  const taxCents = applyRateHalfUp(subtotalCents, taxRateBasisPoints);
-
   return {
-    subtotalCents,
+    ...extractTaxFromGross(totalCents, taxRateBasisPoints),
     unitPriceCents,
     quantity,
-    taxRateBasisPoints,
-    taxCents,
-    totalCents: subtotalCents + taxCents,
   };
 }
 
 /**
  * Splits an IVA-inclusive gross amount back into base and tax.
  *
- * The catalog is IVA-exclusive, so this is not used by the checkout. It exists
- * for reconciliation: MercadoPago settlement reports and manual adjustments
- * arrive as gross totals and finance needs the same rounding rule applied.
+ * This is the primitive the whole catalog rests on, and the same rule
+ * reconciliation needs: MercadoPago settlement reports and manual adjustments
+ * arrive as gross totals. The base is rounded half up and the tax is the
+ * remainder, so base + tax is always exactly the gross amount and no cent is
+ * created or lost by the split.
  */
 export function extractTaxFromGross(
   totalCents: number,
@@ -117,7 +117,9 @@ export function extractTaxFromGross(
 
   return {
     subtotalCents,
-    unitPriceCents: subtotalCents,
+    // A bare gross amount is one IVA-inclusive unit; a multi-unit line
+    // overrides these two fields with the real tier price and quantity.
+    unitPriceCents: totalCents,
     quantity: 1,
     taxRateBasisPoints,
     taxCents: totalCents - subtotalCents,

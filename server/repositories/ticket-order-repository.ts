@@ -424,6 +424,7 @@ const notifiableOrderRowSchema = z.object({
   ),
   tier: z.enum(["plus", "general", "estudiante"]),
   quantity: z.coerce.number().int().min(1),
+  unit_price_cents: z.coerce.number().int().nonnegative(),
   subtotal_cents: z.coerce.number().int().nonnegative(),
   tax_cents: z.coerce.number().int().nonnegative(),
   total_cents: z.coerce.number().int().nonnegative(),
@@ -448,7 +449,7 @@ export async function getNotifiableTicketOrder(
   const { data, error } = await getSupabaseServerClient()
     .from("ticket_orders")
     .select(
-      "id,status,tier,quantity,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,language,requires_invoice",
+      "id,status,tier,quantity,unit_price_cents,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,language,requires_invoice",
     )
     .eq("id", orderId)
     .single();

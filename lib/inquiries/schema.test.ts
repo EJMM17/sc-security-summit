@@ -17,12 +17,18 @@ const COMMON = {
   attribution: {},
 };
 
+/** A roster with one named participant per requested access. */
+const roster = (seats: number) =>
+  Array.from({ length: seats }, (_, index) => `Participante ${index + 1}`);
+
 describe("inquiry schemas", () => {
   it("pins the approved privacy notice version", () => {
-    expect(INQUIRY_CONSENT_VERSION).toBe("2026-08-24");
+    expect(INQUIRY_CONSENT_VERSION).toBe("2026-08-25");
   });
 
-  it.each([2, 10])("accepts a corporate inquiry with %i seats", (requestedSeats) => {
+  it.each([2, 10, 45])(
+    "accepts a corporate inquiry with %i seats",
+    (requestedSeats) => {
     const result = corporateInquirySchema.safeParse({
       ...COMMON,
       kind: "corporate",
@@ -30,6 +36,7 @@ describe("inquiry schemas", () => {
       lastName: " Lovelace ",
       role: " Security   Director ",
       requestedSeats,
+      attendees: roster(requestedSeats),
     });
 
     expect(result.success).toBe(true);
@@ -37,21 +44,50 @@ describe("inquiry schemas", () => {
       expect(result.data.email).toBe("contact@example.com");
       expect(result.data.company).toBe("Example Logistics");
       expect(result.data.requestedSeats).toBe(requestedSeats);
+      expect(result.data.attendees).toHaveLength(requestedSeats);
     }
-  });
+    },
+  );
 
-  it.each([1, 11, 2.5])("rejects an invalid corporate seat count: %s", (requestedSeats) => {
+  it("requires exactly one named participant per access", () => {
+    const base = {
+      ...COMMON,
+      kind: "corporate" as const,
+      firstName: "Ada",
+      lastName: "Lovelace",
+      role: "Director",
+      requestedSeats: 4,
+    };
+    expect(
+      corporateInquirySchema.safeParse({ ...base, attendees: roster(3) }).success,
+    ).toBe(false);
+    expect(
+      corporateInquirySchema.safeParse({ ...base, attendees: roster(5) }).success,
+    ).toBe(false);
     expect(
       corporateInquirySchema.safeParse({
-        ...COMMON,
-        kind: "corporate",
-        firstName: "Ada",
-        lastName: "Lovelace",
-        role: "Director",
-        requestedSeats,
+        ...base,
+        attendees: ["Ada Lovelace", "  ", "Alan Turing", "Grace Hopper"],
       }).success,
     ).toBe(false);
   });
+
+  it.each([1, 201, 2.5])(
+    "rejects an invalid corporate seat count: %s",
+    (requestedSeats) => {
+      expect(
+        corporateInquirySchema.safeParse({
+          ...COMMON,
+          kind: "corporate",
+          firstName: "Ada",
+          lastName: "Lovelace",
+          role: "Director",
+          requestedSeats,
+          attendees: roster(Math.max(2, Math.trunc(requestedSeats))),
+        }).success,
+      ).toBe(false);
+    },
+  );
 
   it("enforces the database's combined contact-name limit", () => {
     const base = {
@@ -59,6 +95,7 @@ describe("inquiry schemas", () => {
       kind: "corporate" as const,
       role: "Director",
       requestedSeats: 4,
+      attendees: roster(4),
     };
     expect(
       corporateInquirySchema.safeParse({
@@ -104,6 +141,7 @@ describe("inquiry schemas", () => {
         lastName: "Lovelace",
         role: "Director",
         requestedSeats: 4,
+        attendees: roster(4),
         interest: "I should not be here",
       }).success,
     ).toBe(false);
@@ -190,11 +228,13 @@ describe("parseInquiryFormData", () => {
       last_touch_timestamp: "2026-07-01T10:00:00.000Z",
       gclid: "discarded-by-data-minimization",
     }).forEach(([key, value]) => formData.set(key, value));
+    roster(7).forEach((name) => formData.append("attendees", ` ${name} `));
 
     const result = parseInquiryFormData(formData);
     expect(result.success).toBe(true);
     if (result.success && result.data.kind === "corporate") {
       expect(result.data.requestedSeats).toBe(7);
+      expect(result.data.attendees).toEqual(roster(7));
       expect(result.data.attribution.utm_source).toBe("linkedin");
       expect("gclid" in result.data.attribution).toBe(false);
     }

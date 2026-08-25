@@ -25,16 +25,26 @@ describe("ticket catalog", () => {
     );
   });
 
-  it("prices a quote with IVA on top of the published price", () => {
+  it("prices a quote with the IVA already inside the published price", () => {
     expect(quoteTicketOrder("plus", 2)).toMatchObject({
       tier: "plus",
       currency: "MXN",
       quantity: 2,
       unitPriceCents: 250_000,
-      subtotalCents: 500_000,
-      taxCents: 80_000,
-      totalCents: 580_000,
+      subtotalCents: 431_034,
+      taxCents: 68_966,
+      totalCents: 500_000,
     });
+  });
+
+  it("never charges more than the price the visitor saw", () => {
+    for (const id of TICKET_TIER_IDS) {
+      const tier = TICKET_TIERS[id];
+      for (let quantity = 1; quantity <= tier.maxQuantity; quantity += 1) {
+        const quote = quoteTicketOrder(id, quantity);
+        expect(quote.totalCents).toBe(tier.unitPriceCents * quantity);
+      }
+    }
   });
 
   it("refuses a quantity above the tier limit", () => {

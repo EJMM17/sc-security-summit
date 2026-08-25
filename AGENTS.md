@@ -17,7 +17,9 @@ Internalize these boundaries before changing code:
    the MercadoPago panel. Eventbrite is retired from the site entirely — no
    link, no constant, no env var.
 2. Supabase stores corporate-pass and sponsorship inquiries, and ticket
-   orders. Published prices are the IVA-exclusive taxable base.
+   orders. Published prices already include IVA: the seller absorbs the 16%
+   and the base is extracted from the gross for the CFDI. A corporate request
+   carries a roster of named participants, one per requested access.
 3. Supabase persistence defines receipt. Resend is a recoverable notification
    channel after persistence.
 4. Do not reuse historical `public.registros`, folios, payment fields, or the
@@ -318,6 +320,7 @@ retention period, the ARCO process and the deletion/anonymization procedure on
 2026-07-30. This approval does not satisfy the independent backup, database,
 Vercel billing, migration, merge or Production deployment gates.
 
+Consent version `2026-08-25` adds the corporate roster of participant names.
 Consent version `2026-08-24` adds on-site payments, the fiscal-data category
 and a five-year retention for purchase records (CFF art. 30). **It has not been
 approved yet.** Do not sell a ticket in Production until it is.

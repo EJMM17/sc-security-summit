@@ -1,6 +1,10 @@
 import { z } from "zod";
 import { MARKETING_CONSENT_FORM_FIELD } from "@/lib/consent";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
+import {
+  CORPORATE_MAX_SEATS,
+  CORPORATE_MIN_SEATS,
+} from "@/lib/payments/catalog";
 
 const normalizedText = (minimum: number, maximum: number) =>
   z
@@ -104,12 +108,36 @@ const corporateInquiryObject = z
     firstName: normalizedText(2, 80),
     lastName: normalizedText(2, 80),
     role: normalizedText(2, 120),
-    requestedSeats: z.coerce.number().int().min(2).max(10),
+    requestedSeats: z.coerce
+      .number()
+      .int()
+      .min(CORPORATE_MIN_SEATS)
+      .max(CORPORATE_MAX_SEATS),
+    // One named participant per access: the DC-3 certificate is issued per
+    // person, so a block without a full roster cannot be fulfilled.
+    attendees: z
+      .array(normalizedText(3, 160))
+      .min(CORPORATE_MIN_SEATS)
+      .max(CORPORATE_MAX_SEATS),
   })
   .strict();
 
-export const corporateInquirySchema =
-  corporateInquiryObject.superRefine(validateCombinedContactName);
+function validateRosterMatchesSeats(
+  value: { requestedSeats: number; attendees: string[] },
+  context: z.RefinementCtx,
+): void {
+  if (value.attendees.length !== value.requestedSeats) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ["attendees"],
+      message: "attendees_must_match_requested_seats",
+    });
+  }
+}
+
+export const corporateInquirySchema = corporateInquiryObject
+  .superRefine(validateCombinedContactName)
+  .superRefine(validateRosterMatchesSeats);
 
 export const sponsorInquirySchema = z
   .object({
@@ -123,7 +151,9 @@ export const sponsorInquirySchema = z
 export const inquirySchema = z
   .discriminatedUnion("kind", [corporateInquiryObject, sponsorInquirySchema])
   .superRefine((value, context) => {
-    if (value.kind === "corporate") validateCombinedContactName(value, context);
+    if (value.kind !== "corporate") return;
+    validateCombinedContactName(value, context);
+    validateRosterMatchesSeats(value, context);
   });
 
 export type Attribution = z.infer<typeof attributionSchema>;
@@ -146,6 +176,17 @@ const ATTRIBUTION_KEYS = [
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
   return typeof value === "string" ? value : "";
+}
+
+/**
+ * Roster entries arrive as repeated fields, one per rendered seat. Order is
+ * the browser's submission order, which is the order the inputs are painted
+ * in, so seat 1 stays seat 1.
+ */
+function formAttendees(formData: FormData): string[] {
+  return formData
+    .getAll("attendees")
+    .filter((value): value is string => typeof value === "string");
 }
 
 function formAttribution(formData: FormData): Record<string, string> {
@@ -188,6 +229,7 @@ export function parseInquiryFormData(formData: FormData): z.SafeParseReturnType<
           lastName: formString(formData, "lastName"),
           role: formString(formData, "role"),
           requestedSeats: formString(formData, "requestedSeats"),
+          attendees: formAttendees(formData),
         }
       : kind === "sponsor"
         ? {

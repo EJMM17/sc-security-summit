@@ -27,34 +27,43 @@ panel de Eventbrite; el sitio ya no los referencia.
 Lo que **no** cambia:
 
 - los pases corporativos y los patrocinios siguen siendo `inquiries`
-  (cotización por correo, sin cobro en línea);
+  (cotización por correo, sin cobro en línea). El formulario corporativo
+  muestra una **cotización estimada** con el 25% de descuento a partir de 5
+  accesos, calculada con `quoteCorporatePass()`; es orientativa y no se
+  persiste como importe;
 - el CFDI se timbra manualmente. El sitio captura, valida y almacena los datos
   fiscales; no hay PAC integrado.
 
 ## Reglas de IVA
 
-Los precios publicados en `lib/content.ts` son **base gravable**, sin IVA. La
-copy pública ya lo dice (`ui.taxNote` → "más I.V.A." / "plus VAT").
+Los precios publicados en `lib/content.ts` **ya incluyen IVA**: el número que
+ve el visitante es el total que paga y el 16% va dentro. La copy pública lo
+dice (`ui.taxNote` → "IVA incluido" / "VAT included"). El vendedor absorbe el
+impuesto; el precio publicado no cambió al hacer el cambio.
 
-| Acceso | Base | IVA 16% | Total |
+| Acceso | Total publicado | Base gravable | IVA 16% incluido |
 |---|---:|---:|---:|
-| Plus | $2,500.00 | $400.00 | $2,900.00 |
-| General | $900.00 | $144.00 | $1,044.00 |
-| Estudiante | $650.00 | $104.00 | $754.00 |
+| Plus | $2,500.00 | $2,155.17 | $344.83 |
+| General | $900.00 | $775.86 | $124.14 |
+| Estudiante | $650.00 | $560.34 | $89.66 |
 
 Reglas de cálculo, en `lib/payments/tax.ts`:
 
 - todo se opera en **centavos enteros**; no hay aritmética de punto flotante
   sobre importes;
 - la tasa se expresa en puntos base (`1600` = 16%), no como decimal;
-- el redondeo es **medio hacia arriba** (`applyRateHalfUp`), implementado con
-  operaciones enteras;
-- el impuesto se calcula **una vez sobre la línea completa**, no por unidad.
+- la base se **extrae del bruto** (`extractTaxFromGross`) con redondeo medio
+  hacia arriba y el impuesto es el resto, de modo que base + IVA es exactamente
+  el importe cobrado y la división nunca crea ni pierde un centavo;
+- la extracción se hace **una vez sobre la línea completa**, no por unidad.
   Esto es lo que el SAT espera en un concepto de CFDI y evita que el total del
   CFDI difiera del importe capturado por MercadoPago;
-- `record_ticket_order_payment` y `create_ticket_order` repiten la misma
-  fórmula en SQL, así que un importe inconsistente no se puede persistir ni
-  siquiera desde `psql`.
+- `create_ticket_order` repite la misma fórmula en SQL y la restricción
+  `ticket_orders_amounts_check` exige `subtotal + IVA = precio unitario ×
+  cantidad`, así que un importe inconsistente no se puede persistir ni siquiera
+  desde `psql`;
+- la preferencia de MercadoPago lleva **un solo ítem** al precio bruto. Una
+  línea de IVA aparte volvería a cobrar un impuesto que ya está dentro.
 
 El navegador **nunca envía un importe**. Envía `tier` y `quantity`; el servidor
 los cotiza contra `lib/payments/catalog.ts`, que es la única fuente de verdad

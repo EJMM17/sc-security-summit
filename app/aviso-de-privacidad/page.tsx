@@ -104,7 +104,21 @@ export default function AvisoPrivacidad() {
               Cuando el titular <strong>compra un acceso individual</strong> en
               este sitio, el Responsable recaba además su nombre, correo
               electrónico, teléfono, empresa (opcional), el tipo y la cantidad
-              de accesos, el importe con el IVA desglosado y el estado del pago.
+              de accesos, el importe pagado —el precio publicado ya incluye el
+              IVA, que se desglosa internamente para efectos fiscales— y el
+              estado del pago.
+            </p>
+            <p className="mt-3">
+              Cuando el titular solicita un <strong>pase corporativo</strong>,
+              el Responsable recaba además el{" "}
+              <strong>nombre completo de cada persona que asistirá</strong> con
+              ese bloque de accesos, uno por acceso solicitado. Estos datos los
+              proporciona quien hace la solicitud por cuenta de esas personas y
+              se utilizan únicamente para emitir la constancia DC-3 a nombre de
+              cada participante y para el control de acceso el día del evento.
+              No se recaba ningún otro dato de los participantes. Quien realiza
+              la solicitud es responsable de haber informado a esas personas del
+              tratamiento descrito en este aviso.
             </p>
             <p className="mt-3">
               El Responsable <strong>no recaba ni almacena datos de tarjetas

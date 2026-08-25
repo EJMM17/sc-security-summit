@@ -5,7 +5,7 @@ import { hashTicketOrderPayload } from "@/lib/payments/canonical-payload";
 import { quoteTicketOrder, TICKET_TIERS } from "@/lib/payments/catalog";
 import type { CheckoutResult } from "@/lib/payments/result";
 import type { TicketCheckout } from "@/lib/payments/schema";
-import { centsToAmount, formatTaxRate } from "@/lib/payments/tax";
+import { centsToAmount } from "@/lib/payments/tax";
 import {
   attachPreference,
   persistTicketOrder,
@@ -155,10 +155,6 @@ export async function createTicketCheckoutUseCase(
 
   const tier = TICKET_TIERS[order.tier];
   const tierLabel = tier.label[order.language];
-  const taxLabel =
-    order.language === "es"
-      ? `IVA ${formatTaxRate(quote.taxRateBasisPoints)}`
-      : `VAT ${formatTaxRate(quote.taxRateBasisPoints)}`;
 
   let preference: CreatedPreference;
   try {
@@ -179,15 +175,10 @@ export async function createTicketCheckoutUseCase(
               : "SC Security Summit 2026 — September 24, Reynosa",
           quantity: quote.quantity,
           currency_id: quote.currency,
+          // The published price already contains the IVA, so the preference
+          // carries a single item at the gross unit price. A separate tax item
+          // would double-charge the buyer for a tax that is already inside it.
           unit_price: centsToAmount(quote.unitPriceCents),
-        },
-        {
-          id: "iva",
-          title: taxLabel,
-          category_id: "tickets",
-          quantity: 1,
-          currency_id: quote.currency,
-          unit_price: centsToAmount(quote.taxCents),
         },
       ],
       payer: {
