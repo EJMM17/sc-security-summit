@@ -5,6 +5,7 @@ import {
 } from "@/lib/payments/canonical-payload";
 import {
   checkoutFixture,
+  corporateCheckoutFixture,
   invoicedCheckoutFixture,
 } from "@/tests/payments/checkout-fixtures";
 
@@ -53,5 +54,29 @@ describe("canonicalTicketOrderPayload", () => {
 
   it("produces a 64-character lowercase hex digest", () => {
     expect(hashTicketOrderPayload(checkoutFixture)).toMatch(/^[0-9a-f]{64}$/);
+  });
+});
+
+describe("corporate blocks and referrals", () => {
+  it("treats a changed roster as a different order", () => {
+    const renamed = {
+      ...corporateCheckoutFixture,
+      attendees: [
+        "María González López",
+        "Juan Pérez Ruiz",
+        "Ana Ramírez Solís",
+        "Luis Torres Vega",
+        "Sofía Herrera Silva",
+      ],
+    };
+    expect(hashTicketOrderPayload(renamed)).not.toBe(
+      hashTicketOrderPayload(corporateCheckoutFixture),
+    );
+  });
+
+  it("treats a changed referrer as a different order", () => {
+    expect(
+      hashTicketOrderPayload({ ...checkoutFixture, referral: "Ana" }),
+    ).not.toBe(hashTicketOrderPayload(checkoutFixture));
   });
 });

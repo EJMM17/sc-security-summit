@@ -3,8 +3,11 @@
 Sitio bilingüe en Next.js 15 para el evento del 24 de septiembre de 2026 en
 Reynosa, Tamaulipas.
 
-- Los accesos individuales se venden y administran en Eventbrite.
-- Los formularios corporate y sponsor se conservan en Supabase.
+- Los accesos individuales y los pases corporativos se venden en el sitio con
+  MercadoPago; un bloque corporativo guarda además el nombre de cada
+  participante.
+- Las solicitudes corporate y sponsor recibidas antes del corte se conservan en
+  Supabase; el sitio ya no crea nuevas.
 - Resend notifica al equipo después de persistir.
 - El cron de Vercel reintenta notificaciones fallidas.
 
@@ -101,7 +104,7 @@ components/
   SponsorInquiryForm.tsx
 
 lib/
-  content.ts                        Copy ES/EN, agenda, accesos, sponsors
+  content.ts                        Copy ES/EN, agenda, accesos
   inquiries/                        Schema, canonicalización, resultado
   supabase-server.ts                Cliente server-only
   database.types.ts                 Tipos generados

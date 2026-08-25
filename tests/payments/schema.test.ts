@@ -4,7 +4,12 @@ import {
   parseTicketCheckoutFormData,
   ticketCheckoutSchema,
 } from "@/lib/payments/schema";
-import { checkoutFixture, checkoutFormData } from "@/tests/payments/checkout-fixtures";
+import {
+  checkoutFixture,
+  checkoutFormData,
+  corporateCheckoutFixture,
+  corporateCheckoutFormData,
+} from "@/tests/payments/checkout-fixtures";
 
 describe("ticketCheckoutSchema", () => {
   it("accepts a valid order without an invoice", () => {
@@ -185,5 +190,72 @@ describe("parseTicketCheckoutFormData", () => {
         checkoutFormData({ consentVersion: INQUIRY_CONSENT_VERSION }),
       ).success,
     ).toBe(true);
+  });
+});
+
+describe("corporate blocks", () => {
+  it("accepts a block whose roster matches the requested accesses", () => {
+    const result = ticketCheckoutSchema.safeParse(corporateCheckoutFixture);
+    expect(result.success).toBe(true);
+    expect(result.data?.attendees).toHaveLength(5);
+    expect(result.data?.referral).toBe("Cámara de Comercio de Reynosa");
+  });
+
+  it("refuses a roster that does not name every access", () => {
+    const result = ticketCheckoutSchema.safeParse({
+      ...corporateCheckoutFixture,
+      quantity: 6,
+    });
+    expect(result.success).toBe(false);
+    expect(
+      result.error?.issues.some((i) => i.message === "attendees_must_match_quantity"),
+    ).toBe(true);
+  });
+
+  it("refuses a block smaller than two accesses", () => {
+    const result = ticketCheckoutSchema.safeParse({
+      ...corporateCheckoutFixture,
+      quantity: 1,
+      attendees: ["María González López"],
+    });
+    expect(result.success).toBe(false);
+    expect(
+      result.error?.issues.some((i) => i.message === "corporate_block_too_small"),
+    ).toBe(true);
+  });
+
+  it("refuses a roster on an individual access", () => {
+    const result = ticketCheckoutSchema.safeParse({
+      ...checkoutFixture,
+      attendees: ["María González López", "Juan Pérez Ruiz"],
+    });
+    expect(result.success).toBe(false);
+    expect(
+      result.error?.issues.some((i) => i.message === "attendees_not_expected"),
+    ).toBe(true);
+  });
+
+  it("reads the roster and the referrer out of the submitted form", () => {
+    const parsed = parseTicketCheckoutFormData(corporateCheckoutFormData());
+    expect(parsed.success).toBe(true);
+    expect(parsed.data?.tier).toBe("corporativo");
+    expect(parsed.data?.quantity).toBe(5);
+    expect(parsed.data?.attendees?.[0]).toBe("María González López");
+    expect(parsed.data?.referral).toBe("Cámara de Comercio de Reynosa");
+  });
+
+  it("keeps the referrer optional on an individual access", () => {
+    const parsed = parseTicketCheckoutFormData(checkoutFormData());
+    expect(parsed.success).toBe(true);
+    expect(parsed.data?.referral).toBeUndefined();
+    expect(parsed.data?.attendees).toBeUndefined();
+  });
+
+  it("ignores a roster smuggled into an individual submission", () => {
+    const formData = checkoutFormData();
+    formData.append("attendees", "María González López");
+    const parsed = parseTicketCheckoutFormData(formData);
+    expect(parsed.success).toBe(true);
+    expect(parsed.data?.attendees).toBeUndefined();
   });
 });

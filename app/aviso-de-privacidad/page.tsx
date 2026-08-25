@@ -65,8 +65,9 @@ export default function AvisoPrivacidad() {
           <section>
             <h2 className="text-lg font-bold text-slate-900 mb-3">2. Datos Personales que se Recaban</h2>
             <p>
-              A través de los formularios de este sitio —solicitud de pase corporativo y solicitud de
-              patrocinio— el Responsable recaba los siguientes datos personales:
+              A través de los formularios de este sitio —compra de accesos
+              individuales y compra de pases corporativos— el Responsable
+              recaba los siguientes datos personales:
             </p>
             <ul className="list-disc pl-6 mt-3 space-y-1">
               <li>Nombre(s) y apellidos</li>
@@ -74,11 +75,14 @@ export default function AvisoPrivacidad() {
               <li>Número de teléfono móvil</li>
               <li>Empresa y cargo</li>
               <li>
-                Cantidad de accesos solicitados, para pases corporativos
+                Cantidad de accesos comprados, y el número de accesos del
+                bloque en el caso de un pase corporativo
               </li>
               <li>
-                El mensaje o interés que el titular incluya en una solicitud de
-                patrocinio
+                De forma opcional, el nombre de la persona o empresa que
+                recomendó el Summit al titular, cuando el titular decida
+                escribirlo. Este campo puede dejarse vacío y no condiciona la
+                compra ni el precio.
               </li>
               <li>
                 Idioma, versión del aviso aceptado y fecha y hora del
@@ -109,15 +113,15 @@ export default function AvisoPrivacidad() {
               estado del pago.
             </p>
             <p className="mt-3">
-              Cuando el titular solicita un <strong>pase corporativo</strong>,
+              Cuando el titular compra un <strong>pase corporativo</strong>,
               el Responsable recaba además el{" "}
               <strong>nombre completo de cada persona que asistirá</strong> con
-              ese bloque de accesos, uno por acceso solicitado. Estos datos los
-              proporciona quien hace la solicitud por cuenta de esas personas y
+              ese bloque de accesos, uno por acceso comprado. Estos datos los
+              proporciona quien realiza la compra por cuenta de esas personas y
               se utilizan únicamente para emitir la constancia DC-3 a nombre de
               cada participante y para el control de acceso el día del evento.
               No se recaba ningún otro dato de los participantes. Quien realiza
-              la solicitud es responsable de haber informado a esas personas del
+              la compra es responsable de haber informado a esas personas del
               tratamiento descrito en este aviso.
             </p>
             <p className="mt-3">
@@ -144,18 +148,21 @@ export default function AvisoPrivacidad() {
             <h2 className="text-lg font-bold text-slate-900 mb-3">3. Finalidades del Tratamiento</h2>
             <p><strong>Finalidades primarias</strong> (necesarias para la relación jurídica entre el Responsable y el titular):</p>
             <ul className="list-disc pl-6 mt-2 space-y-1">
-              <li>Atender las solicitudes de pase corporativo y de patrocinio recibidas a través del sitio.</li>
               <li>
-                Procesar la compra de accesos individuales, cobrar el importe
-                correspondiente a través de MercadoPago y emitir el
-                comprobante de compra.
+                Procesar la compra de accesos individuales y de pases
+                corporativos, cobrar el importe correspondiente a través de
+                MercadoPago y emitir el comprobante de compra.
+              </li>
+              <li>
+                Emitir la constancia DC-3 a nombre de cada participante nombrado
+                en un pase corporativo.
               </li>
               <li>
                 Emitir el CFDI cuando el titular lo solicite, y cumplir las
                 obligaciones fiscales y contables asociadas.
               </li>
               <li>Acreditar el acceso del titular al Evento el día de su celebración.</li>
-              <li>Contactar al titular para dar seguimiento a su solicitud, compartir cotizaciones, disponibilidad y beneficios.</li>
+              <li>Contactar al titular para dar seguimiento a su compra y atender cualquier incidencia relacionada con ella.</li>
               <li>Atender consultas relacionadas con el 1er Summit de Seguridad en la Cadena de Suministros 2026.</li>
               <li>
                 Prevenir abuso, mantener la seguridad del servicio y conservar
@@ -296,14 +303,17 @@ export default function AvisoPrivacidad() {
               8. Conservación y Eliminación
             </h2>
             <p>
-              Cada solicitud de pase corporativo o patrocinio se conserva
-              durante <strong>18 meses</strong> desde su creación, salvo que
-              exista una relación contractual, una solicitud ARCO en trámite o
-              una obligación jurídica que justifique otro plazo.
+              Las solicitudes de pase corporativo y de patrocinio recibidas por
+              el sitio antes de esta versión del aviso se conservan durante{" "}
+              <strong>18 meses</strong> desde su creación, salvo que exista una
+              relación contractual, una solicitud ARCO en trámite o una
+              obligación jurídica que justifique otro plazo. El sitio ya no
+              recibe solicitudes nuevas de ese tipo.
             </p>
             <p className="mt-3">
-              Las <strong>órdenes de compra de accesos</strong> y, en su caso,
-              los datos fiscales asociados se conservan durante{" "}
+              Las <strong>órdenes de compra de accesos</strong> —individuales y
+              corporativas, incluida la lista de participantes de un bloque— y,
+              en su caso, los datos fiscales asociados se conservan durante{" "}
               <strong>cinco años</strong>, porque son parte de la contabilidad
               y de los comprobantes fiscales cuya conservación exige el
               artículo 30 del Código Fiscal de la Federación. Este plazo no

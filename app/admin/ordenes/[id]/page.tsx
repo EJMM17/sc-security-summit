@@ -16,6 +16,7 @@ import { formatMxn, formatTaxRate } from "@/lib/payments/tax";
 import {
   getInvoiceDetails,
   getTicketOrder,
+  listOrderAttendees,
   listOrderNotifications,
 } from "@/server/repositories/admin-ticket-order-repository";
 
@@ -48,8 +49,11 @@ export default async function AdminOrderDetailPage({
   const order = await getTicketOrder(id);
   if (!order) notFound();
 
-  const [invoice, notifications] = await Promise.all([
+  const [invoice, attendees, notifications] = await Promise.all([
     order.requires_invoice ? getInvoiceDetails(id) : Promise.resolve(null),
+    // A block names its participants; an individual order returns an empty
+    // roster, which is why this is not conditioned on the tier.
+    listOrderAttendees(id),
     listOrderNotifications(id),
   ]);
 
@@ -110,8 +114,30 @@ export default async function AdminOrderDetailPage({
           <Field label="Correo" value={order.email} />
           <Field label="Teléfono" value={order.phone} />
           <Field label="Empresa" value={order.company ?? "—"} />
+          <Field label="Referido por" value={order.referral_source ?? "—"} />
         </dl>
       </section>
+
+      {attendees.length > 0 && (
+        <section className="mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h2 className="text-sm font-semibold text-slate-900">
+            Participantes del bloque
+          </h2>
+          <ol className="mt-3 grid gap-2 sm:grid-cols-2">
+            {attendees.map((attendee) => (
+              <li
+                key={attendee.seat_number}
+                className="text-sm text-slate-900"
+              >
+                <span className="mr-2 font-mono text-xs text-slate-500">
+                  {attendee.seat_number}
+                </span>
+                {attendee.full_name}
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
       <section className="mt-4 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <h2 className="text-sm font-semibold text-slate-900">Pago</h2>

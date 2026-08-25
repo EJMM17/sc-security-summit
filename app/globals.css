@@ -7134,6 +7134,12 @@ h3,
   font-weight: 700;
   color: #0F172A;
 }
+/* The volume discount is the one line in the summary that subtracts, so it is
+   the one line that is not slate. */
+.checkout-summary .checkout-summary-discount {
+  color: #047857;
+  font-weight: 600;
+}
 .checkout-summary-note {
   margin-top: 0.55rem;
   font-size: 0.76rem;

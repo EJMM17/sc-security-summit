@@ -9,12 +9,16 @@ Read `AGENTS.md` first. Canonical current state:
   `docs/PAYMENTS.md`. Eventbrite is retired: no link, no `EVENTBRITE_URL`, no
   `NEXT_PUBLIC_EVENTBRITE_URL`. Tickets sold there before the cut stay valid
   and are operated from Eventbrite's own panel.
-- Supabase stores corporate-pass and sponsorship inquiries, and ticket orders.
-  A corporate request carries a roster: one named participant per requested
-  access, stored in `public.inquiry_attendees`. Blocks start at two accesses
-  and have no commercial ceiling; the form quotes 25% off from the fifth access
-  up (`quoteCorporatePass`), as an estimate only — corporate passes are still
-  never charged on site.
+- Corporate passes are sold on site too, as `corporativo` ticket orders. A
+  block starts at two accesses, is picked from a seat dropdown, gets 25% off
+  the unit price from the fifth access up (`quoteCorporateOrder`) and carries a
+  roster: one named participant per purchased access, in
+  `public.ticket_order_attendees`. Every order, individual or corporate, may
+  carry an optional free-text referrer (`referral_source`).
+- The sponsorship funnel is retired: no landing section, no form, no
+  `/sponsors`, no `/media-kit`. The "a quién va dirigido" section is gone too.
+- Supabase still stores the corporate and sponsorship inquiries received before
+  that cut, and `/admin` still reads them, but the site creates no new ones.
 - Persistence happens before email and before MercadoPago; it defines receipt.
 - Resend failure queues a notification; it does not lose the inquiry.
 - Do not reuse historical `public.registros`. The legacy `/admin` built on it
@@ -59,7 +63,7 @@ requires widening `hold_minutes`, `expiration_date_to` and
 `CHECKOUT_EXPIRY_MINUTES` first.
 
 Seat capacity (`public.ticket_capacity`) is opt-in: a scope with no row is
-unlimited. `create_ticket_order` takes an advisory lock before checking it and
+unlimited, and `corporativo` is a scope like any published tier. `create_ticket_order` takes an advisory lock before checking it and
 answers `sold_out` without storing an order; a replay is answered before the
 check so a sold-out event never rejects an existing buyer.
 
@@ -77,6 +81,10 @@ identifiers in an email.
 ## Request flow
 
 ```text
+components/TicketCheckoutForm (individual and corporate)
+  → app/actions/checkout.ts
+  → server/use-cases/create-ticket-checkout.ts
+
 components/*Form
   → app/actions/inquiries.ts
   → server/use-cases/submit-inquiry.ts
@@ -177,10 +185,11 @@ idempotency. Do not log PII or return it from the route.
 ## Privacy
 
 `INQUIRY_CONSENT_VERSION` in `lib/inquiries/constants.ts` is canonical.
-Consent version `2026-08-25` adds the corporate roster: names of third parties
-supplied by the requester on their behalf. `2026-08-24` covered on-site
-payments, the fiscal-data category and a five-year retention for purchase
-records (CFF art. 30); inquiries keep 18 months. **This version is not yet
+Consent version `2026-08-26` moves the corporate roster into a purchase record
+(five-year retention) and adds the optional referrer. `2026-08-25` introduced
+that roster on the inquiry form; `2026-08-24` covered on-site payments, the
+fiscal-data category and a five-year retention for purchase records (CFF art.
+30); inquiries keep 18 months. **This version is not yet
 approved by the privacy owner** — that approval is a blocking gate before
 selling. The previous `2026-07-30` version and its approval remain the record
 for inquiries submitted before the cut. Production remains gated independently on backup,

@@ -27,10 +27,12 @@ test.describe("Checkout de accesos", () => {
     await expect(summary).toContainText("900.00");
     await expect(summary).not.toContainText("1,044.00");
 
-    // The student tier is capped at two seats.
-    await page.getByRole("spinbutton").fill("5");
+    // Quantity is a dropdown, and the student tier is capped at two seats.
+    const quantity = page.getByLabel("Cantidad");
+    await quantity.selectOption("5");
     await page.getByRole("radio", { name: /acceso estudiante/i }).check();
-    await expect(page.getByRole("spinbutton")).toHaveValue("2");
+    await expect(quantity).toHaveValue("2");
+    await expect(quantity.locator("option")).toHaveCount(2);
     await expect(summary).toContainText("1,300.00");
     await expect(summary).not.toContainText("1,508.00");
   });
@@ -70,5 +72,25 @@ test.describe("Checkout de accesos", () => {
     await expect(
       page.getByRole("button", { name: /pay with mercadopago/i }),
     ).toBeVisible();
+  });
+
+  test("el pase corporativo cobra el bloque con descuento", async ({ page }) => {
+    await page.goto("/?lang=es");
+
+    const corporate = page.locator("#registro");
+    const seats = corporate.getByLabel(/número de accesos/i);
+    // The dropdown starts at the smallest block a company can buy.
+    await expect(seats.locator("option").first()).toHaveAttribute("value", "2");
+
+    await seats.selectOption("5");
+    await corporate.getByLabel("Participante 1").fill("Ada Lovelace");
+    await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(5);
+    // Renaming the block keeps what was already typed.
+    await seats.selectOption("6");
+    await expect(corporate.getByLabel("Participante 1")).toHaveValue("Ada Lovelace");
+
+    const summary = corporate.locator(".checkout-summary");
+    await expect(summary).toContainText("Descuento por volumen");
+    await expect(summary).toContainText("11,250.00");
   });
 });

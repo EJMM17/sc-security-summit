@@ -3,7 +3,16 @@
 import type { FormEvent, ReactNode } from "react";
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Building2, Mail, Phone, ReceiptText, UserRound } from "lucide-react";
+import {
+  ArrowRight,
+  Building2,
+  Mail,
+  Phone,
+  ReceiptText,
+  Sparkles,
+  UserRound,
+  UsersRound,
+} from "lucide-react";
 import { createTicketCheckout } from "@/app/actions/checkout";
 import AttributionCapture from "@/components/AttributionCapture";
 import EmptyAttributionFields from "@/components/EmptyAttributionFields";
@@ -12,9 +21,15 @@ import { createSubmissionId } from "@/lib/inquiries/client-submit";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 import type { Language } from "@/lib/language";
 import {
+  CORPORATE_DISCOUNT_MIN_SEATS,
+  CORPORATE_MIN_SEATS,
+  CORPORATE_SEAT_CHOICE_MAX,
+  CORPORATE_SEAT_OPTIONS,
+  CORPORATE_TIER_ID,
   TICKET_TIERS,
   TICKET_TIER_IDS,
-  quoteTicketOrder,
+  quoteCorporatePass,
+  quoteOrder,
   type TicketTierId,
 } from "@/lib/payments/catalog";
 import type { CheckoutFailureReason } from "@/lib/payments/result";
@@ -44,16 +59,27 @@ function isSafeCheckoutUrl(value: string): boolean {
   }
 }
 
+export type CheckoutVariant = "individual" | "corporate";
+
 export default function TicketCheckoutForm({
   language,
   previewDisabled = false,
   initialTier = "plus",
+  variant = "individual",
 }: {
   language: Language;
   previewDisabled?: boolean;
   /** Preselected by the pricing section so the visitor lands on their plan. */
   initialTier?: TicketTierId;
+  /**
+   * A corporate block is the same purchase with a different shape: one tier,
+   * a seat dropdown and a named roster. It shares this component so the buyer
+   * data, the CFDI block and the MercadoPago redirect can never drift apart
+   * between the two ways of buying.
+   */
+  variant?: CheckoutVariant;
 }) {
+  const isCorporate = variant === "corporate";
   const copy = CONTENT[language].checkout;
   const pricing = CONTENT[language].pricing;
 
@@ -61,7 +87,14 @@ export default function TicketCheckoutForm({
   const [isSending, setIsSending] = useState(false);
   const [submissionId, setSubmissionId] = useState("");
   const [tier, setTier] = useState<TicketTierId>(initialTier);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(
+    isCorporate ? CORPORATE_MIN_SEATS : 1,
+  );
+  // The roster is controlled so that changing the number of accesses keeps the
+  // names already typed instead of remounting the inputs and losing them.
+  const [attendees, setAttendees] = useState<string[]>(() =>
+    isCorporate ? Array.from({ length: CORPORATE_MIN_SEATS }, () => "") : [],
+  );
   const [requiresInvoice, setRequiresInvoice] = useState(false);
   const [rfc, setRfc] = useState("");
 
@@ -69,7 +102,9 @@ export default function TicketCheckoutForm({
     setSubmissionId(createSubmissionId());
   }, []);
 
-  const maxQuantity = TICKET_TIERS[tier].maxQuantity;
+  const maxQuantity = isCorporate
+    ? CORPORATE_SEAT_CHOICE_MAX
+    : TICKET_TIERS[tier].maxQuantity;
 
   // Clamping here rather than in the submit handler keeps the live summary
   // honest when the buyer switches from a 10-seat tier to the 2-seat student
@@ -78,13 +113,33 @@ export default function TicketCheckoutForm({
     setQuantity((current) => Math.min(current, maxQuantity));
   }, [maxQuantity]);
 
+  const orderTier = isCorporate ? CORPORATE_TIER_ID : tier;
+
   const quote = useMemo(() => {
     try {
-      return quoteTicketOrder(tier, quantity);
+      return quoteOrder(orderTier, quantity);
     } catch {
       return null;
     }
-  }, [tier, quantity]);
+  }, [orderTier, quantity]);
+
+  // The block is quoted a second time to show the buyer the list price and the
+  // discount that produced the unit price above.
+  const corporateQuote = useMemo(() => {
+    if (!isCorporate) return null;
+    try {
+      return quoteCorporatePass(quantity);
+    } catch {
+      return null;
+    }
+  }, [isCorporate, quantity]);
+
+  const resizeRoster = (seats: number) => {
+    setQuantity(seats);
+    setAttendees((current) =>
+      Array.from({ length: seats }, (_, index) => current[index] ?? ""),
+    );
+  };
 
   // The RFC length tells us whether the buyer is a persona física or moral,
   // which is what decides the valid regimes and CFDI uses. Showing the wrong
@@ -174,65 +229,137 @@ export default function TicketCheckoutForm({
           aria-hidden="true"
         />
 
-        <fieldset className="m-0 min-w-0 border-0 p-0">
-          <legend className="text-sm font-semibold text-slate-900">
-            {copy.tierLegend}
-          </legend>
-          <div className="mt-3 grid gap-3 sm:grid-cols-3">
-            {TICKET_TIER_IDS.map((id) => {
-              const plan = pricing.find((entry) => entry.id === id);
-              return (
-                <label
-                  key={id}
-                  className={`checkout-tier ${tier === id ? "is-selected" : ""}`}
+        {isCorporate ? (
+          <>
+            <input type="hidden" name="tier" value={CORPORATE_TIER_ID} readOnly />
+            <label className="inquiry-field max-w-[16rem]">
+              <span>{copy.corporateSeats}</span>
+              <span className="inquiry-input-wrap">
+                <UsersRound aria-hidden="true" />
+                <select
+                  required
+                  name="quantity"
+                  value={quantity}
+                  onChange={(event) =>
+                    resizeRoster(Number.parseInt(event.target.value, 10))
+                  }
                 >
-                  <input
-                    type="radio"
-                    name="tier"
-                    value={id}
-                    checked={tier === id}
-                    onChange={() => setTier(id)}
-                    className="sr-only"
-                  />
-                  <span className="checkout-tier-name">
-                    {plan?.label ?? TICKET_TIERS[id].label[language]}
-                  </span>
-                  <span className="checkout-tier-price">
-                    {formatMxn(TICKET_TIERS[id].unitPriceCents, language)}
-                  </span>
-                  <span className="checkout-tier-note">
-                    {CONTENT[language].ui.taxNote}
-                  </span>
-                </label>
-              );
-            })}
-          </div>
-        </fieldset>
+                  {CORPORATE_SEAT_OPTIONS.map((seats) => (
+                    <option key={seats} value={seats}>
+                      {copy.corporateSeatsOption.replace("{n}", String(seats))}
+                    </option>
+                  ))}
+                </select>
+              </span>
+              <small className="inquiry-field-hint">{copy.corporateSeatsHint}</small>
+            </label>
+            <p className="mt-1 text-xs text-slate-500">
+              {copy.corporateLargeBlockHint.replace(
+                "{max}",
+                String(CORPORATE_SEAT_CHOICE_MAX),
+              )}
+            </p>
 
-        <label className="inquiry-field mt-5 max-w-[12rem]">
-          <span>{copy.quantity}</span>
-          <span className="inquiry-input-wrap">
-            <input
-              required
-              name="quantity"
-              type="number"
-              min={1}
-              max={maxQuantity}
-              step={1}
-              value={quantity}
-              inputMode="numeric"
-              onChange={(event) => {
-                const next = Number.parseInt(event.target.value, 10);
-                setQuantity(
-                  Number.isNaN(next) ? 1 : Math.min(Math.max(next, 1), maxQuantity),
-                );
-              }}
-            />
-          </span>
-        </label>
-        <p className="mt-1 text-xs text-slate-500">
-          {copy.quantityHint.replace("{max}", String(maxQuantity))}
-        </p>
+            <fieldset className="m-0 mt-7 min-w-0 border-0 p-0">
+              <legend className="text-sm font-semibold text-slate-900">
+                {copy.corporateRosterLegend}
+              </legend>
+              <p className="mt-1 text-xs text-slate-500">
+                {copy.corporateRosterHint}
+              </p>
+              <div className="mt-4 grid gap-5 sm:grid-cols-2">
+                {attendees.map((name, index) => (
+                  <label className="inquiry-field" key={index}>
+                    <span>
+                      {copy.corporateAttendee.replace("{n}", String(index + 1))}
+                    </span>
+                    <span className="inquiry-input-wrap">
+                      <UserRound aria-hidden="true" />
+                      <input
+                        required
+                        name="attendees"
+                        type="text"
+                        value={name}
+                        placeholder={copy.corporateAttendeePlaceholder}
+                        autoComplete="off"
+                        onChange={(event) => {
+                          const next = event.target.value;
+                          setAttendees((current) =>
+                            current.map((entry, position) =>
+                              position === index ? next : entry,
+                            ),
+                          );
+                        }}
+                      />
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </>
+        ) : (
+          <>
+            <fieldset className="m-0 min-w-0 border-0 p-0">
+              <legend className="text-sm font-semibold text-slate-900">
+                {copy.tierLegend}
+              </legend>
+              <div className="mt-3 grid gap-3 sm:grid-cols-3">
+                {TICKET_TIER_IDS.map((id) => {
+                  const plan = pricing.find((entry) => entry.id === id);
+                  return (
+                    <label
+                      key={id}
+                      className={`checkout-tier ${tier === id ? "is-selected" : ""}`}
+                    >
+                      <input
+                        type="radio"
+                        name="tier"
+                        value={id}
+                        checked={tier === id}
+                        onChange={() => setTier(id)}
+                        className="sr-only"
+                      />
+                      <span className="checkout-tier-name">
+                        {plan?.label ?? TICKET_TIERS[id].label[language]}
+                      </span>
+                      <span className="checkout-tier-price">
+                        {formatMxn(TICKET_TIERS[id].unitPriceCents, language)}
+                      </span>
+                      <span className="checkout-tier-note">
+                        {CONTENT[language].ui.taxNote}
+                      </span>
+                    </label>
+                  );
+                })}
+              </div>
+            </fieldset>
+
+            <label className="inquiry-field mt-5 max-w-[12rem]">
+              <span>{copy.quantity}</span>
+              <span className="inquiry-input-wrap">
+                <select
+                  required
+                  name="quantity"
+                  value={quantity}
+                  onChange={(event) =>
+                    setQuantity(Number.parseInt(event.target.value, 10))
+                  }
+                >
+                  {Array.from({ length: maxQuantity }, (_, index) => index + 1).map(
+                    (value) => (
+                      <option key={value} value={value}>
+                        {value}
+                      </option>
+                    ),
+                  )}
+                </select>
+              </span>
+            </label>
+            <p className="mt-1 text-xs text-slate-500">
+              {copy.quantityHint.replace("{max}", String(maxQuantity))}
+            </p>
+          </>
+        )}
 
         <fieldset className="m-0 mt-8 min-w-0 border-0 p-0">
           <legend className="text-sm font-semibold text-slate-900">
@@ -275,7 +402,17 @@ export default function TicketCheckoutForm({
               name="company"
               placeholder={copy.companyPlaceholder}
               autoComplete="organization"
+              // A block is bought by a company; an individual access is not.
+              required={isCorporate}
+            />
+            <TextField
+              icon={<Sparkles aria-hidden="true" />}
+              label={copy.referral}
+              name="referral"
+              placeholder={copy.referralPlaceholder}
+              autoComplete="off"
               required={false}
+              hint={copy.referralHint}
             />
           </div>
         </fieldset>
@@ -378,6 +515,25 @@ export default function TicketCheckoutForm({
                   {quote.quantity} × {formatMxn(quote.unitPriceCents, language)}
                 </dd>
               </div>
+              {corporateQuote && corporateQuote.discountCents > 0 && (
+                <>
+                  <div>
+                    <dt>
+                      {copy.corporateSummaryList
+                        .replace("{seats}", String(corporateQuote.seats))
+                        .replace(
+                          "{price}",
+                          formatMxn(corporateQuote.listUnitPriceCents, language),
+                        )}
+                    </dt>
+                    <dd>{formatMxn(corporateQuote.listTotalCents, language)}</dd>
+                  </div>
+                  <div className="checkout-summary-discount">
+                    <dt>{copy.corporateSummaryDiscount}</dt>
+                    <dd>−{formatMxn(corporateQuote.discountCents, language)}</dd>
+                  </div>
+                </>
+              )}
               <div className="checkout-summary-total">
                 <dt>{copy.summaryTotal}</dt>
                 <dd>{formatMxn(quote.totalCents, language)} MXN</dd>
@@ -387,6 +543,13 @@ export default function TicketCheckoutForm({
                 final number. The base and the tax still travel to the order
                 row and the CFDI; they are just not a checkout decision. */}
             <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
+            {corporateQuote &&
+              corporateQuote.discountCents === 0 &&
+              corporateQuote.seats === CORPORATE_DISCOUNT_MIN_SEATS - 1 && (
+                <p className="checkout-summary-note">
+                  {copy.corporateDiscountHint}
+                </p>
+              )}
           </div>
         )}
 
@@ -462,6 +625,7 @@ function TextField({
   required = true,
   inputMode,
   maxLength,
+  hint,
 }: {
   icon: ReactNode;
   label: string;
@@ -472,6 +636,7 @@ function TextField({
   required?: boolean;
   inputMode?: "numeric" | "text";
   maxLength?: number;
+  hint?: string;
 }) {
   return (
     <label className="inquiry-field">
@@ -488,6 +653,7 @@ function TextField({
           maxLength={maxLength}
         />
       </span>
+      {hint ? <small className="inquiry-field-hint">{hint}</small> : null}
     </label>
   );
 }

@@ -11,18 +11,16 @@ Datos clave:
 - Sede: Centro de Convenciones de Reynosa, Libramiento Ote S/N, Azteca, C.P. 88680, Reynosa, Tamaulipas, México
 - Idiomas del sitio: español e inglés (parámetro ?lang=en)
 - Accesos: Estudiante $650 MXN · General $900 MXN · Plus $2,500 MXN
-- Compra individual: Eventbrite, desde los botones de acceso del sitio
-- Pase corporativo: https://scsecuritysummit.com/#registro
+- Compra individual: en el sitio con MercadoPago, desde https://scsecuritysummit.com/checkout
+- Pase corporativo: https://scsecuritysummit.com/#registro (compra en línea, desde 2 accesos)
 - Contacto: hola@scsecuritysummit.com · +52 899 112 8755
 
 ## Páginas principales
 
-- [Inicio](https://scsecuritysummit.com): agenda, conferencistas, precios, FAQ, enlaces a Eventbrite y solicitud de pase corporativo
+- [Inicio](https://scsecuritysummit.com): agenda, conferencistas, precios, FAQ, compra de accesos individuales y de pases corporativos
 - [CTPAT y OEA](https://scsecuritysummit.com/ctpat-oea): guía de certificaciones CTPAT/OEA para exportadores
 - [Seguridad en la cadena de suministro](https://scsecuritysummit.com/seguridad-cadena-suministro): riesgos, trazabilidad y cumplimiento
 - [Evento de logística en Reynosa](https://scsecuritysummit.com/evento-logistica-reynosa): información logística del evento
-- [Patrocinios](https://scsecuritysummit.com/sponsors): oportunidades de patrocinio
-- [Media kit](https://scsecuritysummit.com/media-kit): recursos de prensa y marca
 
 ## English
 
@@ -30,5 +28,6 @@ Datos clave:
 2026 (8:00 AM – 7:00 PM) at the Reynosa Convention Center, Tamaulipas, Mexico.
 CTPAT/AEO regulatory updates, B2B networking, and technology solutions for
 northern Mexico's maquiladora industry. Passes: Student $650 MXN, General
-$900 MXN, Plus $2,500 MXN. Individual checkout is handled by
-Eventbrite from the site's access buttons.
+$900 MXN, Plus $2,500 MXN. Individual and corporate passes are bought on the
+site itself through MercadoPago; corporate blocks start at two passes and get
+25% off from the fifth pass up.

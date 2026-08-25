@@ -14,7 +14,11 @@ de septiembre de 2026 en Reynosa, Tamaulipas.
 
 - Eventbrite es el único sistema de venta y administración de accesos
   individuales.
-- El sitio conserva solicitudes de pase corporativo y patrocinio en Supabase.
+- El sitio conserva las solicitudes de pase corporativo y patrocinio recibidas
+  antes del corte, pero ya no crea ninguna: los accesos individuales y los
+  bloques corporativos se compran en el sitio con MercadoPago
+  (`docs/PAYMENTS.md`) y la sección de patrocinio se retiró por completo, junto
+  con `/sponsors`, `/media-kit` y la sección "a quién va dirigido".
 - Supabase es la fuente de verdad de esas solicitudes.
 - Resend es un canal de notificación posterior a la persistencia.
 - No existen folios, pagos, confirmación de boletos ni `/admin` para este flujo.
@@ -149,8 +153,6 @@ intentos o eventos. Consulta `docs/INQUIRY_OPERATIONS.md`.
 | `/ctpat-oea` | SEO CTPAT/OEA |
 | `/seguridad-cadena-suministro` | SEO temático |
 | `/evento-logistica-reynosa` | SEO local |
-| `/sponsors` | Patrocinio |
-| `/media-kit` | Recursos de prensa |
 | `/terminos-y-condiciones` | Términos, noindex |
 | `/aviso-de-privacidad` | Aviso, noindex |
 | `/api/health` | Readiness de aplicación + tabla `inquiries` |

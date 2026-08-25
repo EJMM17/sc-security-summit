@@ -2,7 +2,14 @@ import { z } from "zod";
 import { MARKETING_CONSENT_FORM_FIELD } from "@/lib/consent";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 import { attributionSchema } from "@/lib/inquiries/schema";
-import { TICKET_TIER_IDS, TICKET_TIERS, type TicketTierId } from "@/lib/payments/catalog";
+import {
+  CORPORATE_MAX_SEATS,
+  CORPORATE_MIN_SEATS,
+  CORPORATE_TIER_ID,
+  ORDER_TIER_IDS,
+  TICKET_TIERS,
+  type OrderTierId,
+} from "@/lib/payments/catalog";
 import { isValidPostalCode, normalizeRfc, validateRfc } from "@/lib/payments/rfc";
 import {
   isCfdiUseValidForPersonType,
@@ -78,11 +85,18 @@ export const invoiceDetailsSchema = z
     }
   });
 
+/** One roster entry: the name printed on that access's DC-3 certificate. */
+const attendeeNameSchema = normalizedText(3, 160);
+
 const ticketCheckoutObject = z
   .object({
     submissionId: z.string().uuid(),
-    tier: z.enum(TICKET_TIER_IDS),
-    quantity: z.coerce.number().int().min(1).max(10),
+    tier: z.enum(
+      ORDER_TIER_IDS as unknown as [OrderTierId, ...OrderTierId[]],
+    ),
+    // A corporate block has no commercial ceiling, so the shared bound is the
+    // technical guard and the per-tier limit is checked below.
+    quantity: z.coerce.number().int().min(1).max(CORPORATE_MAX_SEATS),
     firstName: normalizedText(2, 80),
     lastName: normalizedText(2, 80),
     email: z
@@ -97,6 +111,10 @@ const ticketCheckoutObject = z
     consentVersion: z.literal(INQUIRY_CONSENT_VERSION),
     requiresInvoice: z.boolean(),
     invoice: invoiceDetailsSchema.optional(),
+    /** Who sent the buyer. Optional on every order, individual or corporate. */
+    referral: normalizedText(2, 160).optional(),
+    /** Named participants of a corporate block, one per requested access. */
+    attendees: z.array(attendeeNameSchema).max(CORPORATE_MAX_SEATS).optional(),
     attribution: attributionSchema,
   })
   .strict();
@@ -128,7 +146,36 @@ export const ticketCheckoutSchema = ticketCheckoutObject.superRefine(
       });
     }
 
-    const maxQuantity = TICKET_TIERS[value.tier as TicketTierId].maxQuantity;
+    if (value.tier === CORPORATE_TIER_ID) {
+      if (value.quantity < CORPORATE_MIN_SEATS) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["quantity"],
+          message: "corporate_block_too_small",
+        });
+      }
+
+      // The roster is the product: one named participant per access, because
+      // the DC-3 certificate is issued per person.
+      if ((value.attendees?.length ?? 0) !== value.quantity) {
+        context.addIssue({
+          code: z.ZodIssueCode.custom,
+          path: ["attendees"],
+          message: "attendees_must_match_quantity",
+        });
+      }
+      return;
+    }
+
+    if (value.attendees) {
+      context.addIssue({
+        code: z.ZodIssueCode.custom,
+        path: ["attendees"],
+        message: "attendees_not_expected",
+      });
+    }
+
+    const maxQuantity = TICKET_TIERS[value.tier].maxQuantity;
     if (value.quantity > maxQuantity) {
       context.addIssue({
         code: z.ZodIssueCode.custom,
@@ -175,14 +222,22 @@ function optionalFormString(formData: FormData, key: string): string | undefined
   return value === "" ? undefined : value;
 }
 
+function formAttendees(formData: FormData): string[] | undefined {
+  const names = formData
+    .getAll("attendees")
+    .flatMap((value) => (typeof value === "string" ? [value] : []));
+  return names.length > 0 ? names : undefined;
+}
+
 export function parseTicketCheckoutFormData(
   formData: FormData,
 ): z.SafeParseReturnType<unknown, TicketCheckout> {
   const requiresInvoice = formString(formData, "requiresInvoice") === "on";
+  const tier = formString(formData, "tier");
 
   return ticketCheckoutSchema.safeParse({
     submissionId: formString(formData, "submissionId"),
-    tier: formString(formData, "tier"),
+    tier,
     quantity: formString(formData, "quantity"),
     firstName: formString(formData, "firstName"),
     lastName: formString(formData, "lastName"),
@@ -192,6 +247,8 @@ export function parseTicketCheckoutFormData(
     language: formString(formData, "language"),
     consentVersion: formString(formData, "consentVersion"),
     requiresInvoice,
+    referral: optionalFormString(formData, "referral"),
+    attendees: tier === CORPORATE_TIER_ID ? formAttendees(formData) : undefined,
     invoice: requiresInvoice
       ? {
           rfc: formString(formData, "rfc"),

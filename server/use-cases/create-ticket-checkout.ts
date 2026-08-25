@@ -2,7 +2,7 @@ import "server-only";
 
 import { checkRateLimit, getClientIp, RateLimitError } from "@/lib/rate-limit";
 import { hashTicketOrderPayload } from "@/lib/payments/canonical-payload";
-import { quoteTicketOrder, TICKET_TIERS } from "@/lib/payments/catalog";
+import { orderTierLabel, quoteOrder } from "@/lib/payments/catalog";
 import type { CheckoutResult } from "@/lib/payments/result";
 import type { TicketCheckout } from "@/lib/payments/schema";
 import { centsToAmount } from "@/lib/payments/tax";
@@ -87,7 +87,7 @@ export async function createTicketCheckoutUseCase(
   // charged.
   let quote;
   try {
-    quote = quoteTicketOrder(order.tier, order.quantity);
+    quote = quoteOrder(order.tier, order.quantity);
   } catch {
     return { ok: false, reason: "invalid" };
   }
@@ -153,8 +153,7 @@ export async function createTicketCheckoutUseCase(
     },
   );
 
-  const tier = TICKET_TIERS[order.tier];
-  const tierLabel = tier.label[order.language];
+  const tierLabel = orderTierLabel(order.tier)[order.language];
 
   let preference: CreatedPreference;
   try {
@@ -164,7 +163,7 @@ export async function createTicketCheckoutUseCase(
       idempotencyKey: `ticket-order:${persisted.orderId}`,
       items: [
         {
-          id: `${order.tier}`,
+          id: order.tier,
           title: tierLabel,
           // MercadoPago's industry-data guidance: a category on the item feeds
           // the risk model the payment is approved against.

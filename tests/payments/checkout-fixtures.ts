@@ -42,6 +42,36 @@ export const invoicedCheckoutFixture: TicketCheckout = {
   },
 };
 
+export const corporateCheckoutFixture: TicketCheckout = {
+  ...checkoutFixture,
+  submissionId: "6f7e5d4c-3b2a-4190-8f7e-5d4c3b2a1908",
+  tier: "corporativo",
+  quantity: 5,
+  attendees: [
+    "María González López",
+    "Juan Pérez Ruiz",
+    "Ana Ramírez Solís",
+    "Luis Torres Vega",
+    "Sofía Herrera Lima",
+  ],
+  referral: "Cámara de Comercio de Reynosa",
+};
+
+export function corporateCheckoutFormData(
+  overrides: Record<string, string> = {},
+  attendees: string[] = corporateCheckoutFixture.attendees ?? [],
+): FormData {
+  const formData = checkoutFormData({
+    submissionId: corporateCheckoutFixture.submissionId,
+    tier: "corporativo",
+    quantity: String(attendees.length),
+    referral: corporateCheckoutFixture.referral ?? "",
+    ...overrides,
+  });
+  for (const name of attendees) formData.append("attendees", name);
+  return formData;
+}
+
 export function checkoutFormData(
   overrides: Record<string, string> = {},
 ): FormData {

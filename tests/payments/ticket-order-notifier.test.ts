@@ -29,6 +29,7 @@ function order(overrides: Partial<NotifiableTicketOrder> = {}): NotifiableTicket
     email: "maria@empresa.com",
     phone: "+52 899 123 4567",
     company: "Logística del Norte",
+    referral_source: null,
     language: "es",
     requires_invoice: false,
     ...overrides,

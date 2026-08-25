@@ -7,6 +7,7 @@ import {
   INVOICE_STATUS_VALUES,
   TICKET_ORDER_STATUS_VALUES,
   type AdminInvoiceDetails,
+  type AdminTicketOrderAttendee,
   type AdminInvoiceStatus,
   type AdminTicketCapacity,
   type AdminTicketOrder,
@@ -37,12 +38,12 @@ export class AdminTicketOrderRepositoryError extends Error {
 }
 
 const LIST_COLUMNS =
-  "id, status, tier, quantity, subtotal_cents, tax_cents, total_cents, tax_rate_basis_points, buyer_name, email, phone, company, language, requires_invoice, invoice_status, invoiced_at, cfdi_uuid, provider_payment_id, provider_status, paid_at, owner, internal_notes, created_at, updated_at, retention_until";
+  "id, status, tier, quantity, subtotal_cents, tax_cents, total_cents, tax_rate_basis_points, buyer_name, email, phone, company, referral_source, language, requires_invoice, invoice_status, invoiced_at, cfdi_uuid, provider_payment_id, provider_status, paid_at, owner, internal_notes, created_at, updated_at, retention_until";
 
 const orderSchema = z.object({
   id: z.string().uuid(),
   status: z.enum(TICKET_ORDER_STATUS_VALUES),
-  tier: z.enum(["plus", "general", "estudiante"]),
+  tier: z.enum(["plus", "general", "estudiante", "corporativo"]),
   quantity: z.coerce.number().int().min(1),
   subtotal_cents: z.coerce.number().int().min(0),
   tax_cents: z.coerce.number().int().min(0),
@@ -52,6 +53,7 @@ const orderSchema = z.object({
   email: z.string(),
   phone: z.string(),
   company: z.string().nullable(),
+  referral_source: z.string().nullable(),
   language: z.enum(["es", "en"]),
   requires_invoice: z.boolean(),
   invoice_status: z.enum(INVOICE_STATUS_VALUES),
@@ -187,6 +189,36 @@ export async function getInvoiceDetails(
   const parsed = invoiceDetailsSchema.safeParse(data);
   if (!parsed.success) {
     throw new AdminTicketOrderRepositoryError("get_invoice_details_response", {
+      code: "invalid_response",
+    });
+  }
+  return parsed.data;
+}
+
+const attendeeSchema = z.object({
+  seat_number: z.coerce.number().int().min(1),
+  full_name: z.string(),
+});
+
+/**
+ * Roster of a corporate block, in seat order. An individual order has none, so
+ * an empty list is the ordinary answer, not a missing row.
+ */
+export async function listOrderAttendees(
+  orderId: string,
+): Promise<AdminTicketOrderAttendee[]> {
+  const { data, error } = await table("ticket_order_attendees")
+    .select("seat_number, full_name")
+    .eq("order_id", orderId)
+    .order("seat_number", { ascending: true });
+
+  if (error) {
+    throw new AdminTicketOrderRepositoryError("list_order_attendees", error);
+  }
+
+  const parsed = z.array(attendeeSchema).safeParse(data ?? []);
+  if (!parsed.success) {
+    throw new AdminTicketOrderRepositoryError("list_order_attendees_response", {
       code: "invalid_response",
     });
   }

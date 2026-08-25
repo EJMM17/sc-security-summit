@@ -120,8 +120,12 @@ export const INVOICE_STATUS_STYLES: Record<AdminInvoiceStatus, string> = {
   cancelled: "bg-slate-200 text-slate-700",
 };
 
-export const TIER_LABELS: Record<"plus" | "general" | "estudiante", string> = {
+export const TIER_LABELS: Record<
+  "plus" | "general" | "estudiante" | "corporativo",
+  string
+> = {
   plus: "Acceso Plus",
   general: "Acceso General",
   estudiante: "Acceso Estudiante",
+  corporativo: "Pase Corporativo",
 };

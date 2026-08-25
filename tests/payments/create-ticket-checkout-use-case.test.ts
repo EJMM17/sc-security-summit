@@ -11,6 +11,7 @@ import type { hashTicketOrderPayload } from "@/lib/payments/canonical-payload";
 import type { checkRateLimit, getClientIp } from "@/lib/rate-limit";
 import {
   checkoutFixture,
+  corporateCheckoutFixture,
   invoicedCheckoutFixture,
 } from "@/tests/payments/checkout-fixtures";
 
@@ -214,5 +215,43 @@ describe("createTicketCheckoutUseCase", () => {
     ]) {
       expect(logged).not.toContain(secret);
     }
+  });
+});
+
+describe("corporate blocks", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  it("charges the discounted block through the same MercadoPago flow", async () => {
+    const deps = dependencies();
+    deps.persist.mockResolvedValue({
+      outcome: "created" as const,
+      orderId: ORDER_ID,
+      totalCents: 937_500,
+    });
+
+    await expect(
+      createTicketCheckoutUseCase(corporateCheckoutFixture, deps),
+    ).resolves.toMatchObject({ ok: true, checkoutUrl: CHECKOUT_URL });
+
+    const quote = deps.persist.mock.calls[0][1];
+    expect(quote).toMatchObject({
+      tier: "corporativo",
+      quantity: 5,
+      // 25% off the 2,500 MXN list price, applied to the unit so the line
+      // stays an exact multiple of it.
+      unitPriceCents: 187_500,
+      totalCents: 937_500,
+    });
+
+    const preference = deps.createPreference.mock.calls[0][0];
+    expect(preference.items[0]).toMatchObject({
+      id: "corporativo",
+      quantity: 5,
+      unit_price: 1_875,
+    });
   });
 });

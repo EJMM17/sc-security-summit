@@ -403,8 +403,8 @@ controlados.
    REST presente.
 7. Despliega el mismo commit, reconstruido como target Production; no promuevas
    el artefacto Preview.
-8. Envía una solicitud corporate y una sponsor controladas.
-9. Confirma `inquiries`, outbox, intento, evento y correo.
+8. Compra un acceso individual y un bloque corporativo controlados.
+9. Confirma la orden, su roster, el outbox, el intento, el evento y el correo.
 10. Monitorea intensivamente durante 24 horas.
 
 El cron de `vercel.json` llama en Production a
