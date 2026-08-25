@@ -7,31 +7,32 @@ import { expect, test } from "@playwright/test";
  * the automated suite.
  */
 test.describe("Checkout de accesos", () => {
-  test("desglosa el IVA y reacciona al tipo de acceso", async ({ page }) => {
+  test("cobra el precio publicado con IVA incluido y reacciona al tipo de acceso", async ({
+    page,
+  }) => {
     await page.goto("/checkout?lang=es");
 
     await expect(
       page.getByRole("heading", { level: 1, name: /reserva tu acceso/i }),
     ).toBeVisible();
 
-    // Plus is preselected: 1 x $2,500 + 16% = $2,900.
+    // Plus is preselected: 1 x $2,500, IVA already inside that price.
     const summary = page.getByRole("heading", { name: "Resumen" }).locator("..");
     await expect(summary).toContainText("2,500.00");
-    await expect(summary).toContainText("400.00");
-    await expect(summary).toContainText("2,900.00");
+    await expect(summary).toContainText("Incluye IVA del 16%");
+    // Nothing is added on top of the published price.
+    await expect(summary).not.toContainText("2,900.00");
 
     await page.getByRole("radio", { name: /acceso general/i }).check();
     await expect(summary).toContainText("900.00");
-    await expect(summary).toContainText("144.00");
-    await expect(summary).toContainText("1,044.00");
+    await expect(summary).not.toContainText("1,044.00");
 
     // The student tier is capped at two seats.
     await page.getByRole("spinbutton").fill("5");
     await page.getByRole("radio", { name: /acceso estudiante/i }).check();
     await expect(page.getByRole("spinbutton")).toHaveValue("2");
     await expect(summary).toContainText("1,300.00");
-    await expect(summary).toContainText("208.00");
-    await expect(summary).toContainText("1,508.00");
+    await expect(summary).not.toContainText("1,508.00");
   });
 
   test("solo pide datos fiscales cuando se solicita factura", async ({ page }) => {
@@ -65,7 +66,7 @@ test.describe("Checkout de accesos", () => {
     await expect(
       page.getByRole("heading", { level: 1, name: /reserve your pass/i }),
     ).toBeVisible();
-    await expect(page.getByText("VAT 16%")).toBeVisible();
+    await expect(page.getByText("Includes 16% VAT")).toBeVisible();
     await expect(
       page.getByRole("button", { name: /pay with mercadopago/i }),
     ).toBeVisible();

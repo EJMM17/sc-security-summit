@@ -98,6 +98,17 @@ export default async function AdminInquiryDetail({
                 <Field label="Accesos solicitados">
                   {inquiry.requested_seats ?? "—"}
                 </Field>
+                <Field label="Participantes">
+                  {inquiry.attendees.length > 0 ? (
+                    <ol className="list-decimal space-y-0.5 pl-4">
+                      {inquiry.attendees.map((name, index) => (
+                        <li key={`${index}-${name}`}>{name}</li>
+                      ))}
+                    </ol>
+                  ) : (
+                    "—"
+                  )}
+                </Field>
               </>
             ) : (
               <Field label="Interés">{inquiry.interest ?? "—"}</Field>

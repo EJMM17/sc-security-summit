@@ -20,9 +20,10 @@ function order(overrides: Partial<NotifiableTicketOrder> = {}): NotifiableTicket
     status: "paid",
     tier: "plus",
     quantity: 2,
-    subtotal_cents: 500_000,
-    tax_cents: 80_000,
-    total_cents: 580_000,
+    unit_price_cents: 250_000,
+    subtotal_cents: 431_034,
+    tax_cents: 68_966,
+    total_cents: 500_000,
     tax_rate_basis_points: 1_600,
     buyer_name: "María González",
     email: "maria@empresa.com",
@@ -53,12 +54,13 @@ function dependencies() {
 }
 
 describe("buildBuyerReceiptEmail", () => {
-  it("itemizes the base, the IVA and the total", () => {
+  it("states one final amount with the IVA already inside it", () => {
     const email = buildBuyerReceiptEmail(order());
+    expect(email.html).toContain("2,500.00");
     expect(email.html).toContain("5,000.00");
-    expect(email.html).toContain("800.00");
-    expect(email.html).toContain("5,800.00");
-    expect(email.html).toContain("IVA 16%");
+    expect(email.html).toContain("incluye IVA del 16%");
+    // The base and the tax belong on the CFDI, not in the buyer's inbox.
+    expect(email.html).not.toContain("4,310.34");
   });
 
   it("never repeats the buyer's tax identity", () => {
@@ -83,7 +85,7 @@ describe("buildBuyerReceiptEmail", () => {
   it("renders in English for an English order", () => {
     const email = buildBuyerReceiptEmail(order({ language: "en" }));
     expect(email.subject).toContain("Purchase confirmation");
-    expect(email.html).toContain("VAT 16%");
+    expect(email.html).toContain("includes 16% VAT");
   });
 
   it("escapes buyer-controlled text", () => {

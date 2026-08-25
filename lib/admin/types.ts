@@ -45,6 +45,8 @@ export type AdminInquiry = {
   job_title: string | null;
   requested_seats: number | null;
   interest: string | null;
+  /** Named participants of a corporate block, in seat order. */
+  attendees: string[];
   language: "es" | "en";
   owner: string | null;
   internal_notes: string | null;

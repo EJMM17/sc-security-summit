@@ -1,4 +1,9 @@
-import { IVA_RATE_BASIS_POINTS, computeTaxBreakdown, type TaxBreakdown } from "@/lib/payments/tax";
+import {
+  IVA_RATE_BASIS_POINTS,
+  applyRateHalfUp,
+  computeInclusiveTaxBreakdown,
+  type TaxBreakdown,
+} from "@/lib/payments/tax";
 
 /**
  * Server-authoritative price list.
@@ -8,7 +13,9 @@ import { IVA_RATE_BASIS_POINTS, computeTaxBreakdown, type TaxBreakdown } from "@
  * amount — it sends a tier id and a quantity, and the server prices them here.
  * `tests/payments/catalog.test.ts` asserts the two lists cannot drift apart.
  *
- * Amounts are the IVA-exclusive taxable base, in cents of MXN.
+ * Amounts are the IVA-inclusive published price, in cents of MXN: what the
+ * site shows is what the buyer pays, and the 16% is carved out of it for the
+ * CFDI rather than added on top.
  */
 
 export const TICKET_CURRENCY = "MXN" as const;
@@ -19,6 +26,7 @@ export type TicketTierId = (typeof TICKET_TIER_IDS)[number];
 
 export type TicketTier = {
   id: TicketTierId;
+  /** IVA-inclusive published price of one access, in cents. */
   unitPriceCents: number;
   maxQuantity: number;
   /** Tier requires a valid student ID at check-in, so it is not sold in bulk. */
@@ -85,12 +93,79 @@ export function quoteTicketOrder(
   }
 
   return {
-    ...computeTaxBreakdown(
+    ...computeInclusiveTaxBreakdown(
       definition.unitPriceCents,
       quantity,
       IVA_RATE_BASIS_POINTS,
     ),
     tier,
+    currency: TICKET_CURRENCY,
+  };
+}
+
+/**
+ * Corporate passes.
+ *
+ * A corporate request is a lead, not a charge: the block is quoted here so the
+ * form can show the buyer the same arithmetic the team will put in the formal
+ * quote, and so the discount rule lives next to the prices it applies to
+ * instead of being retyped in a component. Nothing here is ever persisted as
+ * an amount owed.
+ */
+export const CORPORATE_PASS_TIER: TicketTierId = "plus";
+
+/** A block is corporate from two people up. */
+export const CORPORATE_MIN_SEATS = 2;
+
+/**
+ * There is no commercial ceiling on a corporate block, so this is only the
+ * technical guard that keeps a tampered form from asking for a quote of a
+ * million seats. Raise it if a real block ever gets close.
+ */
+export const CORPORATE_MAX_SEATS = 200;
+
+/** Volume discount kicks in at the fifth access and never expires above it. */
+export const CORPORATE_DISCOUNT_MIN_SEATS = 5;
+
+export const CORPORATE_DISCOUNT_BASIS_POINTS = 2_500;
+
+export type CorporateQuote = {
+  seats: number;
+  unitPriceCents: number;
+  listTotalCents: number;
+  discountBasisPoints: number;
+  discountCents: number;
+  totalCents: number;
+  currency: typeof TICKET_CURRENCY;
+};
+
+/**
+ * Estimated price of a corporate block, IVA included like every published
+ * price. The discount is applied once over the whole block, not per access, so
+ * the estimate never drifts a cent from `seats × unit − discount`.
+ */
+export function quoteCorporatePass(seats: number): CorporateQuote {
+  if (
+    !Number.isSafeInteger(seats) ||
+    seats < CORPORATE_MIN_SEATS ||
+    seats > CORPORATE_MAX_SEATS
+  ) {
+    throw new RangeError("seats out of range for a corporate quote");
+  }
+
+  const unitPriceCents = TICKET_TIERS[CORPORATE_PASS_TIER].unitPriceCents;
+  const listTotalCents = unitPriceCents * seats;
+  const discountBasisPoints =
+    seats >= CORPORATE_DISCOUNT_MIN_SEATS ? CORPORATE_DISCOUNT_BASIS_POINTS : 0;
+  const discountCents = applyRateHalfUp(listTotalCents, discountBasisPoints);
+
+  return {
+    seats,
+    unitPriceCents,
+    listTotalCents,
+    discountBasisPoints,
+    discountCents,
+    totalCents: listTotalCents - discountCents,
     currency: TICKET_CURRENCY,
   };
 }

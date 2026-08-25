@@ -126,6 +126,14 @@ Los eventos no deben contener nombre, correo, teléfono, mensaje libre ni notas.
 No existen vistas SQL adicionales. Esto evita mantener otra API y otra capa de
 permisos. Crea filtros personales en Table Editor con estas recetas:
 
+Los nombres de los participantes de un pase corporativo viven en
+`public.inquiry_attendees` (`inquiry_id`, `seat_number`, `full_name`) y el
+panel los muestra en el detalle de la solicitud. Son evidencia enviada por el
+titular: el panel y `service_role` sólo pueden leerlos e insertarlos, nunca
+editarlos. Si un nombre llega mal, documéntalo en las notas internas y pide el
+dato corregido; se borran en cascada cuando se elimina la solicitud, con la
+misma retención de 18 meses.
+
 ### Nuevas
 
 - Tabla: `inquiries`

@@ -76,6 +76,14 @@ function detailRows(inquiry: StoredInquiry): Array<[string, string]> {
     rows.push(
       ["Cargo", inquiry.jobTitle ?? ""],
       ["Accesos solicitados", String(inquiry.requestedSeats ?? "")],
+      // The roster is what the DC-3 certificates are issued against, so the
+      // operations inbox gets it with the request instead of chasing it later.
+      [
+        "Participantes",
+        inquiry.attendees
+          .map((name, index) => `${index + 1}. ${name}`)
+          .join("\n"),
+      ],
     );
   } else {
     rows.push(["Interés", inquiry.interest ?? ""]);
@@ -94,7 +102,7 @@ export function buildInquiryNotificationEmail(inquiry: StoredInquiry): {
   const rows = detailRows(inquiry)
     .map(
       ([label, value]) =>
-        `<tr><th style="padding:10px 14px;text-align:left;vertical-align:top;color:#475569">${escapeHtml(label)}</th><td style="padding:10px 14px;color:#0f172a">${escapeHtml(value)}</td></tr>`,
+        `<tr><th style="padding:10px 14px;text-align:left;vertical-align:top;color:#475569">${escapeHtml(label)}</th><td style="padding:10px 14px;color:#0f172a;white-space:pre-line">${escapeHtml(value)}</td></tr>`,
     )
     .join("");
 

@@ -10,6 +10,11 @@ Read `AGENTS.md` first. Canonical current state:
   `NEXT_PUBLIC_EVENTBRITE_URL`. Tickets sold there before the cut stay valid
   and are operated from Eventbrite's own panel.
 - Supabase stores corporate-pass and sponsorship inquiries, and ticket orders.
+  A corporate request carries a roster: one named participant per requested
+  access, stored in `public.inquiry_attendees`. Blocks start at two accesses
+  and have no commercial ceiling; the form quotes 25% off from the fifth access
+  up (`quoteCorporatePass`), as an estimate only — corporate passes are still
+  never charged on site.
 - Persistence happens before email and before MercadoPago; it defines receipt.
 - Resend failure queues a notification; it does not lose the inquiry.
 - Do not reuse historical `public.registros`. The legacy `/admin` built on it
@@ -17,11 +22,14 @@ Read `AGENTS.md` first. Canonical current state:
 
 ## Payments and IVA
 
-Published prices are the IVA-exclusive taxable base; 16% is added on top.
-`lib/payments/catalog.ts` is the single source of truth for money and the
-browser never sends an amount — it sends a tier and a quantity. All arithmetic
-is integer cents with half-up rounding, and the tax is computed once over the
-whole line, never per unit.
+Published prices already include IVA: the number on the site is the whole
+amount the buyer pays and the seller absorbs the 16%. `lib/payments/catalog.ts`
+is the single source of truth for money and the browser never sends an amount —
+it sends a tier and a quantity. All arithmetic is integer cents; the taxable
+base is extracted from the gross line once, half up, and the tax is the
+remainder, so base + tax is exactly the amount charged. The MercadoPago
+preference carries a single item at the gross price, never a separate tax
+line.
 
 Fiscal data is captured only when the buyer requests a CFDI, validated against
 the RFC person type, and stored in its own table. The site does not stamp the
@@ -169,12 +177,13 @@ idempotency. Do not log PII or return it from the route.
 ## Privacy
 
 `INQUIRY_CONSENT_VERSION` in `lib/inquiries/constants.ts` is canonical.
-Consent version `2026-08-24` covers on-site payments, the fiscal-data
-category and a five-year retention for purchase records (CFF art. 30);
-inquiries keep 18 months. **This version is not yet approved by the privacy
-owner** — that approval is a blocking gate before selling. The previous
-`2026-07-30` version and its approval remain the record for inquiries
-submitted before the cut. Production remains gated independently on backup,
+Consent version `2026-08-25` adds the corporate roster: names of third parties
+supplied by the requester on their behalf. `2026-08-24` covered on-site
+payments, the fiscal-data category and a five-year retention for purchase
+records (CFF art. 30); inquiries keep 18 months. **This version is not yet
+approved by the privacy owner** — that approval is a blocking gate before
+selling. The previous `2026-07-30` version and its approval remain the record
+for inquiries submitted before the cut. Production remains gated independently on backup,
 database verification, Vercel billing, migrations and deployment checks.
 
 Never place names, email, phone, interest, notes, recipient, subject or email

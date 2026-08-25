@@ -80,19 +80,12 @@ export default async function CheckoutOutcome({
             <div className="checkout-summary mt-8 text-left">
               <h2>{copy.summaryTitle}</h2>
               <dl>
-                <div>
-                  <dt>{copy.summarySubtotal}</dt>
-                  <dd>{formatMxn(summary.subtotal_cents, language)}</dd>
-                </div>
-                <div>
-                  <dt>{copy.summaryTax}</dt>
-                  <dd>{formatMxn(summary.tax_cents, language)}</dd>
-                </div>
                 <div className="checkout-summary-total">
                   <dt>{copy.summaryTotal}</dt>
                   <dd>{formatMxn(summary.total_cents, language)} MXN</dd>
                 </div>
               </dl>
+              <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
               <p className="mt-4 text-xs text-slate-500">
                 {copy.orderReference}:{" "}
                 <span className="font-mono">{summary.id}</span>

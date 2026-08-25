@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(42);
+select plan(47);
 
 select results_eq(
   $$
@@ -23,7 +23,8 @@ select results_eq(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Engineering Lead',
-      p_requested_seats => 2::smallint
+      p_requested_seats => 2::smallint,
+      p_attendees => array['Participante 1', 'Participante 2']
     )
   $$,
   $$ values ('created'::text) $$,
@@ -81,7 +82,8 @@ select results_eq(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Engineering Lead',
-      p_requested_seats => 2::smallint
+      p_requested_seats => 2::smallint,
+      p_attendees => array['Participante 1', 'Participante 2']
     )
   $$,
   $$ values ('replayed'::text) $$,
@@ -115,7 +117,8 @@ select results_eq(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Changed Role',
-      p_requested_seats => 3::smallint
+      p_requested_seats => 3::smallint,
+      p_attendees => array['Participante 1', 'Participante 2', 'Participante 3']
     )
   $$,
   $$ values ('conflict'::text) $$,
@@ -147,7 +150,8 @@ select throws_ok(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Lead',
-      p_requested_seats => 1::smallint
+      p_requested_seats => 1::smallint,
+      p_attendees => array['Participante 1']
     )
   $$,
   '23514',
@@ -171,11 +175,15 @@ select results_eq(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Lead',
-      p_requested_seats => 10::smallint
+      p_requested_seats => 10::smallint,
+      p_attendees => (
+        select pg_catalog.array_agg('Participante ' || g)
+        from pg_catalog.generate_series(1, 10) as g
+      )
     )
   $$,
   $$ values ('created'::text) $$,
-  'corporate seat count of ten is accepted'
+  'a corporate block of ten is accepted'
 );
 
 select throws_ok(
@@ -193,12 +201,16 @@ select throws_ok(
       p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
       p_retention_until => '2028-01-29'::date,
       p_job_title => 'Lead',
-      p_requested_seats => 11::smallint
+      p_requested_seats => 201::smallint,
+      p_attendees => (
+        select pg_catalog.array_agg('Participante ' || g)
+        from pg_catalog.generate_series(1, 201) as g
+      )
     )
   $$,
   '23514',
   null,
-  'corporate seat count above ten is rejected'
+  'a corporate block above the technical guard is rejected'
 );
 
 select results_eq(
@@ -762,6 +774,109 @@ select is(
   (select count(*)::integer from public.claim_inquiry_notifications(null)),
   10,
   'null batch limit defaults to ten'
+);
+
+-- ---------------------------------------------------------------------------
+-- Corporate roster
+-- ---------------------------------------------------------------------------
+
+select results_eq(
+  $$
+    select seat_number, full_name
+    from public.inquiry_attendees
+    where inquiry_id = (
+      select id
+      from public.inquiries
+      where submission_id = '10000000-0000-4000-8000-000000000001'
+    )
+    order by seat_number
+  $$,
+  $$ values (1::smallint, 'Participante 1'::text), (2::smallint, 'Participante 2'::text) $$,
+  'the roster is stored in seat order with the inquiry'
+);
+
+select throws_ok(
+  $$
+    select public.create_inquiry(
+      p_submission_id => '10000000-0000-4000-8000-000000000020'::uuid,
+      p_payload_hash => repeat('7', 64),
+      p_kind => 'corporate',
+      p_contact_name => 'Short Roster',
+      p_email => 'short-roster@example.com',
+      p_phone => '8991234567',
+      p_company => 'Test Company',
+      p_language => 'es',
+      p_consent_version => 'privacy-2026-07',
+      p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
+      p_retention_until => '2028-01-29'::date,
+      p_job_title => 'Lead',
+      p_requested_seats => 4::smallint,
+      p_attendees => array['Participante 1', 'Participante 2']
+    )
+  $$,
+  '22023',
+  'attendees_required',
+  'a roster shorter than the requested accesses is rejected'
+);
+
+select throws_ok(
+  $$
+    select public.create_inquiry(
+      p_submission_id => '10000000-0000-4000-8000-000000000021'::uuid,
+      p_payload_hash => repeat('8', 64),
+      p_kind => 'corporate',
+      p_contact_name => 'No Roster',
+      p_email => 'no-roster@example.com',
+      p_phone => '8991234567',
+      p_company => 'Test Company',
+      p_language => 'es',
+      p_consent_version => 'privacy-2026-07',
+      p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
+      p_retention_until => '2028-01-29'::date,
+      p_job_title => 'Lead',
+      p_requested_seats => 2::smallint
+    )
+  $$,
+  '22023',
+  'attendees_required',
+  'a corporate request without a roster is rejected'
+);
+
+select throws_ok(
+  $$
+    select public.create_inquiry(
+      p_submission_id => '10000000-0000-4000-8000-000000000022'::uuid,
+      p_payload_hash => repeat('9', 64),
+      p_kind => 'sponsor',
+      p_contact_name => 'Sponsor Roster',
+      p_email => 'sponsor-roster@example.com',
+      p_phone => '8991234567',
+      p_company => 'Test Company',
+      p_language => 'es',
+      p_consent_version => 'privacy-2026-07',
+      p_consented_at => '2026-07-29 12:00:00+00'::timestamptz,
+      p_retention_until => '2028-01-29'::date,
+      p_interest => 'Queremos patrocinar el evento',
+      p_attendees => array['Participante 1']
+    )
+  $$,
+  '22023',
+  'attendees_not_expected',
+  'a sponsorship request cannot carry a roster'
+);
+
+select is(
+  (
+    select count(*)::integer
+    from public.inquiry_attendees
+    where inquiry_id = (
+      select id
+      from public.inquiries
+      where submission_id = '10000000-0000-4000-8000-000000000001'
+    )
+  ),
+  2,
+  'a replay and a conflict leave the original roster untouched'
 );
 
 select * from finish();

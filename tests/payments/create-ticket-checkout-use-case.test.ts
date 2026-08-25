@@ -25,7 +25,7 @@ function dependencies() {
     persist: vi.fn<typeof persistTicketOrder>(async () => ({
       outcome: "created" as const,
       orderId: ORDER_ID,
-      totalCents: 580_000,
+      totalCents: 500_000,
     })),
     createPreference: vi.fn<typeof createCheckoutPreference>(async () => ({
       id: "pref-1",
@@ -52,17 +52,17 @@ describe("createTicketCheckoutUseCase", () => {
       ok: true,
       orderId: ORDER_ID,
       checkoutUrl: CHECKOUT_URL,
-      subtotalCents: 500_000,
-      taxCents: 80_000,
-      totalCents: 580_000,
+      subtotalCents: 431_034,
+      taxCents: 68_966,
+      totalCents: 500_000,
     });
 
     const quote = deps.persist.mock.calls[0][1];
     expect(quote).toMatchObject({
       unitPriceCents: 250_000,
-      subtotalCents: 500_000,
-      taxCents: 80_000,
-      totalCents: 580_000,
+      subtotalCents: 431_034,
+      taxCents: 68_966,
+      totalCents: 500_000,
       taxRateBasisPoints: 1_600,
       currency: "MXN",
     });
@@ -73,7 +73,7 @@ describe("createTicketCheckoutUseCase", () => {
     const order: string[] = [];
     deps.persist.mockImplementation(async () => {
       order.push("persist");
-      return { outcome: "created" as const, orderId: ORDER_ID, totalCents: 580_000 };
+      return { outcome: "created" as const, orderId: ORDER_ID, totalCents: 500_000 };
     });
     deps.createPreference.mockImplementation(async () => {
       order.push("preference");
@@ -84,20 +84,19 @@ describe("createTicketCheckoutUseCase", () => {
     expect(order).toEqual(["persist", "preference"]);
   });
 
-  it("sends the tax as its own MercadoPago line so the total is exact", async () => {
+  it("charges one line at the published price, with no tax added on top", async () => {
     const deps = dependencies();
     await createTicketCheckoutUseCase(checkoutFixture, deps);
 
     const { items } = deps.createPreference.mock.calls[0][0];
-    expect(items).toHaveLength(2);
-    expect(items[0]).toMatchObject({ quantity: 2, unit_price: 2_500 });
-    expect(items[1]).toMatchObject({ id: "iva", quantity: 1, unit_price: 800 });
+    expect(items).toHaveLength(1);
+    expect(items[0]).toMatchObject({ id: "plus", quantity: 2, unit_price: 2_500 });
 
     const charged = items.reduce(
       (sum, item) => sum + item.unit_price * item.quantity,
       0,
     );
-    expect(Math.round(charged * 100)).toBe(580_000);
+    expect(Math.round(charged * 100)).toBe(500_000);
   });
 
   it("keys the preference on the order so a retry cannot double-charge", async () => {
@@ -195,7 +194,7 @@ describe("createTicketCheckoutUseCase", () => {
     );
     const { items } = deps.createPreference.mock.calls[0][0];
     expect(items[0].title).toBe("Plus Pass");
-    expect(items[1].title).toBe("VAT 16%");
+    expect(items[0].description).toContain("September 24");
   });
 
   it("never logs buyer identity or fiscal data", async () => {

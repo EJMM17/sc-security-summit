@@ -14,9 +14,9 @@ const SUCCESS = {
   ok: true as const,
   orderId: "9b2d0c26-2f3d-4a1e-8f2b-6ce0f9b1a742",
   checkoutUrl: "https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=1",
-  subtotalCents: 500_000,
-  taxCents: 80_000,
-  totalCents: 580_000,
+  subtotalCents: 431_034,
+  taxCents: 68_966,
+  totalCents: 500_000,
 };
 
 describe("createTicketCheckout server action", () => {

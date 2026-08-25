@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowRight, Building2, Mail, Phone, UserRound, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { submitInquiry } from "@/app/actions/inquiries";
@@ -16,6 +16,13 @@ import {
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 import type { InquiryFailureReason } from "@/lib/inquiries/result";
 import type { Language } from "@/lib/language";
+import {
+  CORPORATE_DISCOUNT_MIN_SEATS,
+  CORPORATE_MAX_SEATS,
+  CORPORATE_MIN_SEATS,
+  quoteCorporatePass,
+} from "@/lib/payments/catalog";
+import { formatMxn } from "@/lib/payments/tax";
 
 type FormStatus =
   | { kind: "idle" }
@@ -34,10 +41,25 @@ export default function CorporatePassForm({
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
   const [isSending, setIsSending] = useState(false);
   const [submissionId, setSubmissionId] = useState("");
+  const [seats, setSeats] = useState(CORPORATE_MIN_SEATS);
+  // The roster is controlled so that changing the number of accesses keeps the
+  // names already typed instead of remounting the inputs and losing them.
+  const [attendees, setAttendees] = useState<string[]>(() =>
+    Array.from({ length: CORPORATE_MIN_SEATS }, () => ""),
+  );
 
   useEffect(() => {
     setSubmissionId(createSubmissionId());
   }, []);
+
+  const quote = useMemo(() => quoteCorporatePass(seats), [seats]);
+
+  const resizeRoster = (nextSeats: number) => {
+    setSeats(nextSeats);
+    setAttendees((current) =>
+      Array.from({ length: nextSeats }, (_, index) => current[index] ?? ""),
+    );
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -59,6 +81,7 @@ export default function CorporatePassForm({
 
     if (result.ok) {
       form.reset();
+      resizeRoster(CORPORATE_MIN_SEATS);
       setStatus({ kind: "success" });
       setSubmissionId(createSubmissionId());
     } else {
@@ -160,15 +183,101 @@ export default function CorporatePassForm({
               required
               name="requestedSeats"
               type="number"
-              min={2}
-              max={10}
+              min={CORPORATE_MIN_SEATS}
+              max={CORPORATE_MAX_SEATS}
               step={1}
-              defaultValue={2}
+              value={seats}
               inputMode="numeric"
+              onChange={(event) => {
+                const next = Number.parseInt(event.target.value, 10);
+                resizeRoster(
+                  Number.isNaN(next)
+                    ? CORPORATE_MIN_SEATS
+                    : Math.min(
+                        Math.max(next, CORPORATE_MIN_SEATS),
+                        CORPORATE_MAX_SEATS,
+                      ),
+                );
+              }}
             />
           </span>
+          <small className="inquiry-field-hint">{copy.seatsHint}</small>
         </label>
         </div>
+
+        <fieldset className="m-0 mt-7 min-w-0 border-0 p-0">
+          <legend className="text-sm font-semibold text-slate-900">
+            {copy.attendeesLegend}
+          </legend>
+          <p className="mt-1 text-xs text-slate-500">{copy.attendeesHint}</p>
+          <div className="mt-4 grid gap-5 sm:grid-cols-2">
+            {attendees.map((name, index) => (
+              <label className="inquiry-field" key={index}>
+                <span>{copy.attendeeLabel.replace("{n}", String(index + 1))}</span>
+                <span className="inquiry-input-wrap">
+                  <UserRound aria-hidden="true" />
+                  <input
+                    required
+                    name="attendees"
+                    type="text"
+                    value={name}
+                    placeholder={copy.attendeePlaceholder}
+                    autoComplete="off"
+                    onChange={(event) => {
+                      const next = event.target.value;
+                      setAttendees((current) =>
+                        current.map((entry, position) =>
+                          position === index ? next : entry,
+                        ),
+                      );
+                    }}
+                  />
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
+
+        <section
+          className="corporate-quote mt-7"
+          aria-live="polite"
+          aria-labelledby="corporate-quote-title"
+        >
+          <div className="corporate-quote-head">
+            <h3 id="corporate-quote-title">{copy.quoteTitle}</h3>
+            {quote.discountBasisPoints > 0 && (
+              <span className="corporate-quote-badge">
+                {copy.quoteDiscountBadge}
+              </span>
+            )}
+          </div>
+          <dl>
+            <div>
+              <dt>
+                {copy.quoteLine
+                  .replace("{seats}", String(quote.seats))
+                  .replace("{price}", formatMxn(quote.unitPriceCents, language))}
+              </dt>
+              <dd>{formatMxn(quote.listTotalCents, language)}</dd>
+            </div>
+            {quote.discountCents > 0 && (
+              <div className="corporate-quote-discount">
+                <dt>{copy.quoteDiscount}</dt>
+                <dd>−{formatMxn(quote.discountCents, language)}</dd>
+              </div>
+            )}
+            <div className="corporate-quote-total">
+              <dt>{copy.quoteTotal}</dt>
+              <dd>{formatMxn(quote.totalCents, language)}</dd>
+            </div>
+          </dl>
+          <p className="corporate-quote-note">{copy.quoteTaxNote}</p>
+          {quote.discountBasisPoints === 0 &&
+            seats === CORPORATE_DISCOUNT_MIN_SEATS - 1 && (
+              <p className="corporate-quote-note">{copy.quoteHint}</p>
+            )}
+          <p className="corporate-quote-note">{copy.quoteDisclaimer}</p>
+        </section>
 
         <p className="mt-5 text-xs text-slate-500 leading-relaxed">
           {ui.inquiryPrivacy}{" "}

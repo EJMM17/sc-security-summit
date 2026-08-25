@@ -53,7 +53,7 @@ const COPY = {
       "Recibimos tu pago. Guarda este correo: es tu comprobante de compra para el SC Security Summit 2026.",
     access: "Acceso",
     quantity: "Cantidad",
-    subtotal: "Subtotal",
+    unitPrice: "Precio por acceso",
     total: "Total pagado",
     reference: "Referencia de tu orden",
     invoice:
@@ -63,6 +63,7 @@ const COPY = {
     event: "24 de septiembre de 2026 · Centro de Convenciones de Reynosa",
     studentNote:
       "El acceso Estudiante requiere credencial vigente al momento del check-in.",
+    taxIncluded: "El total pagado incluye IVA del 16%.",
   },
   en: {
     subject: "Purchase confirmation — SC Security Summit 2026",
@@ -71,7 +72,7 @@ const COPY = {
       "We received your payment. Keep this email: it is your proof of purchase for SC Security Summit 2026.",
     access: "Pass",
     quantity: "Quantity",
-    subtotal: "Subtotal",
+    unitPrice: "Price per pass",
     total: "Total paid",
     reference: "Your order reference",
     invoice:
@@ -81,6 +82,7 @@ const COPY = {
     event: "September 24, 2026 · Reynosa Convention Center",
     studentNote:
       "The Student pass requires a valid student ID at check-in.",
+    taxIncluded: "The total paid includes 16% VAT.",
   },
 } as const;
 
@@ -101,20 +103,20 @@ export function buildBuyerReceiptEmail(order: NotifiableTicketOrder): {
 } {
   const copy = COPY[order.language];
   const tierLabel = TICKET_TIERS[order.tier].label[order.language];
-  const taxLabel = `${order.language === "es" ? "IVA" : "VAT"} ${formatTaxRate(
-    order.tax_rate_basis_points,
-  )}`;
 
+  // The published price is IVA-inclusive, so the receipt states one final
+  // amount. The base and the tax stay on the order row for the CFDI; a buyer
+  // who did not ask for one has no use for the split.
   const rows = [
     row(copy.access, tierLabel),
     row(copy.quantity, String(order.quantity)),
-    row(copy.subtotal, formatMxn(order.subtotal_cents, order.language)),
-    row(taxLabel, formatMxn(order.tax_cents, order.language)),
+    row(copy.unitPrice, formatMxn(order.unit_price_cents, order.language)),
     row(copy.total, `${formatMxn(order.total_cents, order.language)} MXN`),
     row(copy.reference, order.id),
   ].join("");
 
   const notes = [
+    copy.taxIncluded,
     order.requires_invoice ? copy.invoice : copy.noInvoice,
     order.tier === "estudiante" ? copy.studentNote : "",
   ]
@@ -153,9 +155,12 @@ export function buildInternalOrderEmail(order: NotifiableTicketOrder): {
     row("Empresa", order.company ?? "—"),
     row("Acceso", TICKET_TIERS[order.tier].label.es),
     row("Cantidad", String(order.quantity)),
-    row("Subtotal", formatMxn(order.subtotal_cents, "es")),
-    row("IVA", formatMxn(order.tax_cents, "es")),
-    row("Total", `${formatMxn(order.total_cents, "es")} MXN`),
+    row("Total cobrado", `${formatMxn(order.total_cents, "es")} MXN`),
+    row("Base gravable", formatMxn(order.subtotal_cents, "es")),
+    row(
+      `IVA ${formatTaxRate(order.tax_rate_basis_points)} incluido`,
+      formatMxn(order.tax_cents, "es"),
+    ),
     row("Requiere CFDI", order.requires_invoice ? "Sí" : "No"),
     row("Orden", order.id),
   ].join("");

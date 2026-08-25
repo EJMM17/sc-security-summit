@@ -31,6 +31,7 @@ const INQUIRY: StoredInquiry = {
   language: "es",
   jobTitle: "Director",
   requestedSeats: 6,
+  attendees: ["Ana Ruiz", "Luis Paz"],
   interest: null,
 };
 
@@ -78,6 +79,7 @@ describe("buildInquiryNotificationEmail", () => {
       kind: "sponsor",
       jobTitle: null,
       requestedSeats: null,
+      attendees: [],
       interest: "Premium package details",
     });
     expect(email.subject).toBe("Nueva solicitud de patrocinio");

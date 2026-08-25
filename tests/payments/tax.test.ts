@@ -2,17 +2,18 @@ import { describe, expect, it } from "vitest";
 import {
   applyRateHalfUp,
   centsToAmount,
-  computeTaxBreakdown,
+  computeInclusiveTaxBreakdown,
   extractTaxFromGross,
   formatTaxRate,
   IVA_RATE_BASIS_POINTS,
 } from "@/lib/payments/tax";
 
 describe("applyRateHalfUp", () => {
-  it("applies 16% exactly on the published prices", () => {
+  it("applies a rate to a whole amount", () => {
     expect(applyRateHalfUp(250_000, IVA_RATE_BASIS_POINTS)).toBe(40_000);
     expect(applyRateHalfUp(90_000, IVA_RATE_BASIS_POINTS)).toBe(14_400);
-    expect(applyRateHalfUp(65_000, IVA_RATE_BASIS_POINTS)).toBe(10_400);
+    // The 25% corporate discount rides on the same primitive.
+    expect(applyRateHalfUp(1_250_000, 2_500)).toBe(312_500);
   });
 
   it("rounds a half cent away from zero", () => {
@@ -33,33 +34,45 @@ describe("applyRateHalfUp", () => {
   });
 });
 
-describe("computeTaxBreakdown", () => {
-  it("taxes the whole line once rather than per unit", () => {
-    const breakdown = computeTaxBreakdown(250_000, 3);
-    expect(breakdown.subtotalCents).toBe(750_000);
-    expect(breakdown.taxCents).toBe(120_000);
-    expect(breakdown.totalCents).toBe(870_000);
+describe("computeInclusiveTaxBreakdown", () => {
+  it("carves the tax out of the published price instead of adding it", () => {
+    const breakdown = computeInclusiveTaxBreakdown(250_000, 3);
+    expect(breakdown.totalCents).toBe(750_000);
+    expect(breakdown.subtotalCents).toBe(646_552);
+    expect(breakdown.taxCents).toBe(103_448);
   });
 
-  it("keeps subtotal + tax equal to total for every quantity and tier", () => {
+  it("keeps the total an exact multiple of the published price", () => {
     for (const unit of [250_000, 90_000, 65_000, 1, 7, 333]) {
       for (let quantity = 1; quantity <= 10; quantity += 1) {
-        const breakdown = computeTaxBreakdown(unit, quantity);
-        expect(breakdown.subtotalCents).toBe(unit * quantity);
+        const breakdown = computeInclusiveTaxBreakdown(unit, quantity);
+        expect(breakdown.totalCents).toBe(unit * quantity);
         expect(breakdown.subtotalCents + breakdown.taxCents).toBe(
           breakdown.totalCents,
         );
+        expect(breakdown.unitPriceCents).toBe(unit);
+        expect(breakdown.quantity).toBe(quantity);
       }
     }
   });
 
-  it("supports a zero rate and the border rate", () => {
-    expect(computeTaxBreakdown(100_000, 1, 0).totalCents).toBe(100_000);
-    expect(computeTaxBreakdown(100_000, 1, 800).taxCents).toBe(8_000);
+  it("splits the line once rather than per unit", () => {
+    // 90,000 gross splits to 77,586.20 per unit; splitting per unit and
+    // multiplying would lose two cents of base across three accesses.
+    const line = computeInclusiveTaxBreakdown(90_000, 3);
+    const perUnit = computeInclusiveTaxBreakdown(90_000, 1);
+    expect(line.subtotalCents).toBe(232_759);
+    expect(perUnit.subtotalCents * 3).toBe(232_758);
+  });
+
+  it("leaves the amount untouched at a zero rate", () => {
+    const breakdown = computeInclusiveTaxBreakdown(100_000, 1, 0);
+    expect(breakdown.subtotalCents).toBe(100_000);
+    expect(breakdown.taxCents).toBe(0);
   });
 
   it("rejects a quantity below one", () => {
-    expect(() => computeTaxBreakdown(1_000, 0)).toThrow(RangeError);
+    expect(() => computeInclusiveTaxBreakdown(1_000, 0)).toThrow(RangeError);
   });
 });
 
@@ -69,6 +82,7 @@ describe("extractTaxFromGross", () => {
     expect(breakdown.subtotalCents).toBe(250_000);
     expect(breakdown.taxCents).toBe(40_000);
     expect(breakdown.totalCents).toBe(290_000);
+    expect(breakdown.unitPriceCents).toBe(290_000);
   });
 
   it("never loses a cent in the round trip", () => {

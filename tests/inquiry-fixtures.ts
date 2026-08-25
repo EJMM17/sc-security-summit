@@ -11,6 +11,14 @@ export const corporateInquiryFixture: CorporateInquiry = {
   role: "Security Director",
   phone: "+52 899 123 4567",
   requestedSeats: 6,
+  attendees: [
+    "Ada Lovelace",
+    "Grace Hopper",
+    "Alan Turing",
+    "Katherine Johnson",
+    "Edsger Dijkstra",
+    "Barbara Liskov",
+  ],
   language: "es",
   consentVersion: INQUIRY_CONSENT_VERSION,
   attribution: {

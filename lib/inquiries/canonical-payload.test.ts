@@ -14,6 +14,7 @@ const INQUIRY: CorporateInquiry = {
   role: "Director",
   phone: "+52 899 123 4567",
   requestedSeats: 4,
+  attendees: ["Ada Lovelace", "Grace Hopper", "Alan Turing", "Barbara Liskov"],
   language: "es",
   consentVersion: INQUIRY_CONSENT_VERSION,
   attribution: {
@@ -30,9 +31,22 @@ describe("hashInquiryPayload", () => {
   });
 
   it("does not collide a changed business payload", () => {
-    expect(hashInquiryPayload({ ...INQUIRY, requestedSeats: 5 })).not.toBe(
-      hashInquiryPayload(INQUIRY),
-    );
+    expect(
+      hashInquiryPayload({
+        ...INQUIRY,
+        requestedSeats: 5,
+        attendees: [...INQUIRY.attendees, "Margaret Hamilton"],
+      }),
+    ).not.toBe(hashInquiryPayload(INQUIRY));
+  });
+
+  it("treats a renamed participant as a different payload", () => {
+    expect(
+      hashInquiryPayload({
+        ...INQUIRY,
+        attendees: ["Ada Lovelace", "Grace Hopper", "Alan Turing", "Ana Ruiz"],
+      }),
+    ).not.toBe(hashInquiryPayload(INQUIRY));
   });
 
   it("treats attribution timestamp changes as the same retry", () => {

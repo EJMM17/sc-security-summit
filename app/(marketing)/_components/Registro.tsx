@@ -32,6 +32,10 @@ export default function Registro({
                   <BadgeCheck aria-hidden="true" />
                   {ui.corporateAccessNote}
                 </span>
+                <span>
+                  <BadgeCheck aria-hidden="true" />
+                  {ui.corporateAccessDiscount}
+                </span>
               </div>
               <div className="corporate-pass-form">
                 <CorporatePassForm
