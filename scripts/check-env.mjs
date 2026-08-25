@@ -133,6 +133,12 @@ function validateContract() {
   }
 
   for (const rule of ENV_GROUP_RULES) {
+    if (!["all-or-none", "requires"].includes(rule.mode)) {
+      errors.push(`group rule has an unknown mode: ${rule.mode}`);
+    }
+    if (rule.mode === "requires" && rule.names.length < 2) {
+      errors.push("a requires rule needs a trigger and at least one dependent");
+    }
     for (const name of rule.names) {
       if (!names.has(name)) {
         errors.push(`group rule references unknown variable: ${name}`);
@@ -439,9 +445,20 @@ function validateRuntime(target) {
   }
 
   for (const rule of ENV_GROUP_RULES) {
-    const present = rule.names.filter(isPresent);
-    if (present.length > 0 && present.length < rule.names.length) {
-      const missing = rule.names.filter((name) => !present.includes(name));
+    // "requires": the first name is optional, but setting it obliges the rest.
+    // "all-or-none": every name stands or falls together.
+    const dependents =
+      rule.mode === "requires" ? rule.names.slice(1) : rule.names;
+    if (rule.mode === "requires" && !isPresent(rule.names[0])) continue;
+
+    const present = dependents.filter(isPresent);
+    const triggered =
+      rule.mode === "requires"
+        ? present.length < dependents.length
+        : present.length > 0 && present.length < dependents.length;
+
+    if (triggered) {
+      const missing = dependents.filter((name) => !present.includes(name));
       const message = `${rule.description} Missing: ${missing.join(", ")}`;
       (strict ? errors : warnings).push(message);
     }

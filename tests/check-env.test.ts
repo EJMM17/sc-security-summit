@@ -473,3 +473,54 @@ describe("check-env deployment targets", () => {
     );
   });
 });
+
+describe("MercadoPago credential rules", () => {
+  const LIVE_TOKEN = "APP_USR-0123456789abcdef";
+  const WEBHOOK_SECRET = "abcdefghijklmnopqrstuvwx";
+
+  it("accepts the access token before a webhook secret exists", () => {
+    // Registering the webhook in the MercadoPago panel is what produces the
+    // signing secret, so requiring it up front would block the very deployment
+    // that has to exist first. Payments are confirmed by the reconciliation
+    // sweep until the secret is set.
+    const result = runCheckEnv({
+      ...validProductionEnvironment,
+      MERCADOPAGO_ACCESS_TOKEN: LIVE_TOKEN,
+    });
+
+    expect(result.output).not.toContain("MERCADOPAGO_WEBHOOK_SECRET");
+    expect(result.output).toContain("OK");
+  });
+
+  it("rejects a webhook secret with no access token to verify against", () => {
+    const result = runCheckEnv({
+      ...validProductionEnvironment,
+      MERCADOPAGO_WEBHOOK_SECRET: WEBHOOK_SECRET,
+    });
+
+    expect(result.output).toContain("Missing: MERCADOPAGO_ACCESS_TOKEN");
+    expect(result.output).toContain("Validation failed");
+  });
+
+  it("accepts both together", () => {
+    const result = runCheckEnv({
+      ...validProductionEnvironment,
+      MERCADOPAGO_ACCESS_TOKEN: LIVE_TOKEN,
+      MERCADOPAGO_WEBHOOK_SECRET: WEBHOOK_SECRET,
+    });
+
+    expect(result.output).toContain("OK");
+  });
+
+  it("keeps both credentials out of Preview", () => {
+    const result = runCheckEnv({
+      ...vercelEnvironment("preview"),
+      MERCADOPAGO_ACCESS_TOKEN: "TEST-0123456789abcdef",
+      MERCADOPAGO_WEBHOOK_SECRET: WEBHOOK_SECRET,
+    });
+
+    expect(result.output).toContain("MERCADOPAGO_ACCESS_TOKEN");
+    expect(result.output).toContain("MERCADOPAGO_WEBHOOK_SECRET");
+    expect(result.output).toContain("Validation failed");
+  });
+});

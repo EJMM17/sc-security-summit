@@ -13,6 +13,7 @@ type PaymentEvent =
   | "ticket_webhook_failed"
   | "ticket_order_reconciled"
   | "ticket_order_reconcile_failed"
+  | "ticket_order_sweep_completed"
   | "ticket_order_notification_sent"
   | "ticket_order_notification_retry"
   | "ticket_order_notification_dead";
@@ -31,6 +32,8 @@ type PaymentEventContext = {
   template?: string;
   attempt?: number;
   durationMs?: number;
+  scanned?: number;
+  resolved?: number;
 };
 
 /**

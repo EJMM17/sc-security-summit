@@ -489,3 +489,49 @@ export async function listDeliverableTicketOrderNotificationIds(
     return parsed.success ? [parsed.data.id] : [];
   });
 }
+
+const pendingOrderIdRowSchema = z.object({ id: z.string().uuid() });
+
+/**
+ * Orders still `pending` that are old enough to be worth asking the provider
+ * about, oldest first.
+ *
+ * `minAgeSeconds` keeps the sweep away from orders whose buyer is still on the
+ * MercadoPago checkout: those are pending for the ordinary reason and the
+ * webhook, or the buyer's own return to the site, will resolve them. Only an
+ * order that stayed pending past that window is evidence something was lost.
+ */
+export async function listStalePendingTicketOrderIds(input: {
+  minAgeSeconds: number;
+  maxAgeDays: number;
+  limit: number;
+  now: Date;
+}): Promise<string[]> {
+  const newestAt = new Date(
+    input.now.getTime() - input.minAgeSeconds * 1_000,
+  ).toISOString();
+  const oldestAt = new Date(
+    input.now.getTime() - input.maxAgeDays * 86_400_000,
+  ).toISOString();
+
+  const { data, error } = await getSupabaseServerClient()
+    .from("ticket_orders")
+    .select("id")
+    .eq("status", "pending")
+    .lte("created_at", newestAt)
+    // An order older than the provider's own retention is never going to be
+    // answered; sweeping it forever would be a permanent, pointless cost.
+    .gte("created_at", oldestAt)
+    .order("created_at", { ascending: true })
+    .limit(input.limit);
+
+  if (error) {
+    throw new TicketOrderRepositoryError("list_stale_pending_orders", error);
+  }
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = pendingOrderIdRowSchema.safeParse(row);
+    return parsed.success ? [parsed.data.id] : [];
+  });
+}

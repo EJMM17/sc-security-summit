@@ -30,9 +30,12 @@ histórica de snapshots Preview. Ninguno se marca como resuelto:
       aplicado a Supabase. Validadas contra PostgreSQL 16 local con pgTAP en
       verde, pero falta `supabase db reset --local` con el historial completo,
       `db lint`, backup verificado y regenerar `lib/database.types.ts`.
-- [ ] **Credenciales de MercadoPago.** `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-) y
-      `MERCADOPAGO_WEBHOOK_SECRET` en Vercel Production, y el webhook
-      `payment` registrado en el panel de MercadoPago.
+- [ ] **Credenciales de MercadoPago.** `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-)
+      en Vercel Production. `MERCADOPAGO_WEBHOOK_SECRET` es opcional: lo emite
+      MercadoPago al registrar el webhook `payment` en
+      `https://scsecuritysummit.com/api/webhooks/mercadopago`. Sin él la
+      confirmación la sostiene la reconciliación y tarda hasta un ciclo de
+      cron; regístralo en cuanto puedas. El secreto sin el token se rechaza.
 - [x] El plazo de retención de 18 meses, el proceso ARCO y el procedimiento de
       eliminación/anonimización fueron aprobados el 2026-07-30.
 - [x] Preview no tiene Supabase, Resend, Upstash, cron, analytics de marketing

@@ -8,13 +8,20 @@ vi.mock("@/server/services/ticket-order-notifier", () => ({
   processDueTicketOrderNotifications: vi.fn(),
 }));
 
+vi.mock("@/server/use-cases/sweep-pending-ticket-orders", () => ({
+  sweepPendingTicketOrders: vi.fn(),
+}));
+
 import { GET } from "@/app/api/cron/inquiry-notifications/route";
 import { processDueInquiryNotifications } from "@/server/services/inquiry-notifier";
 import { processDueTicketOrderNotifications } from "@/server/services/ticket-order-notifier";
+import { sweepPendingTicketOrders } from "@/server/use-cases/sweep-pending-ticket-orders";
 
 const mockedProcess = vi.mocked(processDueInquiryNotifications);
 const mockedTicketProcess = vi.mocked(processDueTicketOrderNotifications);
+const mockedSweep = vi.mocked(sweepPendingTicketOrders);
 const EMPTY_BATCH = { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 };
+const EMPTY_SWEEP = { scanned: 0, resolved: 0, stillPending: 0 };
 
 function request(authorization?: string): Request {
   return new Request("https://example.com/api/cron/inquiry-notifications", {
@@ -32,6 +39,8 @@ describe("inquiry notification cron", () => {
     mockedProcess.mockReset();
     mockedTicketProcess.mockReset();
     mockedTicketProcess.mockResolvedValue({ ...EMPTY_BATCH });
+    mockedSweep.mockReset();
+    mockedSweep.mockResolvedValue({ ...EMPTY_SWEEP });
   });
 
   afterEach(() => {
@@ -92,7 +101,51 @@ describe("inquiry notification cron", () => {
       dead: 0,
       failed: 0,
       ticketOrders: { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 },
+      pendingOrderSweep: { scanned: 0, resolved: 0, stillPending: 0 },
     });
+  });
+
+  it("also sweeps orders left pending, and reports what it resolved", async () => {
+    process.env.CRON_SECRET = "correct-secret";
+    mockedProcess.mockResolvedValue({ ...EMPTY_BATCH });
+    mockedSweep.mockResolvedValue({ scanned: 3, resolved: 2, stillPending: 1 });
+
+    const response = await GET(request("Bearer correct-secret"));
+
+    expect(response.status).toBe(200);
+    expect(mockedSweep).toHaveBeenCalledTimes(1);
+    expect((await response.json()).pendingOrderSweep).toEqual({
+      scanned: 3,
+      resolved: 2,
+      stillPending: 1,
+    });
+  });
+
+  it("fails the run when only the pending sweep fails", async () => {
+    // A sweep that stops working silently is how a paid order goes unnoticed
+    // in `pending`, which is exactly what the sweep exists to prevent.
+    process.env.CRON_SECRET = "correct-secret";
+    mockedProcess.mockResolvedValue({ ...EMPTY_BATCH });
+    mockedSweep.mockRejectedValue(new Error("provider down"));
+
+    const response = await GET(request("Bearer correct-secret"));
+
+    expect(response.status).toBe(500);
+    expect(await response.json()).toEqual({
+      ok: false,
+      reason: "processing_unavailable",
+    });
+  });
+
+  it("still drains both outboxes when the sweep fails", async () => {
+    process.env.CRON_SECRET = "correct-secret";
+    mockedProcess.mockResolvedValue({ ...EMPTY_BATCH });
+    mockedSweep.mockRejectedValue(new Error("provider down"));
+
+    await GET(request("Bearer correct-secret"));
+
+    expect(mockedProcess).toHaveBeenCalledTimes(1);
+    expect(mockedTicketProcess).toHaveBeenCalledTimes(1);
   });
 
   it("drains the ticket queue even when the inquiry queue fails", async () => {

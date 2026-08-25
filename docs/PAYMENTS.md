@@ -125,6 +125,31 @@ La preferencia declara `payment_methods` de forma explícita:
 Los ítems declaran `category_id: "tickets"`: es el dato de industria que
 MercadoPago usa para puntuar el riesgo de la operación y aprobarla.
 
+### Operar sin el secreto del webhook
+
+El secreto **no** es una credencial aparte que haya que conseguir: MercadoPago
+lo genera al registrar la URL del webhook en su panel, en el mismo paso. Hasta
+entonces el sitio puede vender igual, porque la confirmación no depende sólo de
+la notificación.
+
+- El webhook **falla cerrado**: sin `MERCADOPAGO_WEBHOOK_SECRET` rechaza todo
+  con 401. Nunca se acepta una notificación sin firma verificada.
+- La confirmación la sostiene la reconciliación: las páginas de retorno para el
+  comprador que vuelve, y el barrido del cron para el que pagó y cerró la
+  pestaña.
+- El contrato de entorno lo refleja: `MERCADOPAGO_ACCESS_TOKEN` se acepta solo,
+  pero `MERCADOPAGO_WEBHOOK_SECRET` sin token se rechaza — un secreto de firma
+  no sirve de nada sin el token con el que se relee el pago.
+
+Es un modo de arranque válido, no el destino: sin webhook la confirmación tarda
+hasta un ciclo de cron en vez de segundos. Registra el webhook en cuanto
+puedas.
+
+La **public key** de MercadoPago no se usa ni se declara. Checkout Pro sólo
+necesita el access token del servidor; la public key hace falta el día que se
+monten los Bricks en el navegador, que además exigirán ampliar la CSP del
+middleware. Guárdala, pero no hay dónde ponerla hoy.
+
 ### Reconciliación cuando el webhook no llega
 
 El webhook es el camino principal y sigue siendo la autoridad, pero no es el
@@ -148,6 +173,27 @@ idempotente y dispara los correos pendientes.
   una ráfaga de llamadas al proveedor. Quedar limitado no es un error: se
   muestra el estado almacenado y el webhook o la siguiente visita se ponen al
   día.
+
+#### Barrido del cron
+
+Las páginas de retorno sólo reconcilian para el comprador que **vuelve**. El
+que paga y cierra la pestaña dejaría su pedido en `pending` para siempre, así
+que la corrida de cron de cada cinco minutos también barre pedidos pendientes
+(`server/use-cases/sweep-pending-ticket-orders.ts`).
+
+- Sólo toca pedidos con más de 15 minutos: por debajo de eso el comprador
+  todavía puede estar en el checkout de MercadoPago y preguntar sería
+  malgastar una llamada.
+- Ignora los de más de 7 días: la preferencia expiró hace mucho y el proveedor
+  no tiene nada nuevo que decir.
+- Procesa en serie y con lote acotado (20 por corrida, 50 como máximo): una
+  ráfaga en paralelo es justo cómo un barrido se gana un rate limit del
+  proveedor.
+- Se salta el límite por pedido, que existe para el comprador que refresca; si
+  lo compartiera, ese comprador podría dejar sin presupuesto al barrido que
+  existe precisamente para quien nunca volvió.
+- Si el checkout está apagado (sin credenciales) devuelve un barrido vacío en
+  vez de fallar la corrida.
 
 ### Idempotencia
 
@@ -202,15 +248,11 @@ Tres capas, todas necesarias:
 | Variable | Local / dev | Preview | Production |
 |---|---|---|---|
 | `MERCADOPAGO_ACCESS_TOKEN` | `TEST-…` | prohibido | `APP_USR-…` |
-| `MERCADOPAGO_WEBHOOK_SECRET` | requerido si hay token | prohibido | requerido si hay token |
+| `MERCADOPAGO_WEBHOOK_SECRET` | opcional | prohibido | opcional, recomendado |
 
-Son un par indivisible: un checkout sin webhook verificado nunca confirma un
-pago. Si faltan ambos, el checkout responde `provider_unavailable` y no se
-cobra nada — falla cerrado.
-
-La clave pública de MercadoPago **no** se usa ni se declara: Checkout Pro sólo
-necesita el access token del servidor. Guárdala para el día que se monten los
-Bricks en el navegador, que exigirán además ampliar la CSP del middleware.
+El token va solo si todavía no registraste el webhook; el secreto **sin** token
+se rechaza. Sin ninguno de los dos el checkout responde `provider_unavailable`
+y no se cobra nada — falla cerrado.
 
 ## Puesta en producción
 
@@ -243,8 +285,10 @@ Falta, y en este orden:
    `docs/DEPLOYMENT.md`. Revisar Security y Performance Advisors.
 4. Configurar en Vercel Production `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-) y
    `MERCADOPAGO_WEBHOOK_SECRET`, ambos **sólo** en el target Production.
-5. En el panel de MercadoPago: registrar el webhook
-   `https://scsecuritysummit.com/api/webhooks/mercadopago` para el tópico
+5. En el panel de MercadoPago: registrar el webhook en la ruta que el sitio
+   expone de verdad —
+   `https://scsecuritysummit.com/api/webhooks/mercadopago`, no
+   `/api/mercadopago/webhook` — para el tópico
    `payment` y copiar el secreto de firma. El botón *Simular notificación* del
    panel envía un `data.id` inventado; el webhook lo autentica, no lo encuentra
    en la API y responde 500 a propósito, porque un 500 es lo que hace que

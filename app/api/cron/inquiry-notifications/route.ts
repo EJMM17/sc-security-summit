@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { isVercelProductionDeployment } from "@/lib/deployment-environment";
 import { processDueInquiryNotifications } from "@/server/services/inquiry-notifier";
 import { processDueTicketOrderNotifications } from "@/server/services/ticket-order-notifier";
+import { sweepPendingTicketOrders } from "@/server/use-cases/sweep-pending-ticket-orders";
 
 export const dynamic = "force-dynamic";
 const DEFAULT_BATCH_SIZE = 10;
@@ -50,9 +51,14 @@ export async function GET(request: Request) {
     // allSettled rather than all, so a failing inquiry queue still lets the
     // ticket queue drain before the run is reported as failed.
     const batchSize = notificationBatchSize();
-    const [inquiries, ticketOrders] = await Promise.allSettled([
+    const [inquiries, ticketOrders, sweep] = await Promise.allSettled([
       processDueInquiryNotifications(batchSize),
       processDueTicketOrderNotifications(batchSize),
+      // The same run also reconciles orders left `pending`. The return pages
+      // only reconcile for a buyer who comes back; this covers the one who
+      // paid and closed the tab, and it is what lets the site sell before
+      // `MERCADOPAGO_WEBHOOK_SECRET` is registered.
+      sweepPendingTicketOrders(),
     ]);
 
     // Both queues are always attempted, but a failure in either one still
@@ -60,11 +66,13 @@ export async function GET(request: Request) {
     // notices has stopped working.
     if (inquiries.status === "rejected") throw inquiries.reason;
     if (ticketOrders.status === "rejected") throw ticketOrders.reason;
+    if (sweep.status === "rejected") throw sweep.reason;
 
     return NextResponse.json({
       ok: true,
       ...inquiries.value,
       ticketOrders: ticketOrders.value,
+      pendingOrderSweep: sweep.value,
     });
   } catch {
     return NextResponse.json(

@@ -358,7 +358,7 @@ export const ENV_SPEC = [
     placeholders: ["change-me", "replace_with_random_secret"],
     group: "Payments (server only)",
     description:
-      "Signing secret from the MercadoPago webhook panel. Without it every notification is rejected; forbidden in Preview.",
+      "Signing secret from the MercadoPago webhook panel. Optional: without it every notification is rejected and payments are confirmed by the reconciliation sweep instead, which is slower. Register the webhook and set it as soon as possible. Forbidden in Preview.",
     templateValue: "",
   },
   {
@@ -433,10 +433,10 @@ export const ENV_GROUP_RULES = [
       "Sentry server and browser DSNs must be configured together or both omitted.",
   },
   {
-    names: ["MERCADOPAGO_ACCESS_TOKEN", "MERCADOPAGO_WEBHOOK_SECRET"],
-    mode: "all-or-none",
+    names: ["MERCADOPAGO_WEBHOOK_SECRET", "MERCADOPAGO_ACCESS_TOKEN"],
+    mode: "requires",
     description:
-      "The MercadoPago access token and webhook signing secret must be configured together; a checkout without a verified webhook never confirms a payment.",
+      "The MercadoPago webhook signing secret is useless without the access token the webhook uses to re-read the payment it was notified about.",
   },
   {
     names: ["ADMIN_PASSWORD", "ADMIN_SESSION_SECRET"],

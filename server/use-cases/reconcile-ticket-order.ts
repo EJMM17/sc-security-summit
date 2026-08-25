@@ -30,17 +30,24 @@ import { tryImmediateTicketOrderNotification } from "@/server/services/ticket-or
  */
 export async function reconcileTicketOrder(
   orderId: string,
+  options: { throttle?: boolean } = {},
 ): Promise<StoredTicketOrder | null> {
+  const throttle = options.throttle ?? true;
   const stored = await getTicketOrderSummary(orderId).catch(() => null);
   if (!stored || stored.status !== "pending") return stored;
 
   // A buyer refreshing the return page must not turn into a stream of provider
   // calls. Being throttled is not an error here: the stored state still
   // renders, and the webhook or the next visit will catch up.
-  try {
-    await checkRateLimit(`reconcile:${orderId}`);
-  } catch {
-    return stored;
+  // The cron sweep opts out: it already paces itself by schedule and batch
+  // size, and sharing the visitor budget would let a refreshing buyer starve
+  // the sweep that exists precisely for buyers who never came back.
+  if (throttle) {
+    try {
+      await checkRateLimit(`reconcile:${orderId}`);
+    } catch {
+      return stored;
+    }
   }
 
   let status: ReturnType<typeof mapPaymentStatus>;
