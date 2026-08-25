@@ -7,7 +7,6 @@ import { BASE_URL, CHECKOUT_URL, CONTENT } from "@/lib/content";
 import { quoteTicketOrder } from "@/lib/payments/catalog";
 import { centsToAmount } from "@/lib/payments/tax";
 import Agenda from "./(marketing)/_components/Agenda";
-import Audience from "./(marketing)/_components/Audience";
 import Faq from "./(marketing)/_components/Faq";
 import FinalCTA from "./(marketing)/_components/FinalCTA";
 import Footer from "./(marketing)/_components/Footer";
@@ -21,7 +20,6 @@ import Presenters from "./(marketing)/_components/Presenters";
 import Pricing from "./(marketing)/_components/Pricing";
 import Registro from "./(marketing)/_components/Registro";
 import Speakers from "./(marketing)/_components/Speakers";
-import Sponsors from "./(marketing)/_components/Sponsors";
 import Value from "./(marketing)/_components/Value";
 import WhyAttend from "./(marketing)/_components/WhyAttend";
 
@@ -241,10 +239,8 @@ export default async function Home({
         <Agenda language={language} />
         <Gallery language={language} />
         <Value language={language} />
-        <Audience language={language} />
         <Pricing language={language} />
         <Registro language={language} />
-        <Sponsors language={language} />
         <FinalCTA language={language} />
         <Location language={language} />
         <Faq language={language} />

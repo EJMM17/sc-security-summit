@@ -16,10 +16,14 @@ Internalize these boundaries before changing code:
    orders. It does not refund and does not check in: refunds are operated from
    the MercadoPago panel. Eventbrite is retired from the site entirely — no
    link, no constant, no env var.
-2. Supabase stores corporate-pass and sponsorship inquiries, and ticket
-   orders. Published prices already include IVA: the seller absorbs the 16%
-   and the base is extracted from the gross for the CFDI. A corporate request
-   carries a roster of named participants, one per requested access.
+2. Corporate passes are sold on site as `corporativo` ticket orders: a seat
+   dropdown from two accesses up, 25% off the unit price from the fifth, and a
+   roster of named participants (one per purchased access) in
+   `ticket_order_attendees`. Every order can carry an optional referrer.
+   The sponsorship funnel and the "a quién va dirigido" section are retired.
+   Supabase keeps the inquiries received before that cut; no new ones are
+   created. Published prices already include IVA: the seller absorbs the 16%
+   and the base is extracted from the gross for the CFDI.
 3. Supabase persistence defines receipt. Resend is a recoverable notification
    channel after persistence.
 4. Do not reuse historical `public.registros`, folios, payment fields, or the
@@ -76,8 +80,7 @@ app/
   aviso-de-privacidad/            Approved privacy notice
 
 components/
-  CorporatePassForm.tsx
-  SponsorInquiryForm.tsx
+  TicketCheckoutForm.tsx          Individual and corporate checkout
 
 lib/
   content.ts                      SSOT for bilingual marketing copy

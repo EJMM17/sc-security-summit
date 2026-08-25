@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("Homepage comercial", () => {
-  test("muestra ponentes, agenda, accesos y formularios actualizados", async ({ page }) => {
+  test("muestra ponentes, agenda, accesos y el checkout corporativo", async ({ page }) => {
     await page.goto("/?lang=es");
 
     await expect(
@@ -24,7 +24,7 @@ test.describe("Homepage comercial", () => {
     await expect(speakers.getByRole("heading", { name: "Fidel Guerrero" })).toBeVisible();
 
     const sectionOrder = await page.evaluate(() =>
-      ["especialistas", "programa", "accesos", "patrocinadores", "registro"].map(
+      ["especialistas", "programa", "accesos", "registro"].map(
         (id) => document.getElementById(id)?.offsetTop ?? -1,
       ),
     );
@@ -43,39 +43,43 @@ test.describe("Homepage comercial", () => {
 
     const corporate = page.locator("#registro");
     await expect(corporate.getByRole("heading", { name: /capacita a tu equipo completo/i })).toBeVisible();
-    await expect(corporate.getByLabel(/nombre/i)).toBeVisible();
-    await expect(corporate.getByLabel(/apellido/i)).toBeVisible();
-    await expect(corporate.getByLabel(/correo/i)).toBeVisible();
+    await expect(corporate.getByLabel(/nombre\(s\)/i)).toBeVisible();
+    await expect(corporate.getByLabel(/apellidos/i)).toBeVisible();
+    await expect(corporate.getByLabel(/correo electrónico/i)).toBeVisible();
     await expect(corporate.getByLabel(/empresa/i)).toBeVisible();
-    await expect(corporate.getByLabel(/cargo/i)).toBeVisible();
     await expect(corporate.getByLabel(/teléfono/i)).toBeVisible();
+    // The referral box is offered on the block too, and never required.
+    const referral = corporate.getByLabel(/quién te recomendó/i);
+    await expect(referral).toBeVisible();
+    await expect(referral).not.toHaveAttribute("required", "");
+
+    // Seats are picked from a dropdown, so the roster can only ever hold a
+    // number of names the catalog authorizes.
     const seats = corporate.getByLabel(/número de accesos/i);
-    await expect(seats).toHaveAttribute("min", "2");
-    await expect(seats).toHaveAttribute("max", "200");
-
-    // One roster input per access, and the quote follows the seat count.
+    await expect(seats).toHaveValue("2");
     await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(2);
-    const quote = corporate.getByRole("region", { name: /cotización estimada/i });
-    await expect(quote).toContainText("5,000.00");
-    await expect(quote).not.toContainText("25% aplicado");
 
-    await seats.fill("5");
+    const summary = corporate.locator(".checkout-summary");
+    await expect(summary).toContainText("5,000.00");
+    await expect(summary).not.toContainText("Descuento por volumen");
+
+    await seats.selectOption("5");
     await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(5);
-    await expect(quote).toContainText("25% aplicado");
     // 5 x $2,500 = $12,500 less 25% = $9,375.
-    await expect(quote).toContainText("12,500.00");
-    await expect(quote).toContainText("3,125.00");
-    await expect(quote).toContainText("9,375.00");
+    await expect(summary).toContainText("12,500.00");
+    await expect(summary).toContainText("3,125.00");
+    await expect(summary).toContainText("9,375.00");
+    await expect(
+      corporate.getByRole("button", { name: /pagar con mercadopago/i }),
+    ).toBeVisible();
     await expect(
       corporate.getByRole("link", { name: /aviso de privacidad/i }),
     ).toHaveAttribute("href", "/aviso-de-privacidad");
 
-    const sponsor = page.locator("#contacto-patrocinio");
-    await expect(sponsor.getByRole("heading", { name: /hablemos de tu marca/i })).toBeVisible();
-    await expect(sponsor.getByRole("button", { name: /solicitar información/i })).toBeVisible();
-    await expect(
-      sponsor.getByRole("link", { name: /aviso de privacidad/i }),
-    ).toHaveAttribute("href", "/aviso-de-privacidad");
+    // The sponsorship section and its form are retired from the site.
+    await expect(page.locator("#patrocinadores")).toHaveCount(0);
+    await expect(page.locator("#contacto-patrocinio")).toHaveCount(0);
+    await expect(page.locator("#audiencia")).toHaveCount(0);
   });
 
   test("no produce desbordamiento horizontal", async ({ page }) => {
@@ -124,7 +128,7 @@ test.describe("Homepage comercial", () => {
     );
   });
 
-  test("renderiza los dos formularios y privacidad en inglés", async ({ page }) => {
+  test("renderiza el checkout corporativo y privacidad en inglés", async ({ page }) => {
     await page.goto("/?lang=en");
 
     const corporate = page.locator("#registro");
@@ -133,21 +137,14 @@ test.describe("Homepage comercial", () => {
     ).toBeVisible();
     await expect(corporate.getByLabel("First name")).toBeVisible();
     await expect(corporate.getByLabel("Last name")).toBeVisible();
-    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("min", "2");
-    await expect(corporate.getByLabel("Number of passes")).toHaveAttribute("max", "200");
+    await expect(corporate.getByLabel(/who referred you/i)).toBeVisible();
+    await expect(corporate.getByLabel(/number of passes/i)).toHaveValue("2");
     await expect(corporate.getByLabel(/participant \d+/i)).toHaveCount(2);
-    await expect(
-      corporate.getByRole("region", { name: /estimated quote/i }),
-    ).toBeVisible();
+    await expect(corporate.locator(".checkout-summary")).toBeVisible();
     await expect(
       corporate.getByRole("link", { name: /privacy notice/i }),
     ).toHaveAttribute("href", "/aviso-de-privacidad");
 
-    const sponsor = page.locator("#contacto-patrocinio");
-    await expect(
-      sponsor.getByRole("heading", { name: /let's talk about your brand/i }),
-    ).toBeVisible();
-    await expect(sponsor.getByLabel("What would you like to know?")).toBeVisible();
     await expect(
       page.getByRole("dialog", { name: "Privacy & cookies" }),
     ).toBeVisible();

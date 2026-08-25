@@ -3,7 +3,7 @@ import "server-only";
 import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { TicketCheckout } from "@/lib/payments/schema";
-import type { TicketQuote } from "@/lib/payments/catalog";
+import { ORDER_TIER_IDS, type OrderTierId, type TicketQuote } from "@/lib/payments/catalog";
 import { validateRfc } from "@/lib/payments/rfc";
 import type { TicketOrderStatus } from "@/lib/payments/result";
 import { TICKET_ORDER_STATUSES } from "@/lib/payments/result";
@@ -64,7 +64,7 @@ const storedOrderRowSchema = z.object({
   status: z.enum(
     TICKET_ORDER_STATUSES as unknown as [TicketOrderStatus, ...TicketOrderStatus[]],
   ),
-  tier: z.enum(["plus", "general", "estudiante"]),
+  tier: z.enum(ORDER_TIER_IDS as unknown as [OrderTierId, ...OrderTierId[]]),
   quantity: z.coerce.number().int().min(1),
   subtotal_cents: z.coerce.number().int().nonnegative(),
   tax_cents: z.coerce.number().int().nonnegative(),
@@ -135,6 +135,8 @@ export async function persistTicketOrder(
     p_retention_until: orderRetentionDateFrom(consentedAt),
     p_requires_invoice: order.requiresInvoice,
     p_company: order.company,
+    p_referral_source: order.referral,
+    p_attendees: order.attendees,
     p_rfc: invoice?.rfc,
     p_person_type: personType,
     p_legal_name: invoice?.legalName,
@@ -422,7 +424,7 @@ const notifiableOrderRowSchema = z.object({
   status: z.enum(
     TICKET_ORDER_STATUSES as unknown as [TicketOrderStatus, ...TicketOrderStatus[]],
   ),
-  tier: z.enum(["plus", "general", "estudiante"]),
+  tier: z.enum(ORDER_TIER_IDS as unknown as [OrderTierId, ...OrderTierId[]]),
   quantity: z.coerce.number().int().min(1),
   unit_price_cents: z.coerce.number().int().nonnegative(),
   subtotal_cents: z.coerce.number().int().nonnegative(),
@@ -433,6 +435,7 @@ const notifiableOrderRowSchema = z.object({
   email: z.string(),
   phone: z.string(),
   company: z.string().nullable(),
+  referral_source: z.string().nullable(),
   language: z.enum(["es", "en"]),
   requires_invoice: z.boolean(),
 });
@@ -449,7 +452,7 @@ export async function getNotifiableTicketOrder(
   const { data, error } = await getSupabaseServerClient()
     .from("ticket_orders")
     .select(
-      "id,status,tier,quantity,unit_price_cents,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,language,requires_invoice",
+      "id,status,tier,quantity,unit_price_cents,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,referral_source,language,requires_invoice",
     )
     .eq("id", orderId)
     .single();

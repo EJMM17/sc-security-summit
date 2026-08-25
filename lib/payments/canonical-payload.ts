@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import type { TicketCheckout } from "@/lib/payments/schema";
 
-const CANONICAL_PAYLOAD_VERSION = "ticket-order-payload-v1";
+const CANONICAL_PAYLOAD_VERSION = "ticket-order-payload-v2";
 
 /**
  * The insertion order below is part of the versioned idempotency contract.
@@ -25,6 +25,10 @@ export function canonicalTicketOrderPayload(order: TicketCheckout): string {
     language: order.language,
     consentVersion: order.consentVersion,
     requiresInvoice: order.requiresInvoice,
+    referral: order.referral ?? null,
+    // The roster is part of the order: changing a participant's name is a
+    // different block, not a replay of the one already stored.
+    attendees: order.attendees ?? null,
     invoice: order.invoice
       ? {
           rfc: order.invoice.rfc,

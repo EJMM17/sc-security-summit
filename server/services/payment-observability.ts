@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { OrderTierId } from "@/lib/payments/catalog";
+
 type PaymentEvent =
   | "ticket_order_persisted"
   | "ticket_order_replayed"
@@ -20,7 +22,7 @@ type PaymentEvent =
 
 type PaymentEventContext = {
   orderId?: string;
-  tier?: "plus" | "general" | "estudiante";
+  tier?: OrderTierId;
   quantity?: number;
   language?: "es" | "en";
   requiresInvoice?: boolean;

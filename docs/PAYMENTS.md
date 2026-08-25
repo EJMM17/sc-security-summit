@@ -24,13 +24,38 @@ Términos y el Aviso de Privacidad ya no lo mencionan. Los boletos vendidos en
 Eventbrite **antes** de este cambio siguen siendo válidos y se operan desde el
 panel de Eventbrite; el sitio ya no los referencia.
 
+### Pases corporativos: ahora se cobran en el sitio
+
+El bloque corporativo dejó de ser una solicitud y pasó a ser una **compra**.
+Va por el mismo camino que un acceso individual —Server Action, catálogo del
+servidor, `ticket_orders`, preferencia de MercadoPago, webhook, recibo— con
+tres diferencias:
+
+- el tier es `corporativo` y **no** está en `TICKET_TIER_IDS`: no es un precio
+  publicado, sino un bloque cuyo precio unitario sale de `quoteCorporateOrder()`.
+  El 25% de descuento se aplica **al precio unitario** (2,500 → 1,875 MXN a
+  partir del quinto acceso), nunca al total, para que la línea siga siendo un
+  múltiplo exacto del unitario. De eso dependen la invariante de importes de la
+  base de datos, el `unit_price` de la preferencia y el CFDI;
+- la cantidad se elige en un **desplegable** (`CORPORATE_SEAT_OPTIONS`, de 2 a
+  25). El límite duro del servidor sigue siendo `CORPORATE_MAX_SEATS` (200):
+  un bloque mayor se acuerda con el equipo;
+- la orden lleva un **roster**: un participante nombrado por acceso, en
+  `public.ticket_order_attendees`, que es lo que necesita la constancia DC-3.
+  `create_ticket_order()` lo escribe en la misma transacción y rechaza un
+  roster que no coincida con la cantidad comprada.
+
+Toda orden —individual o corporativa— acepta además un **referido opcional**
+(`referral_source`): texto libre que escribe el comprador, nunca un
+identificador sobre el que el sitio actúe.
+
+Las `inquiries` corporativas y de patrocinio ya recibidas siguen guardadas y se
+consultan desde `/admin`, pero el sitio ya no crea ninguna nueva: la sección de
+patrocinio se retiró por completo (bloque del landing, formulario, `/sponsors`
+y `/media-kit`), igual que la sección "a quién va dirigido".
+
 Lo que **no** cambia:
 
-- los pases corporativos y los patrocinios siguen siendo `inquiries`
-  (cotización por correo, sin cobro en línea). El formulario corporativo
-  muestra una **cotización estimada** con el 25% de descuento a partir de 5
-  accesos, calculada con `quoteCorporatePass()`; es orientativa y no se
-  persiste como importe;
 - el CFDI se timbra manualmente. El sitio captura, valida y almacena los datos
   fiscales; no hay PAC integrado.
 
@@ -46,6 +71,7 @@ impuesto; el precio publicado no cambió al hacer el cambio.
 | Plus | $2,500.00 | $2,155.17 | $344.83 |
 | General | $900.00 | $775.86 | $124.14 |
 | Estudiante | $650.00 | $560.34 | $89.66 |
+| Corporativo (≥5 accesos, por acceso) | $1,875.00 | $1,616.38 | $258.62 |
 
 Reglas de cálculo, en `lib/payments/tax.ts`:
 

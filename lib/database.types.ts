@@ -582,6 +582,35 @@ export type Database = {
         }
         Relationships: []
       }
+      ticket_order_attendees: {
+        Row: {
+          created_at: string
+          full_name: string
+          order_id: string
+          seat_number: number
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          order_id: string
+          seat_number: number
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          order_id?: string
+          seat_number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ticket_order_attendees_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: false
+            referencedRelation: "ticket_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ticket_order_events: {
         Row: {
           created_at: string
@@ -789,6 +818,7 @@ export type Database = {
           provider_status: string | null
           provider_status_detail: string | null
           quantity: number
+          referral_source: string | null
           referrer: string | null
           requires_invoice: boolean
           retention_until: string
@@ -834,6 +864,7 @@ export type Database = {
           provider_status?: string | null
           provider_status_detail?: string | null
           quantity: number
+          referral_source?: string | null
           referrer?: string | null
           requires_invoice?: boolean
           retention_until: string
@@ -879,6 +910,7 @@ export type Database = {
           provider_status?: string | null
           provider_status_detail?: string | null
           quantity?: number
+          referral_source?: string | null
           referrer?: string | null
           requires_invoice?: boolean
           retention_until?: string
@@ -1091,6 +1123,7 @@ export type Database = {
       }
       create_ticket_order: {
         Args: {
+          p_attendees?: string[]
           p_billing_email?: string
           p_buyer_name: string
           p_cfdi_use?: string
@@ -1108,6 +1141,7 @@ export type Database = {
           p_phone: string
           p_postal_code?: string
           p_quantity: number
+          p_referral_source?: string
           p_referrer?: string
           p_requires_invoice?: boolean
           p_retention_until: string

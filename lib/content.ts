@@ -43,7 +43,6 @@ export const NAV_LINKS = {
     { href: "#especialistas", label: "Especialistas" },
     { href: "#accesos", label: "Accesos" },
     { href: "#registro", label: "Pase corporativo" },
-    { href: "#patrocinadores", label: "Patrocinio" },
   ],
   en: [
     { href: "#formacion", label: "Training" },
@@ -51,7 +50,6 @@ export const NAV_LINKS = {
     { href: "#especialistas", label: "Specialists" },
     { href: "#accesos", label: "Passes" },
     { href: "#registro", label: "Corporate pass" },
-    { href: "#patrocinadores", label: "Sponsorship" },
   ],
 } as const;
 
@@ -60,10 +58,8 @@ export const FOOTER_LINKS = {
     { href: "#formacion", label: "Formación" },
     { href: "#especialistas", label: "Especialistas" },
     { href: "#programa", label: "Programa" },
-    { href: "#audiencia", label: "Audiencia" },
     { href: "#accesos", label: "Accesos" },
     { href: "#registro", label: "Pase corporativo" },
-    { href: "#patrocinadores", label: "Patrocinio" },
     { href: "#ubicacion", label: "Ubicación" },
     { href: "#faq", label: "FAQ" },
   ],
@@ -71,10 +67,8 @@ export const FOOTER_LINKS = {
     { href: "#formacion", label: "Training" },
     { href: "#especialistas", label: "Specialists" },
     { href: "#programa", label: "Program" },
-    { href: "#audiencia", label: "Audience" },
     { href: "#accesos", label: "Passes" },
     { href: "#registro", label: "Corporate pass" },
-    { href: "#patrocinadores", label: "Sponsorship" },
     { href: "#ubicacion", label: "Location" },
     { href: "#faq", label: "FAQ" },
   ],
@@ -96,7 +90,6 @@ export const UI_TEXT = {
       "CTPAT · OEA · Gestión de riesgos · Ciberseguridad · Seguridad en transporte",
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
-    sponsorBtn: "PATROCINAR EL EVENTO",
     presentedBy: "Presentado por",
     presentersLabel: "PRESENTADORES",
     presentersTitle: "Las organizaciones que hacen posible el Summit",
@@ -143,10 +136,6 @@ export const UI_TEXT = {
     eventDayLabel: "Día del evento",
     eventDayValue: "24 de septiembre, 2026",
     eventDayVenue: "Centro de Convenciones · Reynosa, Tamaulipas",
-    participantsLabel: "A QUIÉN VA DIRIGIDO",
-    participantsTitle: "Este programa es para ti si...",
-    participantsDesc:
-      "Para quienes mueven, protegen y fortalecen la cadena de suministro. Un punto de encuentro para líderes y especialistas en áreas clave.",
     providersLabel: "PROVEEDORES",
     providersTitle: "Ecosistema B2B",
     providersDesc:
@@ -177,22 +166,6 @@ export const UI_TEXT = {
     taxNote: "IVA incluido",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
-    sponsorsTitle: "Lleva tu marca al siguiente nivel",
-    sponsorsDesc:
-      "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con tomadores de decisión de maquila, transporte, aduanas y compliance, y maximiza tu visibilidad ante la audiencia que importa.",
-    sponsorRequestInfo: "Quiero ser patrocinador",
-    sponsorFormLabel: "SOLICITUD DE PATROCINIO",
-    sponsorFormTitle: "Hablemos de tu marca",
-    sponsorFormDesc:
-      "Déjanos tus datos y un asesor se pondrá en contacto contigo para compartir disponibilidad y beneficios.",
-    sponsorFormSubmit: "SOLICITAR INFORMACIÓN",
-    sponsorSuccess: "Recibimos tu solicitud. Nuestro equipo se pondrá en contacto contigo.",
-    sponsorTierLabel: "Nivel",
-    sponsorSlotsLabel: "cupos exclusivos",
-    sponsorBenefitsLabel: "beneficios incluidos",
-    sponsorExclusiveBadge: "Experiencia Élite",
-    sponsorRecommendedBadge: "Más Solicitado",
-    sponsorStandLabel: "Stand",
     locationLabel: "SEDE DEL EVENTO",
     locationTitle: "Centro de Convenciones de Reynosa",
     addressLabel: "Dirección",
@@ -269,7 +242,6 @@ export const UI_TEXT = {
       "CTPAT · AEO · Risk management · Cybersecurity · Transportation security",
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
-    sponsorBtn: "SPONSOR THE EVENT",
     presentedBy: "Presented by",
     presentersLabel: "PRESENTERS",
     presentersTitle: "The organizations that make the Summit possible",
@@ -316,10 +288,6 @@ export const UI_TEXT = {
     eventDayLabel: "Event day",
     eventDayValue: "September 24, 2026",
     eventDayVenue: "Convention Center · Reynosa, Tamaulipas",
-    participantsLabel: "WHO IT IS FOR",
-    participantsTitle: "This program is for you if...",
-    participantsDesc:
-      "For those who move, protect and strengthen the supply chain. A meeting point for leaders and specialists in key areas.",
     providersLabel: "PROVIDERS",
     providersTitle: "B2B Ecosystem",
     providersDesc:
@@ -350,22 +318,6 @@ export const UI_TEXT = {
     taxNote: "VAT included",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
-    sponsorsTitle: "Take Your Brand to the Next Level",
-    sponsorsDesc:
-      "Position your company as a leader in supply chain security. Connect directly with decision makers from the maquiladora industry, transport, customs and compliance, and maximize your visibility before the audience that matters.",
-    sponsorRequestInfo: "Become a Sponsor",
-    sponsorFormLabel: "SPONSORSHIP REQUEST",
-    sponsorFormTitle: "Let's Talk About Your Brand",
-    sponsorFormDesc:
-      "Leave your details and an advisor will contact you with availability and benefit information.",
-    sponsorFormSubmit: "REQUEST INFORMATION",
-    sponsorSuccess: "We received your request. Our team will contact you shortly.",
-    sponsorTierLabel: "Tier",
-    sponsorSlotsLabel: "exclusive slots",
-    sponsorBenefitsLabel: "benefits included",
-    sponsorExclusiveBadge: "Elite Experience",
-    sponsorRecommendedBadge: "Most Requested",
-    sponsorStandLabel: "Booth",
     locationLabel: "EVENT VENUE",
     locationTitle: "Reynosa Convention Center",
     addressLabel: "Address",
@@ -458,61 +410,6 @@ export const COMPETENCIES = {
     "Cybersecurity",
     "Operational continuity",
     "Leadership and team management",
-  ],
-} as const;
-
-export const AUDIENCE_PATHS = {
-  es: [
-    {
-      label: "PROFESIONAL",
-      title: "Quieres fortalecer tu perfil",
-      description:
-        "Amplía tu visión, actualiza tus conocimientos y prepárate para asumir mayores responsabilidades.",
-      cta: "Ver acceso recomendado",
-      href: "#accesos",
-    },
-    {
-      label: "LÍDER",
-      title: "Tomas decisiones que afectan la operación",
-      description:
-        "Fortalece el criterio con el que diriges proyectos, equipos, auditorías y procesos de seguridad.",
-      cta: "Obtener accesos",
-      href: "#accesos",
-    },
-    {
-      label: "EMPRESA",
-      title: "Necesitas desarrollar capacidades en varias áreas",
-      description:
-        "Capacita a transporte, comercio exterior, seguridad, sistemas y cumplimiento bajo una misma visión.",
-      cta: "Solicitar pase corporativo",
-      href: "#registro",
-    },
-  ],
-  en: [
-    {
-      label: "PROFESSIONAL",
-      title: "You want to strengthen your profile",
-      description:
-        "Broaden your perspective, update your knowledge, and prepare for greater responsibilities.",
-      cta: "View recommended pass",
-      href: "#accesos",
-    },
-    {
-      label: "LEADER",
-      title: "You make decisions that affect the operation",
-      description:
-        "Strengthen the judgment you use to lead projects, teams, audits, and security processes.",
-      cta: "Get passes",
-      href: "#accesos",
-    },
-    {
-      label: "COMPANY",
-      title: "You need to build capabilities across teams",
-      description:
-        "Train transportation, foreign trade, security, systems, and compliance under one shared vision.",
-      cta: "Request a corporate pass",
-      href: "#registro",
-    },
   ],
 } as const;
 
@@ -1106,83 +1003,6 @@ export const INQUIRY_FORMS = {
   },
 } as const;
 
-export type SponsorTierMeta = {
-  level: number;
-  icon: IconKey;
-  slotsTotal: number;
-  stand: string;
-  stripe: string;
-  iconBg: string;
-  iconFg: string;
-  chipBg: string;
-  chipFg: string;
-  accent: string;
-  ring: string;
-  featured: boolean;
-  highlighted: boolean;
-};
-
-export const SPONSOR_TIER_META: readonly SponsorTierMeta[] = [
-  {
-    level: 1,
-    icon: "crown",
-    slotsTotal: 9,
-    stand: "6 × 6 m",
-    stripe: "bg-gradient-to-r from-slate-400 via-slate-200 to-slate-400",
-    iconBg: "bg-slate-900",
-    iconFg: "text-slate-100",
-    chipBg: "bg-slate-900",
-    chipFg: "text-slate-50",
-    accent: "text-slate-900",
-    ring: "hover:ring-2 hover:ring-slate-300",
-    featured: true,
-    highlighted: false,
-  },
-] as const;
-
-export const SPONSORS = {
-  es: [
-    {
-      tier: "Patrocinio Exclusivo",
-      benefits: [
-        "Acceso al Business Hub para generación de relaciones comerciales y networking estratégico con tomadores de decisión",
-        "Acceso a directorio de contactos potenciales autorizados del evento para seguimiento comercial posterior",
-        "Presentación comercial exclusiva de 10 minutos ante audiencia estratégica dentro del Business Hub",
-        "Espacios para stand",
-        "Servicio de coffee break disponible en el área asignada del patrocinador",
-        "Campaña de difusión destacada en redes sociales y mailing antes, durante y después del evento",
-        "Presencia de marca en materiales impresos y digitales: flyers, banners, sitio web, redes sociales, señalética y piezas promocionales",
-        "Proyección de reel publicitario en pantallas oficiales del evento",
-        "Inclusión de material promocional de la empresa en el kit de bienvenida para asistentes",
-        "Mención institucional destacada durante la inauguración y clausura del evento",
-        "10 accesos VIP a conferencias principales",
-        "Capacitación in company de 4 horas para personal de la empresa patrocinadora",
-        "Emisión de constancias de capacitación y formato DC-3 para participantes de la capacitación",
-      ],
-    },
-  ],
-  en: [
-    {
-      tier: "Exclusive Sponsorship",
-      benefits: [
-        "Business Hub access for commercial relationship building and strategic networking with decision makers",
-        "Access to the event's authorized directory of potential contacts for post-event commercial follow-up",
-        "Exclusive 10-minute commercial presentation before a strategic audience within the Business Hub",
-        "Booth spaces",
-        "Coffee break service available in the sponsor's designated area",
-        "Featured social media and email campaign before, during, and after the event",
-        "Brand presence on printed and digital materials: flyers, banners, website, social media, signage, and promotional pieces",
-        "Advertising reel on official event screens",
-        "Inclusion of company promotional material in the attendee welcome kit",
-        "Featured institutional mention at the event opening and closing ceremonies",
-        "10 VIP passes to main conferences",
-        "4-hour in-company training for the sponsor's staff",
-        "Training certificates and DC-3 format for training participants",
-      ],
-    },
-  ],
-} as const;
-
 export const VALUE_HIGHLIGHTS = {
   es: [
     "Contenido especializado con aplicación directa en tu operación diaria",
@@ -1265,11 +1085,6 @@ export const FAQ_ITEMS = [
       "Está diseñado para profesionales y ejecutivos del sector de cadena de suministros: directores de operaciones, gerentes de logística, especialistas en comercio exterior, responsables de compliance, entre otros perfiles clave en la industria.",
   },
   {
-    question: "¿Cómo puedo convertirme en patrocinador?",
-    answer:
-      "Contáctanos directamente a hola@scsecuritysummit.com o al +52 899 112 8755. Te enviaremos toda la información sobre nuestras oportunidades de patrocinio y los beneficios detallados para posicionar tu marca en el evento.",
-  },
-  {
     question: "¿Cómo compro mi acceso?",
     answer:
       "Desde cualquier botón de acceso del sitio llegas al checkout, donde eliges tu tipo de acceso y la cantidad. El pago se procesa con MercadoPago: tarjeta, transferencia SPEI o efectivo. Al confirmarse el pago te enviamos por correo tu comprobante de compra, que es el que presentas el día del evento.",
@@ -1308,11 +1123,6 @@ export const FAQ_ITEMS_EN = [
       "It is designed for supply chain professionals and executives: operations directors, logistics managers, foreign trade specialists, compliance leaders, and other key industry profiles.",
   },
   {
-    question: "How can I become a sponsor?",
-    answer:
-      "Contact us at hola@scsecuritysummit.com or +52 899 112 8755. We will send you all the information about our sponsorship opportunities and the detailed benefits to position your brand at the event.",
-  },
-  {
     question: "How do I buy my pass?",
     answer:
       "Any access button on the site takes you to the checkout, where you pick your access type and quantity. Payment is processed by MercadoPago: card, SPEI transfer or cash. Once the payment clears we email your proof of purchase, which is what you present on the day of the event.",
@@ -1348,6 +1158,27 @@ export const CHECKOUT = {
     tierLegend: "Tipo de acceso",
     quantity: "Cantidad",
     quantityHint: "Máximo {max} por compra.",
+    referral: "¿Quién te recomendó el Summit? (opcional)",
+    referralPlaceholder: "Nombre de la persona o empresa",
+    referralHint:
+      "Si alguien te invitó, escríbelo aquí. Es opcional y no cambia el precio.",
+    corporateLegend: "Pase corporativo",
+    corporateSeats: "Número de accesos",
+    corporateSeatsHint:
+      "Desde 2 accesos. A partir del quinto se aplica 25% de descuento sobre el precio de lista.",
+    corporateSeatsOption: "{n} accesos",
+    corporateLargeBlockHint:
+      "¿Necesitas más de {max} accesos? Escríbenos a hola@scsecuritysummit.com y lo preparamos contigo.",
+    corporateRosterLegend: "Participantes",
+    corporateRosterHint:
+      "Escribe el nombre completo de cada persona que asistirá. Es el nombre que aparecerá en su constancia DC-3.",
+    corporateAttendee: "Participante {n}",
+    corporateAttendeePlaceholder: "Nombre completo",
+    corporateSummaryList: "{seats} accesos × {price}",
+    corporateSummaryDiscount: "Descuento por volumen (25%)",
+    corporateDiscountBadge: "25% aplicado",
+    corporateDiscountHint:
+      "Con un acceso más obtienes 25% de descuento en todo el bloque.",
     buyerLegend: "Datos del comprador",
     firstName: "Nombre(s)",
     lastName: "Apellidos",
@@ -1426,6 +1257,27 @@ export const CHECKOUT = {
     tierLegend: "Pass type",
     quantity: "Quantity",
     quantityHint: "Up to {max} per purchase.",
+    referral: "Who referred you to the Summit? (optional)",
+    referralPlaceholder: "Person or company name",
+    referralHint:
+      "If someone invited you, write it here. It is optional and does not change the price.",
+    corporateLegend: "Corporate pass",
+    corporateSeats: "Number of passes",
+    corporateSeatsHint:
+      "From 2 passes. A 25% discount off the list price applies from the fifth pass up.",
+    corporateSeatsOption: "{n} passes",
+    corporateLargeBlockHint:
+      "Need more than {max} passes? Email hola@scsecuritysummit.com and we will set it up with you.",
+    corporateRosterLegend: "Participants",
+    corporateRosterHint:
+      "Write the full name of each person attending. It is the name printed on their DC-3 certificate.",
+    corporateAttendee: "Participant {n}",
+    corporateAttendeePlaceholder: "Full name",
+    corporateSummaryList: "{seats} passes × {price}",
+    corporateSummaryDiscount: "Volume discount (25%)",
+    corporateDiscountBadge: "25% applied",
+    corporateDiscountHint:
+      "One more pass unlocks a 25% discount on the whole block.",
     buyerLegend: "Buyer details",
     firstName: "First name",
     lastName: "Last name",
@@ -1512,8 +1364,6 @@ export const CONTENT = {
     pricing: PRICING.es,
     checkout: CHECKOUT.es,
     forms: INQUIRY_FORMS.es,
-    sponsorTierMeta: SPONSOR_TIER_META,
-    sponsors: SPONSORS.es,
     valueHighlights: VALUE_HIGHLIGHTS.es,
     whyAttend: WHY_ATTEND.es,
     faq: FAQ_ITEMS,
@@ -1532,8 +1382,6 @@ export const CONTENT = {
     pricing: PRICING.en,
     checkout: CHECKOUT.en,
     forms: INQUIRY_FORMS.en,
-    sponsorTierMeta: SPONSOR_TIER_META,
-    sponsors: SPONSORS.en,
     valueHighlights: VALUE_HIGHLIGHTS.en,
     whyAttend: WHY_ATTEND.en,
     faq: FAQ_ITEMS_EN,

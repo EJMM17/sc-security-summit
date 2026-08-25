@@ -23,7 +23,7 @@ const roster = (seats: number) =>
 
 describe("inquiry schemas", () => {
   it("pins the approved privacy notice version", () => {
-    expect(INQUIRY_CONSENT_VERSION).toBe("2026-08-25");
+    expect(INQUIRY_CONSENT_VERSION).toBe("2026-08-26");
   });
 
   it.each([2, 10, 45])(

@@ -18,18 +18,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     // ── Acquisition / SEO landing pages ──────────────────────────────
     {
-      url: `${BASE_URL}/sponsors`,
-      lastModified: new Date("2026-05-29"),
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-    {
-      url: `${BASE_URL}/media-kit`,
-      lastModified: new Date("2026-05-29"),
-      changeFrequency: "monthly",
-      priority: 0.7,
-    },
-    {
       url: `${BASE_URL}/ctpat-oea`,
       lastModified: new Date("2026-05-29"),
       changeFrequency: "monthly",

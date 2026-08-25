@@ -88,7 +88,7 @@ export type AdminInvoiceStatus = (typeof INVOICE_STATUS_VALUES)[number];
 export type AdminTicketOrder = {
   id: string;
   status: AdminTicketOrderStatus;
-  tier: "plus" | "general" | "estudiante";
+  tier: "plus" | "general" | "estudiante" | "corporativo";
   quantity: number;
   subtotal_cents: number;
   tax_cents: number;
@@ -98,6 +98,7 @@ export type AdminTicketOrder = {
   email: string;
   phone: string;
   company: string | null;
+  referral_source: string | null;
   language: "es" | "en";
   requires_invoice: boolean;
   invoice_status: AdminInvoiceStatus;
@@ -126,6 +127,12 @@ export type AdminInvoiceDetails = {
   cfdi_use: string;
   postal_code: string;
   billing_email: string | null;
+};
+
+/** One named participant of a paid corporate block. */
+export type AdminTicketOrderAttendee = {
+  seat_number: number;
+  full_name: string;
 };
 
 export type AdminTicketOrderNotification = {

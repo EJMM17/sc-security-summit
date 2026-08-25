@@ -55,22 +55,15 @@ test.describe("Preview isolation contract", () => {
     });
 
     const corporate = page.locator("#registro");
-    const sponsor = page.locator("#contacto-patrocinio");
-    await expect(corporate.locator("fieldset")).toHaveAttribute("disabled", "");
-    await expect(sponsor.locator("fieldset")).toHaveAttribute("disabled", "");
+    await expect(corporate.locator("fieldset").first()).toHaveAttribute(
+      "disabled",
+      "",
+    );
     await expect(
-      corporate.getByText(/Vista previa: este formulario está desactivado/i),
-    ).toBeVisible();
-    await expect(
-      sponsor.getByText(/Vista previa: este formulario está desactivado/i),
+      corporate.getByText(/Vista previa: el checkout está desactivado/i),
     ).toBeVisible();
     await expect(
       corporate.getByRole("button", {
-        name: "NO DISPONIBLE EN VISTA PREVIA",
-      }),
-    ).toBeDisabled();
-    await expect(
-      sponsor.getByRole("button", {
         name: "NO DISPONIBLE EN VISTA PREVIA",
       }),
     ).toBeDisabled();
@@ -97,7 +90,6 @@ test.describe("Preview isolation contract", () => {
       ).dataLayer;
       const tracked = new Set([
         "click_register",
-        "click_sponsor",
         "click_whatsapp",
         "scroll_depth",
         "section_view",
@@ -128,26 +120,15 @@ test.describe("Preview isolation contract", () => {
       waitUntil: "domcontentloaded",
     });
     const mobileCorporate = page.locator("#registro");
-    const mobileSponsor = page.locator("#contacto-patrocinio");
-    await expect(mobileCorporate.locator("fieldset")).toHaveAttribute(
-      "disabled",
-      "",
-    );
-    await expect(mobileSponsor.locator("fieldset")).toHaveAttribute(
+    await expect(mobileCorporate.locator("fieldset").first()).toHaveAttribute(
       "disabled",
       "",
     );
     await expect(
-      mobileCorporate.getByText(/Preview mode: this form is disabled/i),
+      mobileCorporate.getByText(/Preview: checkout is disabled/i),
     ).toBeVisible();
     await expect(
-      mobileSponsor.getByText(/Preview mode: this form is disabled/i),
-    ).toBeVisible();
-    await expect(
-      mobileCorporate.getByRole("button", { name: "UNAVAILABLE IN PREVIEW" }),
-    ).toBeDisabled();
-    await expect(
-      mobileSponsor.getByRole("button", { name: "UNAVAILABLE IN PREVIEW" }),
+      mobileCorporate.getByRole("button", { name: "NOT AVAILABLE IN PREVIEW" }),
     ).toBeDisabled();
     const dimensions = await page.evaluate(() => ({
       viewport: window.innerWidth,

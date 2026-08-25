@@ -21,8 +21,6 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         ? "Cerrar menú"
         : "Abrir menú";
   const registerLabel = language === "en" ? "Get passes" : "Conseguir accesos";
-  const sponsorLabel =
-    language === "en" ? "Sponsor the event" : "Patrocinar el evento";
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -86,13 +84,6 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
           >
             <span>{registerLabel}</span>
             <ArrowRight className="w-4 h-4" />
-          </a>
-          <a
-            href="#patrocinadores"
-            onClick={() => setOpen(false)}
-            className="mt-2 py-3 px-4 text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--blue-600)] hover:bg-[var(--blue-50)] rounded-xl transition-colors"
-          >
-            {sponsorLabel}
           </a>
         </nav>
       </div>

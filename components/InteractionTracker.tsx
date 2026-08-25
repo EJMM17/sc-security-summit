@@ -10,7 +10,6 @@ import { useEffect } from "react";
  *
  * Events emitted:
  *   click_register   → any link to #registro
- *   click_sponsor    → sponsorship mailto / sponsors page / #patrocinadores
  *   click_whatsapp   → wa.me links
  *   section_view     → first meaningful view of each landing section
  *   scroll_depth     → 25/50/75/90/100% page-depth milestones
@@ -22,14 +21,6 @@ function pushEvent(event: string, params: Record<string, unknown>): void {
   const w = window as unknown as { dataLayer?: unknown[] };
   w.dataLayer = w.dataLayer || [];
   w.dataLayer.push({ event, ...params });
-}
-
-function safeDecode(value: string): string {
-  try {
-    return decodeURIComponent(value);
-  } catch {
-    return value;
-  }
 }
 
 function pageContext() {
@@ -66,16 +57,6 @@ export default function InteractionTracker() {
         return;
       }
 
-      // ── Sponsorship intent ────────────────────────────────────────
-      const decoded = href.startsWith("mailto:") ? safeDecode(href) : href;
-      if (
-        (href.startsWith("mailto:") && /patrocinio|sponsor/i.test(decoded)) ||
-        href === "/sponsors" ||
-        href.endsWith("/sponsors") ||
-        href.includes("#patrocinadores")
-      ) {
-        pushEvent("click_sponsor", base);
-      }
     }
 
     document.addEventListener("click", onClick, true);

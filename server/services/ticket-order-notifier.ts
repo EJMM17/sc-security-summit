@@ -2,7 +2,7 @@ import "server-only";
 
 import { sendEmail, type SendEmailResult } from "@/lib/email";
 import { emailShell, escapeHtml } from "@/lib/email-templates";
-import { TICKET_TIERS } from "@/lib/payments/catalog";
+import { orderTierLabel } from "@/lib/payments/catalog";
 import { formatMxn, formatTaxRate } from "@/lib/payments/tax";
 import {
   claimDueTicketOrderNotifications,
@@ -102,7 +102,7 @@ export function buildBuyerReceiptEmail(order: NotifiableTicketOrder): {
   html: string;
 } {
   const copy = COPY[order.language];
-  const tierLabel = TICKET_TIERS[order.tier].label[order.language];
+  const tierLabel = orderTierLabel(order.tier)[order.language];
 
   // The published price is IVA-inclusive, so the receipt states one final
   // amount. The base and the tax stay on the order row for the CFDI; a buyer
@@ -153,7 +153,8 @@ export function buildInternalOrderEmail(order: NotifiableTicketOrder): {
     row("Correo", order.email),
     row("Teléfono", order.phone),
     row("Empresa", order.company ?? "—"),
-    row("Acceso", TICKET_TIERS[order.tier].label.es),
+    row("Referido por", order.referral_source ?? "—"),
+    row("Acceso", orderTierLabel(order.tier).es),
     row("Cantidad", String(order.quantity)),
     row("Total cobrado", `${formatMxn(order.total_cents, "es")} MXN`),
     row("Base gravable", formatMxn(order.subtotal_cents, "es")),

@@ -61,6 +61,7 @@ const PAID_ORDER = {
   email: "maria@empresa.com",
   phone: "+52 899 123 4567",
   company: null,
+  referral_source: null,
   language: "es" as const,
   requires_invoice: false,
 };

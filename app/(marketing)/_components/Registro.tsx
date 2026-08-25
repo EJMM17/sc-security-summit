@@ -1,6 +1,6 @@
 import { BadgeCheck, UsersRound } from "lucide-react";
-import CorporatePassForm from "@/components/CorporatePassForm";
 import ScrollReveal from "@/components/ScrollReveal";
+import TicketCheckoutForm from "@/components/TicketCheckoutForm";
 import { CONTENT } from "@/lib/content";
 import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
 import type { Language } from "@/lib/language";
@@ -11,7 +11,9 @@ export default function Registro({
   language: Language;
 }) {
   const { ui } = CONTENT[language];
-  const inquiriesDisabled = isVisualOnlyVercelDeployment();
+  // A block is a paid order like any other access, so it is disabled by the
+  // same rule that disables the individual checkout on a preview deployment.
+  const checkoutDisabled = isVisualOnlyVercelDeployment();
 
   return (
       <section id="registro" className="mock-section mock-section--light mock-corporate">
@@ -38,9 +40,10 @@ export default function Registro({
                 </span>
               </div>
               <div className="corporate-pass-form">
-                <CorporatePassForm
+                <TicketCheckoutForm
                   language={language}
-                  previewDisabled={inquiriesDisabled}
+                  variant="corporate"
+                  previewDisabled={checkoutDisabled}
                 />
               </div>
             </div>
