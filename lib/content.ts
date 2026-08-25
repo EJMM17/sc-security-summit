@@ -130,10 +130,6 @@ export const UI_TEXT = {
       "Especialistas con experiencia directa en seguridad, cumplimiento, transporte, comercio exterior y continuidad operativa.",
     speakersMorePrefix: "Más conferencistas serán anunciados pronto.",
     speakersMoreCTA: "Regístrate para recibirlos primero →",
-    speakerOpportunityTitle: "¿Quieres vincular tu marca con el Summit?",
-    speakerOpportunityDesc:
-      "Conoce las oportunidades para presentar soluciones ante una audiencia especializada.",
-    speakerOpportunityCTA: "Conocer oportunidades",
     agendaLabel: "PROGRAMA EJECUTIVO",
     agendaTitle: "Tres dimensiones para fortalecer tu operación",
     agendaDesc:
@@ -181,7 +177,6 @@ export const UI_TEXT = {
     taxNote: "IVA incluido",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
-    sponsorsLabel: "OPORTUNIDAD DE PATROCINIO",
     sponsorsTitle: "Lleva tu marca al siguiente nivel",
     sponsorsDesc:
       "Posiciona tu empresa como líder en seguridad de la cadena de suministros. Conecta directamente con tomadores de decisión de maquila, transporte, aduanas y compliance, y maximiza tu visibilidad ante la audiencia que importa.",
@@ -308,10 +303,6 @@ export const UI_TEXT = {
       "Specialists with direct experience in security, compliance, transportation, foreign trade, and operational continuity.",
     speakersMorePrefix: "More speakers will be announced soon.",
     speakersMoreCTA: "Register to hear about them first →",
-    speakerOpportunityTitle: "Would you like to connect your brand with the Summit?",
-    speakerOpportunityDesc:
-      "Explore opportunities to present solutions to a specialized audience.",
-    speakerOpportunityCTA: "Explore opportunities",
     agendaLabel: "EXECUTIVE PROGRAM",
     agendaTitle: "Three dimensions to strengthen your operation",
     agendaDesc:
@@ -359,7 +350,6 @@ export const UI_TEXT = {
     taxNote: "VAT included",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
-    sponsorsLabel: "SPONSORSHIP OPPORTUNITY",
     sponsorsTitle: "Take Your Brand to the Next Level",
     sponsorsDesc:
       "Position your company as a leader in supply chain security. Connect directly with decision makers from the maquiladora industry, transport, customs and compliance, and maximize your visibility before the audience that matters.",

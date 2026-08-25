@@ -15,8 +15,7 @@ export default function Sponsors({ language }: { language: Language }) {
       <div className="mock-container sponsor-production-grid">
         <ScrollReveal>
           <div className="sponsor-production-copy">
-            <span className="section-label">{ui.sponsorsLabel}</span>
-            <h2 className="section-title mt-3">{ui.sponsorsTitle}</h2>
+            <h2 className="section-title">{ui.sponsorsTitle}</h2>
             <p className="section-desc mt-5">{ui.sponsorsDesc}</p>
 
             <div className="sponsor-tier-summary">

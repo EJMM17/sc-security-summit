@@ -1,4 +1,4 @@
-import { ArrowRight, Mic2 } from "lucide-react";
+import { Mic2 } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import SpeakersCarousel from "@/components/SpeakersCarousel";
 import { CONTENT } from "@/lib/content";
@@ -24,19 +24,6 @@ export default function Speakers({ language }: { language: Language }) {
 
           <ScrollReveal delay={120} direction="scale">
             <SpeakersCarousel speakers={speakers} language={language} />
-          </ScrollReveal>
-
-          <ScrollReveal delay={180}>
-            <div className="speaker-opportunity">
-              <div>
-                <h3>{ui.speakerOpportunityTitle}</h3>
-                <p>{ui.speakerOpportunityDesc}</p>
-              </div>
-              <a href="#patrocinadores">
-                {ui.speakerOpportunityCTA}
-                <ArrowRight aria-hidden="true" />
-              </a>
-            </div>
           </ScrollReveal>
         </div>
       </section>
