@@ -1,7 +1,6 @@
 import "server-only";
 
 import { z } from "zod";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { TicketCheckout } from "@/lib/payments/schema";
 import type { TicketQuote } from "@/lib/payments/catalog";
@@ -10,54 +9,11 @@ import type { TicketOrderStatus } from "@/lib/payments/result";
 import { TICKET_ORDER_STATUSES } from "@/lib/payments/result";
 
 /**
- * `lib/database.types.ts` is generated from the database and must not be
- * hand-edited. It will only describe the tables added by
- * `20260824120000_add_ticket_orders.sql` after that migration is applied and
- * `npm run db:types` is re-run.
- *
- * Until then this narrow local contract types the three new RPCs. It is
- * deliberately confined to this module so no other file depends on it, and it
- * is the one place to delete once the generated types catch up.
+ * The generated types now describe the ticket tables and RPCs, so the shared
+ * server client is used directly and no local database contract is needed.
  */
-type TicketOrderRpc = {
-  create_ticket_order: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-  claim_ticket_order_notification: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-  claim_ticket_order_notifications: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-  complete_ticket_order_notification: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-  attach_ticket_order_preference: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-  record_ticket_order_payment: {
-    Args: Record<string, unknown>;
-    Returns: unknown;
-  };
-};
-
-type TicketOrderDatabase = {
-  public: {
-    Tables: Record<string, never>;
-    Views: Record<string, never>;
-    Functions: TicketOrderRpc;
-    Enums: Record<string, never>;
-    CompositeTypes: Record<string, never>;
-  };
-};
-
-function rpcClient(): SupabaseClient<TicketOrderDatabase> {
-  return getSupabaseServerClient() as unknown as SupabaseClient<TicketOrderDatabase>;
+function rpcClient() {
+  return getSupabaseServerClient();
 }
 
 export class TicketOrderRepositoryError extends Error {
@@ -299,7 +255,7 @@ export async function getTicketOrderSummary(
   orderId: string,
 ): Promise<StoredTicketOrder | null> {
   const { data, error } = await getSupabaseServerClient()
-    .from("ticket_orders" as never)
+    .from("ticket_orders")
     .select(
       "id,status,tier,quantity,subtotal_cents,tax_cents,total_cents,language,requires_invoice",
     )
@@ -444,7 +400,7 @@ export async function getTicketNotificationStatus(
   notificationId: string,
 ): Promise<TicketNotificationStatus> {
   const { data, error } = await getSupabaseServerClient()
-    .from("ticket_order_notifications" as never)
+    .from("ticket_order_notifications")
     .select("status")
     .eq("id", notificationId)
     .single();
@@ -490,7 +446,7 @@ export async function getNotifiableTicketOrder(
   orderId: string,
 ): Promise<NotifiableTicketOrder> {
   const { data, error } = await getSupabaseServerClient()
-    .from("ticket_orders" as never)
+    .from("ticket_orders")
     .select(
       "id,status,tier,quantity,subtotal_cents,tax_cents,total_cents,tax_rate_basis_points,buyer_name,email,phone,company,language,requires_invoice",
     )
@@ -518,7 +474,7 @@ export async function listDeliverableTicketOrderNotificationIds(
   orderId: string,
 ): Promise<string[]> {
   const { data, error } = await getSupabaseServerClient()
-    .from("ticket_order_notifications" as never)
+    .from("ticket_order_notifications")
     .select("id")
     .eq("order_id", orderId)
     .in("status", ["pending", "retry"]);
@@ -530,6 +486,52 @@ export async function listDeliverableTicketOrderNotificationIds(
 
   return data.flatMap((row) => {
     const parsed = notificationIdRowSchema.safeParse(row);
+    return parsed.success ? [parsed.data.id] : [];
+  });
+}
+
+const pendingOrderIdRowSchema = z.object({ id: z.string().uuid() });
+
+/**
+ * Orders still `pending` that are old enough to be worth asking the provider
+ * about, oldest first.
+ *
+ * `minAgeSeconds` keeps the sweep away from orders whose buyer is still on the
+ * MercadoPago checkout: those are pending for the ordinary reason and the
+ * webhook, or the buyer's own return to the site, will resolve them. Only an
+ * order that stayed pending past that window is evidence something was lost.
+ */
+export async function listStalePendingTicketOrderIds(input: {
+  minAgeSeconds: number;
+  maxAgeDays: number;
+  limit: number;
+  now: Date;
+}): Promise<string[]> {
+  const newestAt = new Date(
+    input.now.getTime() - input.minAgeSeconds * 1_000,
+  ).toISOString();
+  const oldestAt = new Date(
+    input.now.getTime() - input.maxAgeDays * 86_400_000,
+  ).toISOString();
+
+  const { data, error } = await getSupabaseServerClient()
+    .from("ticket_orders")
+    .select("id")
+    .eq("status", "pending")
+    .lte("created_at", newestAt)
+    // An order older than the provider's own retention is never going to be
+    // answered; sweeping it forever would be a permanent, pointless cost.
+    .gte("created_at", oldestAt)
+    .order("created_at", { ascending: true })
+    .limit(input.limit);
+
+  if (error) {
+    throw new TicketOrderRepositoryError("list_stale_pending_orders", error);
+  }
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = pendingOrderIdRowSchema.safeParse(row);
     return parsed.success ? [parsed.data.id] : [];
   });
 }

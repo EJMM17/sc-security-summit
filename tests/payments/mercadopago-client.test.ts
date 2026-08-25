@@ -1,11 +1,13 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCheckoutPreference,
+  findPaymentByExternalReference,
   getMercadoPagoAccessToken,
   getPayment,
   isMercadoPagoCheckoutUrl,
   isMercadoPagoConfigured,
   mapPaymentStatus,
+  MAX_INSTALLMENTS,
   MercadoPagoApiError,
   MercadoPagoConfigurationError,
 } from "@/server/services/mercadopago-client";
@@ -227,5 +229,120 @@ describe("mapPaymentStatus", () => {
     expect(mapPaymentStatus("refunded")).toBe("refunded");
     expect(mapPaymentStatus("charged_back")).toBe("charged_back");
     expect(mapPaymentStatus("something_new")).toBe("pending");
+  });
+});
+
+describe("preference payment methods", () => {
+  beforeEach(() => {
+    vi.stubEnv("MERCADOPAGO_ACCESS_TOKEN", TEST_TOKEN);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("excludes offline payment types the seat hold cannot outlive", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({
+        id: "pref-1",
+        init_point: "https://www.mercadopago.com.mx/checkout/v1/redirect?pref_id=1",
+      }),
+    );
+
+    await createCheckoutPreference(preferenceInput());
+
+    const body = JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body));
+    expect(body.payment_methods.excluded_payment_types).toEqual([
+      { id: "ticket" },
+      { id: "atm" },
+    ]);
+    expect(body.payment_methods.installments).toBe(MAX_INSTALLMENTS);
+  });
+});
+
+describe("findPaymentByExternalReference", () => {
+  const ORDER_ID = "9b2d0c26-2f3d-4a1e-8f2b-6ce0f9b1a742";
+
+  beforeEach(() => {
+    vi.stubEnv("MERCADOPAGO_ACCESS_TOKEN", TEST_TOKEN);
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("rejects a reference that is not an order id", async () => {
+    const fetchMock = vi.spyOn(globalThis, "fetch");
+    await expect(findPaymentByExternalReference("../../v1/payments")).rejects.toThrow(
+      MercadoPagoApiError,
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("searches by external reference and returns null when nothing matches", async () => {
+    const fetchMock = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(jsonResponse({ results: [] }));
+
+    expect(await findPaymentByExternalReference(ORDER_ID)).toBeNull();
+
+    const url = String(fetchMock.mock.calls[0]?.[0]);
+    expect(url).toContain("/v1/payments/search?");
+    expect(url).toContain(`external_reference=${ORDER_ID}`);
+  });
+
+  it("prefers an approved payment over a rejected earlier attempt", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({
+        results: [
+          { id: 222, status: "rejected", external_reference: ORDER_ID },
+          {
+            id: 111,
+            status: "approved",
+            status_detail: "accredited",
+            external_reference: ORDER_ID,
+            transaction_amount: 2900,
+            currency_id: "MXN",
+            date_approved: "2026-08-24T10:00:00.000-06:00",
+          },
+        ],
+      }),
+    );
+
+    const payment = await findPaymentByExternalReference(ORDER_ID);
+    expect(payment?.id).toBe("111");
+    expect(payment?.status).toBe("approved");
+    expect(payment?.dateApproved).toBe("2026-08-24T10:00:00.000-06:00");
+  });
+
+  it("discards a result that belongs to another order", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({
+        results: [
+          {
+            id: 999,
+            status: "approved",
+            external_reference: "11111111-2222-4333-8444-555555555555",
+          },
+        ],
+      }),
+    );
+
+    expect(await findPaymentByExternalReference(ORDER_ID)).toBeNull();
+  });
+
+  it("falls back to the most recent attempt when none is approved", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      jsonResponse({
+        results: [
+          { id: 333, status: "rejected", external_reference: ORDER_ID },
+          { id: 222, status: "cancelled", external_reference: ORDER_ID },
+        ],
+      }),
+    );
+
+    expect((await findPaymentByExternalReference(ORDER_ID))?.id).toBe("333");
   });
 });

@@ -11,6 +11,9 @@ type PaymentEvent =
   | "ticket_payment_ignored"
   | "ticket_webhook_rejected"
   | "ticket_webhook_failed"
+  | "ticket_order_reconciled"
+  | "ticket_order_reconcile_failed"
+  | "ticket_order_sweep_completed"
   | "ticket_order_notification_sent"
   | "ticket_order_notification_retry"
   | "ticket_order_notification_dead";
@@ -29,6 +32,8 @@ type PaymentEventContext = {
   template?: string;
   attempt?: number;
   durationMs?: number;
+  scanned?: number;
+  resolved?: number;
 };
 
 /**
@@ -51,6 +56,7 @@ export function recordPaymentEvent(
     event === "ticket_order_persistence_failed" ||
     event === "ticket_order_preference_failed" ||
     event === "ticket_webhook_failed" ||
+    event === "ticket_order_reconcile_failed" ||
     event === "ticket_order_notification_dead"
   ) {
     console.error(JSON.stringify(entry));
