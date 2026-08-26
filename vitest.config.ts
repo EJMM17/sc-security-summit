@@ -33,6 +33,7 @@ export default defineConfig({
         "server/services/payment-observability.ts",
         "server/use-cases/create-ticket-checkout.ts",
         "lib/supabase-server.ts",
+        "lib/supabase-retry-fetch.ts",
         "server/repositories/inquiry-repository.ts",
         "server/services/inquiry-notifier.ts",
         "server/services/inquiry-observability.ts",

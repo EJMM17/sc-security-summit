@@ -1,35 +1,54 @@
 # Contexto vigente del proyecto
 
-Última revisión: 2026-07-30.
+Última revisión: 2026-08-26.
 
 Este documento describe el repositorio después de incorporar persistencia para
-solicitudes. No demuestra que el código, migraciones o variables ya estén
-activos en Production. El estado de despliegue se verifica en Vercel y
-Supabase; los gates están en `docs/DEPLOYMENT.md`.
+solicitudes y la venta en sitio con MercadoPago. No demuestra que el código,
+migraciones o variables ya estén activos en Production. El estado de despliegue
+se verifica en Vercel y Supabase; los gates están en `docs/DEPLOYMENT.md`.
+
+Verificado contra Production el 2026-08-26: el proyecto Vercel corre Node 22.x
+en plan Pro con el cron de cinco minutos activo, `/api/health` responde 200 y
+las 24 migraciones del repositorio están aplicadas en Supabase. Sigue abierto
+el `401 PGRST303` intermitente descrito en `docs/DEPLOYMENT.md` y en la sección
+7.1 del runbook.
 
 ## 1. Producto
 
 SC Security Summit 2026 es un sitio de marketing bilingüe para el evento del 24
 de septiembre de 2026 en Reynosa, Tamaulipas.
 
-- Eventbrite es el único sistema de venta y administración de accesos
-  individuales.
+- Los accesos individuales y los bloques corporativos se compran en el sitio
+  con MercadoPago Checkout Pro (`docs/PAYMENTS.md`). Eventbrite está retirado:
+  sin enlace, sin constante y sin variable de entorno. Los boletos vendidos
+  ahí antes del corte siguen siendo válidos y se operan desde su propio panel.
 - El sitio conserva las solicitudes de pase corporativo y patrocinio recibidas
-  antes del corte, pero ya no crea ninguna: los accesos individuales y los
-  bloques corporativos se compran en el sitio con MercadoPago
-  (`docs/PAYMENTS.md`) y la sección de patrocinio se retiró por completo, junto
-  con `/sponsors`, `/media-kit` y la sección "a quién va dirigido".
-- Supabase es la fuente de verdad de esas solicitudes.
+  antes del corte, pero ya no crea ninguna: la sección de patrocinio se retiró
+  por completo, junto con `/sponsors`, `/media-kit` y la sección "a quién va
+  dirigido".
+- Supabase es la fuente de verdad de solicitudes y de órdenes.
 - Resend es un canal de notificación posterior a la persistencia.
-- No existen folios, pagos, confirmación de boletos ni `/admin` para este flujo.
+- `/admin` opera solicitudes, órdenes y boletos; el sitio no emite CFDI ni
+  hace check-in, y los reembolsos se operan desde el panel de MercadoPago.
 - Las tablas históricas de asistentes se preservan, pero no se reutilizan.
 
 ## 2. Arquitectura
 
 ```text
 Navegador
-  ├─ CTA individual ───────────────────────────────► Eventbrite
-  └─ Formulario corporate / sponsor
+  ├─ Checkout individual y corporativo
+  │    ├─ submission_id estable
+  │    ├─ consentimiento versionado
+  │    └─ Server Action
+  │         ├─ Zod + catálogo (precios con IVA incluido)
+  │         └─ create-ticket-checkout
+  │              ├─ RPC idempotente ──────────────► Supabase
+  │              │    ├─ ticket_orders
+  │              │    ├─ ticket_order_attendees
+  │              │    └─ ticket_order_notifications
+  │              └─ preferencia ──────────────────► MercadoPago
+  │
+  └─ Formulario corporate / sponsor (retirado, solo histórico)
        ├─ submission_id estable
        ├─ consentimiento versionado
        ├─ honeypot
@@ -43,11 +62,15 @@ Navegador
                  │    └─ inquiry_events
                  └─ intento de notificación ──────► Resend
 
+MercadoPago
+  ├─ webhook firmado ─────────────────────────────► /api/webhooks/mercadopago
+  └─ página de retorno ───────────────────────────► reconciliación por orden
+
 Vercel Cron, cada 5 min
-  └─ processor compartido
-       ├─ reclama outbox con lease
-       ├─ reintenta con backoff
-       └─ registra intento y evento sin PII
+  └─ una corrida, tres tareas
+       ├─ outbox de solicitudes
+       ├─ outbox de órdenes
+       └─ barrido de órdenes `pending` (15 min a 7 días)
 ```
 
 ### Semántica de recepción
@@ -67,7 +90,8 @@ Resend no pierde el lead.
 
 | Tema | Fuente |
 |---|---|
-| Copy, agenda, accesos, ponentes, FAQ, Eventbrite | `lib/content.ts` |
+| Copy, agenda, accesos, ponentes, FAQ | `lib/content.ts` |
+| Precios, IVA y descuento por volumen | `lib/payments/catalog.ts` |
 | Schemas y parsing de formularios | `lib/inquiries/schema.ts` |
 | Versión de consentimiento | `lib/inquiries/constants.ts` |
 | Payload canónico e idempotencia | `lib/inquiries/canonical-payload.ts` |
@@ -166,19 +190,23 @@ intentos o eventos. Consulta `docs/INQUIRY_OPERATIONS.md`.
 
 | Ruta | Función |
 |---|---|
-| `/` | Landing, Eventbrite y formularios |
+| `/` | Landing y accesos |
 | `/ctpat-oea` | SEO CTPAT/OEA |
 | `/seguridad-cadena-suministro` | SEO temático |
 | `/evento-logistica-reynosa` | SEO local |
 | `/terminos-y-condiciones` | Términos, noindex |
 | `/aviso-de-privacidad` | Aviso, noindex |
+| `/checkout` | Compra individual y corporativa |
+| `/checkout/gracias`, `/checkout/pendiente`, `/checkout/error` | Retorno de MercadoPago y reconciliación |
+| `/admin`, `/admin/ordenes`, `/admin/boletos` | Panel interno, 404 sin credenciales |
 | `/api/health` | Readiness de aplicación + tabla `inquiries` |
-| `/api/cron/inquiry-notifications` | Reintento interno autenticado |
+| `/api/cron/inquiry-notifications` | Corrida autenticada: ambos outbox y el barrido |
+| `/api/webhooks/mercadopago` | Confirmación de pago con firma HMAC |
 
 `/api/health` carga el cliente Supabase de forma lazy y ejecuta un probe
 privacy-safe sobre `inquiries` con presupuesto de tres segundos. Devuelve `503`
 si la configuración o el almacenamiento crítico no están disponibles. No
-comprueba Resend, Upstash, cron o Eventbrite. Las solicitudes concurrentes
+comprueba Resend, Upstash, cron ni MercadoPago. Las solicitudes concurrentes
 comparten un solo probe; un resultado sano se reutiliza 30 segundos y un fallo
 5 segundos, con el mismo TTL corto en CDN, para evitar amplificación hacia
 Supabase.
@@ -268,15 +296,21 @@ ellos; nunca se usa `npm audit fix --force`.
 
 ## 9. Privacidad y retención
 
-El consentimiento vigente usa `2026-07-30`. La persona responsable de
-privacidad aprobó el 2026-07-30 el aviso, la retención de 18 meses, el proceso
+El consentimiento vigente en el código es `2026-08-26`, que mueve el roster
+corporativo a un registro de compra con retención de cinco años y añade el
+referidor opcional. **La persona responsable de privacidad todavía no aprueba
+esa versión ni los Términos reescritos, y ese gate bloquea la venta en
+Production.** Lo aprobado sigue siendo `2026-07-30`, que es el registro de las
+solicitudes anteriores al corte: sobre esa versión, la persona responsable
+aprobó el 2026-07-30 el aviso, la retención de 18 meses, el proceso
 ARCO y el procedimiento de eliminación/anonimización. Las excepciones al plazo
 son una relación contractual, una solicitud ARCO en trámite o una obligación
 jurídica documentada. Al vencimiento, una persona autorizada elimina los datos
 personales o los anonimiza de forma irreversible y registra solo fecha,
 responsable, conteo y resultado, nunca PII.
 
-Esta aprobación cerró el gate legal. El backup, el historial y los advisors se
+Esa aprobación cerró el gate legal de las solicitudes, no el de la venta. El
+backup, el historial y los advisors se
 verificaron el 2026-07-30. Ese mismo día se aplicaron las tres migraciones, se
 desplegó el tombstone JWT/HTTP 410 y Vercel publicó el merge `d1c5241` en
 Production. La cuenta Vercel continúa vencida por decisión del propietario:
@@ -323,8 +357,11 @@ Anticorrupción y Buen Gobierno, no el extinto INAI.
 - Upstash no disponible en Production: rate limiting falla cerrado. Preview
   corta antes de invocarlo.
 - Cron no disponible: outbox se conserva; Operaciones escala si supera 15 min.
-- Eventbrite no disponible: se detiene la venta individual, sin afectar datos
-  de solicitudes ya guardadas.
+- Supabase rechaza una petición con `401 PGRST303`: la aplicación reintenta ese
+  fallo concreto dos veces y registra `supabase_auth_retry`. Es una mitigación
+  con incidente abierto; ver `docs/RUNBOOK.md`, sección 7.1.
+- MercadoPago no disponible: la orden queda `pending` y el barrido del cron la
+  reconcilia cuando el proveedor responde; ninguna compra se pierde.
 - Sentry o analítica no configurados: no bloquean captura.
 
 ## 11. Cambio seguro
