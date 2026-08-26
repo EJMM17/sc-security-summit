@@ -542,7 +542,7 @@ export default function TicketCheckoutForm({
             {/* The IVA is inside the published price, so the buyer sees one
                 final number. The base and the tax still travel to the order
                 row and the CFDI; they are just not a checkout decision. */}
-            <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
+            <p className="checkout-summary-note">{copy.summaryPlatformFee}</p>
             {corporateQuote &&
               corporateQuote.discountCents === 0 &&
               corporateQuote.seats === CORPORATE_DISCOUNT_MIN_SEATS - 1 && (
