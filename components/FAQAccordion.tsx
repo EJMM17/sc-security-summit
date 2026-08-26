@@ -5,23 +5,13 @@ type FAQItem = {
   answer: string;
 };
 
-const FALLBACK_FAQ: FAQItem[] = [
-  {
-    question: "¿Dónde y cuándo se llevará a cabo el Summit?",
-    answer: "El 1er Summit de Seguridad en la Cadena de Suministros se realizará el 24 de septiembre de 2026 en el Centro de Convenciones de Reynosa, Tamaulipas, México — a solo 10 minutos de la frontera con Texas.",
-  },
-  {
-    question: "¿A quién está dirigido este evento?",
-    answer: "Directivos, gerentes y especialistas de operaciones, logística, aduanas, seguridad patrimonial, compliance y abastecimiento.",
-  },
-];
-
-export default function FAQAccordion({ items }: { items?: FAQItem[] }) {
-  const data = items ?? FALLBACK_FAQ;
-
+// The FAQ copy is bilingual and lives in `lib/content.ts`; the only caller
+// passes it in. The former hardcoded Spanish fallback was unreachable and
+// still described the retired "a quién va dirigido" audience section.
+export default function FAQAccordion({ items }: { items: FAQItem[] }) {
   return (
     <div className="w-full">
-      {data.map((item, i) => (
+      {items.map((item, i) => (
         <details
           key={i}
           className="faq-item"

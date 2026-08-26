@@ -2,11 +2,17 @@
 // Language detection (server-side)
 // =============================================================
 // Source-of-truth chain (highest priority first):
-//   1. NEXT_LOCALE cookie set by the user via the in-app toggle
-//   2. ?lang=es|en URL search param (one-shot override, e.g. social
-//      shares "view this in EN")
+//   1. ?lang=es|en URL search param (one-shot override, e.g. social
+//      shares "view this in EN" and the hreflang alternates)
+//   2. NEXT_LOCALE cookie set by the user via the in-app toggle
 //   3. Accept-Language request header — basic en/es prefix match
 //   4. Default "es" — site is Spanish-first
+//
+// The param outranks the cookie so a shared "?lang=en" link renders in
+// English for a returning Spanish reader. That makes the toggle's job
+// bigger than writing the cookie: on a URL that already carries ?lang=,
+// the cookie it writes would lose to the param on the very next render,
+// so the toggle must rewrite the param too. See `languageSwitchTarget`.
 //
 // Components on the client mirror the same value via localStorage so
 // the SSR-rendered <html lang=...> agrees with the client's first

@@ -3,7 +3,7 @@ import PageShell from "@/components/PageShell";
 import TicketCheckoutForm from "@/components/TicketCheckoutForm";
 import { BASE_URL, CONTENT } from "@/lib/content";
 import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
-import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
+import { getRequestLanguage } from "@/lib/language";
 import { isTicketTierId } from "@/lib/payments/catalog";
 
 const PATH = "/checkout";
@@ -29,7 +29,11 @@ export async function generateMetadata({
   searchParams?: SearchParams;
 }): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const language = resolveRequestLanguage(params?.lang);
+  // The body resolves the language from the param, the NEXT_LOCALE cookie and
+  // Accept-Language. Resolving the metadata from the param alone left an
+  // English reader with an English page under a Spanish <title> and og:locale,
+  // contradicting the <html lang> the layout had already emitted.
+  const language = await getRequestLanguage(params?.lang ?? null);
   const seo = SEO[language];
 
   return {

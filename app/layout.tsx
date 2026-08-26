@@ -128,7 +128,7 @@ export default async function RootLayout({
         {/* Pointer-tracked card edges. Renders nothing; stays inert on touch
             devices and under prefers-reduced-motion. */}
         <PointerSpotlight />
-        <WhatsAppButton />
+        <WhatsAppButton language={language} />
         <ServiceWorkerRegister />
         <Toaster theme="light" position="bottom-right" richColors />
         {/* Analytics, pixels and interaction tracking use basic consent mode. */}
