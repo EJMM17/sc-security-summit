@@ -1,5 +1,6 @@
 import ScrollReveal from "@/components/ScrollReveal";
 import { CONTENT } from "@/lib/content";
+import { TICKET_TIERS } from "@/lib/payments/catalog";
 import type { Language } from "@/lib/language";
 import PremiumCheck from "./_primitives/PremiumCheck";
 import PrimaryCTA from "./_primitives/PrimaryCTA";
@@ -66,6 +67,11 @@ export default function Pricing({ language }: { language: Language }) {
                       <span>MXN</span>
                     </div>
                     <p>{ui.taxNote}</p>
+                    {/* The volume discount is a property of the tier, so the
+                        card announces it wherever the catalog grants it. */}
+                    {TICKET_TIERS[plan.id].volumeDiscount ? (
+                      <p className="pricing-tier-volume">{ui.pricingVolumeNote}</p>
+                    ) : null}
                   </div>
 
                   <div className="pricing-tier-benefits">

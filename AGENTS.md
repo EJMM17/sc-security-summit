@@ -17,9 +17,12 @@ Internalize these boundaries before changing code:
    the MercadoPago panel. Eventbrite is retired from the site entirely — no
    link, no constant, no env var.
 2. Corporate passes are sold on site as `corporativo` ticket orders: a seat
-   dropdown from two accesses up, 25% off the unit price from the fifth, and a
-   roster of named participants (one per purchased access) in
-   `ticket_order_attendees`. Every order can carry an optional referrer.
+   stepper from two accesses up and a roster of named participants (one per
+   purchased access) in `ticket_order_attendees`. The 25% volume discount is
+   one rule shared by both ways of buying: it cuts the unit price from the
+   fifth access up, on a corporate block and on any tier flagged
+   `volumeDiscount` (today Plus) bought individually. Every order can carry an
+   optional referrer.
    The sponsorship funnel and the "a quién va dirigido" section are retired.
    Supabase keeps the inquiries received before that cut; no new ones are
    created. Published prices already include IVA: the seller absorbs the 16%

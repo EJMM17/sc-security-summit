@@ -31,6 +31,13 @@ export type TicketTier = {
   maxQuantity: number;
   /** Tier requires a valid student ID at check-in, so it is not sold in bulk. */
   requiresProofAtCheckIn: boolean;
+  /**
+   * Whether buying this tier in volume earns the block discount. It is the
+   * same 25% a corporate block gets, because a corporate block is exactly this
+   * tier bought in volume: a buyer who takes five Plus accesses on the
+   * individual form must not pay more than the same five inside a block.
+   */
+  volumeDiscount: boolean;
   label: { es: string; en: string };
 };
 
@@ -40,6 +47,7 @@ export const TICKET_TIERS: Readonly<Record<TicketTierId, TicketTier>> = {
     unitPriceCents: 250_000,
     maxQuantity: 10,
     requiresProofAtCheckIn: false,
+    volumeDiscount: true,
     label: { es: "Acceso Plus", en: "Plus Pass" },
   },
   general: {
@@ -47,6 +55,7 @@ export const TICKET_TIERS: Readonly<Record<TicketTierId, TicketTier>> = {
     unitPriceCents: 90_000,
     maxQuantity: 10,
     requiresProofAtCheckIn: false,
+    volumeDiscount: false,
     label: { es: "Acceso General", en: "General Pass" },
   },
   estudiante: {
@@ -54,6 +63,7 @@ export const TICKET_TIERS: Readonly<Record<TicketTierId, TicketTier>> = {
     unitPriceCents: 65_000,
     maxQuantity: 2,
     requiresProofAtCheckIn: true,
+    volumeDiscount: false,
     label: { es: "Acceso Estudiante", en: "Student Pass" },
   },
 } as const;
@@ -111,6 +121,52 @@ export type TicketQuote = TaxBreakdown & {
 };
 
 /**
+ * Volume discount.
+ *
+ * One rule serves both ways of buying: the same 25% applies from the fifth
+ * access up, whether those accesses are bought as a corporate block or as five
+ * individual Plus accesses on the checkout form. Only tiers flagged
+ * `volumeDiscount` earn it — General and Estudiante are already entry prices,
+ * and Estudiante is capped below the threshold anyway.
+ *
+ * The discount is always applied to the unit price rather than to the line
+ * total, so the line stays an exact multiple of the unit — the invariant the
+ * database, the MercadoPago preference and the CFDI all depend on.
+ */
+export const VOLUME_DISCOUNT_MIN_QUANTITY = 5;
+
+export const VOLUME_DISCOUNT_BASIS_POINTS = 2_500;
+
+/** Tiers that earn the volume discount, for the copy that announces it. */
+export const VOLUME_DISCOUNT_TIER_IDS: readonly TicketTierId[] =
+  TICKET_TIER_IDS.filter((id) => TICKET_TIERS[id].volumeDiscount);
+
+export function tierEarnsVolumeDiscount(tier: TicketTierId): boolean {
+  return TICKET_TIERS[tier].volumeDiscount;
+}
+
+export function tierVolumeDiscountBasisPoints(
+  tier: TicketTierId,
+  quantity: number,
+): number {
+  return tierEarnsVolumeDiscount(tier) && quantity >= VOLUME_DISCOUNT_MIN_QUANTITY
+    ? VOLUME_DISCOUNT_BASIS_POINTS
+    : 0;
+}
+
+/** What one access of `tier` actually costs at `quantity`, IVA included. */
+export function tierUnitPriceCents(tier: TicketTierId, quantity: number): number {
+  const listUnitPriceCents = TICKET_TIERS[tier].unitPriceCents;
+  return (
+    listUnitPriceCents -
+    applyRateHalfUp(
+      listUnitPriceCents,
+      tierVolumeDiscountBasisPoints(tier, quantity),
+    )
+  );
+}
+
+/**
  * Prices a tier and quantity. Throws on an out-of-range quantity so a tampered
  * form can never produce a quote the catalog does not authorize.
  */
@@ -130,7 +186,7 @@ export function quoteTicketOrder(
 
   return {
     ...computeInclusiveTaxBreakdown(
-      definition.unitPriceCents,
+      tierUnitPriceCents(tier, quantity),
       quantity,
       IVA_RATE_BASIS_POINTS,
     ),
@@ -143,10 +199,9 @@ export function quoteTicketOrder(
  * Corporate passes.
  *
  * A block is a paid order like any other: it is priced here, charged through
- * MercadoPago and stored in `ticket_orders` under the corporate tier. The
- * discount is applied to the unit price rather than to the block total so the
- * line stays an exact multiple of the unit — the invariant the database, the
- * MercadoPago preference and the CFDI all depend on.
+ * MercadoPago and stored in `ticket_orders` under the corporate tier. It is
+ * the Plus access bought in volume, so it shares the discount rule above
+ * rather than carrying one of its own.
  */
 export const CORPORATE_PASS_TIER: TicketTierId = "plus";
 
@@ -161,10 +216,10 @@ export const CORPORATE_MIN_SEATS = 2;
 export const CORPORATE_MAX_SEATS = 200;
 
 /**
- * What the seat dropdown offers. The buyer picks from a list instead of typing
- * a number, so the roster below it can never be resized by a stray keystroke.
- * A block larger than this is still valid server side and is arranged with the
- * team.
+ * What the seat picker offers. The buyer picks from a bounded list instead of
+ * typing a number, so the roster below it can never be resized by a stray
+ * keystroke. A block larger than this is still valid server side and is
+ * arranged with the team.
  */
 export const CORPORATE_SEAT_CHOICE_MAX = 25;
 
@@ -173,16 +228,34 @@ export const CORPORATE_SEAT_OPTIONS: readonly number[] = Array.from(
   (_, index) => CORPORATE_MIN_SEATS + index,
 );
 
+/**
+ * Shortcuts offered next to the seat picker: the smallest block, the first
+ * discounted block, and two common team sizes above it.
+ */
+export const CORPORATE_SEAT_PRESETS: readonly number[] = [
+  CORPORATE_MIN_SEATS,
+  VOLUME_DISCOUNT_MIN_QUANTITY,
+  10,
+  CORPORATE_SEAT_CHOICE_MAX,
+];
+
 /** Volume discount kicks in at the fifth access and never expires above it. */
-export const CORPORATE_DISCOUNT_MIN_SEATS = 5;
+export const CORPORATE_DISCOUNT_MIN_SEATS = VOLUME_DISCOUNT_MIN_QUANTITY;
 
-export const CORPORATE_DISCOUNT_BASIS_POINTS = 2_500;
+export const CORPORATE_DISCOUNT_BASIS_POINTS = VOLUME_DISCOUNT_BASIS_POINTS;
 
-export type CorporateQuote = {
-  seats: number;
+/**
+ * A quote as a buyer reads it: list price, discount and total, next to the
+ * amounts the order actually charges. Every amount is derived from the
+ * discounted unit, so what the form shows is exactly what the preference
+ * charges.
+ */
+export type VolumeQuote = {
+  tier: OrderTierId;
+  quantity: number;
   /** List price of one access before the volume discount. */
   listUnitPriceCents: number;
-  /** What one access actually costs in this block, IVA included. */
+  /** What one access actually costs at this quantity, IVA included. */
   unitPriceCents: number;
   listTotalCents: number;
   discountBasisPoints: number;
@@ -190,6 +263,9 @@ export type CorporateQuote = {
   totalCents: number;
   currency: typeof TICKET_CURRENCY;
 };
+
+/** The block quote keeps its seat vocabulary for the corporate form. */
+export type CorporateQuote = VolumeQuote & { seats: number };
 
 function assertCorporateSeats(seats: number): void {
   if (
@@ -202,9 +278,7 @@ function assertCorporateSeats(seats: number): void {
 }
 
 export function corporateDiscountBasisPoints(seats: number): number {
-  return seats >= CORPORATE_DISCOUNT_MIN_SEATS
-    ? CORPORATE_DISCOUNT_BASIS_POINTS
-    : 0;
+  return tierVolumeDiscountBasisPoints(CORPORATE_PASS_TIER, seats);
 }
 
 /**
@@ -212,36 +286,57 @@ export function corporateDiscountBasisPoints(seats: number): number {
  */
 export function corporateUnitPriceCents(seats: number): number {
   assertCorporateSeats(seats);
-  const listUnitPriceCents = TICKET_TIERS[CORPORATE_PASS_TIER].unitPriceCents;
-  return (
-    listUnitPriceCents -
-    applyRateHalfUp(listUnitPriceCents, corporateDiscountBasisPoints(seats))
-  );
+  return tierUnitPriceCents(CORPORATE_PASS_TIER, seats);
 }
 
 /**
- * The block as the form shows it: list price, discount and total. Every amount
- * is derived from the discounted unit, so what the buyer reads here is exactly
- * what the preference charges.
+ * Prices any order tier as the buyer reads it, individual or corporate. The
+ * corporate block is quoted against the Plus list price; an individual tier is
+ * quoted against its own.
  */
-export function quoteCorporatePass(seats: number): CorporateQuote {
-  assertCorporateSeats(seats);
+export function quoteVolumePricing(
+  tier: OrderTierId,
+  quantity: number,
+): VolumeQuote {
+  const pricedTier = tier === CORPORATE_TIER_ID ? CORPORATE_PASS_TIER : tier;
 
-  const listUnitPriceCents = TICKET_TIERS[CORPORATE_PASS_TIER].unitPriceCents;
-  const unitPriceCents = corporateUnitPriceCents(seats);
-  const listTotalCents = listUnitPriceCents * seats;
-  const totalCents = unitPriceCents * seats;
+  if (tier === CORPORATE_TIER_ID) {
+    assertCorporateSeats(quantity);
+  } else {
+    const definition = getTicketTier(pricedTier);
+    if (
+      !Number.isSafeInteger(quantity) ||
+      quantity < 1 ||
+      quantity > definition.maxQuantity
+    ) {
+      throw new RangeError(`quantity out of range for tier ${tier}`);
+    }
+  }
+
+  const listUnitPriceCents = TICKET_TIERS[pricedTier].unitPriceCents;
+  const unitPriceCents = tierUnitPriceCents(pricedTier, quantity);
+  const listTotalCents = listUnitPriceCents * quantity;
+  const totalCents = unitPriceCents * quantity;
 
   return {
-    seats,
+    tier,
+    quantity,
     listUnitPriceCents,
     unitPriceCents,
     listTotalCents,
-    discountBasisPoints: corporateDiscountBasisPoints(seats),
+    discountBasisPoints: tierVolumeDiscountBasisPoints(pricedTier, quantity),
     discountCents: listTotalCents - totalCents,
     totalCents,
     currency: TICKET_CURRENCY,
   };
+}
+
+/**
+ * The block as the corporate form shows it.
+ */
+export function quoteCorporatePass(seats: number): CorporateQuote {
+  const quote = quoteVolumePricing(CORPORATE_TIER_ID, seats);
+  return { ...quote, seats };
 }
 
 /**

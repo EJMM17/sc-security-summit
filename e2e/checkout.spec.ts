@@ -27,6 +27,11 @@ test.describe("Checkout de accesos", () => {
     await expect(summary).toContainText("900.00");
     await expect(summary).not.toContainText("1,044.00");
 
+    // The redirect note that promised a platform fee screen is gone.
+    await expect(page.locator("form")).not.toContainText(
+      "checkout seguro de MercadoPago",
+    );
+
     // Quantity is a dropdown, and the student tier is capped at two seats.
     const quantity = page.getByLabel("Cantidad");
     await quantity.selectOption("5");
@@ -35,6 +40,31 @@ test.describe("Checkout de accesos", () => {
     await expect(quantity.locator("option")).toHaveCount(2);
     await expect(summary).toContainText("1,300.00");
     await expect(summary).not.toContainText("1,508.00");
+  });
+
+  test("aplica el 25% por volumen al comprar 5 accesos plus", async ({ page }) => {
+    await page.goto("/checkout?lang=es&tier=plus");
+
+    const summary = page.getByRole("heading", { name: "Resumen" }).locator("..");
+    const quantity = page.getByLabel("Cantidad");
+
+    // Below the threshold the buyer pays the list price and is told what the
+    // fifth access would do.
+    await quantity.selectOption("4");
+    await expect(summary).toContainText("10,000.00");
+    await expect(summary).not.toContainText("Descuento por volumen");
+    await expect(page.locator(".checkout-volume-note")).toContainText("1,875.00");
+
+    // From the fifth up, the same 25% a corporate block gets.
+    await quantity.selectOption("5");
+    await expect(summary).toContainText("Descuento por volumen");
+    await expect(summary).toContainText("9,375.00");
+    await expect(page.locator(".checkout-volume-note.is-applied")).toBeVisible();
+
+    // The entry tier keeps its price at the same quantity.
+    await page.getByRole("radio", { name: /acceso general/i }).check();
+    await expect(summary).toContainText("4,500.00");
+    await expect(summary).not.toContainText("Descuento por volumen");
   });
 
   test("solo pide datos fiscales cuando se solicita factura", async ({ page }) => {
@@ -70,7 +100,7 @@ test.describe("Checkout de accesos", () => {
     ).toBeVisible();
     await expect(page.getByText("Includes 16% VAT")).toBeVisible();
     await expect(
-      page.getByRole("button", { name: /pay with mercadopago/i }),
+      page.getByRole("button", { name: /process payment/i }),
     ).toBeVisible();
   });
 
@@ -92,5 +122,44 @@ test.describe("Checkout de accesos", () => {
     const summary = corporate.locator(".checkout-summary");
     await expect(summary).toContainText("Descuento por volumen");
     await expect(summary).toContainText("11,250.00");
+
+    // The live rail follows the block: discounted unit, total and savings.
+    const rail = corporate.locator(".corporate-rail");
+    await expect(rail).toContainText("1,875.00");
+    await expect(rail).toContainText("11,250.00");
+    await expect(rail).toContainText("Ahorras");
+
+    // The stepper and the presets move the block and the roster with it.
+    await corporate.getByRole("button", { name: /agregar un acceso/i }).click();
+    await expect(seats).toHaveValue("7");
+    await expect(corporate.getByLabel(/participante \d+/i)).toHaveCount(7);
+    await corporate.getByRole("button", { name: "10 accesos", exact: true }).click();
+    await expect(seats).toHaveValue("10");
+  });
+
+  test("el bloque corporativo acomoda una lista pegada", async ({ page }) => {
+    await page.goto("/?lang=es");
+
+    const corporate = page.locator("#registro");
+    const seats = corporate.getByLabel(/número de accesos/i);
+
+    await corporate.getByText(/pegar la lista de participantes/i).click();
+    await corporate
+      .locator(".corporate-bulk textarea")
+      .fill("Ada Lovelace\nGrace Hopper\nAlan Turing\nKatherine Johnson");
+    await corporate.getByRole("button", { name: /acomodar nombres/i }).click();
+
+    // Four names grow a two-seat block to four and fill it in order.
+    await expect(seats).toHaveValue("4");
+    await expect(corporate.getByLabel("Participante 1")).toHaveValue("Ada Lovelace");
+    await expect(corporate.getByLabel("Participante 4")).toHaveValue(
+      "Katherine Johnson",
+    );
+    await expect(corporate.locator(".corporate-roster-progress")).toContainText(
+      "Lista completa",
+    );
+
+    await corporate.getByRole("button", { name: /vaciar lista/i }).click();
+    await expect(corporate.getByLabel("Participante 1")).toHaveValue("");
   });
 });
