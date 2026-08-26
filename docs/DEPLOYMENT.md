@@ -36,6 +36,16 @@ histórica de snapshots Preview. Ninguno se marca como resuelto:
       referidor. Los `PGRST202`/`404` de `create_ticket_order` y `ticket_orders`
       que se veían hasta las 06:00 UTC de ese día cesaron al recargarse el
       schema cache.
+- [ ] **Migración de expiración.** `20260826140000_expire_stale_ticket_orders.sql`
+      no se ha aplicado. Amplía el vocabulario de `ticket_order_events` con
+      `order_expired` y agrega `public.expire_stale_ticket_orders(uuid[], integer)`.
+      Validada aplicando el historial completo sobre PostgreSQL 16 con las doce
+      aserciones de `supabase/tests/database/008_expire_stale_ticket_orders.test.sql`
+      en verde; falta correrla con pgTAP y `db lint` en la máquina de
+      desarrollo y regenerar `lib/database.types.ts` con `npm run db:types`
+      para confirmar que la entrada añadida a mano coincide con el generador.
+      Desplegar el código antes que la migración no rompe la venta: el barrido
+      registra `ticket_order_expiry_failed` y sigue reconciliando.
 - [ ] **Credenciales de MercadoPago.** `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-)
       está cargado y funciona: el 2026-08-26 se crearon cuatro preferencias
       reales desde Production. Falta el webhook.

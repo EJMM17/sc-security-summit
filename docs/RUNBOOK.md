@@ -178,6 +178,26 @@ multi-target. Antes haz un inventario y respalda IDs/targets/origen sin copiar
 valores, y edita el target desde Dashboard/API. Para Upstash, cambia o rota la
 conexión en Vercel Storage y reconstruye Production.
 
+### 9.1 SOP — pedido `cancelled` que el comprador dice haber pagado
+
+Un pedido con `provider_status = 'expired'` fue cerrado por el barrido porque
+MercadoPago respondió que no tenía ningún pago para él pasada la ventana de la
+preferencia. Antes de tocar nada:
+
+1. Busca el pago en el panel de MercadoPago por el correo o el monto, y
+   confirma su `external_reference`.
+2. Si existe un pago aprobado con ese `external_reference`, el webhook debe
+   poder aplicarlo: reenvía la notificación desde el panel del proveedor. Un
+   pedido expirado no bloquea el cobro — `record_ticket_order_payment` lo
+   mueve a `paid` y encola el comprobante.
+3. Si el pago existe pero con otro `external_reference`, no lo fuerces sobre
+   este pedido: registra el caso y trátalo como cobro manual.
+4. Si no existe ningún pago, el cierre fue correcto. El comprador puede volver
+   a comprar; el pedido viejo no reserva cupo.
+
+Nunca edites `status` a mano para "arreglar" un cobro: la única ruta que
+escribe un pago es la del proveedor.
+
 ## 10. Venta y evento
 
 Para “pagué y no recibí boleto”, busca el pedido en Eventbrite por el correo de

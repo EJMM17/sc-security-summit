@@ -192,6 +192,47 @@ describe("buildSalesTracking", () => {
     expect(tracking.conversionRate).toBe(0.5);
   });
 
+  it("counts an expired checkout as abandoned, not as a lost sale", () => {
+    const tracking = buildSalesTracking(
+      [
+        order({}),
+        order({
+          id: "33333333-2222-4333-8444-555555555555",
+          status: "cancelled",
+          provider_status: "expired",
+          provider_payment_id: null,
+          paid_at: null,
+        }),
+      ],
+      now,
+    );
+
+    expect(tracking.abandonedOrders).toBe(1);
+    expect(tracking.lostOrders).toBe(0);
+    // The buyer never attempted a payment, so the conversion rate is still
+    // one paid checkout out of one that resolved at the provider.
+    expect(tracking.conversionRate).toBe(1);
+  });
+
+  it("still counts a cancellation the buyer made as a lost sale", () => {
+    const tracking = buildSalesTracking(
+      [
+        order({}),
+        order({
+          id: "44444444-2222-4333-8444-555555555555",
+          status: "cancelled",
+          provider_status: "cancelled",
+          paid_at: null,
+        }),
+      ],
+      now,
+    );
+
+    expect(tracking.abandonedOrders).toBe(0);
+    expect(tracking.lostOrders).toBe(1);
+    expect(tracking.conversionRate).toBe(0.5);
+  });
+
   it("reports no conversion rate before any checkout resolves", () => {
     const tracking = buildSalesTracking(
       [order({ status: "pending", paid_at: null })],

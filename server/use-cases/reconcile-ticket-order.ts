@@ -16,6 +16,30 @@ import { recordPaymentEvent } from "@/server/services/payment-observability";
 import { tryImmediateTicketOrderNotification } from "@/server/services/ticket-order-notifier";
 
 /**
+ * What the provider had to say about an order.
+ *
+ * The sweep needs more than the resulting order: "MercadoPago has no payment
+ * for this order" is what separates an abandoned checkout from one that could
+ * not be checked, and only the first of those may be expired.
+ */
+export type ReconcileOutcome =
+  /** The stored order moved to a terminal status. */
+  | "updated"
+  /** The provider answered and holds no payment for this order at all. */
+  | "no_payment"
+  /** A payment exists but has nothing terminal to say yet. */
+  | "provider_pending"
+  /** The order was already terminal, or does not exist. */
+  | "not_pending"
+  /** Throttled, misconfigured or failed: the provider was not heard from. */
+  | "unavailable";
+
+export type ReconcileResult = {
+  order: StoredTicketOrder | null;
+  outcome: ReconcileOutcome;
+};
+
+/**
  * Brings one order's stored status back in line with MercadoPago.
  *
  * The webhook is the primary path and stays authoritative; this is the safety
@@ -32,9 +56,23 @@ export async function reconcileTicketOrder(
   orderId: string,
   options: { throttle?: boolean } = {},
 ): Promise<StoredTicketOrder | null> {
+  return (await reconcileTicketOrderWithOutcome(orderId, options)).order;
+}
+
+/**
+ * The same reconciliation, reporting what the provider said.
+ *
+ * Only the sweep needs this: a page renders the order and nothing else.
+ */
+export async function reconcileTicketOrderWithOutcome(
+  orderId: string,
+  options: { throttle?: boolean } = {},
+): Promise<ReconcileResult> {
   const throttle = options.throttle ?? true;
   const stored = await getTicketOrderSummary(orderId).catch(() => null);
-  if (!stored || stored.status !== "pending") return stored;
+  if (!stored || stored.status !== "pending") {
+    return { order: stored, outcome: "not_pending" };
+  }
 
   // A buyer refreshing the return page must not turn into a stream of provider
   // calls. Being throttled is not an error here: the stored state still
@@ -46,7 +84,7 @@ export async function reconcileTicketOrder(
     try {
       await checkRateLimit(`reconcile:${orderId}`);
     } catch {
-      return stored;
+      return { order: stored, outcome: "unavailable" };
     }
   }
 
@@ -58,10 +96,16 @@ export async function reconcileTicketOrder(
 
   try {
     const payment = await findPaymentByExternalReference(orderId);
-    if (!payment || !payment.id) return stored;
+    // No payment at all is the abandoned checkout: the buyer never got as far
+    // as one. A payment without an id is malformed rather than absent, so it
+    // is reported as pending news and never as evidence of abandonment.
+    if (!payment) return { order: stored, outcome: "no_payment" };
+    if (!payment.id) return { order: stored, outcome: "provider_pending" };
 
     status = mapPaymentStatus(payment.status);
-    if (status === "pending") return stored;
+    if (status === "pending") {
+      return { order: stored, outcome: "provider_pending" };
+    }
 
     paymentId = payment.id;
     providerStatus = payment.status;
@@ -75,7 +119,7 @@ export async function reconcileTicketOrder(
           ? "not_configured"
           : technicalCode(error),
     });
-    return stored;
+    return { order: stored, outcome: "unavailable" };
   }
 
   try {
@@ -110,10 +154,12 @@ export async function reconcileTicketOrder(
       orderId,
       code: technicalCode(error),
     });
-    return stored;
+    return { order: stored, outcome: "unavailable" };
   }
 
-  return (await getTicketOrderSummary(orderId).catch(() => stored)) ?? stored;
+  const refreshed =
+    (await getTicketOrderSummary(orderId).catch(() => stored)) ?? stored;
+  return { order: refreshed, outcome: "updated" };
 }
 
 function technicalCode(error: unknown): string {

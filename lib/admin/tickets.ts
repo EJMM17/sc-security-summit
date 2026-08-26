@@ -23,6 +23,13 @@ export const SOLD_ORDER_STATUS = "paid" as const;
 /** Orders still on their way to being sold: the seat is held, not sold. */
 export const IN_FLIGHT_ORDER_STATUSES = ["pending", "in_process"] as const;
 
+/**
+ * The provider status the sweep writes when it cancels a checkout nobody ever
+ * paid. MercadoPago has no status by that name, so it cannot collide with a
+ * real one.
+ */
+export const EXPIRED_PROVIDER_STATUS = "expired" as const;
+
 const EVENT_TIME_ZONE = "America/Monterrey";
 
 const DAY_FORMAT = new Intl.DateTimeFormat("en-CA", {
@@ -138,6 +145,7 @@ export function buildSalesTracking(
   let heldSeats = 0;
   let heldOrders = 0;
   let lostOrders = 0;
+  let abandonedOrders = 0;
   let invoicesRequested = 0;
   let invoicesIssued = 0;
   let lastSaleAt: string | null = null;
@@ -154,7 +162,15 @@ export function buildSalesTracking(
       continue;
     }
     if (order.status !== SOLD_ORDER_STATUS) {
-      lostOrders += 1;
+      // An abandoned checkout is cancelled like any other, but it is not a
+      // lost sale in the sense this panel measures: nobody attempted a
+      // payment and nothing was declined. Counting it as lost would let a
+      // cleanup quietly redefine the conversion rate.
+      if (order.provider_status === EXPIRED_PROVIDER_STATUS) {
+        abandonedOrders += 1;
+      } else {
+        lostOrders += 1;
+      }
       continue;
     }
 
@@ -203,6 +219,7 @@ export function buildSalesTracking(
     heldSeats,
     heldOrders,
     lostOrders,
+    abandonedOrders,
     grossCents,
     taxCents,
     netCents,

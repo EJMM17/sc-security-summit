@@ -53,7 +53,12 @@ The webhook stays authoritative, but a return page reconciles an order still
 `pending` against `GET /v1/payments/search`, so a notification that never
 arrived cannot strand a paid order. Reconciliation never re-reads a terminal
 order and is throttled per order id. The same cron run also sweeps pending
-orders older than 15 minutes for the buyer who paid and closed the tab.
+orders older than 15 minutes for the buyer who paid and closed the tab, and
+closes the ones nobody paid: an order MercadoPago confirms it holds no payment
+for becomes `cancelled` with `provider_status = 'expired'` once it is older
+than the preference window. Only orders the provider was just asked about are
+ever expired, the database re-checks every condition, and a late payment still
+moves such an order to `paid`.
 
 `MERCADOPAGO_WEBHOOK_SECRET` is optional and the webhook fails closed without
 it; the secret is issued by MercadoPago when the webhook URL is registered, so

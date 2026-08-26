@@ -16,6 +16,8 @@ type PaymentEvent =
   | "ticket_order_reconciled"
   | "ticket_order_reconcile_failed"
   | "ticket_order_sweep_completed"
+  | "ticket_order_expired"
+  | "ticket_order_expiry_failed"
   | "ticket_order_notification_sent"
   | "ticket_order_notification_retry"
   | "ticket_order_notification_dead";
@@ -36,6 +38,7 @@ type PaymentEventContext = {
   durationMs?: number;
   scanned?: number;
   resolved?: number;
+  expired?: number;
 };
 
 /**

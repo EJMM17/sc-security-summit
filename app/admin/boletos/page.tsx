@@ -110,6 +110,10 @@ export default async function AdminTicketsPage({
           ? "—"
           : percent(tracking.conversionRate),
     },
+    {
+      label: "Abandonadas",
+      value: String(tracking.abandonedOrders),
+    },
   ];
 
   const chartDays = tracking.byDay.slice(-DAYS_IN_CHART);

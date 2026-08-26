@@ -71,6 +71,8 @@ Vercel Cron, cada 5 min
        ├─ outbox de solicitudes
        ├─ outbox de órdenes
        └─ barrido de órdenes `pending` (15 min a 7 días)
+            ├─ reconcilia contra MercadoPago
+            └─ expira las que el proveedor confirma sin pago
 ```
 
 ### Semántica de recepción
@@ -361,7 +363,11 @@ Anticorrupción y Buen Gobierno, no el extinto INAI.
   fallo concreto dos veces y registra `supabase_auth_retry`. Es una mitigación
   con incidente abierto; ver `docs/RUNBOOK.md`, sección 7.1.
 - MercadoPago no disponible: la orden queda `pending` y el barrido del cron la
-  reconcilia cuando el proveedor responde; ninguna compra se pierde.
+  reconcilia cuando el proveedor responde; ninguna compra se pierde. Sin
+  respuesta del proveedor no se expira nada.
+- Checkout abandonado: pasada la ventana de la preferencia, el barrido lo deja
+  `cancelled` con `provider_status = 'expired'`. Un pago tardío por webhook
+  todavía lo mueve a `paid`.
 - Sentry o analítica no configurados: no bloquean captura.
 
 ## 11. Cambio seguro

@@ -539,3 +539,36 @@ export async function listStalePendingTicketOrderIds(input: {
     return parsed.success ? [parsed.data.id] : [];
   });
 }
+
+const expiredOrderIdRowSchema = z.object({ order_id: z.string().uuid() });
+
+/**
+ * Cancels the named pending orders whose checkout window closed without a
+ * payment.
+ *
+ * The caller names them because only the caller has just heard from the
+ * provider; the conditions are still re-checked in the function, inside the
+ * statement that writes the change, so a payment arriving at that exact
+ * moment cannot lose to an expiry decided a few milliseconds earlier.
+ */
+export async function expireStaleTicketOrders(input: {
+  orderIds: string[];
+  expiryMinutes: number;
+}): Promise<string[]> {
+  if (input.orderIds.length === 0) return [];
+
+  const { data, error } = await rpcClient().rpc("expire_stale_ticket_orders", {
+    p_order_ids: input.orderIds,
+    p_expiry_minutes: input.expiryMinutes,
+  });
+
+  if (error) {
+    throw new TicketOrderRepositoryError("expire_stale_ticket_orders", error);
+  }
+  if (!Array.isArray(data)) return [];
+
+  return data.flatMap((row) => {
+    const parsed = expiredOrderIdRowSchema.safeParse(row);
+    return parsed.success ? [parsed.data.order_id] : [];
+  });
+}
