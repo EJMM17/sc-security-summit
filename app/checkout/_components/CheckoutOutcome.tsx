@@ -64,8 +64,8 @@ export default async function CheckoutOutcome({
 
   return (
     <PageShell language={language}>
-      <section className="bg-white px-4 py-20 sm:px-6">
-        <div className="mx-auto max-w-xl text-center">
+      <section className="checkout-page">
+        <div className="checkout-page-inner max-w-xl text-center">
           <div className="flex justify-center">{presentation.icon}</div>
           <h1 className="section-title mt-5">{presentation.title}</h1>
           <p className="mt-4 text-slate-500">{presentation.desc}</p>
@@ -77,16 +77,18 @@ export default async function CheckoutOutcome({
           )}
 
           {summary ? (
-            <div className="checkout-summary mt-8 text-left">
-              <h2>{copy.summaryTitle}</h2>
-              <dl>
-                <div className="checkout-summary-total">
-                  <dt>{copy.summaryTotal}</dt>
-                  <dd>{formatMxn(summary.total_cents, language)} MXN</dd>
-                </div>
-              </dl>
-              <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
-              <p className="mt-4 text-xs text-slate-500">
+            <div className="checkout-panel checkout-outcome-panel">
+              <div className="checkout-summary">
+                <h2>{copy.summaryTitle}</h2>
+                <dl>
+                  <div className="checkout-summary-total">
+                    <dt>{copy.summaryTotal}</dt>
+                    <dd>{formatMxn(summary.total_cents, language)} MXN</dd>
+                  </div>
+                </dl>
+                <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
+              </div>
+              <p className="mt-5 text-xs text-slate-500">
                 {copy.orderReference}:{" "}
                 <span className="font-mono">{summary.id}</span>
               </p>

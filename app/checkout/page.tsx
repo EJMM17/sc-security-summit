@@ -61,13 +61,14 @@ export default async function CheckoutPage({
 
   return (
     <PageShell language={language}>
-      <section className="bg-white px-4 pb-16 pt-16 sm:px-6">
-        <div className="mx-auto max-w-3xl">
-          <span className="section-label">{copy.label}</span>
-          <h1 className="section-title mt-3">{copy.title}</h1>
-          <p className="mt-4 text-slate-500">{copy.desc}</p>
+      <section className="checkout-page">
+        <div className="checkout-page-inner">
+          <div className="checkout-page-head">
+            <span className="section-label">{copy.label}</span>
+            <h1 className="section-title">{copy.title}</h1>
+          </div>
 
-          <div className="mt-10">
+          <div className="checkout-panel">
             <TicketCheckoutForm
               language={language}
               previewDisabled={previewDisabled}
