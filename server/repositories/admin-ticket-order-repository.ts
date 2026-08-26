@@ -4,9 +4,18 @@ import { z } from "zod";
 import type { Database } from "@/lib/database.types";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import {
+  buildSalesTracking,
+  expandSoldTickets,
+  SOLD_ORDER_STATUS,
+} from "@/lib/admin/tickets";
+import {
   INVOICE_STATUS_VALUES,
+  TICKET_TIER_VALUES,
   TICKET_ORDER_STATUS_VALUES,
   type AdminInvoiceDetails,
+  type AdminSalesTracking,
+  type AdminSoldTicket,
+  type AdminTicketTier,
   type AdminTicketOrderAttendee,
   type AdminInvoiceStatus,
   type AdminTicketCapacity,
@@ -43,7 +52,7 @@ const LIST_COLUMNS =
 const orderSchema = z.object({
   id: z.string().uuid(),
   status: z.enum(TICKET_ORDER_STATUS_VALUES),
-  tier: z.enum(["plus", "general", "estudiante", "corporativo"]),
+  tier: z.enum(TICKET_TIER_VALUES),
   quantity: z.coerce.number().int().min(1),
   subtotal_cents: z.coerce.number().int().min(0),
   tax_cents: z.coerce.number().int().min(0),
@@ -362,4 +371,110 @@ export async function updateTicketOrderOperations(input: {
   if (error) {
     throw new AdminTicketOrderRepositoryError("update_order_operations", error);
   }
+}
+
+export type ListSoldTicketsFilters = {
+  tier: AdminTicketTier | "all";
+  search: string;
+};
+
+/**
+ * Every access that was actually paid for, one row per seat.
+ *
+ * Two reads and no join: the paid orders, then the rosters of exactly those
+ * orders. Expanding seats in SQL would need a view and a migration for
+ * something that is a presentation of rows the panel already reads.
+ */
+export async function listSoldTickets(
+  filters: ListSoldTicketsFilters,
+  limit = 500,
+): Promise<AdminSoldTicket[]> {
+  let query = table("ticket_orders")
+    .select(LIST_COLUMNS)
+    .eq("status", SOLD_ORDER_STATUS)
+    .order("paid_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+
+  if (filters.tier !== "all") query = query.eq("tier", filters.tier);
+
+  const { data, error } = await query;
+  if (error) throw new AdminTicketOrderRepositoryError("list_sold", error);
+
+  const parsed = z.array(orderSchema).safeParse(data ?? []);
+  if (!parsed.success) {
+    throw new AdminTicketOrderRepositoryError("list_sold_response", {
+      code: "invalid_response",
+    });
+  }
+
+  const orders = parsed.data;
+  if (orders.length === 0) return [];
+
+  const { data: rosterData, error: rosterError } = await table(
+    "ticket_order_attendees",
+  )
+    .select("order_id, seat_number, full_name")
+    .in(
+      "order_id",
+      orders.map((order) => order.id),
+    );
+
+  if (rosterError) {
+    throw new AdminTicketOrderRepositoryError("list_sold_roster", rosterError);
+  }
+
+  const roster = z
+    .array(attendeeSchema.extend({ order_id: z.string().uuid() }))
+    .safeParse(rosterData ?? []);
+  if (!roster.success) {
+    throw new AdminTicketOrderRepositoryError("list_sold_roster_response", {
+      code: "invalid_response",
+    });
+  }
+
+  const byOrder = new Map<string, AdminTicketOrderAttendee[]>();
+  for (const row of roster.data) {
+    const seats = byOrder.get(row.order_id) ?? [];
+    seats.push({ seat_number: row.seat_number, full_name: row.full_name });
+    byOrder.set(row.order_id, seats);
+  }
+
+  const tickets = expandSoldTickets(orders, byOrder);
+  const term = filters.search.trim().toLowerCase();
+  if (!term) return tickets;
+
+  // Free-text matching happens here rather than in PostgREST because the
+  // attendee name and the buyer name live in different tables and a seat has
+  // to match on either of them.
+  return tickets.filter((ticket) =>
+    [
+      ticket.attendee_name,
+      ticket.buyer_name,
+      ticket.email,
+      ticket.company,
+      ticket.ticket_code,
+    ]
+      .filter((value): value is string => typeof value === "string")
+      .some((value) => value.toLowerCase().includes(term)),
+  );
+}
+
+/**
+ * Sales tracking over every order ever created, not only the paid ones: the
+ * held and lost counts are what make the paid number readable.
+ */
+export async function getSalesTracking(): Promise<AdminSalesTracking> {
+  const { data, error } = await table("ticket_orders")
+    .select(LIST_COLUMNS)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new AdminTicketOrderRepositoryError("sales_tracking", error);
+
+  const parsed = z.array(orderSchema).safeParse(data ?? []);
+  if (!parsed.success) {
+    throw new AdminTicketOrderRepositoryError("sales_tracking_response", {
+      code: "invalid_response",
+    });
+  }
+  return buildSalesTracking(parsed.data);
 }

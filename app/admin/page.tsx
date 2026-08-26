@@ -1,4 +1,5 @@
 import Link from "next/link";
+import AdminNav from "@/components/admin/AdminNav";
 import { redirect } from "next/navigation";
 import { logout } from "@/app/admin/actions";
 import { hasAdminSession } from "@/lib/admin/auth";
@@ -97,12 +98,7 @@ export default async function AdminDashboard({
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href="/admin/ordenes"
-            className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-          >
-            Órdenes de accesos
-          </Link>
+          <AdminNav current="/admin" />
           <form action={logout}>
           <button
             type="submit"

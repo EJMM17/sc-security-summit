@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import AdminNav from "@/components/admin/AdminNav";
 import { hasAdminSession } from "@/lib/admin/auth";
 import {
   formatDateTime,
@@ -104,12 +105,7 @@ export default async function AdminOrdersPage({
             desglosado; los datos fiscales se ven en el detalle de cada orden.
           </p>
         </div>
-        <Link
-          href="/admin"
-          className="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-        >
-          Ver solicitudes
-        </Link>
+        <AdminNav current="/admin/ordenes" />
       </header>
 
       <section className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
