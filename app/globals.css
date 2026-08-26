@@ -2351,55 +2351,409 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 
 /* ═══ EMAIL INQUIRY FORMS ═══ */
 .corporate-pass-panel {
-  display: grid;
-  grid-template-columns: minmax(14rem, 0.72fr) minmax(0, 1.28fr);
   overflow: hidden;
   border: 1px solid #DCE7F5;
   border-radius: var(--radius-lg);
   background: #FFFFFF;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
 }
-.corporate-pass-summary {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: clamp(2rem, 5vw, 3.5rem);
+
+/* ═══ CORPORATE BLOCK CHECKOUT ═══ */
+.corporate-layout {
+  display: grid;
+  grid-template-columns: minmax(15rem, 0.62fr) minmax(0, 1.38fr);
+}
+/* The column paints the whole height so the panel keeps its two-tone shape,
+   while the quote inside it sticks to the viewport as the buyer scrolls the
+   roster. */
+.corporate-rail {
   color: var(--on-navy-title);
-  background: var(--surface-navy-panel);
+  background:
+    radial-gradient(120% 130% at 0% 0%, rgba(37, 99, 235, 0.35), transparent 62%),
+    var(--surface-navy-panel);
 }
-.corporate-pass-summary > svg {
-  width: 2.75rem;
-  height: 2.75rem;
+.corporate-rail-inner {
+  position: sticky;
+  top: 5.5rem;
+  padding: clamp(1.75rem, 4vw, 2.75rem);
+}
+.corporate-rail-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: var(--on-navy-accent);
-  stroke-width: 1.5;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
-.corporate-pass-summary > p {
-  margin-top: 1.5rem;
+.corporate-rail-label svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  stroke-width: 1.75;
+}
+.corporate-rail-seats {
+  margin-top: 0.85rem;
   font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(2rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 2.4vw, 2rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+.corporate-rail-unit,
+.corporate-rail-total {
+  display: grid;
+  gap: 0.15rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.corporate-rail-unit > span,
+.corporate-rail-total > span {
+  color: var(--on-navy-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.corporate-rail-unit > strong {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  /* The discounted unit is the number a company is deciding on, so it reads
+     as the live figure and the list price sits struck through under it. */
+  line-height: 1.15;
+}
+.corporate-rail-unit > s {
+  color: var(--on-navy-body);
+  font-size: 0.8rem;
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+}
+.corporate-rail-total > strong {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: clamp(1.9rem, 3vw, 2.5rem);
   font-weight: 700;
   line-height: 1.05;
 }
-.corporate-pass-summary > span {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-  margin-top: 1.5rem;
+.corporate-rail-total > small {
   color: var(--on-navy-body);
-  font-size: 0.85rem;
+  font-size: 0.72rem;
+}
+.corporate-rail-saving,
+.corporate-rail-progress {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+.corporate-rail-saving {
+  color: #ECFDF5;
+  background: rgba(16, 185, 129, 0.18);
+  border: 1px solid rgba(16, 185, 129, 0.42);
+  font-weight: 700;
+}
+.corporate-rail-saving svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
+  color: #6EE7B7;
+}
+.corporate-rail-progress {
+  color: var(--on-navy-body);
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+}
+.corporate-rail-includes {
+  margin-top: 1.75rem;
+  color: var(--on-navy-accent);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.corporate-rail-list {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+.corporate-rail-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  color: var(--on-navy-body);
+  font-size: 0.82rem;
   line-height: 1.5;
 }
-.corporate-pass-summary > span svg {
-  width: 1.1rem;
-  height: 1.1rem;
+.corporate-rail-list svg {
+  width: 1rem;
+  height: 1rem;
   flex: none;
   color: var(--on-navy-accent);
 }
-.corporate-pass-summary > span + span {
+
+.corporate-steps {
+  display: grid;
+  gap: clamp(2rem, 4vw, 3rem);
+  padding: clamp(1.5rem, 4vw, 3rem);
+}
+.corporate-step-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+.corporate-step-index {
+  display: grid;
+  place-items: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: none;
+  border-radius: 999px;
+  background: #EFF6FF;
+  border: 1px solid #BFDBFE;
+  color: #1D4ED8;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.corporate-step-heading small {
+  display: block;
+  color: #64748B;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.corporate-step-heading h3 {
+  margin-top: 0.15rem;
+  color: #0F172A;
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.corporate-step-hint {
+  margin-top: 0.75rem;
+  color: #64748B;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+
+.corporate-seat-picker {
+  display: flex;
+  align-items: stretch;
+  gap: 0.6rem;
+  margin-top: 1.25rem;
+}
+.corporate-seat-step {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  flex: none;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-sm);
+  background: #F8FAFC;
+  color: #0F172A;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+.corporate-seat-step:hover:not(:disabled) {
+  border-color: #2563EB;
+  background: #EFF6FF;
+}
+.corporate-seat-step:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.corporate-seat-step svg {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+.corporate-seat-field {
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 14rem;
+}
+.corporate-seat-field select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 2.2rem 0.75rem 0.9rem;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-sm);
+  background-color: #F8FAFC;
+  color: #0F172A;
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #94A3B8 50%),
+    linear-gradient(135deg, #94A3B8 50%, transparent 50%);
+  background-position: calc(100% - 1.1rem) 1.35rem, calc(100% - 0.75rem) 1.35rem;
+  background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+}
+.corporate-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+}
+.corporate-preset {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid #CBD5E1;
+  border-radius: 999px;
+  background: #FFFFFF;
+  color: #334155;
+  font-size: 0.78rem;
+  font-weight: 600;
+  transition: border-color 180ms ease, background-color 180ms ease,
+    color 180ms ease;
+}
+.corporate-preset:hover {
+  border-color: #2563EB;
+  color: #1D4ED8;
+}
+.corporate-preset.is-active {
+  border-color: #2563EB;
+  background: #2563EB;
+  color: #FFFFFF;
+}
+
+.corporate-roster-progress {
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1.25rem;
+}
+.corporate-roster-bar {
+  height: 0.4rem;
+  border-radius: 999px;
+  background: #E2E8F0;
+  overflow: hidden;
+}
+.corporate-roster-bar > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #2563EB, #60A5FA);
+  transition: width 220ms ease;
+}
+.corporate-roster-progress p {
+  color: #475569;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.corporate-bulk {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border: 1px dashed #BFDBFE;
+  border-radius: var(--radius-sm);
+  background: #F8FAFC;
+}
+.corporate-bulk > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #1D4ED8;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  list-style: none;
+}
+.corporate-bulk > summary::-webkit-details-marker {
+  display: none;
+}
+.corporate-bulk > summary svg {
+  width: 1rem;
+  height: 1rem;
+}
+.corporate-bulk > p {
+  margin-top: 0.6rem;
+  color: #64748B;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+.corporate-bulk textarea {
+  width: 100%;
+  margin-top: 0.65rem;
+  padding: 0.75rem 0.9rem;
+  border: 1px solid #CBD5E1;
+  border-radius: var(--radius-sm);
+  background: #FFFFFF;
+  color: #0F172A;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  resize: vertical;
+}
+.corporate-bulk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
   margin-top: 0.75rem;
 }
-.corporate-pass-form {
-  padding: clamp(1.5rem, 4vw, 3rem);
+.corporate-bulk-actions .btn-outline {
+  padding: 0.6rem 1.25rem;
+  border-color: #2563EB;
+  color: #1D4ED8;
+  font-size: 0.75rem;
+}
+.corporate-bulk-clear {
+  color: #64748B;
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.corporate-bulk-notice {
+  margin-top: 0.6rem;
+  color: #047857;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+.corporate-roster {
+  display: grid;
+  gap: 0.75rem;
+}
+@media (min-width: 640px) {
+  .corporate-roster {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+.corporate-roster > li {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+.corporate-roster .inquiry-field {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.corporate-roster-index {
+  display: grid;
+  place-items: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  flex: none;
+  border-radius: 999px;
+  border: 1px solid #CBD5E1;
+  background: #F1F5F9;
+  color: #64748B;
+  font-size: 0.78rem;
+  font-weight: 700;
+  transition: background-color 180ms ease, border-color 180ms ease,
+    color 180ms ease;
+}
+.corporate-roster > li.is-filled .corporate-roster-index {
+  border-color: #34D399;
+  background: #ECFDF5;
+  color: #047857;
+}
+.corporate-roster-index svg {
+  width: 0.95rem;
+  height: 0.95rem;
 }
 
 .inquiry-field-hint {
@@ -2561,8 +2915,15 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   font-size: 0.9rem;
   line-height: 1.7;
 }
+@media (max-width: 1023px) {
+  .corporate-layout {
+    grid-template-columns: 1fr;
+  }
+  .corporate-rail-inner {
+    position: static;
+  }
+}
 @media (max-width: 767px) {
-  .corporate-pass-panel,
   .sponsor-contact-panel {
     grid-template-columns: 1fr;
   }
@@ -7144,4 +7505,74 @@ h3,
   margin-top: 0.55rem;
   font-size: 0.76rem;
   color: #64748B;
+}
+/* The volume offer is announced next to the quantity, where it can still
+   change the decision, and turns green once it has been earned. */
+.checkout-volume-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.85rem;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid #BFDBFE;
+  border-radius: var(--radius-sm);
+  background: #EFF6FF;
+  color: #1E3A8A;
+  font-size: 0.79rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.checkout-volume-note svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: none;
+  color: #2563EB;
+}
+.checkout-volume-note.is-applied {
+  border-color: #6EE7B7;
+  background: #ECFDF5;
+  color: #065F46;
+}
+.checkout-volume-note.is-applied svg {
+  color: #047857;
+}
+.checkout-tier {
+  position: relative;
+}
+/* The radio stays a real focusable control but covers its whole card, so a
+   pointer anywhere on the card selects the tier instead of landing on the
+   label text above a 1px screen-reader-only input. */
+.checkout-tier input[type="radio"] {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  clip: auto;
+  clip-path: none;
+  cursor: pointer;
+}
+.pricing-tier-volume {
+  margin-top: 0.35rem;
+  color: #047857;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+.pricing-tier--featured .pricing-tier-volume {
+  color: #6EE7B7;
+}
+.checkout-tier-badge {
+  position: absolute;
+  pointer-events: none;
+  top: -0.6rem;
+  right: 0.6rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: #047857;
+  color: #FFFFFF;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }

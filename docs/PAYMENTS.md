@@ -32,18 +32,31 @@ servidor, `ticket_orders`, preferencia de MercadoPago, webhook, recibo— con
 tres diferencias:
 
 - el tier es `corporativo` y **no** está en `TICKET_TIER_IDS`: no es un precio
-  publicado, sino un bloque cuyo precio unitario sale de `quoteCorporateOrder()`.
-  El 25% de descuento se aplica **al precio unitario** (2,500 → 1,875 MXN a
-  partir del quinto acceso), nunca al total, para que la línea siga siendo un
-  múltiplo exacto del unitario. De eso dependen la invariante de importes de la
-  base de datos, el `unit_price` de la preferencia y el CFDI;
-- la cantidad se elige en un **desplegable** (`CORPORATE_SEAT_OPTIONS`, de 2 a
-  25). El límite duro del servidor sigue siendo `CORPORATE_MAX_SEATS` (200):
-  un bloque mayor se acuerda con el equipo;
+  publicado, sino un bloque cuyo precio unitario sale de `quoteCorporateOrder()`;
+- la cantidad se elige con un **selector de accesos** (menos/más, atajos y el
+  desplegable `CORPORATE_SEAT_OPTIONS`, de 2 a 25). El límite duro del servidor
+  sigue siendo `CORPORATE_MAX_SEATS` (200): un bloque mayor se acuerda con el
+  equipo;
 - la orden lleva un **roster**: un participante nombrado por acceso, en
   `public.ticket_order_attendees`, que es lo que necesita la constancia DC-3.
   `create_ticket_order()` lo escribe en la misma transacción y rechaza un
   roster que no coincida con la cantidad comprada.
+
+### Descuento por volumen: una sola regla
+
+El 25% dejó de ser una ventaja exclusiva del bloque corporativo. Es una regla
+del catálogo (`VOLUME_DISCOUNT_MIN_QUANTITY`, `VOLUME_DISCOUNT_BASIS_POINTS`)
+que se aplica **a partir del quinto acceso** a cualquier tier marcado
+`volumeDiscount` —hoy sólo Plus— y a todo bloque corporativo. Cinco Accesos
+Plus cuestan lo mismo comprados uno a uno que dentro de un bloque
+(2,500 → 1,875 MXN por acceso).
+
+El descuento se aplica siempre **al precio unitario**, nunca al total, para que
+la línea siga siendo un múltiplo exacto del unitario. De eso dependen la
+invariante de importes de la base de datos, el `unit_price` de la preferencia y
+el CFDI. `quoteVolumePricing()` es lo que lee el comprador (precio de lista,
+descuento y total) y `quoteOrder()` lo que se cobra; ambos derivan del mismo
+unitario descontado.
 
 Toda orden —individual o corporativa— acepta además un **referido opcional**
 (`referral_source`): texto libre que escribe el comprador, nunca un

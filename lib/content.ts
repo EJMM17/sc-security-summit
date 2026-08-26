@@ -164,6 +164,7 @@ export const UI_TEXT = {
     pricingDesc:
       "Un día de capacitación especializada · 24 de septiembre de 2026 · Centro de Convenciones, Reynosa",
     taxNote: "IVA incluido",
+    pricingVolumeNote: "−25% al llevar 5 o más",
     getAccessBtn: "OBTENER ACCESO",
     mostPopular: "MÁS POPULAR",
     locationLabel: "SEDE DEL EVENTO",
@@ -191,8 +192,6 @@ export const UI_TEXT = {
     corporateAccessNote: "DC-3 incluido para cada participante.",
     corporateAccessDiscount:
       "25% de descuento desde 5 accesos, sin límite superior.",
-    corporateSubmit: "SOLICITAR PASE CORPORATIVO",
-    corporateSuccess: "Recibimos tu solicitud de pase corporativo. Te contactaremos muy pronto.",
     inquiryPrivacy:
       "Al continuar, aceptas que usemos tus datos únicamente para dar seguimiento a esta solicitud.",
     inquiryPrivacyLink: "Consulta el Aviso de Privacidad.",
@@ -316,6 +315,7 @@ export const UI_TEXT = {
     pricingDesc:
       "One day of specialized training · September 24, 2026 · Reynosa Convention Center",
     taxNote: "VAT included",
+    pricingVolumeNote: "−25% when you take 5 or more",
     getAccessBtn: "GET ACCESS",
     mostPopular: "MOST POPULAR",
     locationLabel: "EVENT VENUE",
@@ -343,8 +343,6 @@ export const UI_TEXT = {
     corporateAccessNote: "DC-3 training certificate included for each participant.",
     corporateAccessDiscount:
       "25% off from five passes up, with no upper limit.",
-    corporateSubmit: "REQUEST A CORPORATE PASS",
-    corporateSuccess: "We received your corporate pass request. We will contact you shortly.",
     inquiryPrivacy:
       "By continuing, you agree that we may use your information only to follow up on this request.",
     inquiryPrivacyLink: "Read the Privacy Notice.",
@@ -1097,7 +1095,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Puedo comprar accesos para mi equipo?",
     answer:
-      "Sí. El pase corporativo cubre hasta 10 accesos Plus con DC-3 incluido para cada participante, para que cada departamento asista al bloque que le corresponde. Solicítalo desde la sección de pases corporativos del sitio y un asesor te responde por correo con la cotización.",
+      "Sí, y se compra en línea. Un bloque corporativo empieza en 2 accesos Plus, con DC-3 incluido para cada participante, y desde el quinto acceso cada uno baja 25%. El mismo descuento aplica si compras 5 o más Accesos Plus desde el checkout individual. Elige los accesos, escribe los nombres de quienes asisten y paga con MercadoPago.",
   },
   {
     question: "¿Puedo obtener factura (CFDI)?",
@@ -1135,7 +1133,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "Can I buy passes for my team?",
     answer:
-      "Yes. The corporate pass covers up to 10 Plus passes with a DC-3 certificate for each participant, so every department attends the block that matches its role. Request it from the corporate passes section of the site and an advisor will reply by email with a quote.",
+      "Yes, and you buy it online. A corporate block starts at 2 Plus passes, with a DC-3 certificate for each participant, and from the fifth pass up each one drops 25%. The same discount applies if you buy 5 or more Plus passes from the individual checkout. Pick the passes, write the names of everyone attending and pay with MercadoPago.",
   },
   {
     question: "Can I request an invoice (CFDI)?",
@@ -1158,27 +1156,59 @@ export const CHECKOUT = {
     tierLegend: "Tipo de acceso",
     quantity: "Cantidad",
     quantityHint: "Máximo {max} por compra.",
+    volumeOffer:
+      "Llévate {min} o más Accesos Plus y cada uno baja 25%: de {list} a {price}.",
+    volumeProgressOne:
+      "Agrega 1 acceso más y los {min} bajan 25% ({price} cada uno).",
+    volumeProgressMany:
+      "Agrega {missing} accesos más y los {min} bajan 25% ({price} cada uno).",
+    volumeApplied: "25% de descuento por volumen aplicado.",
+    volumeBadge: "−25% desde {min}",
     referral: "¿Quién te recomendó el Summit? (opcional)",
     referralPlaceholder: "Nombre de la persona o empresa",
     referralHint:
       "Si alguien te invitó, escríbelo aquí. Es opcional y no cambia el precio.",
     corporateLegend: "Pase corporativo",
+    corporateStepLabel: "Paso {n} de 3",
+    corporateStepSeats: "Elige cuántos accesos",
+    corporateStepRoster: "Escribe quién asiste",
+    corporateStepBuyer: "Datos y pago",
     corporateSeats: "Número de accesos",
     corporateSeatsHint:
       "Desde 2 accesos. A partir del quinto se aplica 25% de descuento sobre el precio de lista.",
     corporateSeatsOption: "{n} accesos",
+    corporateSeatsDecrease: "Quitar un acceso",
+    corporateSeatsIncrease: "Agregar un acceso",
+    corporateSeatsPresetLabel: "Bloques frecuentes",
     corporateLargeBlockHint:
       "¿Necesitas más de {max} accesos? Escríbenos a hola@scsecuritysummit.com y lo preparamos contigo.",
     corporateRosterLegend: "Participantes",
     corporateRosterHint:
       "Escribe el nombre completo de cada persona que asistirá. Es el nombre que aparecerá en su constancia DC-3.",
+    corporateRosterProgress: "{done} de {total} nombres capturados",
+    corporateRosterComplete: "Lista completa.",
     corporateAttendee: "Participante {n}",
     corporateAttendeePlaceholder: "Nombre completo",
-    corporateSummaryList: "{seats} accesos × {price}",
-    corporateSummaryDiscount: "Descuento por volumen (25%)",
-    corporateDiscountBadge: "25% aplicado",
-    corporateDiscountHint:
-      "Con un acceso más obtienes 25% de descuento en todo el bloque.",
+    corporateBulkToggle: "Pegar la lista de participantes",
+    corporateBulkHint:
+      "Pega los nombres uno por línea (o separados por comas) y los acomodamos en la lista.",
+    corporateBulkPlaceholder: "Ada Lovelace\nGrace Hopper\nAlan Turing",
+    corporateBulkApply: "Acomodar nombres",
+    corporateBulkClear: "Vaciar lista",
+    corporateBulkFilled: "Acomodamos {n} nombres.",
+    corporateBulkGrew: "Acomodamos {n} nombres y ampliamos el bloque a {seats} accesos.",
+    corporateBulkOverflow:
+      "Acomodamos los primeros {n}. El bloque llega hasta {max} accesos; escríbenos para uno mayor.",
+    corporateBulkEmpty: "Escribe al menos un nombre antes de acomodarlos.",
+    corporateRailLabel: "Tu bloque",
+    corporateRailSeats: "{n} accesos Plus",
+    corporateRailPerSeat: "Por acceso",
+    corporateRailBefore: "Antes {price}",
+    corporateRailTotal: "Total a pagar",
+    corporateRailSaving: "Ahorras {amount}",
+    corporateRailIncludes: "Cada acceso incluye",
+    summaryListLine: "{quantity} accesos × {price}",
+    summaryDiscount: "Descuento por volumen (25%)",
     buyerLegend: "Datos del comprador",
     firstName: "Nombre(s)",
     lastName: "Apellidos",
@@ -1213,8 +1243,6 @@ export const CHECKOUT = {
       "Incluye IVA del 16%. MercadoPago suma aparte su cargo por plataforma; lo verás desglosado en el checkout antes de confirmar.",
     submit: "PROCESAR PAGO",
     submitSending: "REDIRIGIENDO...",
-    redirectNote:
-      "Te llevamos al checkout seguro de MercadoPago para completar el pago. Ahí verás el cargo por plataforma antes de confirmar.",
     privacy:
       "Al continuar aceptas que usemos tus datos para procesar esta compra, emitir tu acceso y, si lo solicitaste, tu CFDI.",
     privacyLink: "Consulta el Aviso de Privacidad.",
@@ -1259,27 +1287,59 @@ export const CHECKOUT = {
     tierLegend: "Pass type",
     quantity: "Quantity",
     quantityHint: "Up to {max} per purchase.",
+    volumeOffer:
+      "Take {min} or more Plus Passes and each one drops 25%: from {list} to {price}.",
+    volumeProgressOne:
+      "Add 1 more pass and all {min} drop 25% ({price} each).",
+    volumeProgressMany:
+      "Add {missing} more passes and all {min} drop 25% ({price} each).",
+    volumeApplied: "25% volume discount applied.",
+    volumeBadge: "−25% from {min}",
     referral: "Who referred you to the Summit? (optional)",
     referralPlaceholder: "Person or company name",
     referralHint:
       "If someone invited you, write it here. It is optional and does not change the price.",
     corporateLegend: "Corporate pass",
+    corporateStepLabel: "Step {n} of 3",
+    corporateStepSeats: "Choose how many passes",
+    corporateStepRoster: "Name who attends",
+    corporateStepBuyer: "Details and payment",
     corporateSeats: "Number of passes",
     corporateSeatsHint:
       "From 2 passes. A 25% discount off the list price applies from the fifth pass up.",
     corporateSeatsOption: "{n} passes",
+    corporateSeatsDecrease: "Remove one pass",
+    corporateSeatsIncrease: "Add one pass",
+    corporateSeatsPresetLabel: "Common blocks",
     corporateLargeBlockHint:
       "Need more than {max} passes? Email hola@scsecuritysummit.com and we will set it up with you.",
     corporateRosterLegend: "Participants",
     corporateRosterHint:
       "Write the full name of each person attending. It is the name printed on their DC-3 certificate.",
+    corporateRosterProgress: "{done} of {total} names filled in",
+    corporateRosterComplete: "Roster complete.",
     corporateAttendee: "Participant {n}",
     corporateAttendeePlaceholder: "Full name",
-    corporateSummaryList: "{seats} passes × {price}",
-    corporateSummaryDiscount: "Volume discount (25%)",
-    corporateDiscountBadge: "25% applied",
-    corporateDiscountHint:
-      "One more pass unlocks a 25% discount on the whole block.",
+    corporateBulkToggle: "Paste the participant list",
+    corporateBulkHint:
+      "Paste one name per line (or separated by commas) and we will lay them out in the roster.",
+    corporateBulkPlaceholder: "Ada Lovelace\nGrace Hopper\nAlan Turing",
+    corporateBulkApply: "Lay out names",
+    corporateBulkClear: "Clear roster",
+    corporateBulkFilled: "We laid out {n} names.",
+    corporateBulkGrew: "We laid out {n} names and grew the block to {seats} passes.",
+    corporateBulkOverflow:
+      "We laid out the first {n}. The block goes up to {max} passes; email us for a larger one.",
+    corporateBulkEmpty: "Write at least one name before laying them out.",
+    corporateRailLabel: "Your block",
+    corporateRailSeats: "{n} Plus passes",
+    corporateRailPerSeat: "Per pass",
+    corporateRailBefore: "Was {price}",
+    corporateRailTotal: "Total to pay",
+    corporateRailSaving: "You save {amount}",
+    corporateRailIncludes: "Every pass includes",
+    summaryListLine: "{quantity} passes × {price}",
+    summaryDiscount: "Volume discount (25%)",
     buyerLegend: "Buyer details",
     firstName: "First name",
     lastName: "Last name",
@@ -1314,8 +1374,6 @@ export const CHECKOUT = {
       "Includes 16% VAT. MercadoPago adds its platform fee on top; it is itemized at checkout before you confirm.",
     submit: "PROCESS PAYMENT",
     submitSending: "REDIRECTING...",
-    redirectNote:
-      "You will be taken to MercadoPago's secure checkout to complete the payment. The platform fee is shown there before you confirm.",
     privacy:
       "By continuing you agree that we use your data to process this purchase, issue your pass and, if requested, your CFDI.",
     privacyLink: "Read the Privacy Notice.",

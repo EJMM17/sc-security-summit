@@ -10,11 +10,16 @@ Read `AGENTS.md` first. Canonical current state:
   `NEXT_PUBLIC_EVENTBRITE_URL`. Tickets sold there before the cut stay valid
   and are operated from Eventbrite's own panel.
 - Corporate passes are sold on site too, as `corporativo` ticket orders. A
-  block starts at two accesses, is picked from a seat dropdown, gets 25% off
-  the unit price from the fifth access up (`quoteCorporateOrder`) and carries a
-  roster: one named participant per purchased access, in
-  `public.ticket_order_attendees`. Every order, individual or corporate, may
-  carry an optional free-text referrer (`referral_source`).
+  block starts at two accesses, is picked from a seat stepper with presets, and
+  carries a roster: one named participant per purchased access, in
+  `public.ticket_order_attendees`. The roster can be pasted in bulk from the
+  form. Every order, individual or corporate, may carry an optional free-text
+  referrer (`referral_source`).
+- The 25% volume discount is one rule, not a corporate privilege: it applies to
+  the unit price from the fifth access up on any tier flagged `volumeDiscount`
+  in the catalog (today Plus) and to every corporate block. Five Plus accesses
+  cost the same bought individually or as a block. It is always applied to the
+  unit price, never to the line total.
 - The sponsorship funnel is retired: no landing section, no form, no
   `/sponsors`, no `/media-kit`. The "a quién va dirigido" section is gone too.
 - Supabase still stores the corporate and sponsorship inquiries received before

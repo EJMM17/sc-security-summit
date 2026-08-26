@@ -1,4 +1,3 @@
-import { BadgeCheck, UsersRound } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
 import TicketCheckoutForm from "@/components/TicketCheckoutForm";
 import { CONTENT } from "@/lib/content";
@@ -16,39 +15,27 @@ export default function Registro({
   const checkoutDisabled = isVisualOnlyVercelDeployment();
 
   return (
-      <section id="registro" className="mock-section mock-section--light mock-corporate">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <ScrollReveal>
-            <div className="mock-section-intro text-center">
-              <span className="section-label section-label--center">{ui.regLabel}</span>
-              <h2 className="section-title mt-3">{ui.regTitle}</h2>
-              <p className="text-slate-500 max-w-xl mx-auto mt-4">{ui.regDesc}</p>
-            </div>
-          </ScrollReveal>
-          <ScrollReveal delay={120}>
-            <div id="pase-corporativo" className="corporate-pass-panel">
-              <div className="corporate-pass-summary">
-                <UsersRound aria-hidden="true" />
-                <p>{ui.corporateAccessTitle}</p>
-                <span>
-                  <BadgeCheck aria-hidden="true" />
-                  {ui.corporateAccessNote}
-                </span>
-                <span>
-                  <BadgeCheck aria-hidden="true" />
-                  {ui.corporateAccessDiscount}
-                </span>
-              </div>
-              <div className="corporate-pass-form">
-                <TicketCheckoutForm
-                  language={language}
-                  variant="corporate"
-                  previewDisabled={checkoutDisabled}
-                />
-              </div>
-            </div>
-          </ScrollReveal>
-        </div>
-      </section>
+    <section id="registro" className="mock-section mock-section--light mock-corporate">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <ScrollReveal>
+          <div className="mock-section-intro text-center">
+            <span className="section-label section-label--center">{ui.regLabel}</span>
+            <h2 className="section-title mt-3">{ui.regTitle}</h2>
+            <p className="text-slate-500 max-w-2xl mx-auto mt-4">{ui.regDesc}</p>
+          </div>
+        </ScrollReveal>
+        <ScrollReveal delay={120}>
+          {/* The panel is only a frame now: the price rail lives inside the
+              form, where it can follow the seat count the buyer is choosing. */}
+          <div id="pase-corporativo" className="corporate-pass-panel">
+            <TicketCheckoutForm
+              language={language}
+              variant="corporate"
+              previewDisabled={checkoutDisabled}
+            />
+          </div>
+        </ScrollReveal>
+      </div>
+    </section>
   );
 }

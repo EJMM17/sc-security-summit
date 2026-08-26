@@ -27,19 +27,13 @@ export default function FinalCTA({ language }: { language: Language }) {
           </dl>
         </ScrollReveal>
         <ScrollReveal delay={200}>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-8">
-            <PrimaryCTA
-              href={checkoutHref(language)}
-              size="lg"
-            >
+          {/* One action only: the corporate block is bought through the same
+              checkout, so a second button here sent visitors to a form that
+              asks for the whole roster before they have chosen anything. */}
+          <div className="flex items-center justify-center mt-8">
+            <PrimaryCTA href={checkoutHref(language)} size="lg">
               {ui.registerNowBtn}
             </PrimaryCTA>
-            <a
-              href="#registro"
-              className="btn-outline px-8 py-4 text-base border-white/30 text-white hover:bg-white/10"
-            >
-              {ui.corporateSubmit}
-            </a>
           </div>
         </ScrollReveal>
       </div>

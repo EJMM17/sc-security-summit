@@ -70,7 +70,7 @@ test.describe("Homepage comercial", () => {
     await expect(summary).toContainText("3,125.00");
     await expect(summary).toContainText("9,375.00");
     await expect(
-      corporate.getByRole("button", { name: /pagar con mercadopago/i }),
+      corporate.getByRole("button", { name: /procesar pago/i }),
     ).toBeVisible();
     await expect(
       corporate.getByRole("link", { name: /aviso de privacidad/i }),
