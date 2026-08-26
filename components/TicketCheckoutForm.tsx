@@ -113,6 +113,22 @@ export default function TicketCheckoutForm({
     setSubmissionId(createSubmissionId());
   }, []);
 
+  /**
+   * The shape of the order the last attempt sent.
+   *
+   * The submission id is what makes a retry a replay instead of a second
+   * charge, but it only holds while the order is the same one. A buyer whose
+   * first attempt persisted a row and then failed at the provider (or was told
+   * the block is sold out) will change the seats and press again — with the
+   * same id and a different payload that is exactly the `idempotency_conflict`
+   * the database is built to reject. Minting a fresh id the moment the priced
+   * order changes after an attempt keeps the replay guarantee for a true retry
+   * and turns the edited order into the new order it actually is.
+   */
+  const [attemptedOrderShape, setAttemptedOrderShape] = useState<string | null>(
+    null,
+  );
+
   const maxQuantity = isCorporate
     ? CORPORATE_SEAT_CHOICE_MAX
     : TICKET_TIERS[tier].maxQuantity;
@@ -143,6 +159,31 @@ export default function TicketCheckoutForm({
       return null;
     }
   }, [orderTier, quantity]);
+
+  // Only what the server prices and hashes counts as a different order: the
+  // tier, the quantity and the roster names. Buyer contact details are part of
+  // the same purchase, and editing a typo in a phone number must stay a replay.
+  const orderShape = useMemo(
+    () =>
+      JSON.stringify([
+        orderTier,
+        quantity,
+        attendees.map((name) => name.trim().replace(/\s+/g, " ")),
+      ]),
+    [orderTier, quantity, attendees],
+  );
+
+  useEffect(() => {
+    if (attemptedOrderShape === null || attemptedOrderShape === orderShape) {
+      return;
+    }
+    setSubmissionId(createSubmissionId());
+    setAttemptedOrderShape(null);
+    // The error belonged to the order that was just replaced, so it is
+    // cleared with it — but never the redirect state, which means the browser
+    // is already on its way to MercadoPago.
+    setStatus((current) => (current.kind === "error" ? { kind: "idle" } : current));
+  }, [attemptedOrderShape, orderShape]);
 
   const earnsVolumeDiscount = tierEarnsVolumeDiscount(
     isCorporate ? "plus" : tier,
@@ -179,7 +220,13 @@ export default function TicketCheckoutForm({
     );
   };
 
-  const filledAttendees = attendees.filter((name) => name.trim() !== "").length;
+  // Counted against the seats actually being bought, so the bar can never
+  // report more names than the block has or divide by an empty roster.
+  const filledAttendees = attendees
+    .slice(0, quantity)
+    .filter((name) => name.trim() !== "").length;
+  const rosterProgress =
+    quantity > 0 ? Math.round((filledAttendees / quantity) * 100) : 0;
 
   /**
    * Pasting a roster is how a company actually holds it: in a column of a
@@ -248,22 +295,56 @@ export default function TicketCheckoutForm({
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (previewDisabled) return;
+    if (previewDisabled || isSending || status.kind === "redirecting") return;
 
     const form = event.currentTarget;
     const currentSubmissionId = submissionId || createSubmissionId();
     if (!submissionId) setSubmissionId(currentSubmissionId);
+
+    // `required` is satisfied by a single space, so a roster pasted from a
+    // spreadsheet with a blank row would reach the server and come back as the
+    // generic "check the fields". Normalizing here is what the server does
+    // anyway, and it puts the browser's own message on the offending input.
+    const normalizedAttendees = attendees.map((name) =>
+      name.trim().replace(/\s+/g, " "),
+    );
+    if (isCorporate) {
+      // Writing the trimmed value back leaves the offending seats visibly
+      // empty, so the buyer sees which row of the pasted list was blank. The
+      // React state update has not reached the DOM yet, which is why the
+      // message comes from the form's own status line rather than from
+      // `reportValidity`.
+      setAttendees(normalizedAttendees);
+      if (normalizedAttendees.some((name) => name === "")) {
+        setStatus({ kind: "error", reason: "invalid" });
+        return;
+      }
+    }
+
     setStatus({ kind: "idle" });
     setIsSending(true);
 
     try {
       const formData = new FormData(form);
       formData.set("submissionId", currentSubmissionId);
+      if (isCorporate) {
+        formData.delete("attendees");
+        for (const name of normalizedAttendees) {
+          formData.append("attendees", name);
+        }
+      }
+      // Remembered before the round trip: whatever this attempt may have
+      // persisted is keyed to this exact order.
+      setAttemptedOrderShape(
+        JSON.stringify([orderTier, quantity, normalizedAttendees]),
+      );
+
       const result = await createTicketCheckout(formData);
 
       if (result.ok && isSafeCheckoutUrl(result.checkoutUrl)) {
-        // Stay in the sending state: the page is being replaced, and
-        // re-enabling the button would invite a second order.
+        // The button stays disabled from here on: the page is being replaced,
+        // and re-enabling it would invite a second order against a preference
+        // that is already paid for.
         setStatus({ kind: "redirecting" });
         window.location.assign(result.checkoutUrl);
         return;
@@ -273,14 +354,14 @@ export default function TicketCheckoutForm({
         kind: "error",
         reason: result.ok ? "provider_unavailable" : result.reason,
       });
+      setIsSending(false);
     } catch {
       setStatus({ kind: "error", reason: "unexpected" });
-    } finally {
-      // Released unconditionally; the redirect branch returns before this only
-      // in the sense that the navigation replaces the page anyway.
       setIsSending(false);
     }
   };
+
+  const isBusy = isSending || status.kind === "redirecting";
 
   const summary = quote && volumeQuote && (
     <div className="checkout-summary" aria-live="polite">
@@ -319,7 +400,7 @@ export default function TicketCheckoutForm({
       {/* The IVA is inside the published price, so the buyer sees one final
           number. The base and the tax still travel to the order row and the
           CFDI; they are just not a checkout decision. */}
-      <p className="checkout-summary-note">{copy.summaryPlatformFee}</p>
+      <p className="checkout-summary-note">{copy.summaryTaxIncluded}</p>
     </div>
   );
 
@@ -389,7 +470,10 @@ export default function TicketCheckoutForm({
               </div>
               <div className="corporate-rail-total">
                 <span>{copy.corporateRailTotal}</span>
-                <strong>{formatMxn(volumeQuote.totalCents, language)} MXN</strong>
+                <strong>
+                  {formatMxn(volumeQuote.totalCents, language)}
+                  <span>MXN</span>
+                </strong>
                 <small>{ui.taxNote}</small>
               </div>
               {volumeQuote.discountCents > 0 ? (
@@ -510,9 +594,7 @@ export default function TicketCheckoutForm({
                     aria-label={copy.corporateRosterLegend}
                   >
                     <span
-                      style={{
-                        width: `${Math.round((filledAttendees / quantity) * 100)}%`,
-                      }}
+                      style={{ width: `${rosterProgress}%` }}
                     />
                   </div>
                   <p>
@@ -622,7 +704,7 @@ export default function TicketCheckoutForm({
                 <SubmitButton
                   copy={copy}
                   previewDisabled={previewDisabled}
-                  isSending={isSending}
+                  isSending={isBusy}
                   submissionId={submissionId}
                 />
               </section>
@@ -631,9 +713,7 @@ export default function TicketCheckoutForm({
         ) : (
           <>
             <fieldset className="m-0 min-w-0 border-0 p-0">
-              <legend className="text-sm font-semibold text-slate-900">
-                {copy.tierLegend}
-              </legend>
+              <legend className="checkout-legend">{copy.tierLegend}</legend>
               <div className="mt-3 grid gap-3 sm:grid-cols-3">
                 {TICKET_TIER_IDS.map((id) => {
                   const plan = pricing.find((entry) => entry.id === id);
@@ -694,7 +774,7 @@ export default function TicketCheckoutForm({
                 </select>
               </span>
             </label>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="checkout-hint">
               {copy.quantityHint.replace("{max}", String(maxQuantity))}
             </p>
 
@@ -726,7 +806,7 @@ export default function TicketCheckoutForm({
             <SubmitButton
               copy={copy}
               previewDisabled={previewDisabled}
-              isSending={isSending}
+              isSending={isBusy}
               submissionId={submissionId}
             />
           </>
@@ -780,9 +860,7 @@ function BuyerFields({
 }) {
   return (
     <fieldset className="m-0 mt-8 min-w-0 border-0 p-0">
-      <legend className="text-sm font-semibold text-slate-900">
-        {copy.buyerLegend}
-      </legend>
+      <legend className="checkout-legend">{copy.buyerLegend}</legend>
       <div className="mt-3 grid gap-5 sm:grid-cols-2">
         <TextField
           icon={<UserRound aria-hidden="true" />}
@@ -858,7 +936,7 @@ function InvoiceBlock({
 }) {
   return (
     <>
-      <label className="mt-8 flex items-start gap-3 text-sm text-slate-700">
+      <label className="checkout-invoice-toggle">
         <input
           type="checkbox"
           name="requiresInvoice"
@@ -867,21 +945,17 @@ function InvoiceBlock({
           className="mt-1"
         />
         <span>
-          <span className="inline-flex items-center gap-2 font-semibold">
-            <ReceiptText className="h-4 w-4" aria-hidden="true" />
+          <span className="checkout-invoice-toggle-title">
+            <ReceiptText aria-hidden="true" />
             {copy.invoiceToggle}
           </span>
-          <span className="mt-1 block text-xs text-slate-500">
-            {copy.invoiceHint}
-          </span>
+          <span className="checkout-invoice-toggle-hint">{copy.invoiceHint}</span>
         </span>
       </label>
 
       {requiresInvoice && (
         <fieldset className="m-0 mt-6 min-w-0 border-0 p-0">
-          <legend className="text-sm font-semibold text-slate-900">
-            {copy.invoiceLegend}
-          </legend>
+          <legend className="checkout-legend">{copy.invoiceLegend}</legend>
           <div className="mt-3 grid gap-5 sm:grid-cols-2">
             <label className="inquiry-field">
               <span>{copy.rfc}</span>
@@ -951,11 +1025,9 @@ function InvoiceBlock({
 
 function Legal({ copy }: { copy: CheckoutCopy }) {
   return (
-    <p className="mt-5 text-xs leading-relaxed text-slate-500">
+    <p className="checkout-legal">
       {copy.privacy}{" "}
-      <Link className="underline underline-offset-2" href="/aviso-de-privacidad">
-        {copy.privacyLink}
-      </Link>
+      <Link href="/aviso-de-privacidad">{copy.privacyLink}</Link>
     </p>
   );
 }

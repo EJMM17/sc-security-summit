@@ -1151,8 +1151,6 @@ export const CHECKOUT = {
   es: {
     label: "COMPRA EN LÍNEA",
     title: "Reserva tu acceso",
-    desc:
-      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. El precio publicado ya incluye el IVA del 16%; MercadoPago suma aparte su cargo por plataforma, que verás en el checkout antes de confirmar.",
     tierLegend: "Tipo de acceso",
     quantity: "Cantidad",
     quantityHint: "Máximo {max} por compra.",
@@ -1239,8 +1237,6 @@ export const CHECKOUT = {
     summaryAccesses: "Accesos",
     summaryTotal: "Total a pagar",
     summaryTaxIncluded: "Precio final. Incluye IVA del 16%.",
-    summaryPlatformFee:
-      "Incluye IVA del 16%. MercadoPago suma aparte su cargo por plataforma; lo verás desglosado en el checkout antes de confirmar.",
     submit: "PROCESAR PAGO",
     submitSending: "REDIRIGIENDO...",
     privacy:
@@ -1282,8 +1278,6 @@ export const CHECKOUT = {
   en: {
     label: "ONLINE PURCHASE",
     title: "Reserve your pass",
-    desc:
-      "Pay by card, SPEI transfer or cash through MercadoPago. The published price already includes the 16% VAT; MercadoPago adds its own platform fee on top, shown at checkout before you confirm.",
     tierLegend: "Pass type",
     quantity: "Quantity",
     quantityHint: "Up to {max} per purchase.",
@@ -1370,8 +1364,6 @@ export const CHECKOUT = {
     summaryAccesses: "Passes",
     summaryTotal: "Total due",
     summaryTaxIncluded: "Final price. Includes 16% VAT.",
-    summaryPlatformFee:
-      "Includes 16% VAT. MercadoPago adds its platform fee on top; it is itemized at checkout before you confirm.",
     submit: "PROCESS PAYMENT",
     submitSending: "REDIRECTING...",
     privacy:

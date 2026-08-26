@@ -162,4 +162,65 @@ test.describe("Checkout de accesos", () => {
     await corporate.getByRole("button", { name: /vaciar lista/i }).click();
     await expect(corporate.getByLabel("Participante 1")).toHaveValue("");
   });
+
+  test("no envía un bloque con un nombre en blanco", async ({ page }) => {
+    await page.goto("/?lang=es");
+
+    const corporate = page.locator("#registro");
+    // A pasted column with a blank row satisfies `required` but is not a name.
+    await corporate.getByLabel("Participante 1", { exact: true }).fill("Ada Lovelace");
+    await corporate.getByLabel("Participante 2", { exact: true }).fill("   ");
+    await corporate.getByLabel("Nombre(s)").fill("María");
+    await corporate.getByLabel("Apellidos").fill("González López");
+    await corporate.getByLabel("Correo electrónico").fill("maria@empresa.com");
+    await corporate.getByLabel("Teléfono móvil").fill("+52 899 123 4567");
+    await corporate.getByLabel(/empresa/i).first().fill("Logística del Norte");
+
+    await corporate.getByRole("button", { name: /procesar pago/i }).click();
+
+    // The whitespace is normalized away and the order never leaves the browser.
+    await expect(
+      corporate.getByLabel("Participante 2", { exact: true }),
+    ).toHaveValue("");
+    await expect(corporate.locator(".inquiry-status.is-error")).toContainText(
+      "Revisa los campos",
+    );
+    await expect(
+      corporate.getByLabel("Participante 1", { exact: true }),
+    ).toHaveValue("Ada Lovelace");
+  });
+
+  test("cambia el identificador de la compra cuando el bloque cambia tras un intento", async ({
+    page,
+  }) => {
+    // Belt and braces: in a fully configured environment this attempt would
+    // reach MercadoPago, and the suite must never leave the site under test.
+    await page.route(/mercadopago\.com/, (route) => route.abort());
+    await page.goto("/?lang=es");
+
+    const corporate = page.locator("#registro");
+    const submissionId = corporate.locator('input[name="submissionId"]');
+    await expect(submissionId).not.toHaveValue("");
+
+    await corporate.getByLabel("Participante 1", { exact: true }).fill("Ada Lovelace");
+    await corporate.getByLabel("Participante 2", { exact: true }).fill("Grace Hopper");
+    await corporate.getByLabel("Nombre(s)").fill("María");
+    await corporate.getByLabel("Apellidos").fill("González López");
+    await corporate.getByLabel("Correo electrónico").fill("maria@empresa.com");
+    await corporate.getByLabel("Teléfono móvil").fill("+52 899 123 4567");
+    await corporate.getByLabel(/empresa/i).first().fill("Logística del Norte");
+
+    const firstId = await submissionId.inputValue();
+    await corporate.getByRole("button", { name: /procesar pago/i }).click();
+    // No database is reachable from the E2E build, so the attempt fails after
+    // the order has already been sent — exactly the case that used to strand
+    // the buyer on an idempotency conflict.
+    await expect(corporate.locator(".inquiry-status.is-error")).toBeVisible();
+
+    // Editing the block after that attempt makes it a different order, so it
+    // travels with a new submission id instead of colliding with the old one.
+    await corporate.getByRole("button", { name: /agregar un acceso/i }).click();
+    await expect(submissionId).not.toHaveValue(firstId);
+    await expect(corporate.locator(".inquiry-status.is-error")).toHaveCount(0);
+  });
 });

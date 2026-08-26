@@ -2349,135 +2349,157 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   to { transform: scale(1.075) translateX(0.6%); }
 }
 
-/* ═══ EMAIL INQUIRY FORMS ═══ */
+/* ═══ CORPORATE BLOCK CHECKOUT ═══
+   The block is a purchase panel on the landing plane, so it is built from
+   the same primitives the pricing rows and speaker cards use: the shared
+   hairline, the three radii, the three elevations and the navy panel from
+   the token block below. Nothing here restates a near-identical hex. */
 .corporate-pass-panel {
   overflow: hidden;
-  border: 1px solid #DCE7F5;
-  border-radius: var(--radius-lg);
-  background: #FFFFFF;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--elev-2);
 }
 
-/* ═══ CORPORATE BLOCK CHECKOUT ═══ */
 .corporate-layout {
   display: grid;
   grid-template-columns: minmax(15rem, 0.62fr) minmax(0, 1.38fr);
 }
 /* The column paints the whole height so the panel keeps its two-tone shape,
    while the quote inside it sticks to the viewport as the buyer scrolls the
-   roster. */
+   roster. The plane is flat: on this page a gradient reads as decoration,
+   and the only thing that should draw the eye here is the number. */
 .corporate-rail {
   color: var(--on-navy-title);
-  background:
-    radial-gradient(120% 130% at 0% 0%, rgba(37, 99, 235, 0.35), transparent 62%),
-    var(--surface-navy-panel);
+  background: var(--surface-navy-panel);
 }
 .corporate-rail-inner {
   position: sticky;
   top: 5.5rem;
   padding: clamp(1.75rem, 4vw, 2.75rem);
 }
+/* Same solid chip as the featured pricing row's badge — a label on a dark
+   plane cannot be an outline at a fraction of opacity. */
 .corporate-rail-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--on-navy-accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  gap: 0.45rem;
+  padding: 0.34rem 0.7rem;
+  border-radius: 999px;
+  background: var(--on-navy-accent);
+  color: var(--surface-navy);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .corporate-rail-label svg {
-  width: 1.05rem;
-  height: 1.05rem;
-  stroke-width: 1.75;
+  width: 0.85rem;
+  height: 0.85rem;
+  stroke-width: 2.25;
 }
 .corporate-rail-seats {
-  margin-top: 0.85rem;
+  margin-top: 1.1rem;
   font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(1.5rem, 2.4vw, 2rem);
-  font-weight: 700;
-  line-height: 1.1;
+  font-size: clamp(1.5rem, 2.4vw, 1.95rem);
+  font-weight: 780;
+  line-height: 1.05;
 }
 .corporate-rail-unit,
 .corporate-rail-total {
   display: grid;
-  gap: 0.15rem;
+  gap: 0.2rem;
   margin-top: 1.5rem;
   padding-top: 1.25rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  border-top: 1px solid var(--on-navy-line);
 }
 .corporate-rail-unit > span,
 .corporate-rail-total > span {
-  color: var(--on-navy-body);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  color: var(--on-navy-accent);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .corporate-rail-unit > strong {
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.5rem;
-  font-weight: 700;
+  font-weight: 780;
   /* The discounted unit is the number a company is deciding on, so it reads
      as the live figure and the list price sits struck through under it. */
   line-height: 1.15;
 }
 .corporate-rail-unit > s {
-  color: var(--on-navy-body);
-  font-size: 0.8rem;
-  text-decoration-color: rgba(255, 255, 255, 0.45);
+  color: var(--on-navy-faint);
+  font-size: 0.78rem;
+  text-decoration-color: var(--on-navy-line);
 }
 .corporate-rail-total > strong {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.4rem;
   font-family: var(--font-oswald), sans-serif;
-  font-size: clamp(1.9rem, 3vw, 2.5rem);
-  font-weight: 700;
-  line-height: 1.05;
+  font-size: clamp(1.8rem, 2.6vw, 2.2rem);
+  font-weight: 780;
+  line-height: 1.02;
+}
+/* The currency is a unit, not part of the figure, so it never competes with
+   it for size and never drags the amount onto a second line. */
+.corporate-rail-total > strong > span {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: var(--on-navy-accent);
 }
 .corporate-rail-total > small {
-  color: var(--on-navy-body);
-  font-size: 0.72rem;
+  color: var(--on-navy-faint);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
+/* Both notices are the same shape so the rail does not jump when the block
+   crosses the discount threshold: a hairline rule on the leading edge, no
+   filled box. */
 .corporate-rail-saving,
 .corporate-rail-progress {
   display: flex;
   align-items: flex-start;
-  gap: 0.5rem;
-  margin-top: 1.1rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: var(--radius-sm);
+  gap: 0.55rem;
+  margin-top: 1.25rem;
+  padding: 0.15rem 0 0.15rem 0.85rem;
+  border-left: 2px solid var(--on-navy-line);
+  color: var(--on-navy-body);
   font-size: 0.8rem;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 .corporate-rail-saving {
-  color: #ECFDF5;
-  background: rgba(16, 185, 129, 0.18);
-  border: 1px solid rgba(16, 185, 129, 0.42);
+  border-left-color: var(--on-navy-accent);
+  color: var(--on-navy-title);
   font-weight: 700;
 }
 .corporate-rail-saving svg {
-  width: 1.05rem;
-  height: 1.05rem;
+  width: 1rem;
+  height: 1rem;
   flex: none;
-  color: #6EE7B7;
-}
-.corporate-rail-progress {
-  color: var(--on-navy-body);
-  background: rgba(255, 255, 255, 0.07);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  margin-top: 0.15rem;
+  color: var(--on-navy-accent);
 }
 .corporate-rail-includes {
-  margin-top: 1.75rem;
+  margin-top: 1.85rem;
   color: var(--on-navy-accent);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .corporate-rail-list {
   display: grid;
-  gap: 0.6rem;
-  margin-top: 0.75rem;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
 }
 .corporate-rail-list li {
   display: flex;
@@ -2488,62 +2510,63 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   line-height: 1.5;
 }
 .corporate-rail-list svg {
-  width: 1rem;
-  height: 1rem;
+  width: 0.95rem;
+  height: 0.95rem;
   flex: none;
+  margin-top: 0.2rem;
   color: var(--on-navy-accent);
 }
 
 .corporate-steps {
   display: grid;
-  gap: clamp(2rem, 4vw, 3rem);
+  gap: clamp(2rem, 4vw, 2.75rem);
   padding: clamp(1.5rem, 4vw, 3rem);
 }
+/* An editorial step marker rather than a filled circle: the numeral is set
+   in the display face over a hairline rule, the same device the agenda and
+   the section overlines already use. */
 .corporate-step-heading {
   display: flex;
-  align-items: center;
+  align-items: baseline;
   gap: 0.85rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--line);
 }
 .corporate-step-index {
-  display: grid;
-  place-items: center;
-  width: 2.15rem;
-  height: 2.15rem;
   flex: none;
-  border-radius: 999px;
-  background: #EFF6FF;
-  border: 1px solid #BFDBFE;
-  color: #1D4ED8;
+  color: var(--summit-blue);
   font-family: var(--font-oswald), sans-serif;
-  font-size: 1.05rem;
-  font-weight: 700;
+  font-size: 1.55rem;
+  font-weight: 780;
+  line-height: 1;
 }
 .corporate-step-heading small {
   display: block;
-  color: #64748B;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  color: var(--text-faint);
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 .corporate-step-heading h3 {
-  margin-top: 0.15rem;
-  color: #0F172A;
-  font-size: 1.05rem;
-  font-weight: 700;
-  line-height: 1.25;
+  margin-top: 0.2rem;
+  color: var(--text-strong);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.2rem;
+  font-weight: 780;
+  line-height: 1.15;
 }
 .corporate-step-hint {
   margin-top: 0.75rem;
-  color: #64748B;
+  color: var(--text-muted);
   font-size: 0.78rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 
 .corporate-seat-picker {
   display: flex;
   align-items: stretch;
-  gap: 0.6rem;
+  gap: 0.5rem;
   margin-top: 1.25rem;
 }
 .corporate-seat-step {
@@ -2551,23 +2574,23 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   place-items: center;
   width: 3rem;
   flex: none;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background: #F8FAFC;
-  color: #0F172A;
-  transition: border-color 180ms ease, background-color 180ms ease;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-strong);
+  transition: border-color var(--dur) ease, color var(--dur) ease;
 }
 .corporate-seat-step:hover:not(:disabled) {
-  border-color: #2563EB;
-  background: #EFF6FF;
+  border-color: var(--summit-blue);
+  color: var(--summit-blue);
 }
 .corporate-seat-step:disabled {
-  opacity: 0.45;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 .corporate-seat-step svg {
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1.05rem;
+  height: 1.05rem;
 }
 .corporate-seat-field {
   flex: 1 1 auto;
@@ -2578,85 +2601,91 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   width: 100%;
   min-height: 3rem;
   padding: 0.75rem 2.2rem 0.75rem 0.9rem;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background-color: #F8FAFC;
-  color: #0F172A;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background-color: var(--surface-soft);
+  color: var(--text-strong);
   font-family: var(--font-oswald), sans-serif;
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 780;
   appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #94A3B8 50%),
-    linear-gradient(135deg, #94A3B8 50%, transparent 50%);
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+    linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
   background-position: calc(100% - 1.1rem) 1.35rem, calc(100% - 0.75rem) 1.35rem;
   background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
   background-repeat: no-repeat;
 }
+/* Shortcuts, not a segmented control: square chips on the same hairline as
+   every other bordered element, and the active one is marked by the brand
+   tint rather than by a fully saturated pill. */
 .corporate-presets {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.85rem;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
 }
 .corporate-preset {
-  padding: 0.45rem 0.85rem;
-  border: 1px solid #CBD5E1;
-  border-radius: 999px;
-  background: #FFFFFF;
-  color: #334155;
-  font-size: 0.78rem;
-  font-weight: 600;
-  transition: border-color 180ms ease, background-color 180ms ease,
-    color 180ms ease;
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-body);
+  font-size: 0.76rem;
+  font-weight: 700;
+  transition: border-color var(--dur) ease, background-color var(--dur) ease,
+    color var(--dur) ease;
 }
 .corporate-preset:hover {
-  border-color: #2563EB;
-  color: #1D4ED8;
+  border-color: var(--line-accent);
+  color: var(--summit-blue);
 }
 .corporate-preset.is-active {
-  border-color: #2563EB;
-  background: #2563EB;
-  color: #FFFFFF;
+  border-color: var(--summit-blue);
+  background: var(--summit-blue-tint);
+  color: var(--summit-blue);
 }
 
 .corporate-roster-progress {
   display: grid;
-  gap: 0.45rem;
+  gap: 0.5rem;
   margin-top: 1.25rem;
 }
 .corporate-roster-bar {
-  height: 0.4rem;
+  height: 0.3rem;
   border-radius: 999px;
-  background: #E2E8F0;
+  background: var(--line);
   overflow: hidden;
 }
 .corporate-roster-bar > span {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #2563EB, #60A5FA);
-  transition: width 220ms ease;
+  background: var(--summit-blue);
+  transition: width 220ms var(--ease-out);
 }
 .corporate-roster-progress p {
-  color: #475569;
-  font-size: 0.76rem;
-  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
 }
 
 .corporate-bulk {
   margin-top: 1.25rem;
   padding: 0.9rem 1.1rem;
-  border: 1px dashed #BFDBFE;
-  border-radius: var(--radius-sm);
-  background: #F8FAFC;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-soft);
 }
 .corporate-bulk > summary {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: #1D4ED8;
-  font-size: 0.82rem;
-  font-weight: 700;
+  color: var(--summit-blue);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
   cursor: pointer;
   list-style: none;
 }
@@ -2664,23 +2693,23 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   display: none;
 }
 .corporate-bulk > summary svg {
-  width: 1rem;
-  height: 1rem;
+  width: 0.95rem;
+  height: 0.95rem;
 }
 .corporate-bulk > p {
   margin-top: 0.6rem;
-  color: #64748B;
+  color: var(--text-muted);
   font-size: 0.76rem;
-  line-height: 1.55;
+  line-height: 1.6;
 }
 .corporate-bulk textarea {
   width: 100%;
   margin-top: 0.65rem;
   padding: 0.75rem 0.9rem;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background: #FFFFFF;
-  color: #0F172A;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text-strong);
   font-size: 0.85rem;
   line-height: 1.6;
   resize: vertical;
@@ -2694,12 +2723,12 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .corporate-bulk-actions .btn-outline {
   padding: 0.6rem 1.25rem;
-  border-color: #2563EB;
-  color: #1D4ED8;
-  font-size: 0.75rem;
+  border-color: var(--summit-blue);
+  color: var(--summit-blue);
+  font-size: 0.72rem;
 }
 .corporate-bulk-clear {
-  color: #64748B;
+  color: var(--text-muted);
   font-size: 0.76rem;
   font-weight: 600;
   text-decoration: underline;
@@ -2707,14 +2736,14 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
 }
 .corporate-bulk-notice {
   margin-top: 0.6rem;
-  color: #047857;
+  color: var(--summit-blue);
   font-size: 0.76rem;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .corporate-roster {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 @media (min-width: 640px) {
   .corporate-roster {
@@ -2731,96 +2760,42 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   flex: 1 1 auto;
   min-width: 0;
 }
+/* The seat number is set in the display face like every other numeral on the
+   page, in a square that shares the small radius rather than a lone pill. */
 .corporate-roster-index {
   display: grid;
   place-items: center;
-  width: 1.85rem;
-  height: 1.85rem;
+  width: 1.9rem;
+  height: 1.9rem;
   flex: none;
-  border-radius: 999px;
-  border: 1px solid #CBD5E1;
-  background: #F1F5F9;
-  color: #64748B;
-  font-size: 0.78rem;
-  font-weight: 700;
-  transition: background-color 180ms ease, border-color 180ms ease,
-    color 180ms ease;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface-soft);
+  color: var(--text-faint);
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 0.88rem;
+  font-weight: 780;
+  transition: background-color var(--dur) ease, border-color var(--dur) ease,
+    color var(--dur) ease;
 }
 .corporate-roster > li.is-filled .corporate-roster-index {
-  border-color: #34D399;
-  background: #ECFDF5;
-  color: #047857;
+  border-color: var(--line-accent);
+  background: var(--summit-blue-tint);
+  color: var(--summit-blue);
 }
 .corporate-roster-index svg {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke-width: 2.5;
 }
 
 .inquiry-field-hint {
   display: block;
   margin-top: 0.4rem;
-  color: #64748B;
+  color: var(--text-muted);
   font-size: 0.72rem;
 }
 
-.corporate-quote {
-  padding: 1.1rem 1.25rem;
-  border: 1px solid #BFDBFE;
-  border-radius: var(--radius-sm);
-  background: #EFF6FF;
-}
-.corporate-quote-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-.corporate-quote-head h3 {
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #1D4ED8;
-}
-.corporate-quote-badge {
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  background: #BBF7D0;
-  color: #166534;
-  font-size: 0.68rem;
-  font-weight: 700;
-  white-space: nowrap;
-}
-.corporate-quote dl {
-  display: grid;
-  gap: 0.4rem;
-}
-.corporate-quote dl > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.88rem;
-  color: #475569;
-}
-.corporate-quote .corporate-quote-discount {
-  color: #166534;
-}
-.corporate-quote .corporate-quote-total {
-  margin-top: 0.4rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid #BFDBFE;
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #0F172A;
-}
-.corporate-quote-note {
-  margin-top: 0.55rem;
-  color: #64748B;
-  font-size: 0.72rem;
-  line-height: 1.5;
-}
 .inquiry-form {
   width: 100%;
 }
@@ -2919,8 +2894,37 @@ h1, h2, h3, h4, h5, h6, .font-oswald {
   .corporate-layout {
     grid-template-columns: 1fr;
   }
+  /* Stacked, the rail is a banner above the form rather than a column beside
+     it: the two figures sit side by side so the buyer is not asked to scroll
+     past a full-height navy panel to reach the first field. */
   .corporate-rail-inner {
     position: static;
+    padding: clamp(1.5rem, 5vw, 2rem);
+  }
+  .corporate-rail-unit,
+  .corporate-rail-total {
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+  }
+  .corporate-rail-includes {
+    margin-top: 1.35rem;
+  }
+}
+@media (min-width: 480px) and (max-width: 1023px) {
+  .corporate-rail-unit,
+  .corporate-rail-total {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 0.15rem 1rem;
+  }
+  .corporate-rail-unit > s {
+    grid-column: 2;
+    text-align: right;
+  }
+  .corporate-rail-total > small {
+    grid-column: 2;
+    text-align: right;
   }
 }
 @media (max-width: 767px) {
@@ -7399,145 +7403,66 @@ h3,
   }
 }
 
-/* === Ticket checkout (MercadoPago) === */
+/* === Ticket checkout (MercadoPago) ===
+   The checkout is a page of this site, not a detached payment widget, so it
+   draws from the same tokens as the landing: one hairline, three radii, the
+   display face on every numeral, and the brand tint as the only fill. */
+.checkout-page {
+  padding-block: clamp(3.5rem, 7vw, 5.5rem);
+  background: var(--surface-soft);
+}
+.checkout-page-inner {
+  width: min(100%, 52rem);
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+.checkout-page-head {
+  padding-bottom: 1.75rem;
+  border-bottom: 1px solid var(--line);
+}
+.checkout-page-head .section-title {
+  margin-inline: 0;
+  max-width: 16ch;
+  text-align: left;
+  font-size: clamp(2.25rem, 4.5vw, 3rem);
+}
+.checkout-panel {
+  margin-top: 2rem;
+  padding: clamp(1.5rem, 4vw, 2.75rem);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  box-shadow: var(--elev-2);
+}
+.checkout-outcome-panel {
+  margin-top: 2rem;
+  text-align: left;
+}
+
 .checkout-tier {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.2rem;
-  padding: 0.9rem 1rem;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background: #F8FAFC;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
   cursor: pointer;
-  transition: border-color 180ms ease, background-color 180ms ease,
-    box-shadow 180ms ease;
+  transition: border-color var(--dur) ease, background-color var(--dur) ease;
 }
 .checkout-tier:hover {
-  border-color: #94A3B8;
+  border-color: var(--line-accent);
 }
 .checkout-tier.is-selected {
-  border-color: #2563EB;
-  background: #EFF6FF;
-  box-shadow: 0 0 0 1px #2563EB inset;
+  border-color: var(--summit-blue);
+  background: var(--summit-blue-tint);
 }
 /* Keyboard focus lands on the visually hidden radio, so the ring is drawn
    on the label that actually renders. */
 .checkout-tier:focus-within {
-  outline: 2px solid #2563EB;
+  outline: 2px solid var(--summit-blue);
   outline-offset: 2px;
-}
-.checkout-tier-name {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: #0F172A;
-}
-.checkout-tier-price {
-  font-family: var(--font-oswald), system-ui, sans-serif;
-  font-size: 1.15rem;
-  font-weight: 700;
-  color: #0F172A;
-}
-.checkout-tier-note {
-  font-size: 0.68rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: #64748B;
-}
-.inquiry-input-wrap select {
-  width: 100%;
-  min-height: 3rem;
-  padding: 0.75rem 2.2rem 0.75rem 0.9rem;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background-color: #F8FAFC;
-  color: #0F172A;
-  font-size: 0.88rem;
-  appearance: none;
-  background-image: linear-gradient(45deg, transparent 50%, #94A3B8 50%),
-    linear-gradient(135deg, #94A3B8 50%, transparent 50%);
-  background-position: calc(100% - 1.1rem) 1.35rem, calc(100% - 0.75rem) 1.35rem;
-  background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
-  background-repeat: no-repeat;
-  transition: border-color 180ms ease, box-shadow 180ms ease;
-}
-.checkout-summary {
-  padding: 1.1rem 1.25rem;
-  border: 1px solid #CBD5E1;
-  border-radius: var(--radius-sm);
-  background: #F8FAFC;
-}
-.checkout-summary h3 {
-  margin-bottom: 0.65rem;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #334155;
-}
-.checkout-summary dl {
-  display: grid;
-  gap: 0.4rem;
-}
-.checkout-summary dl > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1rem;
-  font-size: 0.88rem;
-  color: #475569;
-}
-.checkout-summary .checkout-summary-total {
-  margin-top: 0.4rem;
-  padding-top: 0.6rem;
-  border-top: 1px solid #CBD5E1;
-  font-size: 1rem;
-  font-weight: 700;
-  color: #0F172A;
-}
-/* The volume discount is the one line in the summary that subtracts, so it is
-   the one line that is not slate. */
-.checkout-summary .checkout-summary-discount {
-  color: #047857;
-  font-weight: 600;
-}
-.checkout-summary-note {
-  margin-top: 0.55rem;
-  font-size: 0.76rem;
-  color: #64748B;
-}
-/* The volume offer is announced next to the quantity, where it can still
-   change the decision, and turns green once it has been earned. */
-.checkout-volume-note {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.5rem;
-  margin-top: 0.85rem;
-  padding: 0.7rem 0.9rem;
-  border: 1px solid #BFDBFE;
-  border-radius: var(--radius-sm);
-  background: #EFF6FF;
-  color: #1E3A8A;
-  font-size: 0.79rem;
-  font-weight: 600;
-  line-height: 1.5;
-}
-.checkout-volume-note svg {
-  width: 1.05rem;
-  height: 1.05rem;
-  flex: none;
-  color: #2563EB;
-}
-.checkout-volume-note.is-applied {
-  border-color: #6EE7B7;
-  background: #ECFDF5;
-  color: #065F46;
-}
-.checkout-volume-note.is-applied svg {
-  color: #047857;
-}
-.checkout-tier {
-  position: relative;
 }
 /* The radio stays a real focusable control but covers its whole card, so a
    pointer anywhere on the card selects the tier instead of landing on the
@@ -7553,6 +7478,145 @@ h3,
   clip-path: none;
   cursor: pointer;
 }
+.checkout-tier-name {
+  color: var(--text-strong);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.checkout-tier-price {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.45rem;
+  font-weight: 780;
+  line-height: 1.1;
+  color: var(--text-strong);
+}
+.checkout-tier-note {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+.checkout-tier-badge {
+  position: absolute;
+  pointer-events: none;
+  top: -0.6rem;
+  right: 0.6rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: var(--summit-blue);
+  color: var(--surface);
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.inquiry-input-wrap select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.75rem 2.2rem 0.75rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background-color: var(--surface-soft);
+  color: var(--text-strong);
+  font-size: 0.88rem;
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--text-faint) 50%),
+    linear-gradient(135deg, var(--text-faint) 50%, transparent 50%);
+  background-position: calc(100% - 1.1rem) 1.35rem, calc(100% - 0.75rem) 1.35rem;
+  background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+  background-repeat: no-repeat;
+  transition: border-color var(--dur) ease;
+}
+/* The summary is a receipt, so it is ruled rather than boxed: the total sits
+   under a hairline in the display face, the way every price on the page is
+   set. */
+.checkout-summary {
+  padding-top: 1.1rem;
+  border-top: 2px solid var(--text-strong);
+}
+.checkout-summary h2,
+.checkout-summary h3 {
+  margin-bottom: 0.8rem;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--summit-blue);
+}
+.checkout-summary dl {
+  display: grid;
+  gap: 0.45rem;
+}
+.checkout-summary dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.86rem;
+  color: var(--text-body);
+}
+.checkout-summary .checkout-summary-total {
+  margin-top: 0.55rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-strong);
+}
+.checkout-summary .checkout-summary-total dt {
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.checkout-summary .checkout-summary-total dd {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: 1.6rem;
+  font-weight: 780;
+  line-height: 1.05;
+}
+/* The volume discount is the one line in the summary that subtracts, so it is
+   the one line that is not slate. */
+.checkout-summary .checkout-summary-discount {
+  color: var(--summit-blue);
+  font-weight: 700;
+}
+.checkout-summary-note {
+  margin-top: 0.65rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+/* The volume offer is announced next to the quantity, where it can still
+   change the decision, on the same leading-edge rule the corporate rail uses
+   so the two ways of buying speak with one voice. */
+.checkout-volume-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+  padding: 0.1rem 0 0.1rem 0.85rem;
+  border-left: 2px solid var(--line-accent);
+  color: var(--text-body);
+  font-size: 0.79rem;
+  font-weight: 600;
+  line-height: 1.55;
+}
+.checkout-volume-note svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  margin-top: 0.2rem;
+  color: var(--summit-blue);
+}
+.checkout-volume-note.is-applied {
+  border-left-color: var(--summit-blue);
+  color: var(--text-strong);
+  font-weight: 700;
+}
 .pricing-tier-volume {
   margin-top: 0.35rem;
   color: #047857;
@@ -7563,16 +7627,68 @@ h3,
 .pricing-tier--featured .pricing-tier-volume {
   color: #6EE7B7;
 }
-.checkout-tier-badge {
-  position: absolute;
-  pointer-events: none;
-  top: -0.6rem;
-  right: 0.6rem;
-  padding: 0.15rem 0.5rem;
-  border-radius: 999px;
-  background: #047857;
-  color: #FFFFFF;
-  font-size: 0.62rem;
+/* Form scaffolding shared by both ways of buying. A legend, a hint and the
+   legal line read the same on the individual checkout and inside a corporate
+   step, so neither drifts into its own type scale. */
+.checkout-legend {
+  color: var(--summit-blue);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.checkout-hint {
+  margin-top: 0.5rem;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+.checkout-invoice-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+  color: var(--text-body);
+  font-size: 0.86rem;
+  cursor: pointer;
+}
+.checkout-invoice-toggle input[type="checkbox"] {
+  margin-top: 0.2rem;
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+  accent-color: var(--summit-blue);
+}
+.checkout-invoice-toggle-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-strong);
   font-weight: 700;
-  letter-spacing: 0.04em;
+}
+.checkout-invoice-toggle-title svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--summit-blue);
+}
+.checkout-invoice-toggle-hint {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+.checkout-legal {
+  margin-top: 1.5rem;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  line-height: 1.7;
+}
+.checkout-legal a {
+  color: var(--summit-blue);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
