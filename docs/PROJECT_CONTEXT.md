@@ -132,6 +132,23 @@ acceso usa contraseña más cookie de sesión firmada (HMAC, HttpOnly,
 SameSite=Lax, 8 horas) y los intentos de login pasan por el mismo limitador
 Upstash que los formularios públicos.
 
+Además de las solicitudes, el panel opera la venta: `/admin/ordenes` para las
+compras y `/admin/boletos` para los accesos vendidos uno por asiento, con el
+seguimiento de venta (boletos, cobrado con IVA, promedio, últimos siete días,
+conversión, desglose por tipo de acceso, venta por día, origen declarado y
+cupo) y la descarga en CSV para la mesa de registro. Las tres secciones
+comparten la misma navegación y la misma sesión. Ver `docs/PAYMENTS.md`.
+
+`ADMIN_ACCESS_KEY` agrega, opcionalmente, una puerta previa de enlace privado:
+con esa variable configurada toda ruta `/admin` responde 404 hasta que el
+navegador visita una vez `/admin/acceso?k=<clave>`, que valida la clave en
+tiempo constante, guarda una cookie de puerta firmada (HMAC, HttpOnly, 30 días)
+y redirige al login sin la clave en la URL. La contraseña sigue siendo
+obligatoria después: el enlace no da acceso a ningún dato por sí mismo, sólo
+hace visible el panel. Sin la cookie de puerta no hay login ni sesión válida,
+así que nadie llega al panel escribiendo la URL. Si `ADMIN_ACCESS_KEY` no está
+configurada, el panel se comporta como antes.
+
 El panel no reemplaza a Supabase Studio con cuentas individuales y MFA, que
 sigue siendo válido con las mismas restricciones de campos.
 

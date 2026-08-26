@@ -394,6 +394,22 @@ export const ENV_SPEC = [
     templateValue: "",
   },
   {
+    name: "ADMIN_ACCESS_KEY",
+    scope: "server",
+    secret: true,
+    runtimeRequired: false,
+    previewRequired: false,
+    productionRequired: false,
+    forbiddenTargets: ["preview"],
+    format: "token",
+    placeholderAllowed: false,
+    placeholders: ["change-me", "replace_with_random_secret"],
+    group: "Operations panel (server only)",
+    description:
+      "Optional private-link key (32+ chars). With it set, every /admin URL answers 404 until the browser visits /admin/acceso?k=<key> once; the password login still applies afterwards. Forbidden in Preview.",
+    templateValue: "",
+  },
+  {
     name: "ENFORCE_ENV_VALIDATION",
     scope: "server",
     secret: false,

@@ -78,7 +78,12 @@ idempotency contract as the inquiry one. One cron drains both queues.
 
 `/admin/ordenes` lists and details orders. Its writes are restricted to
 `invoice_status`, `cfdi_uuid`, `owner` and `internal_notes`; capacity is
-read-only there and configured in Studio.
+read-only there and configured in Studio. `/admin/boletos` is the same data per
+seat — one row per paid access, named from the corporate roster when there is
+one — with the sales tracking above it and a CSV download. A ticket is not a
+table: its folio and per-seat amount are derived in `lib/admin/tickets.ts`, the
+amount splits the order total without losing a cent, and the page writes
+nothing.
 
 Never log buyer identity, RFC, legal name or postal code, and never put fiscal
 identifiers in an email.
@@ -222,7 +227,10 @@ only after persistence succeeds.
 `/admin` is an internal panel over `inquiries`: list, filters, detail and the
 notification state of each request. It unlocks only when `ADMIN_PASSWORD` and
 `ADMIN_SESSION_SECRET` are both set, and answers 404 otherwise, so Preview
-never exposes it. Its writes are restricted to `status`, `owner`,
+never exposes it. `ADMIN_ACCESS_KEY` is an optional private-link gate in front
+of that: with it set, every `/admin` URL answers 404 until the browser visits
+`/admin/acceso?k=<key>` once and receives the signed gate cookie; the password
+login still applies, and the key alone grants no data. Its writes are restricted to `status`, `owner`,
 `internal_notes` and `next_follow_up_at` — the same fields Supabase Studio
 allows. Supabase Studio with MFA remains valid for anything the panel does not
 cover.

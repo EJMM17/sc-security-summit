@@ -85,10 +85,19 @@ export const INVOICE_STATUS_VALUES = [
 
 export type AdminInvoiceStatus = (typeof INVOICE_STATUS_VALUES)[number];
 
+export const TICKET_TIER_VALUES = [
+  "plus",
+  "general",
+  "estudiante",
+  "corporativo",
+] as const;
+
+export type AdminTicketTier = (typeof TICKET_TIER_VALUES)[number];
+
 export type AdminTicketOrder = {
   id: string;
   status: AdminTicketOrderStatus;
-  tier: "plus" | "general" | "estudiante" | "corporativo";
+  tier: AdminTicketTier;
   quantity: number;
   subtotal_cents: number;
   tax_cents: number;
@@ -151,4 +160,76 @@ export type AdminTicketCapacity = {
   hold_minutes: number;
   committed_seats: number;
   remaining_seats: number;
+};
+
+// ---------------------------------------------------------------------------
+// Sold accesses and sales tracking
+// ---------------------------------------------------------------------------
+
+/**
+ * One purchased access. Derived from an order and its roster rather than
+ * stored: `ticket_code` and `amount_cents` are computed in
+ * `lib/admin/tickets.ts` and exist only for the panel.
+ */
+export type AdminSoldTicket = {
+  order_id: string;
+  ticket_code: string;
+  seat_number: number;
+  seats_in_order: number;
+  tier: AdminTicketTier;
+  attendee_name: string | null;
+  buyer_name: string;
+  email: string;
+  phone: string;
+  company: string | null;
+  referral_source: string | null;
+  language: "es" | "en";
+  status: AdminTicketOrderStatus;
+  invoice_status: AdminInvoiceStatus;
+  amount_cents: number;
+  paid_at: string | null;
+  created_at: string;
+};
+
+export type AdminSalesTierRow = {
+  tier: AdminTicketTier;
+  seats: number;
+  orders: number;
+  grossCents: number;
+};
+
+export type AdminSalesDayRow = {
+  day: string;
+  seats: number;
+  grossCents: number;
+};
+
+export type AdminSalesReferralRow = {
+  source: string;
+  seats: number;
+  orders: number;
+};
+
+export type AdminSalesTracking = {
+  soldSeats: number;
+  paidOrders: number;
+  /** Seats of orders still in checkout: held, not sold. */
+  heldSeats: number;
+  heldOrders: number;
+  /** Rejected, cancelled, refunded or charged back. */
+  lostOrders: number;
+  grossCents: number;
+  taxCents: number;
+  netCents: number;
+  averageOrderCents: number;
+  averageSeatCents: number;
+  invoicesRequested: number;
+  invoicesIssued: number;
+  seatsLast7Days: number;
+  lastSaleAt: string | null;
+  /** Paid over resolved checkouts, or null while none has resolved. */
+  conversionRate: number | null;
+  byTier: AdminSalesTierRow[];
+  byDay: AdminSalesDayRow[];
+  byReferral: AdminSalesReferralRow[];
 };
