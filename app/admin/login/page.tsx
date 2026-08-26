@@ -17,13 +17,14 @@ export default async function AdminLoginPage() {
           Panel de operación
         </h1>
         <p className="mt-2 mb-6 text-sm text-slate-600">
-          Acceso restringido. Aquí se consultan las solicitudes de pase
-          corporativo y patrocinio recibidas por los formularios del sitio.
+          Acceso restringido. Aquí se consultan las solicitudes recibidas por
+          los formularios del sitio, las órdenes de compra y los boletos
+          vendidos.
         </p>
         <LoginForm />
       </div>
       <p className="mt-6 text-center text-xs text-slate-500">
-        Las compras de accesos individuales están en Órdenes.
+        Sesión de 8 horas. Cerrar sesión no revoca el enlace de acceso.
       </p>
     </main>
   );

@@ -1,7 +1,9 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
+  adminAccessKey,
   adminPassword,
   adminSessionSecret,
+  isAdminLinkGateEnabled,
   isAdminPanelConfigured,
 } from "@/lib/admin/config";
 
@@ -48,5 +50,35 @@ describe("admin panel configuration", () => {
     setSecrets("  a-sufficiently-long-password  ", "a-sufficiently-long-session-secret");
     expect(isAdminPanelConfigured()).toBe(true);
     expect(adminPassword()).toBe("a-sufficiently-long-password");
+  });
+});
+
+describe("private-link gate", () => {
+  const ORIGINAL_KEY = process.env.ADMIN_ACCESS_KEY;
+
+  afterEach(() => {
+    if (ORIGINAL_KEY === undefined) delete process.env.ADMIN_ACCESS_KEY;
+    else process.env.ADMIN_ACCESS_KEY = ORIGINAL_KEY;
+  });
+
+  it("is off when no access key is configured", () => {
+    delete process.env.ADMIN_ACCESS_KEY;
+    expect(isAdminLinkGateEnabled()).toBe(false);
+    expect(adminAccessKey()).toBeNull();
+  });
+
+  it("ignores a key that is too short or carries whitespace", () => {
+    process.env.ADMIN_ACCESS_KEY = "short-key";
+    expect(isAdminLinkGateEnabled()).toBe(false);
+
+    process.env.ADMIN_ACCESS_KEY = `${"a".repeat(20)} ${"b".repeat(20)}`;
+    expect(isAdminLinkGateEnabled()).toBe(false);
+  });
+
+  it("turns on with a long key and trims it", () => {
+    const key = "k".repeat(40);
+    process.env.ADMIN_ACCESS_KEY = `  ${key}  `;
+    expect(isAdminLinkGateEnabled()).toBe(true);
+    expect(adminAccessKey()).toBe(key);
   });
 });

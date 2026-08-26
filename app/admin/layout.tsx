@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { hasAdminAccessGate } from "@/lib/admin/auth";
 import { isAdminPanelConfigured } from "@/lib/admin/config";
 
 export const metadata: Metadata = {
@@ -9,14 +10,16 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-export default function AdminLayout({
+export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
   // A deployment without both admin secrets has no panel at all, not a login
-  // screen that advertises one.
+  // screen that advertises one. With ADMIN_ACCESS_KEY set, the same is true
+  // for anyone who did not arrive through the private link.
   if (!isAdminPanelConfigured()) notFound();
+  if (!(await hasAdminAccessGate())) notFound();
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">{children}</div>

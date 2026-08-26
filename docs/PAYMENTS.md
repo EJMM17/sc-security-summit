@@ -412,6 +412,23 @@ evidencia recibida y son de sólo lectura. No se puede marcar una factura como
 emitida sin capturar su UUID fiscal, ni operar el flujo de factura en una orden
 cuyo comprador no la pidió.
 
+`/admin/boletos` es la misma información vista por asiento en lugar de por
+orden: un renglón por acceso pagado, con el nombre del participante cuando la
+orden trae roster corporativo y el del comprador cuando no. Encima de la tabla
+va el seguimiento de venta —boletos vendidos, órdenes pagadas, cobrado con
+IVA, IVA incluido, promedio por boleto, boletos de los últimos siete días,
+asientos aún en proceso y conversión—, el desglose por tipo de acceso, la
+venta por día en zona horaria del evento, el origen declarado por el comprador
+(`referral_source`) y el cupo. `/admin/boletos/lista.csv` descarga la lista
+filtrada para la mesa de registro y para los DC-3.
+
+Ni el boleto ni su folio son tablas: el folio `SCS-<orden>-<asiento>` y el
+importe por asiento se derivan de la orden en `lib/admin/tickets.ts`. El
+importe se reparte sin perder centavos, así que la suma de los asientos es
+exactamente lo cobrado. El folio es referencia interna del panel y no sustituye
+al comprobante de MercadoPago. `/admin/boletos` no escribe nada: la única
+escritura sobre órdenes sigue siendo la de `/admin/ordenes/[id]`.
+
 El cupo se muestra en el panel pero **no se edita desde ahí**: `service_role`
 sólo tiene `select` sobre `ticket_capacity`. Se configura en Studio.
 
@@ -422,4 +439,6 @@ sólo tiene `select` sobre `ticket_capacity`. Se configura en Studio.
   operan desde el panel de MercadoPago; la cancelación del CFDI o la nota de
   crédito es manual.
 - No hay check-in digital: el comprobante de compra es el documento que se
-  presenta el día del evento.
+  presenta el día del evento. `/admin/boletos` y su CSV son la lista de
+  asistentes, no un control de acceso: no registran entradas ni marcan
+  asistencia.
