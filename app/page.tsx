@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { headers } from "next/headers";
 import ScrollRevealObserver from "@/components/ScrollRevealObserver";
 import ScrollProgress from "@/components/ScrollProgress";
-import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
+import { getRequestLanguage } from "@/lib/language";
 import { BASE_URL, CHECKOUT_URL, CONTENT } from "@/lib/content";
 import { quoteTicketOrder } from "@/lib/payments/catalog";
 import { centsToAmount } from "@/lib/payments/tax";
@@ -61,7 +61,11 @@ export async function generateMetadata({
   searchParams?: SearchParams;
 }): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const lang = resolveRequestLanguage(params?.lang);
+  // The body resolves the language from the param, the NEXT_LOCALE cookie and
+  // Accept-Language. Resolving the metadata from the param alone left an
+  // English reader with an English page under a Spanish <title> and og:locale,
+  // contradicting the <html lang> the layout had already emitted.
+  const lang = await getRequestLanguage(params?.lang ?? null);
   const m = META[lang];
 
   return {
@@ -140,9 +144,9 @@ function buildStructuredData(lang: "es" | "en") {
           jobTitle: s.role,
           image: `${BASE_URL}${s.image}`,
         })),
-        // Published prices are IVA-exclusive, but a rich result must show what
-        // the buyer actually pays, so the offer carries the gross amount and
-        // declares the tax as included in it.
+        // Published prices already include IVA, and a rich result must show
+        // what the buyer actually pays, so the offer carries that gross amount
+        // and declares the tax as included in it.
         offers: content.pricing.map((plan) => {
           const quote = quoteTicketOrder(plan.id, 1);
           return {

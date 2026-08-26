@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import PageShell from "@/components/PageShell";
-import { getRequestLanguage, resolveRequestLanguage } from "@/lib/language";
+import { getRequestLanguage } from "@/lib/language";
 import { BASE_URL } from "@/lib/content";
 
 const PATH = "/seguridad-cadena-suministro";
@@ -83,7 +83,11 @@ export async function generateMetadata({
   searchParams?: SearchParams;
 }): Promise<Metadata> {
   const params = searchParams ? await searchParams : undefined;
-  const lang = resolveRequestLanguage(params?.lang);
+  // The body resolves the language from the param, the NEXT_LOCALE cookie and
+  // Accept-Language. Resolving the metadata from the param alone left an
+  // English reader with an English page under a Spanish <title> and og:locale,
+  // contradicting the <html lang> the layout had already emitted.
+  const lang = await getRequestLanguage(params?.lang ?? null);
   const c = COPY[lang];
   return {
     title: c.title,

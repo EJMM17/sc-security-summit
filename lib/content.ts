@@ -182,6 +182,9 @@ export const UI_TEXT = {
     datesValue: "24 de septiembre, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contacto",
+    whatsappLabel: "Contactar por WhatsApp",
+    whatsappMessage:
+      "Hola, me interesa obtener información sobre el Summit de Seguridad en la Cadena de Suministros 2026.",
     faqLabel: "PREGUNTAS FRECUENTES",
     faqTitle: "Preguntas frecuentes",
     regLabel: "PASES CORPORATIVOS",
@@ -333,6 +336,9 @@ export const UI_TEXT = {
     datesValue: "September 24, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contact",
+    whatsappLabel: "Contact us on WhatsApp",
+    whatsappMessage:
+      "Hi, I would like information about the Supply Chain Security Summit 2026.",
     faqLabel: "FREQUENTLY ASKED QUESTIONS",
     faqTitle: "Frequently asked questions",
     regLabel: "CORPORATE PASSES",

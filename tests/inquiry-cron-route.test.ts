@@ -172,6 +172,62 @@ describe("inquiry notification cron", () => {
     });
   });
 
+  it("names the failing task and its code in the log line", async () => {
+    // A bare 500 said only that something failed. Production ran a cron that
+    // failed two runs out of three and the logs could not say which queue.
+    process.env.CRON_SECRET = "correct-secret";
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
+    const rejection = Object.assign(new Error("claim failed"), {
+      code: "PGRST202",
+    });
+    mockedProcess.mockRejectedValue(rejection);
+    mockedTicketProcess.mockResolvedValue({ ...EMPTY_BATCH });
+
+    const response = await GET(request("Bearer correct-secret"));
+
+    expect(response.status).toBe(500);
+    expect(errorLog).toHaveBeenCalledTimes(1);
+    const entry = JSON.parse(errorLog.mock.calls[0][0] as string);
+    expect(entry.event).toBe("cron_run_failed");
+    expect(entry.failures).toEqual([{ task: "inquiries", code: "PGRST202" }]);
+    errorLog.mockRestore();
+  });
+
+  it("reports every failing task, not just the first", async () => {
+    process.env.CRON_SECRET = "correct-secret";
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockedProcess.mockRejectedValue(new Error("inquiry outbox down"));
+    mockedTicketProcess.mockRejectedValue(new Error("ticket outbox down"));
+
+    const response = await GET(request("Bearer correct-secret"));
+
+    expect(response.status).toBe(500);
+    const entry = JSON.parse(errorLog.mock.calls[0][0] as string);
+    expect(entry.failures.map((f: { task: string }) => f.task)).toEqual([
+      "inquiries",
+      "ticketOrders",
+    ]);
+    errorLog.mockRestore();
+  });
+
+  it("keeps buyer data out of the logged failure", async () => {
+    // The message carries an address; only the sanitized code may be logged.
+    process.env.CRON_SECRET = "correct-secret";
+    const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
+    mockedProcess.mockRejectedValue(new Error("ada@example.com"));
+    mockedTicketProcess.mockResolvedValue({ ...EMPTY_BATCH });
+
+    const response = await GET(request("Bearer correct-secret"));
+
+    expect(response.status).toBe(500);
+    const logged = errorLog.mock.calls[0][0] as string;
+    expect(logged).not.toContain("ada@example.com");
+    expect(JSON.parse(logged).failures).toEqual([
+      { task: "inquiries", code: "Error" },
+    ]);
+    errorLog.mockRestore();
+  });
+
   it("uses the default batch size for an invalid configuration", async () => {
     process.env.CRON_SECRET = "correct-secret";
     process.env.INQUIRY_NOTIFICATION_BATCH_SIZE = "not-a-number";

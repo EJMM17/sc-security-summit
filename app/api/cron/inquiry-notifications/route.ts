@@ -20,6 +20,25 @@ function authorized(request: Request, secret: string): boolean {
   );
 }
 
+/**
+ * The technical code of a failed cron task, and nothing else.
+ *
+ * Both repository errors already carry a sanitized `code`; the surrounding
+ * message names the operation and never a payload. Anything else is reduced to
+ * its constructor name, so a provider error object can never leak a buyer
+ * address or a fiscal identifier into a log line.
+ */
+function failureCode(error: unknown): string {
+  if (typeof error === "object" && error !== null && "code" in error) {
+    const code = String((error as { code: unknown }).code);
+    if (/^[a-zA-Z0-9_.-]{1,64}$/.test(code)) return code;
+  }
+  if (error instanceof Error && /^[a-zA-Z0-9_.-]{1,64}$/.test(error.name)) {
+    return error.name;
+  }
+  return "unexpected_error";
+}
+
 function notificationBatchSize(): number {
   const configured = Number(process.env.INQUIRY_NOTIFICATION_BATCH_SIZE);
   if (!Number.isInteger(configured) || configured < 1) return DEFAULT_BATCH_SIZE;
@@ -63,10 +82,37 @@ export async function GET(request: Request) {
 
     // Both queues are always attempted, but a failure in either one still
     // fails the run: a cron that silently reports success is a cron nobody
-    // notices has stopped working.
-    if (inquiries.status === "rejected") throw inquiries.reason;
-    if (ticketOrders.status === "rejected") throw ticketOrders.reason;
-    if (sweep.status === "rejected") throw sweep.reason;
+    // notices has stopped working. Naming the task that failed is what makes
+    // that visible run diagnosable — a bare 500 says only that something did.
+    if (
+      inquiries.status === "rejected" ||
+      ticketOrders.status === "rejected" ||
+      sweep.status === "rejected"
+    ) {
+      const failures = (
+        [
+          ["inquiries", inquiries],
+          ["ticketOrders", ticketOrders],
+          ["pendingOrderSweep", sweep],
+        ] as const
+      ).flatMap(([task, outcome]) =>
+        outcome.status === "rejected"
+          ? [{ task, code: failureCode(outcome.reason) }]
+          : [],
+      );
+
+      console.error(
+        JSON.stringify({
+          timestamp: new Date().toISOString(),
+          event: "cron_run_failed",
+          failures,
+        }),
+      );
+      return NextResponse.json(
+        { ok: false, reason: "processing_unavailable" },
+        { status: 500 },
+      );
+    }
 
     return NextResponse.json({
       ok: true,
@@ -74,7 +120,14 @@ export async function GET(request: Request) {
       ticketOrders: ticketOrders.value,
       pendingOrderSweep: sweep.value,
     });
-  } catch {
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        timestamp: new Date().toISOString(),
+        event: "cron_run_failed",
+        failures: [{ task: "route", code: failureCode(error) }],
+      }),
+    );
     return NextResponse.json(
       { ok: false, reason: "processing_unavailable" },
       { status: 500 },

@@ -614,6 +614,7 @@ export default function TicketCheckoutForm({
                   <p>{copy.corporateBulkHint}</p>
                   <textarea
                     rows={4}
+                    aria-label={copy.corporateBulkToggle}
                     value={bulkNames}
                     placeholder={copy.corporateBulkPlaceholder}
                     onChange={(event) => setBulkNames(event.target.value)}
