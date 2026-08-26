@@ -1154,7 +1154,7 @@ export const CHECKOUT = {
     label: "COMPRA EN LÍNEA",
     title: "Reserva tu acceso",
     desc:
-      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. El precio publicado es el total final: ya incluye IVA y no se suma nada al pagar.",
+      "Paga con tarjeta, transferencia SPEI o efectivo a través de MercadoPago. El precio publicado ya incluye el IVA del 16%; MercadoPago suma aparte su cargo por plataforma, que verás en el checkout antes de confirmar.",
     tierLegend: "Tipo de acceso",
     quantity: "Cantidad",
     quantityHint: "Máximo {max} por compra.",
@@ -1209,10 +1209,12 @@ export const CHECKOUT = {
     summaryAccesses: "Accesos",
     summaryTotal: "Total a pagar",
     summaryTaxIncluded: "Precio final. Incluye IVA del 16%.",
-    submit: "PAGAR CON MERCADOPAGO",
+    summaryPlatformFee:
+      "Incluye IVA del 16%. MercadoPago suma aparte su cargo por plataforma; lo verás desglosado en el checkout antes de confirmar.",
+    submit: "PROCESAR PAGO",
     submitSending: "REDIRIGIENDO...",
     redirectNote:
-      "Te llevamos al checkout seguro de MercadoPago para completar el pago.",
+      "Te llevamos al checkout seguro de MercadoPago para completar el pago. Ahí verás el cargo por plataforma antes de confirmar.",
     privacy:
       "Al continuar aceptas que usemos tus datos para procesar esta compra, emitir tu acceso y, si lo solicitaste, tu CFDI.",
     privacyLink: "Consulta el Aviso de Privacidad.",
@@ -1253,7 +1255,7 @@ export const CHECKOUT = {
     label: "ONLINE PURCHASE",
     title: "Reserve your pass",
     desc:
-      "Pay by card, SPEI transfer or cash through MercadoPago. The published price is the final total: VAT is already included and nothing is added at checkout.",
+      "Pay by card, SPEI transfer or cash through MercadoPago. The published price already includes the 16% VAT; MercadoPago adds its own platform fee on top, shown at checkout before you confirm.",
     tierLegend: "Pass type",
     quantity: "Quantity",
     quantityHint: "Up to {max} per purchase.",
@@ -1308,10 +1310,12 @@ export const CHECKOUT = {
     summaryAccesses: "Passes",
     summaryTotal: "Total due",
     summaryTaxIncluded: "Final price. Includes 16% VAT.",
-    submit: "PAY WITH MERCADOPAGO",
+    summaryPlatformFee:
+      "Includes 16% VAT. MercadoPago adds its platform fee on top; it is itemized at checkout before you confirm.",
+    submit: "PROCESS PAYMENT",
     submitSending: "REDIRECTING...",
     redirectNote:
-      "You will be taken to MercadoPago's secure checkout to complete the payment.",
+      "You will be taken to MercadoPago's secure checkout to complete the payment. The platform fee is shown there before you confirm.",
     privacy:
       "By continuing you agree that we use your data to process this purchase, issue your pass and, if requested, your CFDI.",
     privacyLink: "Read the Privacy Notice.",
