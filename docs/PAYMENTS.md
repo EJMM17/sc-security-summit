@@ -243,6 +243,40 @@ que la corrida de cron de cada cinco minutos también barre pedidos pendientes
 - Si el checkout está apagado (sin credenciales) devuelve un barrido vacío en
   vez de fallar la corrida.
 
+### Checkout abandonado
+
+Un comprador que cierra la pestaña nunca genera un pago: MercadoPago no tiene
+nada que notificar y la reconciliación no tiene nada que aplicar. Sin más, el
+pedido se queda `pending` mientras exista la fila, el panel no distingue un
+abandono de alguien que está pagando ahora mismo, y el barrido vuelve a
+preguntar por él cada cinco minutos hasta que caduca la ventana de siete días.
+
+Por eso la misma corrida cierra los abandonos, con
+`public.expire_stale_ticket_orders(uuid[], integer)`:
+
+- **Sólo expira lo que el proveedor confirmó.** El barrido nombra únicamente
+  los pedidos que acaba de consultar y para los que MercadoPago respondió que
+  no tiene ningún pago. La antigüedad por sí sola no prueba abandono —un pago
+  puede estar en un estado no terminal que el sitio aún no registró— y un
+  proveedor inalcanzable no expira nada: sin respuesta, "abandonado" y "no
+  pude comprobar" se ven igual.
+- **La base vuelve a comprobar todo.** Sigue `pending`, sin
+  `provider_payment_id` y con más de 60 minutos, dentro de la misma sentencia
+  que escribe el cambio y con `for update skip locked`, así que un pago que
+  aterriza en ese instante gana.
+- **El piso son 30 minutos**, la expiración de la preferencia
+  (`CHECKOUT_EXPIRY_MINUTES`). El parámetro se acota, no se obedece.
+- El pedido queda `cancelled` con `provider_status = 'expired'`, que no colisiona
+  con ningún estado real de MercadoPago y deja ver en `/admin` la diferencia
+  entre un abandono y una cancelación del comprador. Se registra un evento
+  `order_expired`.
+- **Expirar no cierra el dinero.** `record_ticket_order_payment` sigue moviendo
+  un pedido `cancelled` a `paid` si un pago real llega tarde por el webhook, y
+  el disparador del comprobante actúa como siempre.
+- El seguimiento de venta cuenta esos pedidos como **abandonados**, no como
+  venta perdida: nadie intentó pagar y nada fue rechazado, así que la tasa de
+  conversión conserva su significado.
+
 ### Idempotencia
 
 Tres capas, todas necesarias:

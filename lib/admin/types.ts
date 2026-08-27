@@ -216,8 +216,10 @@ export type AdminSalesTracking = {
   /** Seats of orders still in checkout: held, not sold. */
   heldSeats: number;
   heldOrders: number;
-  /** Rejected, cancelled, refunded or charged back. */
+  /** Rejected, cancelled, refunded or charged back after a payment attempt. */
   lostOrders: number;
+  /** Checkouts abandoned before any payment, cancelled by the sweep. */
+  abandonedOrders: number;
   grossCents: number;
   taxCents: number;
   netCents: number;

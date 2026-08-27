@@ -1165,6 +1165,12 @@ export type Database = {
           total_cents: number
         }[]
       }
+      expire_stale_ticket_orders: {
+        Args: { p_expiry_minutes?: number; p_order_ids: string[] }
+        Returns: {
+          order_id: string
+        }[]
+      }
       get_cupos_disponibles: { Args: never; Returns: number }
       is_safe_inquiry_event_metadata: {
         Args: { p_metadata: Json }

@@ -106,6 +106,35 @@ Mientras Supabase esté sano, la captura sigue disponible y el usuario recibe
 5. Cuando vuelva el servicio, ejecuta una solicitud controlada y confirma fila,
    outbox y notificación.
 
+### 7.1 SOP — `401 PGRST303` intermitente
+
+Síntoma: peticiones sueltas a `/rest/v1/*` responden `401` con
+`PGRST303` ("JWT claims validation or parsing failed") mientras el resto de las
+peticiones, con la misma credencial, responden `200`. En Vercel aparece como
+`cron_run_failed` con el código `PGRST303` en una de las tres tareas del cron;
+en Supabase, como `401` en `edge_logs`. Observado por primera vez el
+2026-08-26, alrededor de seis por hora.
+
+Efecto: la aplicación reintenta el intento transitorio dos veces
+(`lib/supabase-retry-fetch.ts`), así que una incidencia aislada ya no pierde el
+lote. El reintento es una mitigación, no la causa resuelta: cada uno se
+registra como `supabase_auth_retry` en los logs de Function.
+
+1. Cuenta los `401` de las últimas 24 h en el Log Explorer de Supabase y los
+   `supabase_auth_retry` en Vercel. Si suben, escala.
+2. Comprueba el formato de `SUPABASE_SECRET_KEY` en Vercel Production y si el
+   proyecto todavía admite las llaves legacy JWT.
+3. Rota la llave desde el Dashboard de Supabase y actualiza solo el target
+   Production. No copies el valor a ningún otro target ni a un ticket.
+4. Reconstruye Production y confirma con `/api/health` y una corrida de cron
+   limpia.
+5. Si los `401` persisten con una llave recién emitida, abre soporte con
+   Supabase citando `PGRST303`, el `x-vercel-id` y la hora exacta; nunca el
+   valor de la llave.
+
+No amplíes el reintento a otros `401`: una llave equivocada, ausente o
+caducada debe seguir fallando de inmediato y de forma visible.
+
 ## 8. SOP — cron detenido
 
 1. Confirma que el equipo Vercel sigue en Pro.
@@ -148,6 +177,26 @@ Incidente de alcance: nunca uses `vercel env rm NAME preview` sobre una entrada
 multi-target. Antes haz un inventario y respalda IDs/targets/origen sin copiar
 valores, y edita el target desde Dashboard/API. Para Upstash, cambia o rota la
 conexión en Vercel Storage y reconstruye Production.
+
+### 9.1 SOP — pedido `cancelled` que el comprador dice haber pagado
+
+Un pedido con `provider_status = 'expired'` fue cerrado por el barrido porque
+MercadoPago respondió que no tenía ningún pago para él pasada la ventana de la
+preferencia. Antes de tocar nada:
+
+1. Busca el pago en el panel de MercadoPago por el correo o el monto, y
+   confirma su `external_reference`.
+2. Si existe un pago aprobado con ese `external_reference`, el webhook debe
+   poder aplicarlo: reenvía la notificación desde el panel del proveedor. Un
+   pedido expirado no bloquea el cobro — `record_ticket_order_payment` lo
+   mueve a `paid` y encola el comprobante.
+3. Si el pago existe pero con otro `external_reference`, no lo fuerces sobre
+   este pedido: registra el caso y trátalo como cobro manual.
+4. Si no existe ningún pago, el cierre fue correcto. El comprador puede volver
+   a comprar; el pedido viejo no reserva cupo.
+
+Nunca edites `status` a mano para "arreglar" un cobro: la única ruta que
+escribe un pago es la del proveedor.
 
 ## 10. Venta y evento
 

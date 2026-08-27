@@ -7,6 +7,7 @@ import {
   isVercelProductionDeployment,
   isVisualOnlyVercelDeployment,
 } from "@/lib/deployment-environment";
+import { createSupabaseRetryingFetch } from "@/lib/supabase-retry-fetch";
 
 let client: SupabaseClient<Database> | null = null;
 let clientSignature = "";
@@ -56,6 +57,21 @@ function getServerConfiguration(): { url: string; secretKey: string } {
 }
 
 /**
+ * The retry itself is technical and PII-free by construction: an attempt
+ * number and nothing else. It is logged so a key that starts failing
+ * validation is visible in Vercel before it becomes a lost notification.
+ */
+function reportAuthRetry(attempt: number): void {
+  console.warn(
+    JSON.stringify({
+      timestamp: new Date().toISOString(),
+      event: "supabase_auth_retry",
+      attempt,
+    }),
+  );
+}
+
+/**
  * Creates one backend-only client. It never reads cookies, persists sessions,
  * or exposes the elevated key to a client component.
  */
@@ -69,6 +85,12 @@ export function getSupabaseServerClient(): SupabaseClient<Database> {
         autoRefreshToken: false,
         detectSessionInUrl: false,
         persistSession: false,
+      },
+      global: {
+        // A sporadic `PGRST303` rejects a request that carries a valid key.
+        // Without this the cron loses whole batches to it; see
+        // `lib/supabase-retry-fetch.ts`.
+        fetch: createSupabaseRetryingFetch({ onRetry: reportAuthRetry }),
       },
     });
     clientSignature = signature;

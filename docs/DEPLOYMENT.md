@@ -1,6 +1,6 @@
 # Deployment — Vercel + Supabase
 
-Última revisión: 2026-07-30.
+Última revisión: 2026-08-26.
 
 Este documento es el procedimiento canónico de despliegue. La aplicación y la
 base se despliegan por separado y en este orden:
@@ -25,13 +25,31 @@ histórica de snapshots Preview. Ninguno se marca como resuelto:
       categoría de datos fiscales, retención de cinco años por CFF art. 30) y
       los Términos reescritos NO han sido aprobados. Bloqueante para vender un
       acceso en Production. Ver `docs/PAYMENTS.md`.
-- [ ] **Migraciones de pagos.** `20260824120000_add_ticket_orders.sql` y
-      `20260824130000_add_ticket_capacity_and_notifications.sql` no se han
-      aplicado a Supabase. Validadas contra PostgreSQL 16 local con pgTAP en
-      verde, pero falta `supabase db reset --local` con el historial completo,
-      `db lint`, backup verificado y regenerar `lib/database.types.ts`.
+- [x] **Migraciones de pagos.** Aplicadas y verificadas contra el proyecto
+      Summit el 2026-08-26: `supabase_migrations` contiene las 24 versiones del
+      repositorio, incluidas `20260824120000_add_ticket_orders`,
+      `20260824130000_add_ticket_capacity_and_notifications`,
+      `20260825120000_iva_inclusive_ticket_prices`,
+      `20260825130000_corporate_attendee_roster` y
+      `20260826120000_corporate_ticket_orders`. El `check` de `tier` ya acepta
+      `corporativo` y `create_ticket_order` expone la firma con roster y
+      referidor. Los `PGRST202`/`404` de `create_ticket_order` y `ticket_orders`
+      que se veían hasta las 06:00 UTC de ese día cesaron al recargarse el
+      schema cache.
+- [ ] **Migración de expiración.** `20260826140000_expire_stale_ticket_orders.sql`
+      no se ha aplicado. Amplía el vocabulario de `ticket_order_events` con
+      `order_expired` y agrega `public.expire_stale_ticket_orders(uuid[], integer)`.
+      Validada aplicando el historial completo sobre PostgreSQL 16 con las doce
+      aserciones de `supabase/tests/database/008_expire_stale_ticket_orders.test.sql`
+      en verde; falta correrla con pgTAP y `db lint` en la máquina de
+      desarrollo y regenerar `lib/database.types.ts` con `npm run db:types`
+      para confirmar que la entrada añadida a mano coincide con el generador.
+      Desplegar el código antes que la migración no rompe la venta: el barrido
+      registra `ticket_order_expiry_failed` y sigue reconciliando.
 - [ ] **Credenciales de MercadoPago.** `MERCADOPAGO_ACCESS_TOKEN` (APP_USR-)
-      en Vercel Production. `MERCADOPAGO_WEBHOOK_SECRET` es opcional: lo emite
+      está cargado y funciona: el 2026-08-26 se crearon cuatro preferencias
+      reales desde Production. Falta el webhook.
+      `MERCADOPAGO_WEBHOOK_SECRET` es opcional: lo emite
       MercadoPago al registrar el webhook `payment` en
       `https://scsecuritysummit.com/api/webhooks/mercadopago`. Sin él la
       confirmación la sostiene la reconciliación y tarda hasta un ciclo de
@@ -50,13 +68,35 @@ histórica de snapshots Preview. Ninguno se marca como resuelto:
 - [ ] Los deployments Preview históricos que recibieron secretos compartidos
       están protegidos o retirados, o sus credenciales fueron rotadas mediante
       una ventana coordinada con rollback.
-- [ ] Vercel Project Settings y `package.json` usan Node 22.x.
+- [x] Vercel Project Settings y `package.json` usan Node 22.x. Verificado el
+      2026-08-26: el proyecto reporta `nodeVersion: 22.x`.
 - [x] El equipo de Vercel sigue en plan Pro. El cron de cinco minutos no es
       compatible con Hobby.
 - [ ] La cuenta de Vercel está al corriente, sin facturas vencidas ni avisos de
       suspensión. El estado `overdue` observado el 2026-07-30 bloquea el corte.
 - [x] El operador y la ventana para retirar el webhook legado están
       confirmados según el corte controlado de la siguiente sección.
+
+### Incidente abierto — `401 PGRST303` intermitente
+
+Desde alrededor de las 10:00 UTC del 2026-08-26, entre cinco y ocho peticiones
+por hora de Production a `/rest/v1/*` responden `401` con `PGRST303` ("JWT
+claims validation or parsing failed"), con la misma credencial que atiende el
+resto del tráfico. El cron perdía una de sus tres tareas por corrida
+—notificaciones de solicitudes, notificaciones de órdenes o el barrido de
+órdenes `pending`—, de modo que un recibo o una reconciliación podía retrasarse
+un ciclo completo sin que nada quedara marcado como fallido en Supabase.
+
+La aplicación ahora reintenta ese fallo concreto dos veces antes de rendirse
+(`lib/supabase-retry-fetch.ts`). El reintento es seguro porque PostgREST
+rechaza la petición en la capa de autenticación, antes de tocar la base: la
+sentencia no llegó a ejecutarse. Cualquier otro `401` sigue fallando de
+inmediato.
+
+Esto no cierra el incidente. Queda pendiente diagnosticar por qué una llave
+válida falla validación y rotarla; el procedimiento está en `docs/RUNBOOK.md`,
+sección 7.1. Mientras tanto, los reintentos se registran como
+`supabase_auth_retry` en los logs de Function y son la señal a vigilar.
 
 El plan Vercel Pro fue confirmado durante la revisión del 2026-07-29. Debe
 confirmarse otra vez si cambia la suscripción: en Hobby, `*/5 * * * *` hace que

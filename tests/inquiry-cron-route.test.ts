@@ -21,7 +21,7 @@ const mockedProcess = vi.mocked(processDueInquiryNotifications);
 const mockedTicketProcess = vi.mocked(processDueTicketOrderNotifications);
 const mockedSweep = vi.mocked(sweepPendingTicketOrders);
 const EMPTY_BATCH = { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 };
-const EMPTY_SWEEP = { scanned: 0, resolved: 0, stillPending: 0 };
+const EMPTY_SWEEP = { scanned: 0, resolved: 0, stillPending: 0, expired: 0 };
 
 function request(authorization?: string): Request {
   return new Request("https://example.com/api/cron/inquiry-notifications", {
@@ -101,14 +101,19 @@ describe("inquiry notification cron", () => {
       dead: 0,
       failed: 0,
       ticketOrders: { claimed: 0, sent: 0, queued: 0, dead: 0, failed: 0 },
-      pendingOrderSweep: { scanned: 0, resolved: 0, stillPending: 0 },
+      pendingOrderSweep: { scanned: 0, resolved: 0, stillPending: 0, expired: 0 },
     });
   });
 
   it("also sweeps orders left pending, and reports what it resolved", async () => {
     process.env.CRON_SECRET = "correct-secret";
     mockedProcess.mockResolvedValue({ ...EMPTY_BATCH });
-    mockedSweep.mockResolvedValue({ scanned: 3, resolved: 2, stillPending: 1 });
+    mockedSweep.mockResolvedValue({
+      scanned: 3,
+      resolved: 2,
+      stillPending: 1,
+      expired: 0,
+    });
 
     const response = await GET(request("Bearer correct-secret"));
 
@@ -118,6 +123,7 @@ describe("inquiry notification cron", () => {
       scanned: 3,
       resolved: 2,
       stillPending: 1,
+      expired: 0,
     });
   });
 
