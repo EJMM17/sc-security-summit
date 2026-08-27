@@ -7645,12 +7645,6 @@ h3,
   height: 1rem;
   flex: none;
 }
-.checkout-discount-hint {
-  margin-top: 0.4rem;
-  color: var(--text-muted);
-  font-size: 0.76rem;
-  line-height: 1.6;
-}
 .checkout-discount-row {
   display: flex;
   flex-wrap: wrap;
