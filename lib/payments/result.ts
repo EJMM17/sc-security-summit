@@ -6,6 +6,7 @@ export type CheckoutFailureReason =
   | "idempotency_conflict"
   | "sold_out"
   | "provider_unavailable"
+  | "discount_code_changed"
   | "unexpected";
 
 export type CheckoutResult =
@@ -21,6 +22,43 @@ export type CheckoutResult =
   | {
       ok: false;
       reason: CheckoutFailureReason;
+    };
+
+/**
+ * Why an optional discount code was not applied. The buyer is told the code
+ * does not apply and nothing more: naming the exact rule would turn the form
+ * into an oracle for probing partner agreements.
+ */
+export type DiscountCodeRejection =
+  | "unknown"
+  | "not_applicable"
+  | "rate_limited"
+  | "unavailable";
+
+/**
+ * What the checkout form is told about a code it asked the server to check.
+ *
+ * Every amount is computed server side from the tier and quantity the form
+ * already sends; the browser never supplies a price. The answer is
+ * informational only — the pay action re-reads the coupon and re-prices the
+ * order from scratch.
+ */
+export type DiscountCodeResult =
+  | {
+      valid: true;
+      code: string;
+      discountBasisPoints: number;
+      /** Gross line total before the code, in cents. */
+      listTotalCents: number;
+      discountCents: number;
+      totalCents: number;
+    }
+  | {
+      valid: false;
+      reason: DiscountCodeRejection;
+      listTotalCents: number;
+      discountCents: 0;
+      totalCents: number;
     };
 
 export type TicketOrderStatus =

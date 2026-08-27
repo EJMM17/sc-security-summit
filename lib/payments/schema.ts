@@ -10,6 +10,10 @@ import {
   TICKET_TIERS,
   type OrderTierId,
 } from "@/lib/payments/catalog";
+import {
+  DISCOUNT_CODE_MAX_LENGTH,
+  normalizeDiscountCode,
+} from "@/lib/payments/coupons";
 import { isValidPostalCode, normalizeRfc, validateRfc } from "@/lib/payments/rfc";
 import {
   isCfdiUseValidForPersonType,
@@ -113,6 +117,18 @@ const ticketCheckoutObject = z
     invoice: invoiceDetailsSchema.optional(),
     /** Who sent the buyer. Optional on every order, individual or corporate. */
     referral: normalizedText(2, 160).optional(),
+    /**
+     * Optional partner discount code. Never a price: the server looks the code
+     * up and prices the order itself. An unknown code is not a form error —
+     * the order is simply created without a discount — so this only bounds the
+     * string and normalizes it.
+     */
+    discountCode: z
+      .string()
+      .trim()
+      .max(DISCOUNT_CODE_MAX_LENGTH)
+      .transform(normalizeDiscountCode)
+      .optional(),
     /** Named participants of a corporate block, one per requested access. */
     attendees: z.array(attendeeNameSchema).max(CORPORATE_MAX_SEATS).optional(),
     attribution: attributionSchema,
@@ -248,6 +264,7 @@ export function parseTicketCheckoutFormData(
     consentVersion: formString(formData, "consentVersion"),
     requiresInvoice,
     referral: optionalFormString(formData, "referral"),
+    discountCode: optionalFormString(formData, "discountCode"),
     attendees: tier === CORPORATE_TIER_ID ? formAttendees(formData) : undefined,
     invoice: requiresInvoice
       ? {

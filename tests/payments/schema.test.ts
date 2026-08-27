@@ -258,4 +258,34 @@ describe("corporate blocks", () => {
     expect(parsed.success).toBe(true);
     expect(parsed.data?.attendees).toBeUndefined();
   });
+
+  it("normalizes the discount code and keeps it optional", () => {
+    expect(
+      parseTicketCheckoutFormData(checkoutFormData()).data?.discountCode,
+    ).toBeUndefined();
+
+    for (const typed of ["UVB2026", "uvb2026", " Uvb2026", "UVB2026 "]) {
+      const parsed = parseTicketCheckoutFormData(
+        checkoutFormData({ discountCode: typed }),
+      );
+      expect(parsed.success).toBe(true);
+      expect(parsed.data?.discountCode).toBe("UVB2026");
+    }
+  });
+
+  it("accepts a code nobody issued: an invalid code is not a form error", () => {
+    const parsed = parseTicketCheckoutFormData(
+      checkoutFormData({ discountCode: "ABC123" }),
+    );
+    expect(parsed.success).toBe(true);
+    expect(parsed.data?.discountCode).toBe("ABC123");
+  });
+
+  it("refuses a code longer than the column can hold", () => {
+    expect(
+      parseTicketCheckoutFormData(
+        checkoutFormData({ discountCode: "A".repeat(64) }),
+      ).success,
+    ).toBe(false);
+  });
 });

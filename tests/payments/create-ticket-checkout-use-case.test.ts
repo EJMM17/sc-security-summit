@@ -9,6 +9,7 @@ import type {
 } from "@/server/repositories/ticket-order-repository";
 import type { hashTicketOrderPayload } from "@/lib/payments/canonical-payload";
 import type { checkRateLimit, getClientIp } from "@/lib/rate-limit";
+import type { resolveDiscountCode } from "@/server/services/discount-codes";
 import {
   checkoutFixture,
   corporateCheckoutFixture,
@@ -33,6 +34,9 @@ function dependencies() {
       initPoint: CHECKOUT_URL,
     })),
     attach: vi.fn<typeof attachPreference>(async () => "pref-1"),
+    resolveDiscount: vi.fn<typeof resolveDiscountCode>(async () => ({
+      outcome: "none" as const,
+    })),
     siteUrl: vi.fn(() => "https://scsecuritysummit.com"),
     now: vi.fn(() => new Date("2026-08-24T12:00:00.000Z")),
   };
@@ -253,5 +257,125 @@ describe("corporate blocks", () => {
       quantity: 5,
       unit_price: 1_875,
     });
+  });
+});
+
+describe("createTicketCheckoutUseCase with a discount code", () => {
+  const COUPON_ID = "0f2b1c3d-4e5f-4061-8a2b-3c4d5e6f7081";
+
+  /** A resolver that takes 20% off whatever unit price it is handed. */
+  function twentyPercent() {
+    return vi.fn<typeof resolveDiscountCode>(async (input) => ({
+      outcome: "applied" as const,
+      pricing: {
+        couponId: COUPON_ID,
+        code: "UVB2026",
+        discountType: "percentage" as const,
+        discountBasisPoints: 2_000,
+        listUnitPriceCents: input.listUnitPriceCents,
+        unitPriceCents: input.listUnitPriceCents * 0.8,
+        listTotalCents: input.listUnitPriceCents * input.quantity,
+        discountCents: input.listUnitPriceCents * 0.2 * input.quantity,
+        totalCents: input.listUnitPriceCents * 0.8 * input.quantity,
+        quantity: input.quantity,
+      },
+    }));
+  }
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+  });
+
+  it("charges MercadoPago the discounted amount, from the code alone", async () => {
+    const deps = dependencies();
+    deps.resolveDiscount = twentyPercent();
+    deps.persist.mockResolvedValue({
+      outcome: "created" as const,
+      orderId: ORDER_ID,
+      totalCents: 400_000,
+    });
+
+    const result = await createTicketCheckoutUseCase(
+      { ...checkoutFixture, discountCode: "UVB2026" },
+      deps,
+    );
+
+    expect(result).toMatchObject({ ok: true, totalCents: 400_000 });
+
+    // The resolver was handed the catalog price, never a browser number.
+    expect(deps.resolveDiscount).toHaveBeenCalledWith({
+      code: "UVB2026",
+      listUnitPriceCents: 250_000,
+      quantity: 2,
+      now: expect.any(Date),
+    });
+
+    const quote = deps.persist.mock.calls[0][1];
+    expect(quote).toMatchObject({
+      unitPriceCents: 200_000,
+      totalCents: 400_000,
+      subtotalCents: 344_828,
+      taxCents: 55_172,
+    });
+    // The IVA is still carved out of what is actually charged.
+    expect(quote.subtotalCents + quote.taxCents).toBe(quote.totalCents);
+
+    expect(deps.persist.mock.calls[0][4]).toMatchObject({
+      couponId: COUPON_ID,
+      code: "UVB2026",
+      discountCents: 100_000,
+    });
+
+    const preference = deps.createPreference.mock.calls[0][0];
+    expect(preference.items[0]).toMatchObject({
+      quantity: 2,
+      unit_price: 2_000,
+      currency_id: "MXN",
+    });
+  });
+
+  it("does not consult the coupon store when no code was submitted", async () => {
+    const deps = dependencies();
+    await createTicketCheckoutUseCase(checkoutFixture, deps);
+    expect(deps.resolveDiscount).not.toHaveBeenCalled();
+    expect(deps.createPreference.mock.calls[0][0].items[0].unit_price).toBe(
+      2_500,
+    );
+  });
+
+  it("refuses the attempt when the code stopped applying", async () => {
+    const deps = dependencies();
+    deps.resolveDiscount = vi.fn<typeof resolveDiscountCode>(async () => ({
+      outcome: "rejected" as const,
+      reason: "expired" as const,
+    }));
+
+    await expect(
+      createTicketCheckoutUseCase(
+        { ...checkoutFixture, discountCode: "UVB2026" },
+        deps,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "discount_code_changed" });
+
+    // Nothing was stored and nothing was charged at a price the coupon no
+    // longer justifies.
+    expect(deps.persist).not.toHaveBeenCalled();
+    expect(deps.createPreference).not.toHaveBeenCalled();
+  });
+
+  it("refuses the attempt when the database rejects the coupon", async () => {
+    const deps = dependencies();
+    deps.resolveDiscount = twentyPercent();
+    deps.persist.mockResolvedValue({ outcome: "coupon_unavailable" as const });
+
+    await expect(
+      createTicketCheckoutUseCase(
+        { ...checkoutFixture, discountCode: "UVB2026" },
+        deps,
+      ),
+    ).resolves.toEqual({ ok: false, reason: "discount_code_changed" });
+    expect(deps.createPreference).not.toHaveBeenCalled();
   });
 });

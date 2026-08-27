@@ -3,7 +3,7 @@ import "server-only";
 import { createHash } from "node:crypto";
 import type { TicketCheckout } from "@/lib/payments/schema";
 
-const CANONICAL_PAYLOAD_VERSION = "ticket-order-payload-v2";
+const CANONICAL_PAYLOAD_VERSION = "ticket-order-payload-v3";
 
 /**
  * The insertion order below is part of the versioned idempotency contract.
@@ -11,7 +11,9 @@ const CANONICAL_PAYLOAD_VERSION = "ticket-order-payload-v2";
  * Attribution is excluded for the same reason as on the inquiry forms: a retry
  * from a different campaign link must still be recognized as the same order.
  * The invoice block IS included — asking for a CFDI, or changing the RFC, is a
- * materially different order and must not silently replay the original.
+ * materially different order and must not silently replay the original. So is
+ * the discount code: the same seats bought at a different price are a
+ * different order, and replaying the first one would charge the old amount.
  */
 export function canonicalTicketOrderPayload(order: TicketCheckout): string {
   return JSON.stringify({
@@ -26,6 +28,7 @@ export function canonicalTicketOrderPayload(order: TicketCheckout): string {
     consentVersion: order.consentVersion,
     requiresInvoice: order.requiresInvoice,
     referral: order.referral ?? null,
+    discountCode: order.discountCode ?? null,
     // The roster is part of the order: changing a participant's name is a
     // different block, not a replay of the one already stored.
     attendees: order.attendees ?? null,

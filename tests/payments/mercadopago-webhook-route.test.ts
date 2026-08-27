@@ -231,3 +231,74 @@ describe("POST /api/webhooks/mercadopago", () => {
     expect(mockedNotify).not.toHaveBeenCalled();
   });
 });
+
+describe("POST /api/webhooks/mercadopago — captured amount", () => {
+  beforeEach(() => {
+    vi.stubEnv("MERCADOPAGO_WEBHOOK_SECRET", SECRET);
+    vi.spyOn(console, "info").mockImplementation(() => undefined);
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    mockedGetPayment.mockReset();
+    mockedRecordPayment.mockReset();
+    mockedListNotifications.mockReset();
+    mockedNotify.mockReset();
+    mockedRecordPayment.mockResolvedValue({
+      orderId: ORDER_ID,
+      status: "paid",
+      outcome: "updated",
+    });
+    mockedListNotifications.mockResolvedValue([]);
+    mockedNotify.mockResolvedValue("sent");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it("forwards the captured amount in cents for the database to check", async () => {
+    mockedGetPayment.mockResolvedValue(payment({ transactionAmount: 4_000 }));
+
+    await POST(signedRequest());
+
+    expect(mockedRecordPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ paidAmountCents: 400_000 }),
+    );
+  });
+
+  it("forwards nothing when the provider did not state an amount", async () => {
+    mockedGetPayment.mockResolvedValue(payment({ transactionAmount: null }));
+
+    await POST(signedRequest());
+
+    expect(mockedRecordPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ paidAmountCents: null }),
+    );
+  });
+
+  it("can never match an order total when the currency is not MXN", async () => {
+    mockedGetPayment.mockResolvedValue(
+      payment({ transactionAmount: 4_000, currencyId: "ARS" }),
+    );
+
+    await POST(signedRequest());
+
+    expect(mockedRecordPayment).toHaveBeenCalledWith(
+      expect.objectContaining({ paidAmountCents: 0 }),
+    );
+  });
+
+  it("acknowledges an amount the database refused without sending a receipt", async () => {
+    mockedRecordPayment.mockResolvedValue({
+      orderId: ORDER_ID,
+      status: "pending",
+      outcome: "ignored",
+    });
+    mockedGetPayment.mockResolvedValue(payment({ transactionAmount: 1 }));
+
+    const response = await POST(signedRequest());
+
+    expect(response.status).toBe(200);
+    expect(mockedListNotifications).not.toHaveBeenCalled();
+    expect(mockedNotify).not.toHaveBeenCalled();
+  });
+});

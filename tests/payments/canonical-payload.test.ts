@@ -79,4 +79,20 @@ describe("corporate blocks and referrals", () => {
       hashTicketOrderPayload({ ...checkoutFixture, referral: "Ana" }),
     ).not.toBe(hashTicketOrderPayload(checkoutFixture));
   });
+
+  it("treats a changed discount code as a different order", () => {
+    const withCode = { ...checkoutFixture, discountCode: "UVB2026" };
+    const withOther = { ...checkoutFixture, discountCode: "CANACAR2026" };
+
+    expect(hashTicketOrderPayload(withCode)).not.toBe(
+      hashTicketOrderPayload(checkoutFixture),
+    );
+    expect(hashTicketOrderPayload(withCode)).not.toBe(
+      hashTicketOrderPayload(withOther),
+    );
+    // The same order submitted twice is still the same order.
+    expect(hashTicketOrderPayload(withCode)).toBe(
+      hashTicketOrderPayload({ ...checkoutFixture, discountCode: "UVB2026" }),
+    );
+  });
 });

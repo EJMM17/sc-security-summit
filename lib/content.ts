@@ -1241,8 +1241,27 @@ export const CHECKOUT = {
     selectPlaceholder: "Selecciona una opción",
     summaryTitle: "Resumen",
     summaryAccesses: "Accesos",
+    summarySubtotal: "Subtotal",
+    summaryCouponDiscount: "Descuento {code} ({rate})",
     summaryTotal: "Total a pagar",
     summaryTaxIncluded: "Precio final. Incluye IVA del 16%.",
+    discountLegend: "¿Tienes un código de descuento?",
+    discountHint: "Es opcional. Si no tienes uno, puedes pagar normalmente.",
+    discountLabel: "Código de descuento",
+    discountPlaceholder: "Ingresa tu código",
+    discountApply: "Aplicar",
+    discountApplying: "Validando código…",
+    discountAppliedButton: "Aplicado",
+    discountRemove: "Quitar código",
+    discountApplied: "Código aplicado: {code}",
+    discountAppliedRate: "{rate} de descuento",
+    discountEmpty: "Escribe un código para aplicarlo.",
+    discountInvalid:
+      "Este código de descuento no es válido. Puedes continuar con tu compra sin código.",
+    discountRateLimited:
+      "Probaste varios códigos seguidos. Espera unos minutos o continúa con tu compra sin código.",
+    discountUnavailable:
+      "No pudimos validar el código en este momento. Puedes continuar con tu compra sin código.",
     submit: "PROCESAR PAGO",
     submitSending: "REDIRIGIENDO...",
     privacy:
@@ -1259,6 +1278,8 @@ export const CHECKOUT = {
       "Ya no quedan lugares suficientes para ese acceso y esa cantidad. Prueba con menos accesos o escríbenos a hola@scsecuritysummit.com.",
     providerUnavailable:
       "MercadoPago no está disponible en este momento. Tu solicitud quedó registrada; inténtalo de nuevo en unos minutos.",
+    discountChanged:
+      "El código de descuento dejó de estar disponible. Quítalo y continúa con tu compra al precio publicado.",
     error:
       "No pudimos iniciar el pago. Escríbenos a hola@scsecuritysummit.com.",
     previewDisabled:
@@ -1368,8 +1389,27 @@ export const CHECKOUT = {
     selectPlaceholder: "Select an option",
     summaryTitle: "Summary",
     summaryAccesses: "Passes",
+    summarySubtotal: "Subtotal",
+    summaryCouponDiscount: "{code} discount ({rate})",
     summaryTotal: "Total due",
     summaryTaxIncluded: "Final price. Includes 16% VAT.",
+    discountLegend: "Have a discount code?",
+    discountHint: "It is optional. Without one you can simply pay as usual.",
+    discountLabel: "Discount code",
+    discountPlaceholder: "Enter your code",
+    discountApply: "Apply",
+    discountApplying: "Checking code…",
+    discountAppliedButton: "Applied",
+    discountRemove: "Remove code",
+    discountApplied: "Code applied: {code}",
+    discountAppliedRate: "{rate} off",
+    discountEmpty: "Type a code to apply it.",
+    discountInvalid:
+      "This discount code is not valid. You can continue with your purchase without a code.",
+    discountRateLimited:
+      "You tried several codes in a row. Wait a few minutes or continue without a code.",
+    discountUnavailable:
+      "We could not check the code right now. You can continue with your purchase without a code.",
     submit: "PROCESS PAYMENT",
     submitSending: "REDIRECTING...",
     privacy:
@@ -1386,6 +1426,8 @@ export const CHECKOUT = {
       "There are not enough seats left for that pass and quantity. Try fewer passes or email hola@scsecuritysummit.com.",
     providerUnavailable:
       "MercadoPago is unavailable right now. Your request was recorded; please try again in a few minutes.",
+    discountChanged:
+      "That discount code is no longer available. Remove it and continue at the published price.",
     error: "We could not start the payment. Email us at hola@scsecuritysummit.com.",
     previewDisabled:
       "Preview: checkout is disabled and processes no payments. Use the production site.",
