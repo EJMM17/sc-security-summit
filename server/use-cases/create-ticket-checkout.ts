@@ -3,6 +3,7 @@ import "server-only";
 import { checkRateLimit, getClientIp, RateLimitError } from "@/lib/rate-limit";
 import { hashTicketOrderPayload } from "@/lib/payments/canonical-payload";
 import { orderTierLabel, quoteOrder } from "@/lib/payments/catalog";
+import { applyCouponToQuote, type CouponPricing } from "@/lib/payments/coupons";
 import type { CheckoutResult } from "@/lib/payments/result";
 import type { TicketCheckout } from "@/lib/payments/schema";
 import { centsToAmount } from "@/lib/payments/tax";
@@ -17,6 +18,7 @@ import {
   type CreatedPreference,
 } from "@/server/services/mercadopago-client";
 import { recordPaymentEvent } from "@/server/services/payment-observability";
+import { resolveDiscountCode } from "@/server/services/discount-codes";
 
 const CHECKOUT_EXPIRY_MINUTES = 30;
 const STATEMENT_DESCRIPTOR = "SCSUMMIT2026";
@@ -28,6 +30,7 @@ type CreateCheckoutDependencies = {
   persist: typeof persistTicketOrder;
   createPreference: typeof createCheckoutPreference;
   attach: typeof attachPreference;
+  resolveDiscount: typeof resolveDiscountCode;
   siteUrl: () => string;
   now: () => Date;
 };
@@ -39,6 +42,7 @@ const DEFAULT_DEPENDENCIES: CreateCheckoutDependencies = {
   persist: persistTicketOrder,
   createPreference: createCheckoutPreference,
   attach: attachPreference,
+  resolveDiscount: resolveDiscountCode,
   siteUrl: () => process.env.NEXT_PUBLIC_SITE_URL?.trim() ?? "",
   now: () => new Date(),
 };
@@ -102,6 +106,47 @@ export async function createTicketCheckoutUseCase(
     return { ok: false, reason: "unexpected" };
   }
 
+  // The discount code is re-resolved here, from the code alone, against the
+  // price the catalog just produced. Whatever the form was told earlier is
+  // irrelevant: this is the only calculation that reaches the order row and
+  // the MercadoPago preference.
+  //
+  // The form only ever submits a code it was told applies, so a code that no
+  // longer does means the coupon changed under the buyer — deactivated,
+  // expired, exhausted — between the two calls. Charging the list price
+  // silently would be a surprise on their card, so the attempt is refused and
+  // the form drops the code and lets them pay without it.
+  let coupon: CouponPricing | null = null;
+  if (order.discountCode) {
+    const resolved = await dependencies.resolveDiscount({
+      code: order.discountCode,
+      listUnitPriceCents: quote.unitPriceCents,
+      quantity: quote.quantity,
+      now: dependencies.now(),
+    });
+
+    if (resolved.outcome !== "applied") {
+      recordPaymentEvent("ticket_discount_code_rejected", {
+        tier: order.tier,
+        quantity: order.quantity,
+        language: order.language,
+        code:
+          resolved.outcome === "rejected" ? resolved.reason : resolved.outcome,
+      });
+      return { ok: false, reason: "discount_code_changed" };
+    }
+
+    coupon = resolved.pricing;
+    quote = applyCouponToQuote(quote, coupon);
+    recordPaymentEvent("ticket_discount_code_applied", {
+      tier: order.tier,
+      quantity: order.quantity,
+      language: order.language,
+      couponCode: coupon.code,
+      totalCents: quote.totalCents,
+    });
+  }
+
   let persisted: PersistTicketOrderResult;
   try {
     persisted = await dependencies.persist(
@@ -109,6 +154,7 @@ export async function createTicketCheckoutUseCase(
       quote,
       dependencies.hashPayload(order),
       dependencies.now(),
+      coupon,
     );
   } catch (error) {
     recordPaymentEvent("ticket_order_persistence_failed", {
@@ -127,6 +173,18 @@ export async function createTicketCheckoutUseCase(
       language: order.language,
     });
     return { ok: false, reason: "sold_out" };
+  }
+
+  if (persisted.outcome === "coupon_unavailable") {
+    // The database had the last word: the coupon changed while the order was
+    // being priced. No order was stored, so the buyer retries without it.
+    recordPaymentEvent("ticket_discount_code_rejected", {
+      tier: order.tier,
+      quantity: order.quantity,
+      language: order.language,
+      code: "coupon_unavailable",
+    });
+    return { ok: false, reason: "discount_code_changed" };
   }
 
   if (persisted.outcome === "conflict") {

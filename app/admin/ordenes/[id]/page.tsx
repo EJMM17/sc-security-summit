@@ -115,6 +115,22 @@ export default async function AdminOrderDetailPage({
           <Field label="Teléfono" value={order.phone} />
           <Field label="Empresa" value={order.company ?? "—"} />
           <Field label="Referido por" value={order.referral_source ?? "—"} />
+          <Field
+            label="Código de descuento"
+            value={
+              order.coupon_code
+                ? `${order.coupon_code} (${formatTaxRate(order.coupon_discount_basis_points ?? 0)})`
+                : "—"
+            }
+          />
+          <Field
+            label="Descuento aplicado"
+            value={
+              order.coupon_discount_cents
+                ? `− ${formatMxn(order.coupon_discount_cents, "es")}`
+                : "—"
+            }
+          />
         </dl>
       </section>
 

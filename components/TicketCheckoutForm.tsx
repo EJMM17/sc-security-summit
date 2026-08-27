@@ -15,10 +15,15 @@ import {
   Plus,
   ReceiptText,
   Sparkles,
+  TicketPercent,
   UserRound,
   UsersRound,
+  X,
 } from "lucide-react";
-import { createTicketCheckout } from "@/app/actions/checkout";
+import {
+  createTicketCheckout,
+  validateDiscountCode,
+} from "@/app/actions/checkout";
 import AttributionCapture from "@/components/AttributionCapture";
 import EmptyAttributionFields from "@/components/EmptyAttributionFields";
 import { CONTENT } from "@/lib/content";
@@ -40,7 +45,16 @@ import {
   tierUnitPriceCents,
   type TicketTierId,
 } from "@/lib/payments/catalog";
-import type { CheckoutFailureReason } from "@/lib/payments/result";
+import {
+  DISCOUNT_CODE_MAX_LENGTH,
+  formatDiscountPercentage,
+  normalizeDiscountCode,
+  percentageDiscountPreview,
+} from "@/lib/payments/coupons";
+import type {
+  CheckoutFailureReason,
+  DiscountCodeRejection,
+} from "@/lib/payments/result";
 import { normalizeRfc, validateRfc } from "@/lib/payments/rfc";
 import {
   cfdiUsesForPersonType,
@@ -55,6 +69,21 @@ type CheckoutStatus =
   | { kind: "idle" }
   | { kind: "redirecting" }
   | { kind: "error"; reason: CheckoutFailureReason };
+
+/**
+ * The optional discount code, as the form sees it.
+ *
+ * `applied` holds only the code and the rate the server returned: enough to
+ * show the buyer the new total and to hand the code back at submit. The
+ * amounts are never trusted from here — they are re-derived from the catalog
+ * price on screen, and re-derived again server side before anything is
+ * charged.
+ */
+type DiscountStatus =
+  | { kind: "idle" }
+  | { kind: "checking" }
+  | { kind: "applied" }
+  | { kind: "rejected"; reason: DiscountCodeRejection | "empty" };
 
 const MERCADOPAGO_HOST = /^(www\.)?mercadopago\.com(\.[a-z]{2})?$/;
 
@@ -108,6 +137,13 @@ export default function TicketCheckoutForm({
   const [bulkNotice, setBulkNotice] = useState("");
   const [requiresInvoice, setRequiresInvoice] = useState(false);
   const [rfc, setRfc] = useState("");
+  const [discountInput, setDiscountInput] = useState("");
+  const [discount, setDiscount] = useState<
+    { code: string; discountBasisPoints: number } | null
+  >(null);
+  const [discountStatus, setDiscountStatus] = useState<DiscountStatus>({
+    kind: "idle",
+  });
 
   useEffect(() => {
     setSubmissionId(createSubmissionId());
@@ -160,17 +196,37 @@ export default function TicketCheckoutForm({
     }
   }, [orderTier, quantity]);
 
+  /**
+   * The applied code re-priced against the quantity currently on screen.
+   *
+   * It is recomputed rather than remembered so the summary stays honest when
+   * the buyer changes the number of accesses after applying a code: the same
+   * half-up arithmetic on the same catalog unit price the server will use.
+   */
+  const discountPreview = useMemo(() => {
+    if (!discount || !volumeQuote) return null;
+    return percentageDiscountPreview(
+      volumeQuote.unitPriceCents,
+      volumeQuote.quantity,
+      discount.discountBasisPoints,
+    );
+  }, [discount, volumeQuote]);
+
+  const payableTotalCents = discountPreview?.totalCents ?? quote?.totalCents ?? 0;
+
   // Only what the server prices and hashes counts as a different order: the
-  // tier, the quantity and the roster names. Buyer contact details are part of
-  // the same purchase, and editing a typo in a phone number must stay a replay.
+  // tier, the quantity, the roster names and the code that changes the price.
+  // Buyer contact details are part of the same purchase, and editing a typo in
+  // a phone number must stay a replay.
   const orderShape = useMemo(
     () =>
       JSON.stringify([
         orderTier,
         quantity,
         attendees.map((name) => name.trim().replace(/\s+/g, " ")),
+        discount?.code ?? "",
       ]),
-    [orderTier, quantity, attendees],
+    [orderTier, quantity, attendees, discount],
   );
 
   useEffect(() => {
@@ -181,8 +237,14 @@ export default function TicketCheckoutForm({
     setAttemptedOrderShape(null);
     // The error belonged to the order that was just replaced, so it is
     // cleared with it — but never the redirect state, which means the browser
-    // is already on its way to MercadoPago.
-    setStatus((current) => (current.kind === "error" ? { kind: "idle" } : current));
+    // is already on its way to MercadoPago, and never the message about a
+    // discount code that stopped applying: dropping that code is exactly what
+    // replaced the order, so the explanation has to outlive it.
+    setStatus((current) =>
+      current.kind === "error" && current.reason !== "discount_code_changed"
+        ? { kind: "idle" }
+        : current,
+    );
   }, [attemptedOrderShape, orderShape]);
 
   const earnsVolumeDiscount = tierEarnsVolumeDiscount(
@@ -293,6 +355,60 @@ export default function TicketCheckoutForm({
   const regimeOptions = personType ? regimesForPersonType(personType) : TAX_REGIMES;
   const cfdiUseOptions = personType ? cfdiUsesForPersonType(personType) : CFDI_USES;
 
+  const isCheckingDiscount = discountStatus.kind === "checking";
+
+  /**
+   * Asks the server whether a code applies.
+   *
+   * The answer is informational: it moves the number on screen and nothing
+   * else. The code itself is what travels with the order, and the pay action
+   * looks it up again from scratch.
+   */
+  const applyDiscount = async () => {
+    if (isCheckingDiscount) return;
+
+    const code = normalizeDiscountCode(discountInput);
+    if (!code) {
+      setDiscount(null);
+      setDiscountStatus({ kind: "rejected", reason: "empty" });
+      return;
+    }
+
+    setDiscountStatus({ kind: "checking" });
+
+    try {
+      const result = await validateDiscountCode({
+        tier: orderTier,
+        quantity,
+        code,
+      });
+
+      if (result.valid) {
+        setDiscount({
+          code: result.code,
+          discountBasisPoints: result.discountBasisPoints,
+        });
+        setDiscountInput(result.code);
+        setDiscountStatus({ kind: "applied" });
+        return;
+      }
+
+      // A code that does not apply is never a blocker: the price simply goes
+      // back to the published one and the buyer can pay.
+      setDiscount(null);
+      setDiscountStatus({ kind: "rejected", reason: result.reason });
+    } catch {
+      setDiscount(null);
+      setDiscountStatus({ kind: "rejected", reason: "unavailable" });
+    }
+  };
+
+  const removeDiscount = () => {
+    setDiscount(null);
+    setDiscountInput("");
+    setDiscountStatus({ kind: "idle" });
+  };
+
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (previewDisabled || isSending || status.kind === "redirecting") return;
@@ -336,7 +452,12 @@ export default function TicketCheckoutForm({
       // Remembered before the round trip: whatever this attempt may have
       // persisted is keyed to this exact order.
       setAttemptedOrderShape(
-        JSON.stringify([orderTier, quantity, normalizedAttendees]),
+        JSON.stringify([
+          orderTier,
+          quantity,
+          normalizedAttendees,
+          discount?.code ?? "",
+        ]),
       );
 
       const result = await createTicketCheckout(formData);
@@ -350,10 +471,16 @@ export default function TicketCheckoutForm({
         return;
       }
 
-      setStatus({
-        kind: "error",
-        reason: result.ok ? "provider_unavailable" : result.reason,
-      });
+      const reason = result.ok ? "provider_unavailable" : result.reason;
+      // The coupon changed under the buyer between checking it and paying.
+      // Dropping it here is what makes the next press work: the form goes back
+      // to the published price, and the message above the button explains why.
+      if (reason === "discount_code_changed") {
+        setDiscount(null);
+        setDiscountStatus({ kind: "idle" });
+      }
+
+      setStatus({ kind: "error", reason });
       setIsSending(false);
     } catch {
       setStatus({ kind: "error", reason: "unexpected" });
@@ -362,6 +489,22 @@ export default function TicketCheckoutForm({
   };
 
   const isBusy = isSending || status.kind === "redirecting";
+
+  const discountBlock = (
+    <DiscountCodeField
+      copy={copy}
+      value={discountInput}
+      onChange={setDiscountInput}
+      onApply={applyDiscount}
+      onRemove={removeDiscount}
+      status={discountStatus}
+      appliedCode={discount?.code ?? null}
+      appliedRate={
+        discount ? formatDiscountPercentage(discount.discountBasisPoints) : null
+      }
+      disabled={previewDisabled || isBusy}
+    />
+  );
 
   const summary = quote && volumeQuote && (
     <div className="checkout-summary" aria-live="polite">
@@ -392,9 +535,29 @@ export default function TicketCheckoutForm({
             </div>
           </>
         )}
+        {/* Subtotal is shown whether or not a code is applied, so the buyer can
+            read the discount as the difference between two lines they can both
+            see rather than as a number that appeared. */}
+        <div>
+          <dt>{copy.summarySubtotal}</dt>
+          <dd>{formatMxn(quote.totalCents, language)}</dd>
+        </div>
+        {discount && discountPreview && (
+          <div className="checkout-summary-discount">
+            <dt>
+              {copy.summaryCouponDiscount
+                .replace("{code}", discount.code)
+                .replace(
+                  "{rate}",
+                  formatDiscountPercentage(discount.discountBasisPoints),
+                )}
+            </dt>
+            <dd>−{formatMxn(discountPreview.discountCents, language)}</dd>
+          </div>
+        )}
         <div className="checkout-summary-total">
           <dt>{copy.summaryTotal}</dt>
-          <dd>{formatMxn(quote.totalCents, language)} MXN</dd>
+          <dd>{formatMxn(payableTotalCents, language)} MXN</dd>
         </div>
       </dl>
       {/* The IVA is inside the published price, so the buyer sees one final
@@ -424,6 +587,16 @@ export default function TicketCheckoutForm({
         className="m-0 min-w-0 border-0 p-0 disabled:opacity-60"
       >
         <input type="hidden" name="submissionId" value={submissionId} readOnly />
+        {/* Only a code the server itself said applies is ever submitted, so a
+            code the buyer typed and got rejected never reaches the order. */}
+        {discount && (
+          <input
+            type="hidden"
+            name="discountCode"
+            value={discount.code}
+            readOnly
+          />
+        )}
         <input type="hidden" name="language" value={language} readOnly />
         <input
           type="hidden"
@@ -471,7 +644,10 @@ export default function TicketCheckoutForm({
               <div className="corporate-rail-total">
                 <span>{copy.corporateRailTotal}</span>
                 <strong>
-                  {formatMxn(volumeQuote.totalCents, language)}
+                  {formatMxn(
+                    discountPreview?.totalCents ?? volumeQuote.totalCents,
+                    language,
+                  )}
                   <span>MXN</span>
                 </strong>
                 <small>{ui.taxNote}</small>
@@ -700,7 +876,10 @@ export default function TicketCheckoutForm({
                   regimeOptions={regimeOptions}
                   cfdiUseOptions={cfdiUseOptions}
                 />
-                <div className="mt-8">{summary}</div>
+                <div className="mt-8">
+                  {discountBlock}
+                  {summary}
+                </div>
                 <Legal copy={copy} />
                 <SubmitButton
                   copy={copy}
@@ -802,7 +981,10 @@ export default function TicketCheckoutForm({
               regimeOptions={regimeOptions}
               cfdiUseOptions={cfdiUseOptions}
             />
-            <div className="mt-8">{summary}</div>
+            <div className="mt-8">
+              {discountBlock}
+              {summary}
+            </div>
             <Legal copy={copy} />
             <SubmitButton
               copy={copy}
@@ -914,6 +1096,138 @@ function BuyerFields({
       </div>
     </fieldset>
   );
+}
+
+/**
+ * The optional discount code.
+ *
+ * Deliberately unobtrusive: a question, one field and one button, with no
+ * "required" anywhere near it. A code that does not work says so and leaves
+ * the payment button exactly as it was — buying without a code is the normal
+ * case, not a fallback.
+ */
+function DiscountCodeField({
+  copy,
+  value,
+  onChange,
+  onApply,
+  onRemove,
+  status,
+  appliedCode,
+  appliedRate,
+  disabled,
+}: {
+  copy: CheckoutCopy;
+  value: string;
+  onChange: (value: string) => void;
+  onApply: () => void;
+  onRemove: () => void;
+  status: DiscountStatus;
+  appliedCode: string | null;
+  appliedRate: string | null;
+  disabled: boolean;
+}) {
+  const isChecking = status.kind === "checking";
+  const isApplied = appliedCode !== null;
+
+  return (
+    <div className={`checkout-discount ${isApplied ? "is-applied" : ""}`}>
+      <span className="checkout-discount-title">
+        <TicketPercent aria-hidden="true" />
+        {copy.discountLegend}
+      </span>
+      <p className="checkout-discount-hint">{copy.discountHint}</p>
+
+      <div className="checkout-discount-row">
+        <label className="inquiry-field">
+          <span className="sr-only">{copy.discountLabel}</span>
+          <span className="inquiry-input-wrap">
+            <input
+              type="text"
+              name="discountCodeInput"
+              value={value}
+              maxLength={DISCOUNT_CODE_MAX_LENGTH}
+              placeholder={copy.discountPlaceholder}
+              autoComplete="off"
+              spellCheck={false}
+              disabled={disabled || isApplied}
+              aria-label={copy.discountLabel}
+              onChange={(event) => onChange(event.target.value.toUpperCase())}
+              onKeyDown={(event) => {
+                // The code field lives inside the checkout form, so Enter would
+                // otherwise submit the order instead of checking the code.
+                if (event.key !== "Enter") return;
+                event.preventDefault();
+                if (!isApplied) onApply();
+              }}
+            />
+          </span>
+        </label>
+        {isApplied ? (
+          <button
+            type="button"
+            className="checkout-discount-remove"
+            onClick={onRemove}
+            disabled={disabled}
+          >
+            <X aria-hidden="true" />
+            {copy.discountRemove}
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn-outline checkout-discount-apply"
+            onClick={onApply}
+            // Disabled only while a check is in flight, so a double click
+            // cannot fire two lookups against the rate limit.
+            disabled={disabled || isChecking}
+            aria-busy={isChecking}
+          >
+            {isChecking ? copy.discountApplying : copy.discountApply}
+          </button>
+        )}
+      </div>
+
+      <p className="checkout-discount-status" role="status" aria-live="polite">
+        {isApplied ? (
+          <span className="checkout-discount-ok">
+            <Check aria-hidden="true" />
+            {copy.discountApplied.replace("{code}", appliedCode)}
+            {appliedRate
+              ? ` — ${copy.discountAppliedRate.replace("{rate}", appliedRate)}`
+              : ""}
+          </span>
+        ) : status.kind === "rejected" ? (
+          <span className="checkout-discount-error">
+            {discountRejectionMessage(status.reason, copy)}
+          </span>
+        ) : null}
+      </p>
+    </div>
+  );
+}
+
+export function discountRejectionMessage(
+  reason: DiscountCodeRejection | "empty",
+  copy: {
+    discountEmpty: string;
+    discountInvalid: string;
+    discountRateLimited: string;
+    discountUnavailable: string;
+  },
+): string {
+  switch (reason) {
+    case "empty":
+      return copy.discountEmpty;
+    case "rate_limited":
+      return copy.discountRateLimited;
+    case "unavailable":
+      return copy.discountUnavailable;
+    default:
+      // "unknown" and "not_applicable" answer alike on purpose: the form must
+      // not become a way to learn which codes exist.
+      return copy.discountInvalid;
+  }
 }
 
 function InvoiceBlock({
@@ -1070,6 +1384,7 @@ export function checkoutErrorMessage(
     conflict: string;
     soldOut: string;
     providerUnavailable: string;
+    discountChanged: string;
     error: string;
   },
 ): string {
@@ -1086,6 +1401,8 @@ export function checkoutErrorMessage(
       return copy.soldOut;
     case "provider_unavailable":
       return copy.providerUnavailable;
+    case "discount_code_changed":
+      return copy.discountChanged;
     default:
       return copy.error;
   }

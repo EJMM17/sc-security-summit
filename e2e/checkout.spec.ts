@@ -42,6 +42,52 @@ test.describe("Checkout de accesos", () => {
     await expect(summary).not.toContainText("1,508.00");
   });
 
+  test("ofrece el código de descuento sin volverlo obligatorio", async ({
+    page,
+  }) => {
+    await page.goto("/checkout?lang=es&tier=plus");
+
+    const discount = page.locator(".checkout-discount");
+    await expect(discount).toContainText("¿Tienes un código de descuento?");
+    await expect(discount).toContainText("Es opcional");
+    // Nothing in the block may suggest the code is required.
+    await expect(discount).not.toContainText(/obligatorio|requerido/i);
+
+    const field = page.getByLabel("Código de descuento");
+    await expect(field).toBeVisible();
+    await expect(field).not.toHaveAttribute("required", /.*/);
+
+    // The bundle must not ship the list of valid codes.
+    const html = await page.content();
+    for (const code of [
+      "UVB2026",
+      "IIIES2026",
+      "PVILLAFLORIDA2026",
+      "CANACAR2026",
+    ]) {
+      expect(html).not.toContain(code);
+    }
+
+    // Without a code the summary is the published price and the payment
+    // button is ready.
+    const summary = page.getByRole("heading", { name: "Resumen" }).locator("..");
+    await expect(summary).toContainText("Subtotal");
+    await expect(summary).toContainText("2,500.00");
+    await expect(
+      page.getByRole("button", { name: /procesar pago/i }),
+    ).toBeEnabled();
+
+    // Pressing Enter in the code field checks the code; it never submits the
+    // order.
+    await field.fill("ABC123");
+    await field.press("Enter");
+    await expect(page).toHaveURL(/\/checkout/);
+    await expect(
+      page.getByRole("button", { name: /procesar pago/i }),
+    ).toBeEnabled();
+    await expect(summary).toContainText("2,500.00");
+  });
+
   test("aplica el 25% por volumen al comprar 5 accesos plus", async ({ page }) => {
     await page.goto("/checkout?lang=es&tier=plus");
 

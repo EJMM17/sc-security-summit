@@ -7617,6 +7617,100 @@ h3,
   color: var(--text-strong);
   font-weight: 700;
 }
+/* The optional discount code. It reads as an offer, not a requirement: a
+   quiet question above the summary, never a bordered "required" field, and it
+   leaves the payment button untouched when nothing is applied. */
+.checkout-discount {
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.1rem;
+  border: 1px dashed var(--line);
+  border-radius: 0.6rem;
+}
+.checkout-discount.is-applied {
+  border-style: solid;
+  border-color: var(--summit-blue);
+}
+.checkout-discount-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--summit-blue);
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.checkout-discount-title svg {
+  width: 1rem;
+  height: 1rem;
+  flex: none;
+}
+.checkout-discount-hint {
+  margin-top: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+.checkout-discount-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+.checkout-discount-row .inquiry-field {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+.checkout-discount-row input {
+  text-transform: uppercase;
+}
+.checkout-discount-apply {
+  flex: none;
+  padding: 0.7rem 1.4rem;
+  font-size: 0.72rem;
+}
+.checkout-discount-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: none;
+  padding: 0.7rem 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+.checkout-discount-remove svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+.checkout-discount-status {
+  margin-top: 0.55rem;
+  font-size: 0.78rem;
+  line-height: 1.55;
+}
+.checkout-discount-status:empty {
+  display: none;
+}
+.checkout-discount-ok {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--summit-blue);
+  font-weight: 700;
+}
+.checkout-discount-ok svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: none;
+}
+.checkout-discount-error {
+  color: var(--text-body);
+  font-weight: 600;
+}
+
 .pricing-tier-volume {
   margin-top: 0.35rem;
   color: #047857;

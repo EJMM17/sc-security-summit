@@ -4,6 +4,7 @@ import { z } from "zod";
 import { getSupabaseServerClient } from "@/lib/supabase-server";
 import type { TicketCheckout } from "@/lib/payments/schema";
 import { ORDER_TIER_IDS, type OrderTierId, type TicketQuote } from "@/lib/payments/catalog";
+import type { CouponPricing } from "@/lib/payments/coupons";
 import { validateRfc } from "@/lib/payments/rfc";
 import type { TicketOrderStatus } from "@/lib/payments/result";
 import { TICKET_ORDER_STATUSES } from "@/lib/payments/result";
@@ -42,7 +43,13 @@ function firstRpcRow(data: unknown): unknown {
 const createOrderRowSchema = z.object({
   // `sold_out` carries no order because none was created.
   order_id: z.string().uuid().nullable(),
-  outcome: z.enum(["created", "replayed", "conflict", "sold_out"]),
+  outcome: z.enum([
+    "created",
+    "replayed",
+    "conflict",
+    "sold_out",
+    "coupon_unavailable",
+  ]),
   total_cents: z.coerce.number().int().nonnegative().nullable(),
 });
 
@@ -76,7 +83,9 @@ const storedOrderRowSchema = z.object({
 export type PersistTicketOrderResult =
   | { outcome: "created" | "replayed"; orderId: string; totalCents: number }
   | { outcome: "conflict"; orderId: string }
-  | { outcome: "sold_out" };
+  | { outcome: "sold_out" }
+  /** The coupon stopped applying between pricing and persistence. */
+  | { outcome: "coupon_unavailable" };
 
 export type StoredTicketOrder = z.infer<typeof storedOrderRowSchema>;
 
@@ -107,6 +116,7 @@ export async function persistTicketOrder(
   quote: TicketQuote,
   payloadHash: string,
   consentedAt: Date,
+  coupon: CouponPricing | null = null,
 ): Promise<PersistTicketOrderResult> {
   const attribution = order.attribution;
   const invoice = order.invoice;
@@ -137,6 +147,16 @@ export async function persistTicketOrder(
     p_company: order.company,
     p_referral_source: order.referral,
     p_attendees: order.attendees,
+    // The coupon travels as what it did, not as what it is: the code, the rate
+    // it worked out to, the unit price before it and the cents it removed. The
+    // function re-checks that those numbers add up against the amounts above
+    // and reserves the use in the same transaction that writes the order.
+    p_coupon_id: coupon?.couponId,
+    p_coupon_code: coupon?.code,
+    p_coupon_discount_type: coupon?.discountType,
+    p_coupon_discount_basis_points: coupon?.discountBasisPoints,
+    p_coupon_list_unit_price_cents: coupon?.listUnitPriceCents,
+    p_coupon_discount_cents: coupon?.discountCents,
     p_rfc: invoice?.rfc,
     p_person_type: personType,
     p_legal_name: invoice?.legalName,
@@ -167,6 +187,9 @@ export async function persistTicketOrder(
   const row = parsed.data;
   if (row.outcome === "sold_out") {
     return { outcome: "sold_out" };
+  }
+  if (row.outcome === "coupon_unavailable") {
+    return { outcome: "coupon_unavailable" };
   }
   if (!row.order_id) {
     throw new TicketOrderRepositoryError("create_ticket_order_response", {
@@ -219,6 +242,12 @@ export async function recordPayment(input: {
   providerStatus?: string;
   providerStatusDetail?: string;
   paidAt?: string;
+  /**
+   * Gross cents MercadoPago says it captured, when it said. The function
+   * refuses to mark an order paid for an amount that is not the one stored,
+   * so a preference edited in flight cannot settle for less than the ticket.
+   */
+  paidAmountCents?: number | null;
 }): Promise<RecordPaymentResult> {
   const { data, error } = await rpcClient().rpc("record_ticket_order_payment", {
     p_order_id: input.orderId,
@@ -227,6 +256,7 @@ export async function recordPayment(input: {
     p_provider_status: input.providerStatus?.slice(0, 120),
     p_provider_status_detail: input.providerStatusDetail?.slice(0, 120),
     p_paid_at: input.paidAt,
+    p_paid_amount_cents: input.paidAmountCents ?? undefined,
   });
 
   if (error) {

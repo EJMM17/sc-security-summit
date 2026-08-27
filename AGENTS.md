@@ -22,7 +22,7 @@ Internalize these boundaries before changing code:
    one rule shared by both ways of buying: it cuts the unit price from the
    fifth access up, on a corporate block and on any tier flagged
    `volumeDiscount` (today Plus) bought individually. Every order can carry an
-   optional referrer.
+   optional referrer, and an optional partner discount code.
    The sponsorship funnel and the "a quién va dirigido" section are retired.
    Supabase keeps the inquiries received before that cut; no new ones are
    created. Published prices already include IVA: the seller absorbs the 16%
@@ -230,6 +230,8 @@ New tables:
 - `public.ticket_order_invoice_details`
 - `public.ticket_order_events`
 - `public.ticket_capacity`
+- `public.coupons`
+- `public.coupon_uses`
 - `public.ticket_order_notifications`
 - `public.ticket_order_notification_attempts`
 - `public.inquiries`

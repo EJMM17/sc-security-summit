@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { isVisualOnlyVercelDeployment } from "@/lib/deployment-environment";
 import {
+  capturedAmountCents,
   getPayment,
   mapPaymentStatus,
   MercadoPagoConfigurationError,
@@ -115,7 +116,23 @@ export async function POST(request: Request): Promise<NextResponse> {
       providerStatus: payment.status,
       providerStatusDetail: payment.statusDetail ?? undefined,
       paidAt: payment.dateApproved ?? undefined,
+      // An order is only marked paid for the amount it was priced at. The
+      // database compares this against the stored total and refuses the
+      // update when they differ, so a preference tampered with in flight
+      // settles as an ignored notification instead of a paid ticket.
+      paidAmountCents: capturedAmountCents(payment),
     });
+
+    if (
+      result.outcome === "ignored" &&
+      status === "paid" &&
+      result.status !== "paid"
+    ) {
+      recordPaymentEvent("ticket_payment_amount_mismatch", {
+        orderId: result.orderId,
+        status: result.status,
+      });
+    }
 
     recordPaymentEvent(
       result.outcome === "updated"

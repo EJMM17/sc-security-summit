@@ -20,7 +20,10 @@ type PaymentEvent =
   | "ticket_order_expiry_failed"
   | "ticket_order_notification_sent"
   | "ticket_order_notification_retry"
-  | "ticket_order_notification_dead";
+  | "ticket_order_notification_dead"
+  | "ticket_discount_code_applied"
+  | "ticket_discount_code_rejected"
+  | "ticket_payment_amount_mismatch";
 
 type PaymentEventContext = {
   orderId?: string;
@@ -39,6 +42,13 @@ type PaymentEventContext = {
   scanned?: number;
   resolved?: number;
   expired?: number;
+  /**
+   * A partner discount code. It identifies an agreement, never a person, so it
+   * is the one buyer-typed string allowed in a log line — and only after the
+   * server matched it to a coupon row, so an arbitrary typed string never
+   * reaches here.
+   */
+  couponCode?: string;
 };
 
 /**

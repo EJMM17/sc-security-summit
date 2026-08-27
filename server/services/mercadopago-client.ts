@@ -338,6 +338,21 @@ export async function findPaymentByExternalReference(
   return payments.find((payment) => payment.status === "approved") ?? payments[0];
 }
 
+/**
+ * Gross cents the provider says it captured, or null when it did not say.
+ *
+ * A payment in any currency other than MXN reports zero: it cannot be the
+ * amount of an order priced in pesos, so the amount check that consumes this
+ * refuses it instead of comparing pesos against another currency's number.
+ */
+export function capturedAmountCents(
+  payment: MercadoPagoPayment,
+): number | null {
+  if (payment.transactionAmount === null) return null;
+  if (payment.currencyId !== null && payment.currencyId !== "MXN") return 0;
+  return Math.max(Math.round(payment.transactionAmount * 100), 0);
+}
+
 /** Maps a MercadoPago payment status onto the stored order status. */
 export function mapPaymentStatus(
   status: string,

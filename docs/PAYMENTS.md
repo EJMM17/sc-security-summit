@@ -62,6 +62,64 @@ Toda orden —individual o corporativa— acepta además un **referido opcional*
 (`referral_source`): texto libre que escribe el comprador, nunca un
 identificador sobre el que el sitio actúe.
 
+### Códigos de descuento de convenio (opcionales)
+
+El checkout acepta un **código opcional**. Quien no escribe nada paga el precio
+publicado; quien escribe algo que no es un código válido recibe un aviso y
+**puede pagar igual**, al precio publicado. En ningún estado el campo bloquea
+el botón de pago ni se presenta como obligatorio.
+
+Los códigos viven en `public.coupons` y **sólo ahí**: el bundle del navegador
+nunca recibe la lista. El navegador manda una cadena y el servidor contesta si
+compró un descuento. Los convenios vigentes al corte
+(`UVB2026`, `IIIES2026`, `PVILLAFLORIDA2026`, `CANACAR2026`) valen 20%.
+
+Antes de buscarlo el código se normaliza: se quitan espacios y se pasa a
+mayúsculas, así que `uvb2026`, ` Uvb2026 ` y `UVB2026` son el mismo cupón.
+
+Como el descuento por volumen, el cupón se aplica **al precio unitario**, de
+modo que la línea sigue siendo múltiplo exacto del unitario y el IVA se vuelve
+a extraer del bruto descontado (`applyCouponToQuote`). Las dos reglas se
+componen: cinco Accesos Plus con `UVB2026` son 2,500 → 1,875 (volumen) → 1,500
+(cupón) por acceso.
+
+Dos validaciones, y sólo la segunda decide:
+
+1. `validateDiscountCode` (Server Action) contesta al formulario para que el
+   comprador vea el precio antes de decidir. Es informativa.
+2. `createTicketCheckoutUseCase` vuelve a hacer todo el cálculo antes de crear
+   la preferencia: cotiza el tier y la cantidad contra el catálogo, relee el
+   cupón en Supabase, comprueba `active` y la ventana, recalcula el descuento y
+   cobra ese resultado. Después `create_ticket_order` lo verifica una tercera
+   vez dentro de la transacción y reserva el uso.
+
+El navegador **nunca** manda un importe: manda tier, cantidad y código.
+Manipular por DevTools el porcentaje, el subtotal o el total no cambia nada de
+lo que el servidor calcula ni de lo que MercadoPago cobra.
+
+El formulario sólo envía un código que el servidor ya declaró aplicable. Si
+entre ese momento y el pago el cupón dejó de aplicar, la acción responde
+`discount_code_changed`: no se crea orden, el formulario quita el código y el
+comprador puede pagar al precio publicado. Nunca se le cobra en silencio un
+importe distinto del que vio.
+
+La orden guarda el convenio junto con los importes: `coupon_id`,
+`coupon_code`, `coupon_discount_type`, `coupon_discount_basis_points`,
+`coupon_list_unit_price_cents` y `coupon_discount_cents`. El subtotal previo al
+descuento es `coupon_list_unit_price_cents * quantity` y el total posterior es
+`total_cents`, así que las ventas y los descuentos por convenio se consultan
+sin depender de un cupón que después cambie.
+
+`public.coupon_uses` registra un uso por orden: `reserved` al crear la orden,
+`used` cuando se paga y `released` cuando la orden se cancela, se rechaza, se
+reembolsa o llega a contracargo. Lo mueve un trigger sobre el estado de la
+orden, así que el webhook, la reconciliación y el barrido lo obtienen sin
+código extra y una sola vez. `max_uses` ya se respeta dentro de la transacción;
+`max_uses_per_customer`, `minimum_purchase_cents` y `maximum_discount_cents`
+son columnas listas para una pantalla de administración que todavía no existe.
+Los cupones se administran en Studio: `service_role` sólo puede **leer**
+`public.coupons`.
+
 Las `inquiries` corporativas y de patrocinio ya recibidas siguen guardadas y se
 consultan desde `/admin`, pero el sitio ya no crea ninguna nueva: la sección de
 patrocinio se retiró por completo (bloque del landing, formulario, `/sponsors`
@@ -291,7 +349,12 @@ Tres capas, todas necesarias:
    preferencia de pago.
 3. **`record_ticket_order_payment`**, que bloquea la fila (`for update`),
    ignora entregas duplicadas y nunca deja que una notificación tardía en
-   `pending` degrade una orden ya `paid`.
+   `pending` degrade una orden ya `paid`. Además **sólo marca `paid` por el
+   total guardado**: si MercadoPago informa un importe distinto, se registra el
+   evento `payment_amount_mismatch`, la orden no se marca pagada y el cupón no
+   se consume. El webhook y la reconciliación mandan el importe capturado en
+   centavos (`capturedAmountCents`); una moneda distinta de MXN no puede
+   coincidir jamás.
 
 ## Seguridad
 

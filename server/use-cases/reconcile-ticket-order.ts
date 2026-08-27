@@ -8,6 +8,7 @@ import {
   type StoredTicketOrder,
 } from "@/server/repositories/ticket-order-repository";
 import {
+  capturedAmountCents,
   findPaymentByExternalReference,
   mapPaymentStatus,
   MercadoPagoConfigurationError,
@@ -93,6 +94,7 @@ export async function reconcileTicketOrderWithOutcome(
   let providerStatus: string;
   let providerStatusDetail: string | undefined;
   let paidAt: string | undefined;
+  let paidAmountCents: number | null = null;
 
   try {
     const payment = await findPaymentByExternalReference(orderId);
@@ -111,6 +113,9 @@ export async function reconcileTicketOrderWithOutcome(
     providerStatus = payment.status;
     providerStatusDetail = payment.statusDetail ?? undefined;
     paidAt = payment.dateApproved ?? undefined;
+    // Same amount guard the webhook applies: reconciliation is a second path
+    // to the same write, so it must not be a way around it.
+    paidAmountCents = capturedAmountCents(payment);
   } catch (error) {
     recordPaymentEvent("ticket_order_reconcile_failed", {
       orderId,
@@ -130,6 +135,7 @@ export async function reconcileTicketOrderWithOutcome(
       providerStatus,
       providerStatusDetail,
       paidAt,
+      paidAmountCents,
     });
 
     recordPaymentEvent("ticket_order_reconciled", {

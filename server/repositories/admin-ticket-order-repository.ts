@@ -47,7 +47,7 @@ export class AdminTicketOrderRepositoryError extends Error {
 }
 
 const LIST_COLUMNS =
-  "id, status, tier, quantity, subtotal_cents, tax_cents, total_cents, tax_rate_basis_points, buyer_name, email, phone, company, referral_source, language, requires_invoice, invoice_status, invoiced_at, cfdi_uuid, provider_payment_id, provider_status, paid_at, owner, internal_notes, created_at, updated_at, retention_until";
+  "id, status, tier, quantity, subtotal_cents, tax_cents, total_cents, tax_rate_basis_points, buyer_name, email, phone, company, referral_source, coupon_code, coupon_discount_basis_points, coupon_discount_cents, language, requires_invoice, invoice_status, invoiced_at, cfdi_uuid, provider_payment_id, provider_status, paid_at, owner, internal_notes, created_at, updated_at, retention_until";
 
 const orderSchema = z.object({
   id: z.string().uuid(),
@@ -63,6 +63,9 @@ const orderSchema = z.object({
   phone: z.string(),
   company: z.string().nullable(),
   referral_source: z.string().nullable(),
+  coupon_code: z.string().nullable(),
+  coupon_discount_basis_points: z.coerce.number().int().min(0).nullable(),
+  coupon_discount_cents: z.coerce.number().int().min(0).nullable(),
   language: z.enum(["es", "en"]),
   requires_invoice: z.boolean(),
   invoice_status: z.enum(INVOICE_STATUS_VALUES),

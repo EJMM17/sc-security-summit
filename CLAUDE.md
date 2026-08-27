@@ -15,6 +15,14 @@ Read `AGENTS.md` first. Canonical current state:
   `public.ticket_order_attendees`. The roster can be pasted in bulk from the
   form. Every order, individual or corporate, may carry an optional free-text
   referrer (`referral_source`).
+- The checkout accepts an optional partner discount code. The codes live in
+  `public.coupons` and never in the bundle; the browser sends a string and the
+  server answers whether it bought a discount. An unknown code is never a
+  blocker: the buyer pays the published price. The code is applied to the unit
+  price, like the volume discount, and both compose. Every order keeps the code
+  and what it took off (`coupon_code`, `coupon_discount_cents`, …) and
+  `public.coupon_uses` reserves, confirms or releases the use with the order
+  status. See `docs/PAYMENTS.md`.
 - The 25% volume discount is one rule, not a corporate privilege: it applies to
   the unit price from the fifth access up on any tier flagged `volumeDiscount`
   in the catalog (today Plus) and to every corporate block. Five Plus accesses
@@ -46,7 +54,9 @@ CFDI; the team issues it manually within 72 hours.
 
 The webhook verifies the MercadoPago HMAC signature, rejects notifications
 older than five minutes, re-reads the payment from the API rather than trusting
-the body, and is idempotent. `MERCADOPAGO_ACCESS_TOKEN` accepts a live
+the body, and is idempotent. An order is only ever marked `paid` for the total
+it was priced at: a settlement for any other amount records
+`payment_amount_mismatch`, leaves the order unpaid and consumes no coupon. `MERCADOPAGO_ACCESS_TOKEN` accepts a live
 `APP_USR-` token only in Vercel Production and a `TEST-` token everywhere else.
 
 The webhook stays authoritative, but a return page reconciles an order still

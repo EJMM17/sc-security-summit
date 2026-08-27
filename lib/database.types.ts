@@ -108,6 +108,108 @@ export type Database = {
         }
         Relationships: []
       }
+      coupon_uses: {
+        Row: {
+          coupon_id: string
+          created_at: string
+          customer_key: string | null
+          discount_cents: number
+          id: string
+          order_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          coupon_id: string
+          created_at?: string
+          customer_key?: string | null
+          discount_cents?: number
+          id?: string
+          order_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          coupon_id?: string
+          created_at?: string
+          customer_key?: string | null
+          discount_cents?: number
+          id?: string
+          order_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coupon_uses_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "coupon_uses_order_id_fkey"
+            columns: ["order_id"]
+            isOneToOne: true
+            referencedRelation: "ticket_orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      coupons: {
+        Row: {
+          active: boolean
+          code: string
+          created_at: string
+          discount_amount_cents: number | null
+          discount_basis_points: number | null
+          discount_type: string
+          expires_at: string | null
+          id: string
+          max_uses: number | null
+          max_uses_per_customer: number | null
+          maximum_discount_cents: number | null
+          minimum_purchase_cents: number | null
+          notes: string | null
+          starts_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          code: string
+          created_at?: string
+          discount_amount_cents?: number | null
+          discount_basis_points?: number | null
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          max_uses_per_customer?: number | null
+          maximum_discount_cents?: number | null
+          minimum_purchase_cents?: number | null
+          notes?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          code?: string
+          created_at?: string
+          discount_amount_cents?: number | null
+          discount_basis_points?: number | null
+          discount_type?: string
+          expires_at?: string | null
+          id?: string
+          max_uses?: number | null
+          max_uses_per_customer?: number | null
+          maximum_discount_cents?: number | null
+          minimum_purchase_cents?: number | null
+          notes?: string | null
+          starts_at?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       email_events: {
         Row: {
           created_at: string
@@ -797,6 +899,12 @@ export type Database = {
           company: string | null
           consent_version: string
           consented_at: string
+          coupon_code: string | null
+          coupon_discount_basis_points: number | null
+          coupon_discount_cents: number | null
+          coupon_discount_type: string | null
+          coupon_id: string | null
+          coupon_list_unit_price_cents: number | null
           created_at: string
           currency: string
           email: string
@@ -843,6 +951,12 @@ export type Database = {
           company?: string | null
           consent_version: string
           consented_at: string
+          coupon_code?: string | null
+          coupon_discount_basis_points?: number | null
+          coupon_discount_cents?: number | null
+          coupon_discount_type?: string | null
+          coupon_id?: string | null
+          coupon_list_unit_price_cents?: number | null
           created_at?: string
           currency?: string
           email: string
@@ -889,6 +1003,12 @@ export type Database = {
           company?: string | null
           consent_version?: string
           consented_at?: string
+          coupon_code?: string | null
+          coupon_discount_basis_points?: number | null
+          coupon_discount_cents?: number | null
+          coupon_discount_type?: string | null
+          coupon_id?: string | null
+          coupon_list_unit_price_cents?: number | null
           created_at?: string
           currency?: string
           email?: string
@@ -929,7 +1049,15 @@ export type Database = {
           utm_source?: string | null
           utm_term?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ticket_orders_coupon_id_fkey"
+            columns: ["coupon_id"]
+            isOneToOne: false
+            referencedRelation: "coupons"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -1130,6 +1258,12 @@ export type Database = {
           p_company?: string
           p_consent_version: string
           p_consented_at: string
+          p_coupon_code?: string
+          p_coupon_discount_basis_points?: number
+          p_coupon_discount_cents?: number
+          p_coupon_discount_type?: string
+          p_coupon_id?: string
+          p_coupon_list_unit_price_cents?: number
           p_email: string
           p_first_touch_at?: string
           p_landing_page?: string
@@ -1183,6 +1317,7 @@ export type Database = {
       record_ticket_order_payment: {
         Args: {
           p_order_id: string
+          p_paid_amount_cents?: number
           p_paid_at?: string
           p_payment_id: string
           p_provider_status?: string

@@ -108,6 +108,10 @@ export type AdminTicketOrder = {
   phone: string;
   company: string | null;
   referral_source: string | null;
+  /** The convenio code applied to this order, if any, and what it took off. */
+  coupon_code: string | null;
+  coupon_discount_basis_points: number | null;
+  coupon_discount_cents: number | null;
   language: "es" | "en";
   requires_invoice: boolean;
   invoice_status: AdminInvoiceStatus;
