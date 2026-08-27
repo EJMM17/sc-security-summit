@@ -1136,7 +1136,6 @@ function DiscountCodeField({
         <TicketPercent aria-hidden="true" />
         {copy.discountLegend}
       </span>
-      <p className="checkout-discount-hint">{copy.discountHint}</p>
 
       <div className="checkout-discount-row">
         <label className="inquiry-field">
