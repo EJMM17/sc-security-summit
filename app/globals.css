@@ -7242,12 +7242,12 @@ h3,
   background:
     radial-gradient(
       circle at 8% 72%,
-      color-mix(in srgb, var(--cyan) 8%, transparent) 0,
+      color-mix(in srgb, var(--cyan-400) 8%, transparent) 0,
       transparent 25rem
     ),
     radial-gradient(
       circle at 92% 18%,
-      color-mix(in srgb, var(--blue) 7%, transparent) 0,
+      color-mix(in srgb, var(--blue-600) 7%, transparent) 0,
       transparent 27rem
     ),
     var(--surface);
@@ -7264,7 +7264,7 @@ h3,
   margin-inline: auto;
   padding: clamp(0.45rem, 1vw, 0.7rem);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--blue) 14%, var(--line));
+  border: 1px solid color-mix(in srgb, var(--blue-600) 14%, var(--line));
   border-radius: clamp(1.25rem, 3vw, 2rem);
   background: color-mix(in srgb, var(--surface) 92%, transparent);
   box-shadow:
@@ -7286,13 +7286,13 @@ h3,
 .presenter-stage-glow--left {
   bottom: -7rem;
   left: -5rem;
-  background: var(--cyan);
+  background: var(--cyan-400);
 }
 
 .presenter-stage-glow--right {
   top: -8rem;
   right: -4rem;
-  background: var(--blue);
+  background: var(--blue-600);
 }
 
 .presenter-logo-grid {
@@ -7303,7 +7303,7 @@ h3,
   padding: 0;
   overflow: hidden;
   border-radius: calc(clamp(1.25rem, 3vw, 2rem) - 0.45rem);
-  background: color-mix(in srgb, var(--blue) 11%, var(--line));
+  background: color-mix(in srgb, var(--blue-600) 11%, var(--line));
   list-style: none;
 }
 
@@ -7315,7 +7315,11 @@ h3,
   min-height: clamp(7rem, 20vw, 8.25rem);
   box-sizing: border-box;
   padding: clamp(1.15rem, 3vw, 1.75rem);
-  background: color-mix(in srgb, var(--surface) 97%, var(--blue));
+  /* Plain surface, never a tint: the brand assets ship with a flat white
+     background (see PHOTO_MANIFEST.md), so anything else frames every logo in
+     a visible box. The colour of this section lives in the stage behind the
+     cards and in the hairlines between them. */
+  background: var(--surface);
   transition:
     background-color var(--dur) var(--ease-out),
     box-shadow var(--dur) var(--ease-out);
@@ -7324,7 +7328,7 @@ h3,
 .presenter-logo-card:hover {
   z-index: 1;
   background: var(--surface);
-  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--cyan) 70%, var(--blue));
+  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--cyan-400) 70%, var(--blue-600));
 }
 
 .presenter-logo-frame {
@@ -7355,12 +7359,14 @@ h3,
    breaking the section into a second block. */
 .presenter-logo-card[data-lead="true"] {
   min-height: clamp(10rem, 28vw, 13rem);
-  background: var(--surface);
 }
 
 /* The institutional lockups are stacked rather than horizontal, so the lead
-   row needs a taller canvas than a wordmark to carry the same weight. */
+   row needs a taller canvas than a wordmark to carry the same weight. The
+   width is capped so a wide lockup cannot outgrow a stacked one: the two
+   marks read as a pair instead of one banner beside a small crest. */
 .presenter-logo-card[data-lead="true"] .presenter-logo-frame {
+  width: min(100%, 21rem);
   height: clamp(6rem, 17vw, 9rem);
 }
 
