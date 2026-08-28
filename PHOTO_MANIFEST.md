@@ -65,6 +65,20 @@ Cada archivo se enlaza desde `PRESENTERS` en `lib/content.ts`. Un presentador
 con `logo: null` se muestra como wordmark tipográfico hasta que su archivo
 exista, para no publicar imágenes rotas.
 
+### Instituciones
+
+Las marcas de gobierno encabezan la misma alineación: comparten la primera
+fila entre ellas, con una tarjeta y un lienzo de logo más altos, porque son
+la identidad institucional del Summit. Se enlazan desde `INSTITUTIONS` en
+`lib/content.ts`, con `lead: true`:
+
+- `gobierno-reynosa.png`
+- `secretaria-desarrollo-economico.png`
+
+`secretaria-desarrollo-economico.png` viene de una fuente de 290 px de ancho
+y se muestra ampliada en escritorio; conviene reemplazarla, con el mismo
+nombre, en cuanto exista un original de mayor resolución.
+
 ### Patrocinadores
 
 Los patrocinadores también presentan el Summit: comparten carpeta,

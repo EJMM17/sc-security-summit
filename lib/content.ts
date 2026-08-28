@@ -502,7 +502,28 @@ export const PILARES = {
 export type Presenter = {
   readonly name: string;
   readonly logo: string | null;
+  /** Opens the lineup on its own row, with a taller logo canvas. Reserved for
+   * the institutional marks that head the Summit. */
+  readonly lead?: boolean;
 };
+
+/** The government institutions backing the Summit.
+ *
+ * They head the same single lineup — no separate block — but take the first
+ * row on their own, centred and at a larger size, because they outrank the
+ * companies underneath. */
+export const INSTITUTIONS: readonly Presenter[] = [
+  {
+    name: "Gobierno Municipal de Reynosa",
+    logo: "/images/presenters/gobierno-reynosa.png",
+    lead: true,
+  },
+  {
+    name: "Secretaría de Desarrollo Económico y del Empleo de Reynosa",
+    logo: "/images/presenters/secretaria-desarrollo-economico.png",
+    lead: true,
+  },
+] as const;
 
 export const PRESENTERS: readonly Presenter[] = [
   {
@@ -548,11 +569,13 @@ export const SPONSORS: readonly Presenter[] = [
   },
 ] as const;
 
-/** Every brand presenting the Summit, in one lineup: the organizations that
- * opened it and the set that joined afterwards. The section renders this list
+/** Every brand presenting the Summit, in one lineup: the institutions that
+ * head it, the organizations that opened it and the set that joined
+ * afterwards. The section renders this list
  * and nothing else, so a new brand only has to land in one of the two arrays
  * above. */
 export const PRESENTING_BRANDS: readonly Presenter[] = [
+  ...INSTITUTIONS,
   ...PRESENTERS,
   ...SPONSORS,
 ];

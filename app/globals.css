@@ -7350,38 +7350,41 @@ h3,
   text-wrap: balance;
 }
 
+/* The institutional marks head the lineup: they share the first row between
+   them, on a taller card, so the government identity reads first without
+   breaking the section into a second block. */
+.presenter-logo-card[data-lead="true"] {
+  min-height: clamp(10rem, 28vw, 13rem);
+  background: var(--surface);
+}
+
+/* The institutional lockups are stacked rather than horizontal, so the lead
+   row needs a taller canvas than a wordmark to carry the same weight. */
+.presenter-logo-card[data-lead="true"] .presenter-logo-frame {
+  height: clamp(6rem, 17vw, 9rem);
+}
+
 /* With an odd lineup the first mark opens the mobile composition as its
    anchor and the rest form a balanced two-column matrix; an even lineup fills
-   the two columns on its own and the component drops the anchor. */
+   the two columns on its own and the component drops the anchor. A lead mark
+   always takes the full width here. */
 @media (max-width: 639px) {
-  .presenter-logo-card[data-featured="true"] {
+  .presenter-logo-card[data-featured="true"],
+  .presenter-logo-card[data-lead="true"] {
     grid-column: 1 / -1;
   }
 }
 
-@media (min-width: 640px) and (max-width: 1023px) {
+@media (min-width: 640px) {
+  /* The lineup sets `--lineup-columns` from the marks that follow the lead
+     row, so no row leaves empty cells showing the grid's hairline background,
+     and `--lead-span` splits that first row between the lead marks. */
   .presenter-logo-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--lineup-columns, 4), minmax(0, 1fr));
   }
 
-  .presenter-logo-card {
-    grid-column: span 2;
-  }
-
-  /* Three marks per row here, so a lineup ending in a pair leaves an empty
-     cell: the pair is nudged one column to centre that last row. A lineup
-     that fills its rows exactly keeps the default flow. */
-  .presenter-logo-card:nth-child(3n + 1):nth-last-child(2) {
-    grid-column: 2 / span 2;
-  }
-}
-
-@media (min-width: 1024px) {
-  /* Each lineup sets `--lineup-columns` from its own length, so a block of
-     three sponsors fills its row instead of leaving two empty cells showing
-     the grid's hairline background. */
-  .presenter-logo-grid {
-    grid-template-columns: repeat(var(--lineup-columns, 5), minmax(0, 1fr));
+  .presenter-logo-card[data-lead="true"] {
+    grid-column: span var(--lead-span, 2);
   }
 }
 
