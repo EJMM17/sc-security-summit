@@ -65,6 +65,23 @@ Cada archivo se enlaza desde `PRESENTERS` en `lib/content.ts`. Un presentador
 con `logo: null` se muestra como wordmark tipográfico hasta que su archivo
 exista, para no publicar imágenes rotas.
 
+### Patrocinadores
+
+Los patrocinadores comparten carpeta, tratamiento y tarjeta con los
+presentadores; la única diferencia es la leyenda del bloque en la sección
+`#presentadores`:
+
+- `ford.png`
+- `palco.png`
+- `mundo-gps-reynosa.png`
+
+Se enlazan desde `SPONSORS` en `lib/content.ts`, con el mismo comportamiento de
+wordmark cuando falta el archivo. Las tres fuentes llegaron en JPG con fondo
+plano; se normalizó todo pixel casi blanco (≥ 236 en los tres canales) a blanco
+puro, se recortó el margen sobrante y se guardaron como PNG sRGB. `palco.png`
+es el activo de menor resolución disponible (200 px de ancho): si el patrocinador
+entrega un original mayor, conviene reemplazarlo conservando el nombre.
+
 ## Reglas para reemplazos
 
 - Mantener exactamente el nombre cuando el reemplazo deba ser transparente.

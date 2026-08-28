@@ -91,10 +91,13 @@ export const UI_TEXT = {
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     presentedBy: "Presentado por",
+    sponsoredBy: "Patrocinado por",
     presentersLabel: "PRESENTADORES",
     presentersTitle: "Las organizaciones que hacen posible el Summit",
     presentersDesc:
-      "Empresas e instituciones de la región que presentan el 1er Summit de Seguridad en la Cadena de Suministros.",
+      "Empresas e instituciones de la región que presentan y patrocinan el 1er Summit de Seguridad en la Cadena de Suministros.",
+    presentersLineupLabel: "Presentan",
+    sponsorsLineupLabel: "Patrocinan",
     whyAttendLabel: "NO ES UNA EXPO",
     whyAttendTitle: "Es formación para quienes protegen la operación",
     whyAttendDesc:
@@ -245,10 +248,13 @@ export const UI_TEXT = {
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     presentedBy: "Presented by",
+    sponsoredBy: "Sponsored by",
     presentersLabel: "PRESENTERS",
     presentersTitle: "The organizations that make the Summit possible",
     presentersDesc:
-      "Companies and institutions from the region presenting the 1st Supply Chain Security Summit.",
+      "Companies and institutions from the region presenting and sponsoring the 1st Supply Chain Security Summit.",
+    presentersLineupLabel: "Presenting",
+    sponsorsLineupLabel: "Sponsors",
     whyAttendLabel: "THIS IS NOT AN EXPO",
     whyAttendTitle: "Training for those who protect the operation",
     whyAttendDesc:
@@ -524,6 +530,27 @@ export const PRESENTERS: readonly Presenter[] = [
   {
     name: "Laboratorios Eloisa",
     logo: "/images/presenters/laboratorios-eloisa.png",
+  },
+] as const;
+
+/** Brands sponsoring the Summit.
+ *
+ * They share the `Presenter` shape and the same logo canvas as the presenting
+ * organizations: one lineup language for every brand on the page, with the
+ * caption above each block carrying the difference between presenting and
+ * sponsoring. Names are not translated. */
+export const SPONSORS: readonly Presenter[] = [
+  {
+    name: "Ford",
+    logo: "/images/presenters/ford.png",
+  },
+  {
+    name: "Palco",
+    logo: "/images/presenters/palco.png",
+  },
+  {
+    name: "Mundo GPS Reynosa",
+    logo: "/images/presenters/mundo-gps-reynosa.png",
   },
 ] as const;
 
@@ -1457,6 +1484,7 @@ export const CONTENT = {
     heroStats: HERO_STATS.es,
     pillars: PILARES.es,
     presenters: PRESENTERS,
+    sponsors: SPONSORS,
     speakers: SPEAKERS.es,
     agenda: AGENDA.es,
     attendees: ASISTENTES.es,
@@ -1475,6 +1503,7 @@ export const CONTENT = {
     heroStats: HERO_STATS.en,
     pillars: PILARES.en,
     presenters: PRESENTERS,
+    sponsors: SPONSORS,
     speakers: SPEAKERS.en,
     agenda: AGENDA.en,
     attendees: ASISTENTES.en,

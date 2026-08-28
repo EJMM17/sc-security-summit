@@ -7295,6 +7295,34 @@ h3,
   background: var(--blue);
 }
 
+/* Two lineups share the stage: the organizations presenting the Summit and the
+   brands sponsoring it. The caption is the only thing that separates them, so
+   both blocks keep the same cards, hairlines and hover. */
+.presenter-lineup + .presenter-lineup {
+  margin-top: clamp(0.9rem, 2.2vw, 1.35rem);
+}
+
+.presenter-lineup-label {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin: 0 0 clamp(0.55rem, 1.4vw, 0.8rem);
+  padding-inline: clamp(0.35rem, 1vw, 0.6rem);
+  color: var(--blue-600);
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.presenter-lineup-label::after {
+  flex: 1;
+  height: 1px;
+  background: color-mix(in srgb, var(--blue) 16%, var(--line));
+  content: "";
+}
+
 .presenter-logo-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -7350,8 +7378,9 @@ h3,
   text-wrap: balance;
 }
 
-/* Lanz opens the mobile composition as its visual anchor; the remaining four
-   marks then form a balanced two-by-two matrix instead of leaving an orphan. */
+/* The first mark of each lineup opens the mobile composition as its anchor;
+   the remaining marks then form a balanced two-column matrix instead of
+   leaving an orphan (four for the presenters, two for the sponsors). */
 @media (max-width: 639px) {
   .presenter-logo-card[data-featured="true"] {
     grid-column: 1 / -1;
@@ -7367,14 +7396,19 @@ h3,
     grid-column: span 2;
   }
 
-  .presenter-logo-card:nth-child(4) {
+  /* Centres the orphan row of a five-mark lineup. A lineup that fills its
+     rows exactly (three or six marks) keeps the default flow. */
+  .presenter-logo-card:nth-child(4):nth-last-child(2) {
     grid-column: 2 / span 2;
   }
 }
 
 @media (min-width: 1024px) {
+  /* Each lineup sets `--lineup-columns` from its own length, so a block of
+     three sponsors fills its row instead of leaving two empty cells showing
+     the grid's hairline background. */
   .presenter-logo-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--lineup-columns, 5), minmax(0, 1fr));
   }
 }
 

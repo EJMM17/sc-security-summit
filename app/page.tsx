@@ -138,6 +138,13 @@ function buildStructuredData(lang: "es" | "en") {
           name: "Lanz Logistics",
           url: "https://www.lanzlogistics.com",
         },
+        // The sponsoring brands shown in the presenters section, so a rich
+        // result credits them with the same lineup the page publishes.
+        sponsor: content.sponsors.map((brand) => ({
+          "@type": "Organization",
+          name: brand.name,
+          ...(brand.logo ? { logo: `${BASE_URL}${brand.logo}` } : {}),
+        })),
         performer: content.speakers.map((s) => ({
           "@type": "Person",
           name: s.name,
