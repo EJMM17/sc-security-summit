@@ -75,9 +75,7 @@ la identidad institucional del Summit. Se enlazan desde `INSTITUTIONS` en
 - `gobierno-reynosa.png`
 - `secretaria-desarrollo-economico.png`
 
-`secretaria-desarrollo-economico.png` viene de una fuente de 290 px de ancho
-y se muestra ampliada en escritorio; conviene reemplazarla, con el mismo
-nombre, en cuanto exista un original de mayor resolución.
+Ambos archivos vienen de originales en alta y se muestran sin ampliar.
 
 ### Patrocinadores
 
