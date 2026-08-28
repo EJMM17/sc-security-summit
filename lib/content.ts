@@ -91,13 +91,10 @@ export const UI_TEXT = {
     registerNowBtn: "CONSEGUIR ACCESOS",
     heroAgendaBtn: "VER PROGRAMA",
     presentedBy: "Presentado por",
-    sponsoredBy: "Patrocinado por",
     presentersLabel: "PRESENTADORES",
     presentersTitle: "Las organizaciones que hacen posible el Summit",
     presentersDesc:
       "Empresas e instituciones de la región que presentan y patrocinan el 1er Summit de Seguridad en la Cadena de Suministros.",
-    presentersLineupLabel: "Presentan",
-    sponsorsLineupLabel: "Patrocinan",
     whyAttendLabel: "NO ES UNA EXPO",
     whyAttendTitle: "Es formación para quienes protegen la operación",
     whyAttendDesc:
@@ -248,13 +245,10 @@ export const UI_TEXT = {
     registerNowBtn: "GET PASSES",
     heroAgendaBtn: "VIEW PROGRAM",
     presentedBy: "Presented by",
-    sponsoredBy: "Sponsored by",
     presentersLabel: "PRESENTERS",
     presentersTitle: "The organizations that make the Summit possible",
     presentersDesc:
       "Companies and institutions from the region presenting and sponsoring the 1st Supply Chain Security Summit.",
-    presentersLineupLabel: "Presenting",
-    sponsorsLineupLabel: "Sponsors",
     whyAttendLabel: "THIS IS NOT AN EXPO",
     whyAttendTitle: "Training for those who protect the operation",
     whyAttendDesc:
@@ -533,12 +527,12 @@ export const PRESENTERS: readonly Presenter[] = [
   },
 ] as const;
 
-/** Brands sponsoring the Summit.
+/** The brands that joined the lineup as sponsors.
  *
- * They share the `Presenter` shape and the same logo canvas as the presenting
- * organizations: one lineup language for every brand on the page, with the
- * caption above each block carrying the difference between presenting and
- * sponsoring. Names are not translated. */
+ * They present the Summit alongside the organizations above and render in the
+ * same single lineup, so the page draws no line between the two sets; the list
+ * is kept apart only because the event's structured data credits these three
+ * as its sponsors. Names are not translated. */
 export const SPONSORS: readonly Presenter[] = [
   {
     name: "Ford",
@@ -553,6 +547,15 @@ export const SPONSORS: readonly Presenter[] = [
     logo: "/images/presenters/mundo-gps-reynosa.png",
   },
 ] as const;
+
+/** Every brand presenting the Summit, in one lineup: the organizations that
+ * opened it and the set that joined afterwards. The section renders this list
+ * and nothing else, so a new brand only has to land in one of the two arrays
+ * above. */
+export const PRESENTING_BRANDS: readonly Presenter[] = [
+  ...PRESENTERS,
+  ...SPONSORS,
+];
 
 export const SPEAKERS = {
   es: [
@@ -1483,7 +1486,7 @@ export const CONTENT = {
     ui: UI_TEXT.es,
     heroStats: HERO_STATS.es,
     pillars: PILARES.es,
-    presenters: PRESENTERS,
+    presenters: PRESENTING_BRANDS,
     sponsors: SPONSORS,
     speakers: SPEAKERS.es,
     agenda: AGENDA.es,
@@ -1502,7 +1505,7 @@ export const CONTENT = {
     ui: UI_TEXT.en,
     heroStats: HERO_STATS.en,
     pillars: PILARES.en,
-    presenters: PRESENTERS,
+    presenters: PRESENTING_BRANDS,
     sponsors: SPONSORS,
     speakers: SPEAKERS.en,
     agenda: AGENDA.en,
