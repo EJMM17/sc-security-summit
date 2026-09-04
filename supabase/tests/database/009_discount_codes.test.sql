@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(26);
+select plan(27);
 
 -- ---------------------------------------------------------------------------
 -- The convenios that shipped with the migration
@@ -21,6 +21,17 @@ select is(
   ),
   4,
   'the four seeded codes are active percentage coupons at 20%'
+);
+
+-- 20260904185529 adds AAARAC at a different rate, so the rate is per coupon
+-- and not a property of "being a convenio".
+select is(
+  (
+    select discount_basis_points from public.coupons
+    where code = 'AAARAC2026' and discount_type = 'percentage' and active
+  ),
+  2500,
+  'AAARAC2026 is an active percentage coupon at 25%'
 );
 
 -- The coupon constraints are exercised as the owning role: service_role can
