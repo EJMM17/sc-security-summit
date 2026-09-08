@@ -902,7 +902,6 @@ export const PRICING = {
       desc: "Perfil de estudiante con credencial vigente",
       features: [
         "Acceso a conferencias especializadas",
-        "Kit Futuros Líderes",
         "Gafete de acceso",
         "Constancia de participación disponible con costo preferencial",
       ],
@@ -951,7 +950,6 @@ export const PRICING = {
       desc: "Student profile with valid ID",
       features: [
         "Access to specialized conferences",
-        "Future Leaders kit",
         "Access badge",
         "Certificate of participation available at preferential cost",
       ],
@@ -1149,7 +1147,7 @@ export const FAQ_ITEMS = [
   {
     question: "¿Qué incluye cada tipo de acceso?",
     answer:
-      "El acceso Estudiante incluye conferencias especializadas, kit Futuros Líderes y gafete. El acceso General agrega paneles con expertos de la industria, constancia digital de participación y kit básico. El acceso Plus suma constancia de participación, kit de bienvenida ejecutivo y material descargable con plantillas de trabajo.",
+      "El acceso Estudiante incluye conferencias especializadas y gafete. El acceso General agrega paneles con expertos de la industria, constancia digital de participación y kit básico. El acceso Plus suma constancia de participación, kit de bienvenida ejecutivo y material descargable con plantillas de trabajo.",
   },
   {
     question: "¿Puedo comprar accesos para mi equipo?",
@@ -1187,7 +1185,7 @@ export const FAQ_ITEMS_EN = [
   {
     question: "What is included with each access type?",
     answer:
-      "Student access includes the specialized conferences, the Future Leaders kit, and a badge. General access adds panels with industry experts, a digital certificate of participation, and a basic kit. Plus access adds a printed certificate of participation, an executive welcome kit, and downloadable materials with work templates.",
+      "Student access includes the specialized conferences and a badge. General access adds panels with industry experts, a digital certificate of participation, and a basic kit. Plus access adds a printed certificate of participation, an executive welcome kit, and downloadable materials with work templates.",
   },
   {
     question: "Can I buy passes for my team?",
