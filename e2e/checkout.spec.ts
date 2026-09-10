@@ -64,6 +64,12 @@ test.describe("Checkout de accesos", () => {
       "IIIES2026",
       "PVILLAFLORIDA2026",
       "CANACAR2026",
+      "AAARAC2026",
+      "UT2026",
+      "ITCC2026",
+      "UAT2026",
+      "ATLANTICO2026",
+      "UMAN2026",
     ]) {
       expect(html).not.toContain(code);
     }
