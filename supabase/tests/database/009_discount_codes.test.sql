@@ -9,7 +9,7 @@ select plan(29);
 
 -- ---------------------------------------------------------------------------
 -- The convenios that shipped with the migration (IIES2026 renamed by
--- 20260911120000, which corrected the IIIES2026 typo)
+-- 20260911140721, which corrected the IIIES2026 typo)
 -- ---------------------------------------------------------------------------
 
 select is(
@@ -24,7 +24,7 @@ select is(
   'the four seeded codes are active percentage coupons at 20%'
 );
 
--- 20260911120000 fixes the typo in that first batch: the IIES convenio was
+-- 20260911140721 fixes the typo in that first batch: the IIES convenio was
 -- seeded as IIIES2026, so the typo must no longer be a code at all.
 select is(
   (

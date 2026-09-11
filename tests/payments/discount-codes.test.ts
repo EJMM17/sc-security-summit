@@ -14,7 +14,7 @@ import { validateDiscountCodeUseCase } from "@/server/use-cases/validate-discoun
  *
  * The rate belongs to the coupon, not to "being a convenio": 20260827120000
  * seeded four codes at 20% (IIES2026 among them, spelled IIIES2026 until
- * 20260911120000 corrected the typo), 20260904185529 added AAARAC at 25% and
+ * 20260911140721 corrected the typo), 20260904185529 added AAARAC at 25% and
  * 20260910120000 added five more at 20%.
  */
 const SEEDED_CODES = {
