@@ -13,7 +13,8 @@ import { validateDiscountCodeUseCase } from "@/server/use-cases/validate-discoun
  * The convenios seeded by the migrations, and what each one is worth.
  *
  * The rate belongs to the coupon, not to "being a convenio": 20260827120000
- * seeded four codes at 20% and 20260904185529 added AAARAC at 25%.
+ * seeded four codes at 20%, 20260904185529 added AAARAC at 25% and
+ * 20260910120000 added five more at 20%.
  */
 const SEEDED_CODES = {
   UVB2026: 2_000,
@@ -21,6 +22,11 @@ const SEEDED_CODES = {
   PVILLAFLORIDA2026: 2_000,
   CANACAR2026: 2_000,
   AAARAC2026: 2_500,
+  UT2026: 2_000,
+  ITCC2026: 2_000,
+  UAT2026: 2_000,
+  ATLANTICO2026: 2_000,
+  UMAN2026: 2_000,
 } as const;
 
 function couponRow(code: string): CouponDefinition {
