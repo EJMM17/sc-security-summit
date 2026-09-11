@@ -5,22 +5,33 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(28);
+select plan(29);
 
 -- ---------------------------------------------------------------------------
--- The convenios that shipped with the migration
+-- The convenios that shipped with the migration (IIES2026 renamed by
+-- 20260911120000, which corrected the IIIES2026 typo)
 -- ---------------------------------------------------------------------------
 
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UVB2026', 'IIIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
+    where code in ('UVB2026', 'IIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
   ),
   4,
   'the four seeded codes are active percentage coupons at 20%'
+);
+
+-- 20260911120000 fixes the typo in that first batch: the IIES convenio was
+-- seeded as IIIES2026, so the typo must no longer be a code at all.
+select is(
+  (
+    select count(*)::integer from public.coupons where code = 'IIIES2026'
+  ),
+  0,
+  'the mistyped IIIES2026 is gone: only IIES2026 buys the convenio discount'
 );
 
 -- 20260904185529 adds AAARAC at a different rate, so the rate is per coupon
