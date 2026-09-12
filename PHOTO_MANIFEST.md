@@ -53,7 +53,8 @@ Las versiones en blanco (`presenter-*.png`) que usaba el hero quedaron
 retiradas. La sección `#presentadores` usa los logos a color, en
 `public/images/presenters/`, con fondo blanco plano y sin margen sobrante
 (el fondo original venía en `#f7f7f7` con ruido de compresión; se normalizó
-a blanco puro para que la caja del logo se funda con la tarjeta):
+a blanco puro para que la caja del logo se funda con el plano blanco de la
+sección, que ya no dibuja tarjeta alguna detrás de cada marca):
 
 - `lanz-logistics.png`
 - `villa-florida.png`
@@ -79,13 +80,13 @@ el mismo tratamiento:
   nombre del archivo.
 - `spi.png` — fondo transparente; se recortó al lockup y se dejó fuera la
   regla azul y el claim «Seguridad y telecomunicaciones para tu empresa», que
-  a tamaño de mosaico es microtipografía ilegible. Conserva el descriptor
+  al tamaño de la alineación es microtipografía ilegible. Conserva el descriptor
   «Servicios Profesionales Integrados».
 - `innovalab.png` — fondo transparente; solo se recortó el margen sobrante.
 
 Los dos con transparencia se dejaron con canal alfa en lugar de aplanarlos a
-blanco: sobre la tarjeta el resultado es idéntico y no quedan atados al color
-de la superficie.
+blanco: sobre el plano blanco de la sección el resultado es idéntico y no
+quedan atados al color de la superficie.
 
 ### Proporción del lienzo
 
@@ -107,8 +108,9 @@ en extremos opuestos de la lista para que nunca queden contiguos.
 ### Instituciones
 
 Las marcas de gobierno encabezan la misma alineación: comparten la primera
-fila entre ellas, con una tarjeta y un lienzo de logo más altos, porque son
-la identidad institucional del Summit. Se enlazan desde `INSTITUTIONS` en
+fila entre ellas, con un lienzo de logo más alto y más aire debajo, porque
+son la identidad institucional del Summit. No llevan un tratamiento aparte:
+el rango se lee por escala y espacio, no por un marco propio. Se enlazan desde `INSTITUTIONS` en
 `lib/content.ts`, con `lead: true`:
 
 - `gobierno-reynosa.png`
@@ -118,9 +120,9 @@ Ambos archivos vienen de originales en alta y se muestran sin ampliar.
 
 ### Patrocinadores
 
-Los patrocinadores también presentan el Summit: comparten carpeta,
-tratamiento y tarjeta con los demás y se muestran en la misma alineación
-única de la sección `#presentadores`, sin separación visual:
+Los patrocinadores también presentan el Summit: comparten carpeta y
+tratamiento con los demás y se muestran en la misma alineación única de la
+sección `#presentadores`, sin separación visual:
 
 - `ford.png`
 - `palco.png`
