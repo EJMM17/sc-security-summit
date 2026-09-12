@@ -7232,328 +7232,205 @@ h3,
 }
 
 /* ═══ PRESENTADORES ═══
-   One shared, softly branded stage lets a dozen very different full-colour
-   marks coexist as a single group. The lineup is a centred wrapping row, not
-   a fixed matrix: brands keep joining, so the layout must absorb any count
-   without leaving empty cells, and a row that does not fill centres itself
-   under the ones above. Every mark gets the same tile and the same logo
-   canvas, which is what gives a government crest, an industrial wordmark and
-   a laboratory lockup equal optical weight without distorting any of them.
+   One wall, one plane, no cards. A dozen very different full-colour marks
+   read as a single group when nothing frames them individually: the section
+   is white, every mark sits directly on it, and the only structure is the
+   rhythm of the grid. Boxing each logo — a tile, a hairline, a shadow, a
+   hover lift — is what made the lineup read as a table of vendor cards
+   instead of the lineup of a summit.
 
-   The depth of the section is built from planes, not from ornament on the
-   tiles: the stage is a tinted plane, the tiles are pure white and lifted
-   off it, and the only colour that touches a mark is the hairline around
-   its tile. That inversion is what makes the wall read as a gallery rather
-   than as a table of boxed logos — and it is the one treatment the assets
-   allow, because every logo ships on a flat white background
-   (PHOTO_MANIFEST.md), so a tinted tile would frame each mark in a visible
-   rectangle. */
+   Two rules hold the block together:
+
+   1. The plane must be white. Every asset ships on a flat white background
+      (PHOTO_MANIFEST.md), so any tint behind a mark paints a visible
+      rectangle around it. White on white is not a compromise here, it is the
+      only surface these assets can share.
+   2. The marks must carry the same optical weight. Colour, contrast and
+      proportion vary wildly between a government crest and a consumer
+      wordmark, so the wall normalises all three: one canvas per proportion
+      bucket, and a single desaturated rest state that resolves to full brand
+      colour when the mark is pointed at.
+
+   Hierarchy comes from scale and air, never from a second treatment: the
+   institutional marks open the wall on their own row, larger, with more
+   space under them. */
 .presenters-section {
   position: relative;
-  overflow: hidden;
-  /* The section opens on the soft plane the previous one closes on and
-     resolves to white behind the stage, so the lineup arrives as a change of
-     light rather than as a hard seam between two blocks. */
-  background:
-    radial-gradient(
-      circle at 8% 72%,
-      color-mix(in srgb, var(--cyan-400) 9%, transparent) 0,
-      transparent 25rem
-    ),
-    radial-gradient(
-      circle at 92% 18%,
-      color-mix(in srgb, var(--blue-600) 8%, transparent) 0,
-      transparent 27rem
-    ),
-    linear-gradient(
-      180deg,
-      var(--surface-soft) 0%,
-      var(--surface) 34%,
-      var(--surface) 100%
-    );
+  /* The section opens on the plane the previous one closes on and resolves to
+     white well before the lineup, so the wall arrives as a change of light
+     rather than as a hard seam between two blocks. */
+  background: linear-gradient(
+    180deg,
+    var(--surface-soft) 0%,
+    var(--surface) 24%,
+    var(--surface) 100%
+  );
 }
 
 .presenters-section .mock-section-intro {
-  margin-bottom: clamp(2.25rem, 4.2vw, 3.25rem);
+  margin-bottom: clamp(2.5rem, 5vw, 3.75rem);
 }
 
-/* ── The stage ────────────────────────────────────────────────────────
-   A single tinted plane with a gradient hairline, a blueprint grid worn
-   almost to nothing and two corner glows. Everything that gives the block
-   its weight lives here, so the tiles can stay plain white. */
-.presenter-logo-stage {
+/* ── The wall ─────────────────────────────────────────────────────────
+   A centred wrapping row, not a fixed matrix: the lineup grows as brands
+   join, and a row that does not fill centres its own marks instead of
+   trailing off to one side. `--wall-cols` is how many brands share a row and
+   `--lead-cols` how many institutions do; the marks size themselves from
+   those two numbers, so adding a brand never asks the component to recompute
+   a divisor.
+
+   The wall is deliberately narrower than the container: a logo lineup that
+   runs edge to edge reads as a footer strip, one with margins reads as a
+   plate. */
+.presenter-wall {
+  --wall-gap-x: clamp(1.25rem, 4vw, 3rem);
+  --wall-cols: 2;
+  --lead-cols: 1;
+
   position: relative;
-  isolation: isolate;
-  max-width: 74rem;
-  margin-inline: auto;
-  padding: clamp(1.1rem, 2.6vw, 2rem);
-  overflow: hidden;
-  border-radius: clamp(1.5rem, 3vw, 2.25rem);
-  /* The plane keeps its tint from top to bottom on purpose: the white tiles
-     are what has to lift off it, and a stage that resolved to white would
-     drop the last rows back onto the same value as their own surface. The
-     light only pools under the top edge, where the inner highlight sits. */
-  background:
-    radial-gradient(
-      120% 85% at 50% 0%,
-      rgba(255, 255, 255, 0.9) 0%,
-      rgba(255, 255, 255, 0) 58%
-    ),
-    linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--summit-blue) 4%, var(--summit-blue-tint)) 0%,
-      color-mix(in srgb, var(--summit-blue) 8%, var(--summit-blue-tint)) 100%
-    );
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
-}
-
-/* Gradient hairline. Painted as a ring so the frame reads as light catching
-   an edge instead of as a flat grey stroke — the same blue→cyan ramp the
-   progress bar and the hero mesh already use, at a fraction of its
-   saturation. */
-.presenter-logo-stage::before {
-  content: "";
-  position: absolute;
-  z-index: 3;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: linear-gradient(
-    155deg,
-    color-mix(in srgb, var(--summit-blue-bright) 38%, transparent) 0%,
-    color-mix(in srgb, var(--cyan-400) 30%, transparent) 26%,
-    color-mix(in srgb, var(--line) 90%, transparent) 55%,
-    color-mix(in srgb, var(--summit-blue) 24%, transparent) 100%
-  );
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  pointer-events: none;
-}
-
-/* Blueprint grid: a technical texture at the threshold of visibility, faded
-   out before it reaches the hairline so the plane never looks tiled. */
-.presenter-logo-stage::after {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 0;
-  background-image:
-    linear-gradient(
-      to right,
-      color-mix(in srgb, var(--summit-blue) 7%, transparent) 1px,
-      transparent 1px
-    ),
-    linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--summit-blue) 7%, transparent) 1px,
-      transparent 1px
-    );
-  background-size: 3.25rem 3.25rem;
-  -webkit-mask: radial-gradient(
-    ellipse at 50% 38%,
-    #000 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    transparent 85%
-  );
-  mask: radial-gradient(
-    ellipse at 50% 38%,
-    #000 0%,
-    rgba(0, 0, 0, 0.45) 55%,
-    transparent 85%
-  );
-  pointer-events: none;
-}
-
-.presenter-stage-glow {
-  position: absolute;
-  z-index: -1;
-  width: 14rem;
-  aspect-ratio: 1;
-  border-radius: 999px;
-  opacity: 0.18;
-  filter: blur(3.5rem);
-  pointer-events: none;
-}
-
-.presenter-stage-glow--left {
-  bottom: -7rem;
-  left: -5rem;
-  background: var(--cyan-400);
-}
-
-.presenter-stage-glow--right {
-  top: -8rem;
-  right: -4rem;
-  background: var(--blue-600);
-}
-
-/* `--lineup-columns` is the only number the layout needs: the tiles size
-   themselves from it and wrap on their own, so adding a brand never asks the
-   component to recompute a divisor. `--lineup-lead-columns` is the same for
-   the institutional row. */
-.presenter-logo-grid {
-  --lineup-gap: clamp(0.55rem, 1.5vw, 0.95rem);
-  --lineup-columns: 2;
-  --lineup-lead-columns: 1;
-
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: var(--lineup-gap);
-  margin: 0;
-  padding: 0;
+  column-gap: var(--wall-gap-x);
+  row-gap: clamp(1.5rem, 4vw, 2.75rem);
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding-block: clamp(2rem, 4.5vw, 3.25rem);
+  padding-inline: 0;
   list-style: none;
 }
 
-.presenter-logo-card {
+/* The only two lines in the block. They close the lineup top and bottom so it
+   reads as one deliberate plate instead of logos floating in the section, and
+   they fade out before either end so the wall is framed by light rather than
+   ruled off like a table. Absolutely positioned on purpose: a pseudo-element
+   in normal flow would become a flex item and take a cell in the row. */
+.presenter-wall::before,
+.presenter-wall::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  left: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--line) 18%,
+    color-mix(in srgb, var(--summit-blue) 22%, var(--line)) 50%,
+    var(--line) 82%,
+    transparent 100%
+  );
+}
+
+.presenter-wall::before {
+  top: 0;
+}
+
+.presenter-wall::after {
+  bottom: 0;
+}
+
+/* No tile, no border, no fill, no shadow: a mark is a cell of whitespace with
+   a logo optically centred in it. Everything that used to sit on the tile now
+   lives in the wall's rhythm. */
+.presenter-mark {
   /* Horizontal marks are limited by the canvas width, stacked ones by its
      height, so one canvas cannot weigh both the same. Each shape gets the
-     height that lands them on a comparable optical area; the tile is sized
-     for the taller of the two, and the flex row stretches every card in it
-     to the same height, so the lineup stays a clean matrix either way. */
-  --logo-height: clamp(3.25rem, 8.5vw, 4rem);
+     height that lands them on a comparable optical area. */
+  --logo-height: clamp(3rem, 8vw, 3.9rem);
 
-  position: relative;
   display: flex;
   flex: 0 0
     calc(
-      (100% - (var(--lineup-columns) - 1) * var(--lineup-gap)) /
-        var(--lineup-columns)
+      (100% - (var(--wall-cols) - 1) * var(--wall-gap-x)) / var(--wall-cols)
     );
   align-items: center;
   justify-content: center;
   min-width: 0;
-  min-height: clamp(7.5rem, 22vw, 9.5rem);
-  box-sizing: border-box;
-  padding: clamp(1rem, 2.6vw, 1.6rem);
-  overflow: hidden;
-  /* Plain white, never a tint: the brand assets ship with a flat white
-     background (see PHOTO_MANIFEST.md), so anything else frames every logo in
-     a visible box. The colour of this section lives in the stage behind the
-     tiles and in the hairline around them — and because the stage is tinted,
-     that plain white is now what lifts each mark off the plane. */
-  border: 1px solid color-mix(in srgb, var(--summit-blue) 10%, var(--line));
-  border-radius: clamp(0.85rem, 1.7vw, 1.15rem);
-  background: var(--surface);
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.04),
-    0 10px 24px -16px rgba(15, 35, 72, 0.35);
-  transition:
-    border-color var(--dur) var(--ease-out),
-    box-shadow var(--dur) var(--ease-out),
-    transform var(--dur) var(--ease-out);
 }
 
-/* A glare that crosses the tile once on hover. It is a blue wash rather than
-   a white one because the tile is already white: on a flat mark the sweep
-   reads as light moving over the surface, and it never darkens a logo. */
-.presenter-logo-card::before {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  inset: -40% -65%;
-  background: linear-gradient(
-    105deg,
-    transparent 40%,
-    color-mix(in srgb, var(--summit-blue-bright) 9%, transparent) 50%,
-    transparent 60%
-  );
-  opacity: 0;
-  transform: translateX(-115%);
-  pointer-events: none;
-}
-
-/* The hover underline is the page's own motif: the nav link draws the same
-   rule from the cursor's side. Here it carries the brand ramp and sits on
-   the tile's bottom edge, which is what the block used to do with a hard
-   inset shadow. */
-.presenter-logo-card::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  background: linear-gradient(
-    90deg,
-    var(--summit-blue-bright),
-    var(--cyan-400)
-  );
-  transform: scaleX(0);
-  transform-origin: right center;
-  transition: transform var(--dur-base) var(--ease-out-soft);
-  pointer-events: none;
-}
-
-.presenter-logo-card:hover {
-  z-index: 1;
-  transform: translateY(-4px);
-  border-color: color-mix(in srgb, var(--cyan-400) 48%, var(--line));
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    var(--elev-hover);
-}
-
-.presenter-logo-card:hover::after {
-  transform: scaleX(1);
-  transform-origin: left center;
-}
-
-.presenter-logo-card:hover::before {
-  opacity: 1;
-  animation: presenterSheen 900ms var(--ease-out-soft);
-}
-
-@keyframes presenterSheen {
-  from {
-    transform: translateX(-115%);
-  }
-  to {
-    transform: translateX(115%);
-  }
-}
-
-/* Each step up trades width for height at roughly constant area, so a
-   square crest and a wordmark three times as wide cover the same amount of
-   the tile. The numbers are calibrated against the assets in
+/* Each step up trades width for height at roughly constant area, so a square
+   crest and a wordmark three times as wide cover the same amount of the
+   canvas. The numbers are calibrated against the assets in
    public/images/presenters/, not guessed; `lib/content.ts` documents which
    bucket a mark belongs to and a test keeps the two in sync. */
-.presenter-logo-card[data-shape="balanced"] {
-  --logo-height: clamp(4rem, 10.5vw, 5rem);
+.presenter-mark[data-shape="balanced"] {
+  --logo-height: clamp(3.75rem, 10vw, 5rem);
 }
 
-.presenter-logo-card[data-shape="stacked"] {
-  --logo-height: clamp(4.75rem, 13vw, 6.25rem);
+.presenter-mark[data-shape="stacked"] {
+  --logo-height: clamp(4.5rem, 12.5vw, 6rem);
+}
+
+/* The institutions head the lineup. They fill the first row between them —
+   at every breakpoint `--lead-span` is exactly half the wall — and rank
+   themselves with size and with the extra air underneath, which is the only
+   separation the wall needs: a rule drawn here would break at the column gap
+   and turn the block back into two tables. */
+.presenter-mark[data-lead="true"] {
+  --logo-height: clamp(4.75rem, 13vw, 6.5rem);
+
+  flex-basis: calc(
+    (100% - (var(--lead-cols) - 1) * var(--wall-gap-x)) / var(--lead-cols)
+  );
+  margin-bottom: clamp(0.5rem, 2vw, 1.5rem);
+}
+
+.presenter-mark[data-lead="true"][data-shape="stacked"] {
+  --logo-height: clamp(5.75rem, 16vw, 7.75rem);
 }
 
 .presenter-logo-frame {
   position: relative;
-  z-index: 1;
   width: 100%;
   height: var(--logo-height);
-  transition: transform var(--dur) var(--ease-out);
+  transition:
+    filter var(--dur-base) var(--ease-out-soft),
+    opacity var(--dur-base) var(--ease-out-soft),
+    transform var(--dur-base) var(--ease-out-soft);
 }
 
-.presenter-logo-card:hover .presenter-logo-frame {
-  transform: scale(1.04);
+/* The width is capped so a wide lockup cannot outgrow a stacked one: the
+   institutional marks read as a pair instead of one banner beside a small
+   crest. */
+.presenter-mark[data-lead="true"] .presenter-logo-frame {
+  width: min(100%, 19rem);
 }
 
-/* Fallback while a full-colour asset is pending: a typographic mark that is
-   built to sit in the same lineup as the real logos — capped to the logo
-   canvas width, balanced across lines and optically centred — instead of a
-   broken image or a visible hole in the row. */
+/* The rest state only exists where a pointer can undo it. On a fine pointer
+   the wall is a quiet, near-monochrome lineup and the mark under the cursor
+   comes up to full brand colour — the treatment that lets thirteen unrelated
+   palettes share one row. On touch, where nothing can be pointed at, every
+   mark stays in full colour from the start. */
+@media (hover: hover) and (pointer: fine) {
+  .presenter-logo-frame {
+    filter: grayscale(1) contrast(1.04);
+    opacity: 0.7;
+  }
+
+  .presenter-mark:hover .presenter-logo-frame {
+    filter: none;
+    opacity: 1;
+    transform: scale(1.035);
+  }
+
+  /* The rest of the wall recedes a further step while one mark is read, so
+     the lineup answers the pointer as a group instead of one cell blinking
+     on. */
+  .presenter-wall:hover .presenter-logo-frame {
+    opacity: 0.45;
+  }
+
+  .presenter-wall:hover .presenter-mark:hover .presenter-logo-frame {
+    opacity: 1;
+  }
+}
+
+/* Fallback while a full-colour asset is pending: a typographic mark built to
+   sit in the same lineup as the real logos — capped to the logo canvas width,
+   balanced across lines and optically centred — instead of a broken image or
+   a visible hole in the row. */
 .presenter-wordmark {
-  position: relative;
-  z-index: 1;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -7569,50 +7446,19 @@ h3,
   text-wrap: balance;
 }
 
-/* The institutional marks head the lineup: they take the first row between
-   them, on a wider and taller tile, so the government identity reads first
-   without breaking the section into a second block. They are also the only
-   tiles that sit higher off the plane — a deeper shadow and a brighter
-   hairline, no second treatment — which is enough to rank them without
-   drawing a line across the stage. */
-.presenter-logo-card[data-lead="true"] {
-  --logo-height: clamp(5rem, 14vw, 7rem);
-
-  flex-basis: calc(
-    (100% - (var(--lineup-lead-columns) - 1) * var(--lineup-gap)) /
-      var(--lineup-lead-columns)
-  );
-  min-height: clamp(10rem, 27vw, 12.5rem);
-  border-color: color-mix(in srgb, var(--summit-blue) 18%, var(--line));
-  box-shadow:
-    0 1px 2px rgba(15, 23, 42, 0.05),
-    0 18px 38px -22px rgba(15, 35, 72, 0.45);
-}
-
-.presenter-logo-card[data-lead="true"][data-shape="stacked"] {
-  --logo-height: clamp(6.5rem, 18vw, 9rem);
-}
-
-/* The width is capped so a wide lockup cannot outgrow a stacked one: the two
-   institutional marks read as a pair instead of one banner beside a small
-   crest. */
-.presenter-logo-card[data-lead="true"] .presenter-logo-frame {
-  width: min(100%, 21rem);
-}
-
-/* Entrance. The stage arrives as one block; the tiles then land in reading
-   order, a beat apart, so the wall assembles itself instead of appearing
-   fully built. `--tile-index` is set by the component, which is the only
-   thing it has to know about this treatment. */
-.reveal.visible .presenter-logo-card {
-  animation: presenterTileIn var(--dur-base) var(--ease-out-soft) both;
+/* Entrance. The marks land in reading order, a beat apart, so the wall
+   assembles itself instead of appearing fully built. `--tile-index` is set by
+   the component, which is the only thing it has to know about this
+   treatment. */
+.reveal.visible .presenter-mark {
+  animation: presenterMarkIn var(--dur-base) var(--ease-out-soft) both;
   animation-delay: calc(120ms + var(--tile-index, 0) * 55ms);
 }
 
-@keyframes presenterTileIn {
+@keyframes presenterMarkIn {
   from {
     opacity: 0;
-    transform: translateY(14px) scale(0.975);
+    transform: translateY(12px);
   }
   to {
     opacity: 1;
@@ -7620,64 +7466,32 @@ h3,
   }
 }
 
+/* Three marks per row on a tablet, four on a desktop, and the institutions
+   always half the wall each. */
 @media (min-width: 640px) {
-  .presenter-logo-grid {
-    --lineup-columns: 3;
-    --lineup-lead-columns: 2;
+  .presenter-wall {
+    --wall-cols: 3;
+    --lead-cols: 2;
   }
 }
 
 @media (min-width: 1024px) {
-  .presenter-logo-grid {
-    --lineup-columns: 4;
-  }
-}
-
-/* Fine pointers only: a tap on a touch screen leaves the hover state stuck
-   on the tile it landed on, and the sheen has nothing to answer to. */
-@media (hover: none) {
-  .presenter-logo-card:hover {
-    transform: none;
-    box-shadow:
-      0 1px 2px rgba(15, 23, 42, 0.04),
-      0 10px 24px -16px rgba(15, 35, 72, 0.35);
-  }
-
-  .presenter-logo-card:hover::before,
-  .presenter-logo-card:hover::after {
-    animation: none;
-    opacity: 0;
-    transform: scaleX(0);
-  }
-
-  .presenter-logo-card:hover .presenter-logo-frame {
-    transform: none;
+  .presenter-wall {
+    --wall-cols: 4;
+    --lead-cols: 2;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .presenter-logo-card {
+  .presenter-logo-frame {
     transition: none;
   }
 
-  .presenter-logo-card:hover {
-    transform: none;
-    box-shadow: none;
-  }
-
-  .presenter-logo-card::before {
-    display: none;
-  }
-
-  .presenter-logo-card::after {
-    transition: none;
-  }
-
-  .presenter-logo-card:hover .presenter-logo-frame {
+  .presenter-mark:hover .presenter-logo-frame {
     transform: none;
   }
 
-  .reveal.visible .presenter-logo-card {
+  .reveal.visible .presenter-mark {
     animation: none;
   }
 }
