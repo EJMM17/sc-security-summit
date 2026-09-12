@@ -46,6 +46,7 @@ export default function Presenters({ language }: { language: Language }) {
                   key={presenter.name}
                   className="presenter-logo-card"
                   data-lead={presenter.lead ? "true" : undefined}
+                  data-shape={presenter.shape}
                 >
                   {presenter.logo ? (
                     <div className="presenter-logo-frame">

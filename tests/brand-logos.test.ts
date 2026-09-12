@@ -1,10 +1,11 @@
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
   PRESENTERS,
   PRESENTING_BRANDS,
   SPONSORS,
+  logoShapeForRatio,
   type Presenter,
 } from "@/lib/content";
 
@@ -64,5 +65,34 @@ describe("presenting lineup order", () => {
     for (const brand of [...PRESENTERS, ...SPONSORS]) {
       expect(PRESENTING_BRANDS).toContain(brand);
     }
+  });
+});
+
+/** Reads a PNG's pixel dimensions from its IHDR chunk, which always sits in
+ * the first 24 bytes: width and height as big-endian 32-bit integers at
+ * offsets 16 and 20. Cheaper than decoding the image, and enough to tell a
+ * stacked lockup from a horizontal one. */
+function pngSize(file: string): { width: number; height: number } {
+  const header = readFileSync(file).subarray(0, 24);
+  expect(header.subarray(1, 4).toString("ascii"), `${file} is not a PNG`).toBe(
+    "PNG",
+  );
+  return { width: header.readUInt32BE(16), height: header.readUInt32BE(20) };
+}
+
+describe("logo canvas shape", () => {
+  /** `shape` picks the logo canvas, which is the only thing keeping a
+   * crest-over-wordmark mark from rendering a third the size of the
+   * horizontal ones beside it. Declaring it by hand is fine; letting it drift
+   * away from the asset is not, so every file is measured. */
+  it.each(
+    PRESENTING_BRANDS.filter((brand) => brand.logo).map(
+      (brand) => [brand.name, brand] as const,
+    ),
+  )("%s declares the shape its asset actually has", (_name, brand) => {
+    const { width, height } = pngSize(
+      path.join(process.cwd(), "public", brand.logo as string),
+    );
+    expect(brand.shape ?? "horizontal").toBe(logoShapeForRatio(width / height));
   });
 });
