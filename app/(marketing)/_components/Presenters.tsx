@@ -29,6 +29,11 @@ export default function Presenters({ language }: { language: Language }) {
         <ScrollReveal delay={120}>
           <div className="presenter-stage">
             <div className="presenter-stage-glow" aria-hidden="true" />
+            <div className="presenter-stage-heading" aria-hidden="true">
+              <span>{ui.presentedBy}</span>
+              <span className="presenter-stage-rule" />
+              <span>{String(presenters.length).padStart(2, "0")}</span>
+            </div>
             <ul className="presenter-wall" aria-label={ui.presentedBy}>
               {presenters.map((presenter, index) => (
                 <li
@@ -39,19 +44,24 @@ export default function Presenters({ language }: { language: Language }) {
                   style={{ "--tile-index": index } as CSSProperties}
                 >
                   <div className="presenter-mark-surface">
-                    {presenter.logo ? (
-                      <div className="presenter-logo-frame">
-                        <Image
-                          src={presenter.logo}
-                          alt={presenter.name}
-                          fill
-                          sizes="(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 230px"
-                          className="object-contain"
-                        />
-                      </div>
-                    ) : (
-                      <span className="presenter-wordmark">{presenter.name}</span>
-                    )}
+                    <span className="presenter-index" aria-hidden="true">
+                      {String(index + 1).padStart(2, "0")}
+                    </span>
+                    <div className="presenter-brand">
+                      {presenter.logo ? (
+                        <div className="presenter-logo-frame">
+                          <Image
+                            src={presenter.logo}
+                            alt={presenter.name}
+                            fill
+                            sizes="(max-width: 639px) 46vw, (max-width: 1023px) 30vw, 230px"
+                            className="object-contain"
+                          />
+                        </div>
+                      ) : (
+                        <span className="presenter-wordmark">{presenter.name}</span>
+                      )}
+                    </div>
                   </div>
                 </li>
               ))}
