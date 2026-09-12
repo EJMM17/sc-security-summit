@@ -525,10 +525,29 @@ export const INSTITUTIONS: readonly Presenter[] = [
   },
 ] as const;
 
+/** The organizations presenting the Summit, in render order.
+ *
+ * The order is part of the layout, not an accident of when each brand signed:
+ * the lineup wraps into two, three or four columns depending on the viewport,
+ * so two brands land side by side or one above the other whenever their
+ * positions are within four places of each other. The two clinical
+ * laboratories — Laboratorios Eloisa and InnovaLab — are therefore kept at
+ * opposite ends of the list so they never share a neighbourhood in any of
+ * those layouts, and the sectors in between alternate (logistics, health,
+ * security, industrial, education, consumer) so no row reads as a single
+ * industry block. `tests/brand-logos.test.ts` guards that distance. */
 export const PRESENTERS: readonly Presenter[] = [
   {
     name: "Lanz Logistics",
     logo: "/images/presenters/lanz-logistics.png",
+  },
+  {
+    name: "Laboratorios Eloisa",
+    logo: "/images/presenters/laboratorios-eloisa.png",
+  },
+  {
+    name: "Vigilancia Intramuros Reynosa",
+    logo: null,
   },
   {
     name: "Parque Industrial Villa Florida",
@@ -543,8 +562,12 @@ export const PRESENTERS: readonly Presenter[] = [
     logo: "/images/presenters/blanquita.png",
   },
   {
-    name: "Laboratorios Eloisa",
-    logo: "/images/presenters/laboratorios-eloisa.png",
+    name: "SPI Servicios Profesionales Integrados",
+    logo: null,
+  },
+  {
+    name: "InnovaLab Laboratorio",
+    logo: null,
   },
 ] as const;
 

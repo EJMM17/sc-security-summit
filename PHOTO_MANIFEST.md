@@ -65,6 +65,27 @@ Cada archivo se enlaza desde `PRESENTERS` en `lib/content.ts`. Un presentador
 con `logo: null` se muestra como wordmark tipográfico hasta que su archivo
 exista, para no publicar imágenes rotas.
 
+#### Activos pendientes
+
+Estas tres marcas ya forman parte de la alineación y hoy se publican como
+wordmark. Al colocar el archivo en `public/images/presenters/` basta cambiar
+`logo: null` por la ruta correspondiente en `PRESENTERS`:
+
+| Marca | Archivo esperado |
+| --- | --- |
+| Vigilancia Intramuros Reynosa | `vigilancia-intramuros.png` |
+| SPI Servicios Profesionales Integrados | `spi.png` |
+| InnovaLab Laboratorio | `innovalab.png` |
+
+Aplica el mismo tratamiento que el resto: fondo blanco puro (normalizar todo
+pixel casi blanco, ≥ 236 en los tres canales), recorte del margen sobrante y
+PNG sRGB.
+
+El orden de `PRESENTERS` es parte del diseño: la alineación envuelve en dos,
+tres o cuatro columnas, así que Laboratorios Eloisa e InnovaLab se mantienen
+en extremos opuestos de la lista para que nunca queden contiguos.
+`tests/brand-logos.test.ts` verifica esa distancia.
+
 ### Instituciones
 
 Las marcas de gobierno encabezan la misma alineación: comparten la primera
