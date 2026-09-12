@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import Image from "next/image";
 import { Handshake } from "lucide-react";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -41,12 +42,16 @@ export default function Presenters({ language }: { language: Language }) {
                 institutional marks keep `data-lead` and open the row on a
                 wider, taller tile. */}
             <ul className="presenter-logo-grid" aria-label={ui.presentedBy}>
-              {presenters.map((presenter) => (
+              {presenters.map((presenter, index) => (
                 <li
                   key={presenter.name}
                   className="presenter-logo-card"
                   data-lead={presenter.lead ? "true" : undefined}
                   data-shape={presenter.shape}
+                  /* The tile's place in the lineup, which is all the entrance
+                     animation needs to land the wall in reading order. The
+                     stylesheet owns the timing; the component only counts. */
+                  style={{ "--tile-index": index } as CSSProperties}
                 >
                   {presenter.logo ? (
                     <div className="presenter-logo-frame">
