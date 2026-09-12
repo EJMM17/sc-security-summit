@@ -7238,51 +7238,148 @@ h3,
    without leaving empty cells, and a row that does not fill centres itself
    under the ones above. Every mark gets the same tile and the same logo
    canvas, which is what gives a government crest, an industrial wordmark and
-   a laboratory lockup equal optical weight without distorting any of them. */
+   a laboratory lockup equal optical weight without distorting any of them.
+
+   The depth of the section is built from planes, not from ornament on the
+   tiles: the stage is a tinted plane, the tiles are pure white and lifted
+   off it, and the only colour that touches a mark is the hairline around
+   its tile. That inversion is what makes the wall read as a gallery rather
+   than as a table of boxed logos — and it is the one treatment the assets
+   allow, because every logo ships on a flat white background
+   (PHOTO_MANIFEST.md), so a tinted tile would frame each mark in a visible
+   rectangle. */
 .presenters-section {
   position: relative;
   overflow: hidden;
+  /* The section opens on the soft plane the previous one closes on and
+     resolves to white behind the stage, so the lineup arrives as a change of
+     light rather than as a hard seam between two blocks. */
   background:
     radial-gradient(
       circle at 8% 72%,
-      color-mix(in srgb, var(--cyan-400) 8%, transparent) 0,
+      color-mix(in srgb, var(--cyan-400) 9%, transparent) 0,
       transparent 25rem
     ),
     radial-gradient(
       circle at 92% 18%,
-      color-mix(in srgb, var(--blue-600) 7%, transparent) 0,
+      color-mix(in srgb, var(--blue-600) 8%, transparent) 0,
       transparent 27rem
     ),
-    var(--surface);
+    linear-gradient(
+      180deg,
+      var(--surface-soft) 0%,
+      var(--surface) 34%,
+      var(--surface) 100%
+    );
 }
 
 .presenters-section .mock-section-intro {
-  margin-bottom: clamp(2rem, 4vw, 3rem);
+  margin-bottom: clamp(2.25rem, 4.2vw, 3.25rem);
 }
 
+/* ── The stage ────────────────────────────────────────────────────────
+   A single tinted plane with a gradient hairline, a blueprint grid worn
+   almost to nothing and two corner glows. Everything that gives the block
+   its weight lives here, so the tiles can stay plain white. */
 .presenter-logo-stage {
   position: relative;
   isolation: isolate;
   max-width: 74rem;
   margin-inline: auto;
-  padding: clamp(0.9rem, 2vw, 1.4rem);
+  padding: clamp(1.1rem, 2.6vw, 2rem);
   overflow: hidden;
-  border: 1px solid color-mix(in srgb, var(--blue-600) 14%, var(--line));
-  border-radius: clamp(1.25rem, 3vw, 2rem);
-  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-radius: clamp(1.5rem, 3vw, 2.25rem);
+  /* The plane keeps its tint from top to bottom on purpose: the white tiles
+     are what has to lift off it, and a stage that resolved to white would
+     drop the last rows back onto the same value as their own surface. The
+     light only pools under the top edge, where the inner highlight sits. */
+  background:
+    radial-gradient(
+      120% 85% at 50% 0%,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0) 58%
+    ),
+    linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--summit-blue) 4%, var(--summit-blue-tint)) 0%,
+      color-mix(in srgb, var(--summit-blue) 8%, var(--summit-blue-tint)) 100%
+    );
   box-shadow:
-    0 1.5rem 4rem rgba(15, 35, 72, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    var(--elev-2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+}
+
+/* Gradient hairline. Painted as a ring so the frame reads as light catching
+   an edge instead of as a flat grey stroke — the same blue→cyan ramp the
+   progress bar and the hero mesh already use, at a fraction of its
+   saturation. */
+.presenter-logo-stage::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    155deg,
+    color-mix(in srgb, var(--summit-blue-bright) 38%, transparent) 0%,
+    color-mix(in srgb, var(--cyan-400) 30%, transparent) 26%,
+    color-mix(in srgb, var(--line) 90%, transparent) 55%,
+    color-mix(in srgb, var(--summit-blue) 24%, transparent) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* Blueprint grid: a technical texture at the threshold of visibility, faded
+   out before it reaches the hairline so the plane never looks tiled. */
+.presenter-logo-stage::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(
+      to right,
+      color-mix(in srgb, var(--summit-blue) 7%, transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--summit-blue) 7%, transparent) 1px,
+      transparent 1px
+    );
+  background-size: 3.25rem 3.25rem;
+  -webkit-mask: radial-gradient(
+    ellipse at 50% 38%,
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 85%
+  );
+  mask: radial-gradient(
+    ellipse at 50% 38%,
+    #000 0%,
+    rgba(0, 0, 0, 0.45) 55%,
+    transparent 85%
+  );
+  pointer-events: none;
 }
 
 .presenter-stage-glow {
   position: absolute;
   z-index: -1;
-  width: 12rem;
+  width: 14rem;
   aspect-ratio: 1;
   border-radius: 999px;
-  opacity: 0.14;
-  filter: blur(3rem);
+  opacity: 0.18;
+  filter: blur(3.5rem);
   pointer-events: none;
 }
 
@@ -7303,7 +7400,7 @@ h3,
    component to recompute a divisor. `--lineup-lead-columns` is the same for
    the institutional row. */
 .presenter-logo-grid {
-  --lineup-gap: clamp(0.5rem, 1.4vw, 0.85rem);
+  --lineup-gap: clamp(0.55rem, 1.5vw, 0.95rem);
   --lineup-columns: 2;
   --lineup-lead-columns: 1;
 
@@ -7324,6 +7421,7 @@ h3,
      to the same height, so the lineup stays a clean matrix either way. */
   --logo-height: clamp(3.25rem, 8.5vw, 4rem);
 
+  position: relative;
   display: flex;
   flex: 0 0
     calc(
@@ -7336,26 +7434,92 @@ h3,
   min-height: clamp(7.5rem, 22vw, 9.5rem);
   box-sizing: border-box;
   padding: clamp(1rem, 2.6vw, 1.6rem);
-  /* Plain surface, never a tint: the brand assets ship with a flat white
+  overflow: hidden;
+  /* Plain white, never a tint: the brand assets ship with a flat white
      background (see PHOTO_MANIFEST.md), so anything else frames every logo in
      a visible box. The colour of this section lives in the stage behind the
-     tiles and in the hairline around them. */
-  border: 1px solid color-mix(in srgb, var(--blue-600) 9%, var(--line));
-  border-radius: clamp(0.75rem, 1.6vw, 1.1rem);
+     tiles and in the hairline around them — and because the stage is tinted,
+     that plain white is now what lifts each mark off the plane. */
+  border: 1px solid color-mix(in srgb, var(--summit-blue) 10%, var(--line));
+  border-radius: clamp(0.85rem, 1.7vw, 1.15rem);
   background: var(--surface);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 24px -16px rgba(15, 35, 72, 0.35);
   transition:
     border-color var(--dur) var(--ease-out),
     box-shadow var(--dur) var(--ease-out),
     transform var(--dur) var(--ease-out);
 }
 
+/* A glare that crosses the tile once on hover. It is a blue wash rather than
+   a white one because the tile is already white: on a flat mark the sweep
+   reads as light moving over the surface, and it never darkens a logo. */
+.presenter-logo-card::before {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: -40% -65%;
+  background: linear-gradient(
+    105deg,
+    transparent 40%,
+    color-mix(in srgb, var(--summit-blue-bright) 9%, transparent) 50%,
+    transparent 60%
+  );
+  opacity: 0;
+  transform: translateX(-115%);
+  pointer-events: none;
+}
+
+/* The hover underline is the page's own motif: the nav link draws the same
+   rule from the cursor's side. Here it carries the brand ramp and sits on
+   the tile's bottom edge, which is what the block used to do with a hard
+   inset shadow. */
+.presenter-logo-card::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--summit-blue-bright),
+    var(--cyan-400)
+  );
+  transform: scaleX(0);
+  transform-origin: right center;
+  transition: transform var(--dur-base) var(--ease-out-soft);
+  pointer-events: none;
+}
+
 .presenter-logo-card:hover {
   z-index: 1;
-  transform: translateY(-2px);
-  border-color: color-mix(in srgb, var(--cyan-400) 45%, var(--line));
+  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--cyan-400) 48%, var(--line));
   box-shadow:
-    0 0.75rem 1.75rem rgba(15, 35, 72, 0.09),
-    inset 0 -3px 0 color-mix(in srgb, var(--cyan-400) 70%, var(--blue-600));
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    var(--elev-hover);
+}
+
+.presenter-logo-card:hover::after {
+  transform: scaleX(1);
+  transform-origin: left center;
+}
+
+.presenter-logo-card:hover::before {
+  opacity: 1;
+  animation: presenterSheen 900ms var(--ease-out-soft);
+}
+
+@keyframes presenterSheen {
+  from {
+    transform: translateX(-115%);
+  }
+  to {
+    transform: translateX(115%);
+  }
 }
 
 /* Each step up trades width for height at roughly constant area, so a
@@ -7373,13 +7537,14 @@ h3,
 
 .presenter-logo-frame {
   position: relative;
+  z-index: 1;
   width: 100%;
   height: var(--logo-height);
   transition: transform var(--dur) var(--ease-out);
 }
 
 .presenter-logo-card:hover .presenter-logo-frame {
-  transform: scale(1.035);
+  transform: scale(1.04);
 }
 
 /* Fallback while a full-colour asset is pending: a typographic mark that is
@@ -7387,6 +7552,8 @@ h3,
    canvas width, balanced across lines and optically centred — instead of a
    broken image or a visible hole in the row. */
 .presenter-wordmark {
+  position: relative;
+  z-index: 1;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -7404,7 +7571,10 @@ h3,
 
 /* The institutional marks head the lineup: they take the first row between
    them, on a wider and taller tile, so the government identity reads first
-   without breaking the section into a second block. */
+   without breaking the section into a second block. They are also the only
+   tiles that sit higher off the plane — a deeper shadow and a brighter
+   hairline, no second treatment — which is enough to rank them without
+   drawing a line across the stage. */
 .presenter-logo-card[data-lead="true"] {
   --logo-height: clamp(5rem, 14vw, 7rem);
 
@@ -7413,6 +7583,10 @@ h3,
       var(--lineup-lead-columns)
   );
   min-height: clamp(10rem, 27vw, 12.5rem);
+  border-color: color-mix(in srgb, var(--summit-blue) 18%, var(--line));
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 18px 38px -22px rgba(15, 35, 72, 0.45);
 }
 
 .presenter-logo-card[data-lead="true"][data-shape="stacked"] {
@@ -7424,6 +7598,26 @@ h3,
    crest. */
 .presenter-logo-card[data-lead="true"] .presenter-logo-frame {
   width: min(100%, 21rem);
+}
+
+/* Entrance. The stage arrives as one block; the tiles then land in reading
+   order, a beat apart, so the wall assembles itself instead of appearing
+   fully built. `--tile-index` is set by the component, which is the only
+   thing it has to know about this treatment. */
+.reveal.visible .presenter-logo-card {
+  animation: presenterTileIn var(--dur-base) var(--ease-out-soft) both;
+  animation-delay: calc(120ms + var(--tile-index, 0) * 55ms);
+}
+
+@keyframes presenterTileIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.975);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
 @media (min-width: 640px) {
@@ -7439,6 +7633,28 @@ h3,
   }
 }
 
+/* Fine pointers only: a tap on a touch screen leaves the hover state stuck
+   on the tile it landed on, and the sheen has nothing to answer to. */
+@media (hover: none) {
+  .presenter-logo-card:hover {
+    transform: none;
+    box-shadow:
+      0 1px 2px rgba(15, 23, 42, 0.04),
+      0 10px 24px -16px rgba(15, 35, 72, 0.35);
+  }
+
+  .presenter-logo-card:hover::before,
+  .presenter-logo-card:hover::after {
+    animation: none;
+    opacity: 0;
+    transform: scaleX(0);
+  }
+
+  .presenter-logo-card:hover .presenter-logo-frame {
+    transform: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .presenter-logo-card {
     transition: none;
@@ -7449,8 +7665,20 @@ h3,
     box-shadow: none;
   }
 
+  .presenter-logo-card::before {
+    display: none;
+  }
+
+  .presenter-logo-card::after {
+    transition: none;
+  }
+
   .presenter-logo-card:hover .presenter-logo-frame {
     transform: none;
+  }
+
+  .reveal.visible .presenter-logo-card {
+    animation: none;
   }
 }
 
