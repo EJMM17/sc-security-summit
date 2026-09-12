@@ -7232,10 +7232,13 @@ h3,
 }
 
 /* ═══ PRESENTADORES ═══
-   One shared, softly branded stage lets five very different full-colour marks
-   coexist as a single group. The cells use separators rather than five
-   unrelated floating cards, while a fixed logo canvas gives every mark equal
-   optical weight without distorting it. */
+   One shared, softly branded stage lets a dozen very different full-colour
+   marks coexist as a single group. The lineup is a centred wrapping row, not
+   a fixed matrix: brands keep joining, so the layout must absorb any count
+   without leaving empty cells, and a row that does not fill centres itself
+   under the ones above. Every mark gets the same tile and the same logo
+   canvas, which is what gives a government crest, an industrial wordmark and
+   a laboratory lockup equal optical weight without distorting any of them. */
 .presenters-section {
   position: relative;
   overflow: hidden;
@@ -7262,7 +7265,7 @@ h3,
   isolation: isolate;
   max-width: 74rem;
   margin-inline: auto;
-  padding: clamp(0.45rem, 1vw, 0.7rem);
+  padding: clamp(0.9rem, 2vw, 1.4rem);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--blue-600) 14%, var(--line));
   border-radius: clamp(1.25rem, 3vw, 2rem);
@@ -7295,46 +7298,83 @@ h3,
   background: var(--blue-600);
 }
 
+/* `--lineup-columns` is the only number the layout needs: the tiles size
+   themselves from it and wrap on their own, so adding a brand never asks the
+   component to recompute a divisor. `--lineup-lead-columns` is the same for
+   the institutional row. */
 .presenter-logo-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
+  --lineup-gap: clamp(0.5rem, 1.4vw, 0.85rem);
+  --lineup-columns: 2;
+  --lineup-lead-columns: 1;
+
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--lineup-gap);
   margin: 0;
   padding: 0;
-  overflow: hidden;
-  border-radius: calc(clamp(1.25rem, 3vw, 2rem) - 0.45rem);
-  background: color-mix(in srgb, var(--blue-600) 11%, var(--line));
   list-style: none;
 }
 
 .presenter-logo-card {
+  /* Horizontal marks are limited by the canvas width, stacked ones by its
+     height, so one canvas cannot weigh both the same. Each shape gets the
+     height that lands them on a comparable optical area; the tile is sized
+     for the taller of the two, and the flex row stretches every card in it
+     to the same height, so the lineup stays a clean matrix either way. */
+  --logo-height: clamp(3.25rem, 8.5vw, 4rem);
+
   display: flex;
+  flex: 0 0
+    calc(
+      (100% - (var(--lineup-columns) - 1) * var(--lineup-gap)) /
+        var(--lineup-columns)
+    );
   align-items: center;
   justify-content: center;
   min-width: 0;
-  min-height: clamp(7rem, 20vw, 8.25rem);
+  min-height: clamp(7.5rem, 22vw, 9.5rem);
   box-sizing: border-box;
-  padding: clamp(1.15rem, 3vw, 1.75rem);
+  padding: clamp(1rem, 2.6vw, 1.6rem);
   /* Plain surface, never a tint: the brand assets ship with a flat white
      background (see PHOTO_MANIFEST.md), so anything else frames every logo in
      a visible box. The colour of this section lives in the stage behind the
-     cards and in the hairlines between them. */
+     tiles and in the hairline around them. */
+  border: 1px solid color-mix(in srgb, var(--blue-600) 9%, var(--line));
+  border-radius: clamp(0.75rem, 1.6vw, 1.1rem);
   background: var(--surface);
   transition:
-    background-color var(--dur) var(--ease-out),
-    box-shadow var(--dur) var(--ease-out);
+    border-color var(--dur) var(--ease-out),
+    box-shadow var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out);
 }
 
 .presenter-logo-card:hover {
   z-index: 1;
-  background: var(--surface);
-  box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--cyan-400) 70%, var(--blue-600));
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--cyan-400) 45%, var(--line));
+  box-shadow:
+    0 0.75rem 1.75rem rgba(15, 35, 72, 0.09),
+    inset 0 -3px 0 color-mix(in srgb, var(--cyan-400) 70%, var(--blue-600));
+}
+
+/* Each step up trades width for height at roughly constant area, so a
+   square crest and a wordmark three times as wide cover the same amount of
+   the tile. The numbers are calibrated against the assets in
+   public/images/presenters/, not guessed; `lib/content.ts` documents which
+   bucket a mark belongs to and a test keeps the two in sync. */
+.presenter-logo-card[data-shape="balanced"] {
+  --logo-height: clamp(4rem, 10.5vw, 5rem);
+}
+
+.presenter-logo-card[data-shape="stacked"] {
+  --logo-height: clamp(4.75rem, 13vw, 6.25rem);
 }
 
 .presenter-logo-frame {
   position: relative;
   width: 100%;
-  height: clamp(3.75rem, 10vw, 4.75rem);
+  height: var(--logo-height);
   transition: transform var(--dur) var(--ease-out);
 }
 
@@ -7342,66 +7382,60 @@ h3,
   transform: scale(1.035);
 }
 
-/* Fallback while a full-colour asset is pending: a typographic mark keeps the
-   lineup complete and correctly sized instead of a broken image. */
+/* Fallback while a full-colour asset is pending: a typographic mark that is
+   built to sit in the same lineup as the real logos — capped to the logo
+   canvas width, balanced across lines and optically centred — instead of a
+   broken image or a visible hole in the row. */
 .presenter-wordmark {
-  color: var(--text-title);
-  font-size: 0.9rem;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  max-width: 100%;
+  color: color-mix(in srgb, var(--text-title) 88%, var(--blue-600));
+  font-size: clamp(0.8rem, 1.6vw, 0.95rem);
   font-weight: 700;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
+  line-height: 1.3;
+  letter-spacing: 0.015em;
   text-align: center;
+  text-transform: uppercase;
   text-wrap: balance;
 }
 
-/* The institutional marks head the lineup: they share the first row between
-   them, on a taller card, so the government identity reads first without
-   breaking the section into a second block. */
+/* The institutional marks head the lineup: they take the first row between
+   them, on a wider and taller tile, so the government identity reads first
+   without breaking the section into a second block. */
 .presenter-logo-card[data-lead="true"] {
-  min-height: clamp(10rem, 28vw, 13rem);
+  --logo-height: clamp(5rem, 14vw, 7rem);
+
+  flex-basis: calc(
+    (100% - (var(--lineup-lead-columns) - 1) * var(--lineup-gap)) /
+      var(--lineup-lead-columns)
+  );
+  min-height: clamp(10rem, 27vw, 12.5rem);
 }
 
-/* The institutional lockups are stacked rather than horizontal, so the lead
-   row needs a taller canvas than a wordmark to carry the same weight. The
-   width is capped so a wide lockup cannot outgrow a stacked one: the two
-   marks read as a pair instead of one banner beside a small crest. */
+.presenter-logo-card[data-lead="true"][data-shape="stacked"] {
+  --logo-height: clamp(6.5rem, 18vw, 9rem);
+}
+
+/* The width is capped so a wide lockup cannot outgrow a stacked one: the two
+   institutional marks read as a pair instead of one banner beside a small
+   crest. */
 .presenter-logo-card[data-lead="true"] .presenter-logo-frame {
   width: min(100%, 21rem);
-  height: clamp(6rem, 17vw, 9rem);
-}
-
-/* With an odd lineup the first mark opens the mobile composition as its
-   anchor and the rest form a balanced two-column matrix; an even lineup fills
-   the two columns on its own and the component drops the anchor. A lead mark
-   always takes the full width here. */
-@media (max-width: 639px) {
-  .presenter-logo-card[data-featured="true"],
-  .presenter-logo-card[data-lead="true"] {
-    grid-column: 1 / -1;
-  }
 }
 
 @media (min-width: 640px) {
-  /* The lineup sets `--lineup-columns` from the marks that follow the lead
-     row, so no row leaves empty cells showing the grid's hairline background,
-     and `--lead-span` splits that first row between the lead marks. */
   .presenter-logo-grid {
-    grid-template-columns: repeat(var(--lineup-columns, 4), minmax(0, 1fr));
-  }
-
-  .presenter-logo-card[data-lead="true"] {
-    grid-column: span var(--lead-span, 2);
+    --lineup-columns: 3;
+    --lineup-lead-columns: 2;
   }
 }
 
-@media (max-width: 640px) {
-  .presenter-logo-card {
-    min-height: 7rem;
-    padding: 1rem 1.1rem;
-  }
-
-  .presenter-wordmark {
-    font-size: 0.8rem;
+@media (min-width: 1024px) {
+  .presenter-logo-grid {
+    --lineup-columns: 4;
   }
 }
 
@@ -7411,6 +7445,7 @@ h3,
   }
 
   .presenter-logo-card:hover {
+    transform: none;
     box-shadow: none;
   }
 

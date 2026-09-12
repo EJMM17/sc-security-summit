@@ -60,10 +60,49 @@ a blanco puro para que la caja del logo se funda con la tarjeta):
 - `iies.png`
 - `blanquita.png`
 - `laboratorios-eloisa.png`
+- `vigilancia-intramuros.png`
+- `spi.png`
+- `innovalab.png`
 
 Cada archivo se enlaza desde `PRESENTERS` en `lib/content.ts`. Un presentador
 con `logo: null` se muestra como wordmark tipográfico hasta que su archivo
 exista, para no publicar imágenes rotas.
+
+Las tres marcas que se sumaron después llegaron sin recortar y se les aplicó
+el mismo tratamiento:
+
+- `vigilancia-intramuros.png` — venía con plato `#f7f7f7`; se normalizó a
+  blanco puro y se recortó al lockup visible. La palabra «Reynosa» del
+  original está compuesta en blanco sobre ese plato casi blanco, así que no
+  era legible ni en la fuente y quedó fuera del recorte; si la marca entrega
+  una versión con esa línea en un color legible, se reemplaza conservando el
+  nombre del archivo.
+- `spi.png` — fondo transparente; se recortó al lockup y se dejó fuera la
+  regla azul y el claim «Seguridad y telecomunicaciones para tu empresa», que
+  a tamaño de mosaico es microtipografía ilegible. Conserva el descriptor
+  «Servicios Profesionales Integrados».
+- `innovalab.png` — fondo transparente; solo se recortó el margen sobrante.
+
+Los dos con transparencia se dejaron con canal alfa en lugar de aplanarlos a
+blanco: sobre la tarjeta el resultado es idéntico y no quedan atados al color
+de la superficie.
+
+### Proporción del lienzo
+
+Los logos de la alineación van de casi cuadrados (escudo municipal, 0.95) a
+más de tres veces más anchos que altos (Villa Florida, 3.29). Un solo lienzo
+no puede darles el mismo peso óptico —el ancho limita a los horizontales y la
+altura a los verticales—, así que cada marca declara un `shape` en
+`lib/content.ts` (`horizontal`, `balanced` o `stacked`) que elige la altura de
+lienzo con la que todas cubren un área comparable. Al reemplazar un archivo
+por otro de proporción distinta hay que actualizar ese `shape`;
+`tests/brand-logos.test.ts` mide cada PNG y falla si la declaración dejó de
+corresponder al archivo.
+
+El orden de `PRESENTERS` es parte del diseño: la alineación envuelve en dos,
+tres o cuatro columnas, así que Laboratorios Eloisa e InnovaLab se mantienen
+en extremos opuestos de la lista para que nunca queden contiguos.
+`tests/brand-logos.test.ts` verifica esa distancia.
 
 ### Instituciones
 

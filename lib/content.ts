@@ -505,7 +505,41 @@ export type Presenter = {
   /** Opens the lineup on its own row, with a taller logo canvas. Reserved for
    * the institutional marks that head the Summit. */
   readonly lead?: boolean;
+  /** How wide the mark is relative to its height, which decides how much
+   * canvas the lineup gives it. Omitted means `horizontal`.
+   *
+   * One canvas cannot weigh every shape the same. A logo is fitted inside
+   * its canvas, so a wide wordmark is limited by the canvas width while a
+   * stacked crest is limited by its height: on a canvas sized for the wide
+   * marks, a stacked one ends up covering a third of their area and reads as
+   * an afterthought. The lineup spans proportions from a square municipal
+   * crest to a wordmark three times as wide as it is tall, so it sizes each
+   * bucket to land them all on a comparable optical area — that is what
+   * makes thirteen unrelated marks read as one group.
+   *
+   * `tests/brand-logos.test.ts` measures every asset and fails if a
+   * declaration stops matching its file, so a replaced logo cannot silently
+   * drift into the wrong canvas. */
+  readonly shape?: LogoShape;
 };
+
+/** Proportion buckets, widest first. */
+export type LogoShape = "horizontal" | "balanced" | "stacked";
+
+/** Upper bound of each bucket, as a width-to-height ratio. Anything at or
+ * above the widest bound is `horizontal`. */
+const LOGO_SHAPE_MAX_RATIO: Readonly<Record<"stacked" | "balanced", number>> = {
+  stacked: 1.6,
+  balanced: 2.3,
+};
+
+/** The bucket a mark of this proportion belongs to. Single source of truth
+ * for both the declarations below and the test that checks them. */
+export function logoShapeForRatio(ratio: number): LogoShape {
+  if (ratio < LOGO_SHAPE_MAX_RATIO.stacked) return "stacked";
+  if (ratio < LOGO_SHAPE_MAX_RATIO.balanced) return "balanced";
+  return "horizontal";
+}
 
 /** The government institutions backing the Summit.
  *
@@ -517,6 +551,7 @@ export const INSTITUTIONS: readonly Presenter[] = [
     name: "Gobierno Municipal de Reynosa",
     logo: "/images/presenters/gobierno-reynosa.png",
     lead: true,
+    shape: "stacked",
   },
   {
     name: "Secretaría de Desarrollo Económico y del Empleo de Reynosa",
@@ -525,10 +560,31 @@ export const INSTITUTIONS: readonly Presenter[] = [
   },
 ] as const;
 
+/** The organizations presenting the Summit, in render order.
+ *
+ * The order is part of the layout, not an accident of when each brand signed:
+ * the lineup wraps into two, three or four columns depending on the viewport,
+ * so two brands land side by side or one above the other whenever their
+ * positions are within four places of each other. The two clinical
+ * laboratories — Laboratorios Eloisa and InnovaLab — are therefore kept at
+ * opposite ends of the list so they never share a neighbourhood in any of
+ * those layouts, and the sectors in between alternate (logistics, health,
+ * security, industrial, education, consumer) so no row reads as a single
+ * industry block. `tests/brand-logos.test.ts` guards that distance. */
 export const PRESENTERS: readonly Presenter[] = [
   {
     name: "Lanz Logistics",
     logo: "/images/presenters/lanz-logistics.png",
+    shape: "balanced",
+  },
+  {
+    name: "Laboratorios Eloisa",
+    logo: "/images/presenters/laboratorios-eloisa.png",
+  },
+  {
+    name: "Vigilancia Intramuros Reynosa",
+    logo: "/images/presenters/vigilancia-intramuros.png",
+    shape: "stacked",
   },
   {
     name: "Parque Industrial Villa Florida",
@@ -537,14 +593,20 @@ export const PRESENTERS: readonly Presenter[] = [
   {
     name: "Instituto Internacional de Estudios Superiores",
     logo: "/images/presenters/iies.png",
+    shape: "balanced",
   },
   {
     name: "Blanquita Agua Purificada",
     logo: "/images/presenters/blanquita.png",
   },
   {
-    name: "Laboratorios Eloisa",
-    logo: "/images/presenters/laboratorios-eloisa.png",
+    name: "SPI Servicios Profesionales Integrados",
+    logo: "/images/presenters/spi.png",
+  },
+  {
+    name: "InnovaLab Laboratorio",
+    logo: "/images/presenters/innovalab.png",
+    shape: "stacked",
   },
 ] as const;
 
@@ -562,10 +624,12 @@ export const SPONSORS: readonly Presenter[] = [
   {
     name: "Palco",
     logo: "/images/presenters/palco.png",
+    shape: "stacked",
   },
   {
     name: "Mundo GPS Reynosa",
     logo: "/images/presenters/mundo-gps-reynosa.png",
+    shape: "balanced",
   },
 ] as const;
 
