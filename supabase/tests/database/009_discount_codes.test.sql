@@ -35,7 +35,7 @@ select is(
 );
 
 -- 20260910120000 adds five more convenios at the same 20% as the first batch.
--- ATLANTICO2026 was one of them until 20260915120000 retired it.
+-- ATLANTICO2026 was one of them until 20260915025906 retired it.
 select is(
   (
     select count(*)::integer from public.coupons
@@ -48,7 +48,7 @@ select is(
   'the four surviving later codes are active percentage coupons at 20%'
 );
 
--- 20260915120000 re-issues the Atlántico convenio: the old row stays as the
+-- 20260915025906 re-issues the Atlántico convenio: the old row stays as the
 -- record of the sales made under it, but it no longer buys a discount.
 select is(
   (select active from public.coupons where code = 'ATLANTICO2026'),
