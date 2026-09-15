@@ -287,7 +287,7 @@ CI no contiene secretos productivos.
 `npm run lint` usa ESLint CLI directamente; no depende del comando deprecado
 `next lint`.
 
-Compatibilidad vigilada: Next 15.5.22 declara rangos transitivos de PostCSS y
+Compatibilidad vigilada: Next 15.5.25 declara rangos transitivos de PostCSS y
 Sharp anteriores a las correcciones de seguridad disponibles. `package.json`
 fija overrides temporales a versiones corregidas, y `sharp` es dependencia de
 runtime explícita para que el optimizador no dependa de devDependencies. CI

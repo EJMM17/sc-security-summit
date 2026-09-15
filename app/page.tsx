@@ -233,7 +233,7 @@ export default async function Home({
       <link rel="alternate" hrefLang="es-MX" href={`${BASE_URL}/?lang=es`} />
       <link rel="alternate" hrefLang="en-US" href={`${BASE_URL}/?lang=en`} />
       <link rel="alternate" hrefLang="x-default" href={BASE_URL} />
-      <ScrollRevealObserver />
+      <ScrollRevealObserver key={language} />
       <ScrollProgress />
       <Header language={language} />
       {/* Every other route already exposes a `main` landmark (PageShell, the

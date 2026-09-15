@@ -119,7 +119,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
       <circle data-si={P} cx="6.2" cy="16.9" r="0.85" fill="currentColor" stroke="none" />
       <circle data-si={P} cx="11.4" cy="13.4" r="0.85" fill="currentColor" stroke="none" />
       <circle data-si={P} cx="17.3" cy="10.2" r="0.85" fill="currentColor" stroke="none" />
-      <circle data-si={L} cx="17.3" cy="15.4" r="0.85" fill="currentColor" stroke="none" />
+      <circle data-si={L} pathLength="1" cx="17.3" cy="15.4" r="0.85" fill="currentColor" stroke="none" />
     </>
   ),
 
@@ -155,7 +155,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
       <path data-si={D} pathLength="1" d="M2.6 4.6h2.5l2.7 10.1h9.6l2.4-7.4H7.6" />
       <path data-si={D} pathLength="1" d="M11.8 7.3v7.4M16 7.3l-1 7.4" strokeOpacity="0.6" />
       <circle data-si={P} cx="9.4" cy="19.4" r="1.6" />
-      <circle data-si={L} cx="16.8" cy="19.4" r="1.6" />
+      <circle data-si={L} pathLength="1" cx="16.8" cy="19.4" r="1.6" />
     </>
   ),
 
@@ -182,7 +182,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
         d="M2.4 12s3.9-6.4 9.6-6.4S21.6 12 21.6 12s-3.9 6.4-9.6 6.4S2.4 12 2.4 12Z"
       />
       <circle data-si={D} pathLength="1" cx="12" cy="12" r="3.2" />
-      <circle data-si={L} cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
+      <circle data-si={L} pathLength="1" cx="12" cy="12" r="1.3" fill="currentColor" stroke="none" />
     </>
   ),
 
@@ -245,7 +245,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
         d="M12 1.6v2.6M12 19.8v2.6M1.6 12h2.6M19.8 12h2.6"
         strokeOpacity="0.7"
       />
-      <circle data-si={L} cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
+      <circle data-si={L} pathLength="1" cx="12" cy="12" r="1.7" fill="currentColor" stroke="none" />
     </>
   ),
 
@@ -253,7 +253,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
     <>
       <path data-si={D} pathLength="1" d="M3.2 18.4 4.8 7.1l4.5 3.7L12 4.1l2.7 6.7 4.5-3.7 1.6 11.3Z" />
       <path data-si={D} pathLength="1" d="M4.6 21h14.8" />
-      <circle data-si={L} cx="12" cy="4.1" r="1.3" />
+      <circle data-si={L} pathLength="1" cx="12" cy="4.1" r="1.3" />
     </>
   ),
 
@@ -388,7 +388,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
       <path data-si={D} pathLength="1" d="M20.6 8.8V5.6a2.2 2.2 0 0 0-2.2-2.2h-3.2" />
       <path data-si={D} pathLength="1" d="M3.4 15.2v3.2a2.2 2.2 0 0 0 2.2 2.2h3.2" />
       <path data-si={D} pathLength="1" d="M20.6 15.2v3.2a2.2 2.2 0 0 1-2.2 2.2h-3.2" />
-      <circle data-si={L} cx="12" cy="12" r="3.4" />
+      <circle data-si={L} pathLength="1" cx="12" cy="12" r="3.4" />
       <circle data-si={P} cx="12" cy="12" r="1.1" fill="currentColor" stroke="none" />
     </>
   ),
@@ -400,7 +400,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
       <path data-si={D} pathLength="1" d="M6 14.6c0-3.6 2.3-5.4 5.8-5.4h3.6" />
       <circle data-si={P} cx="6" cy="5.4" r="2.3" />
       <circle data-si={P} cx="6" cy="18.6" r="2.3" />
-      <circle data-si={L} cx="17.7" cy="9.2" r="2.3" />
+      <circle data-si={L} pathLength="1" cx="17.7" cy="9.2" r="2.3" />
     </>
   ),
 
@@ -438,7 +438,7 @@ const GLYPHS: Record<SummitIconName, ReactNode> = {
       <circle data-si={P} cx="7.6" cy="13.6" r="0.85" fill="currentColor" stroke="none" />
       <circle data-si={P} cx="16.4" cy="13.6" r="0.85" fill="currentColor" stroke="none" />
       <circle data-si={P} cx="7.6" cy="17.4" r="0.85" fill="currentColor" stroke="none" />
-      <circle data-si={L} cx="12" cy="15.5" r="2.5" />
+      <circle data-si={L} pathLength="1" cx="12" cy="15.5" r="2.5" />
     </>
   ),
 

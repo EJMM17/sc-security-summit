@@ -36,7 +36,10 @@ export default function ScrollRevealObserver() {
       ),
     );
 
-    if (!("IntersectionObserver" in window)) {
+    if (
+      !("IntersectionObserver" in window) ||
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
       for (const element of elements) element.classList.add("visible");
       return;
     }
@@ -44,14 +47,26 @@ export default function ScrollRevealObserver() {
     for (const element of elements) {
       if (element.classList.contains("visible")) continue;
 
+      // Server content is visible by default. Only arm an entrance below the
+      // viewport after the observer is available; restored scroll positions
+      // and deep links must never flash or conceal already reached content.
+      if (element.getBoundingClientRect().top < window.innerHeight) {
+        element.classList.add("visible");
+        continue;
+      }
+
       const configuredThreshold = Number(element.dataset.revealThreshold);
       const threshold = Number.isFinite(configuredThreshold)
         ? Math.min(1, Math.max(0, configuredThreshold))
         : 0.15;
       const observer = getObserver(threshold);
 
-      callbackMap.set(element, () => element.classList.add("visible"));
+      callbackMap.set(element, () => {
+        element.classList.add("visible");
+        element.removeAttribute("data-reveal-pending");
+      });
       observer.observe(element);
+      element.setAttribute("data-reveal-pending", "");
     }
 
     return () => {
@@ -63,6 +78,7 @@ export default function ScrollRevealObserver() {
         const observer = observerMap.get(threshold);
         if (observer) observer.unobserve(element);
         callbackMap.delete(element);
+        element.removeAttribute("data-reveal-pending");
       }
     };
   }, []);

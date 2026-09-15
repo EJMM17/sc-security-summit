@@ -392,7 +392,7 @@ controlado de un deployment, define `PLAYWRIGHT_BASE_URL` explícitamente.
 destino E2E.
 
 `package.json` fuerza las versiones corregidas de `postcss` y `sharp` que
-Next.js 15.5.22 todavía resuelve de forma transitiva. No uses
+Next.js 15.5.25 todavía puede resolver de forma transitiva. No uses
 `npm audit fix --force` ni retires esos overrides hasta que una versión estable
 de Next.js incluya rangos corregidos y pasen lockfile, audit, build,
 optimización de imágenes y E2E sin ellos.

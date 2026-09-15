@@ -113,9 +113,9 @@ select ok(
     select 1
     from unnest(array['anon', 'authenticated', 'public']) as role_name
     cross join unnest(array[
-      'public.create_ticket_order(uuid, text, text, smallint, integer, integer, integer, integer, text, text, text, text, text, timestamptz, date, boolean, text, text, text, text, text, text, text, text, text, text, text, text, text, text, text, timestamptz, timestamptz)',
+      'public.create_ticket_order(uuid, text, text, smallint, integer, integer, integer, integer, text, text, text, text, text, timestamptz, date, boolean, text, text, text[], uuid, text, text, integer, integer, integer, text, text, text, text, text, text, text, text, text, text, text, text, text, text, timestamptz, timestamptz)',
       'public.attach_ticket_order_preference(uuid, text)',
-      'public.record_ticket_order_payment(uuid, text, text, text, text, timestamptz)'
+      'public.record_ticket_order_payment(uuid, text, text, text, text, timestamptz, integer)'
     ]) as function_signature
     where has_function_privilege(role_name, function_signature, 'EXECUTE')
   ),

@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 import deploymentContract from "../config/deployment-contract.json" with {
   type: "json",
 };

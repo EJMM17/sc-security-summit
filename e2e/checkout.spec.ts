@@ -216,6 +216,12 @@ test.describe("Checkout de accesos", () => {
   });
 
   test("no envía un bloque con un nombre en blanco", async ({ page }) => {
+    const submissions: string[] = [];
+    page.on("request", (request) => {
+      if (request.method() === "POST" && request.headers()["next-action"]) {
+        submissions.push(request.url());
+      }
+    });
     await page.goto("/?lang=es");
 
     const corporate = page.locator("#registro");
@@ -228,15 +234,23 @@ test.describe("Checkout de accesos", () => {
     await corporate.getByLabel("Teléfono móvil").fill("+52 899 123 4567");
     await corporate.getByLabel(/empresa/i).first().fill("Logística del Norte");
 
+    const blankParticipant = corporate.getByLabel("Participante 2", { exact: true });
+    const nativeRejection = await blankParticipant.evaluate(
+      (input) => !(input as HTMLInputElement).validity.valid,
+    );
     await corporate.getByRole("button", { name: /procesar pago/i }).click();
 
-    // The whitespace is normalized away and the order never leaves the browser.
-    await expect(
-      corporate.getByLabel("Participante 2", { exact: true }),
-    ).toHaveValue("");
-    await expect(corporate.locator(".inquiry-status.is-error")).toContainText(
-      "Revisa los campos",
-    );
+    // WebKit can reject whitespace through native required validation before
+    // React receives submit. Both paths must keep the order in the browser.
+    if (nativeRejection) {
+      await expect.poll(() => blankParticipant.evaluate(
+        (input) => (input as HTMLInputElement).validity.valid,
+      )).toBe(false);
+    } else {
+      await expect(blankParticipant).toHaveValue("");
+      await expect(corporate.locator(".inquiry-status.is-error")).toContainText("Revisa los campos");
+    }
+    expect(submissions).toEqual([]);
     await expect(
       corporate.getByLabel("Participante 1", { exact: true }),
     ).toHaveValue("Ada Lovelace");
