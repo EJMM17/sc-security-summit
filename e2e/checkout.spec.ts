@@ -68,7 +68,7 @@ test.describe("Checkout de accesos", () => {
       "UT2026",
       "ITCC2026",
       "UAT2026",
-      "ATLANTICO2026",
+      "UDA2026",
       "UMAN2026",
     ]) {
       expect(html).not.toContain(code);

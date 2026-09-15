@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(28);
+select plan(30);
 
 -- ---------------------------------------------------------------------------
 -- The convenios that shipped with the migration
@@ -35,16 +35,34 @@ select is(
 );
 
 -- 20260910120000 adds five more convenios at the same 20% as the first batch.
+-- ATLANTICO2026 was one of them until 20260915120000 retired it.
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UT2026', 'ITCC2026', 'UAT2026', 'ATLANTICO2026', 'UMAN2026')
+    where code in ('UT2026', 'ITCC2026', 'UAT2026', 'UMAN2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
   ),
-  5,
-  'the five later codes are active percentage coupons at 20%'
+  4,
+  'the four surviving later codes are active percentage coupons at 20%'
+);
+
+-- 20260915120000 re-issues the Atlántico convenio: the old row stays as the
+-- record of the sales made under it, but it no longer buys a discount.
+select is(
+  (select active from public.coupons where code = 'ATLANTICO2026'),
+  false,
+  'ATLANTICO2026 is retired, not deleted'
+);
+
+select is(
+  (
+    select discount_basis_points from public.coupons
+    where code = 'UDA2026' and discount_type = 'percentage' and active
+  ),
+  3000,
+  'UDA2026 is an active percentage coupon at 30%'
 );
 
 -- The coupon constraints are exercised as the owning role: service_role can
