@@ -61,7 +61,7 @@ test.describe("Checkout de accesos", () => {
     const html = await page.content();
     for (const code of [
       "UVB2026",
-      "IIIES2026",
+      "IIES2026",
       "PVILLAFLORIDA2026",
       "CANACAR2026",
       "AAARAC2026",

@@ -19,7 +19,7 @@ import { validateDiscountCodeUseCase } from "@/server/use-cases/validate-discoun
  */
 const SEEDED_CODES = {
   UVB2026: 2_000,
-  IIIES2026: 2_000,
+  IIES2026: 2_000,
   PVILLAFLORIDA2026: 2_000,
   CANACAR2026: 2_000,
   AAARAC2026: 2_500,

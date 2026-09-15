@@ -11,10 +11,12 @@ select plan(30);
 -- The convenios that shipped with the migration
 -- ---------------------------------------------------------------------------
 
+-- 20260911140721 fixed the IIES code, seeded with an extra "I". It renamed
+-- the row in place, so it is the same coupon and the same sales.
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UVB2026', 'IIIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
+    where code in ('UVB2026', 'IIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
