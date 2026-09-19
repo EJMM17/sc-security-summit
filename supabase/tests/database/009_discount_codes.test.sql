@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(28);
+select plan(29);
 
 -- ---------------------------------------------------------------------------
 -- The convenios that shipped with the migration
@@ -34,17 +34,27 @@ select is(
   'AAARAC2026 is an active percentage coupon at 25%'
 );
 
--- 20260910120000 adds five more convenios at the same 20% as the first batch.
+-- 20260910120000 adds five more convenios at the same 20% as the first batch,
+-- and 20260919120000 re-prices UAT2026 alone at 40%.
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UT2026', 'ITCC2026', 'UAT2026', 'ATLANTICO2026', 'UMAN2026')
+    where code in ('UT2026', 'ITCC2026', 'ATLANTICO2026', 'UMAN2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
   ),
-  5,
-  'the five later codes are active percentage coupons at 20%'
+  4,
+  'the other later codes stay active percentage coupons at 20%'
+);
+
+select is(
+  (
+    select discount_basis_points from public.coupons
+    where code = 'UAT2026' and discount_type = 'percentage' and active
+  ),
+  4000,
+  'UAT2026 is an active percentage coupon at 40%'
 );
 
 -- The coupon constraints are exercised as the owning role: service_role can
