@@ -72,9 +72,10 @@ el botón de pago ni se presenta como obligatorio.
 Los códigos viven en `public.coupons` y **sólo ahí**: el bundle del navegador
 nunca recibe la lista. El navegador manda una cadena y el servidor contesta si
 compró un descuento. Los convenios vigentes
-(`UVB2026`, `IIIES2026`, `PVILLAFLORIDA2026`, `CANACAR2026`, `UT2026`,
-`ITCC2026`, `UAT2026`, `ATLANTICO2026`, `UMAN2026`) valen 20%, y
-`AAARAC2026` vale 25%. El porcentaje es de cada cupón, no de "ser convenio":
+(`UVB2026`, `IIES2026`, `PVILLAFLORIDA2026`, `CANACAR2026`, `UT2026`,
+`ITCC2026`, `UMAN2026`) valen 20%, `AAARAC2026` vale 25%, `UDA2026` vale 30% y
+`UAT2026` vale 40%. `ATLANTICO2026` quedó retirado (inactivo, reemplazado por
+`UDA2026`): la fila se conserva porque `coupon_uses` la referencia. El porcentaje es de cada cupón, no de "ser convenio":
 vive en `coupons.discount_basis_points` y cada código puede valer otra cosa.
 
 Antes de buscarlo el código se normaliza: se quitan espacios y se pasa a

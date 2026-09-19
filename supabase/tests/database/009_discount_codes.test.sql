@@ -5,7 +5,7 @@ grant usage on schema extensions to service_role;
 set local role service_role;
 set local search_path = public, extensions, pg_catalog;
 
-select plan(28);
+select plan(31);
 
 -- ---------------------------------------------------------------------------
 -- The convenios that shipped with the migration
@@ -14,13 +14,13 @@ select plan(28);
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UVB2026', 'IIIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
+    where code in ('UVB2026', 'IIES2026', 'PVILLAFLORIDA2026', 'CANACAR2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
   ),
   4,
-  'the four seeded codes are active percentage coupons at 20%'
+  'the four seeded codes are active percentage coupons at 20% (IIES2026 renamed by 20260911140721)'
 );
 
 -- 20260904185529 adds AAARAC at a different rate, so the rate is per coupon
@@ -35,16 +35,44 @@ select is(
 );
 
 -- 20260910120000 adds five more convenios at the same 20% as the first batch.
+-- Of those, 20260915025906 retires ATLANTICO2026 and 20260919012452 re-prices
+-- UAT2026 alone at 40%, so three of them are still active at 20%.
 select is(
   (
     select count(*)::integer from public.coupons
-    where code in ('UT2026', 'ITCC2026', 'UAT2026', 'ATLANTICO2026', 'UMAN2026')
+    where code in ('UT2026', 'ITCC2026', 'UMAN2026')
       and discount_type = 'percentage'
       and discount_basis_points = 2000
       and active
   ),
-  5,
-  'the five later codes are active percentage coupons at 20%'
+  3,
+  'the other later codes stay active percentage coupons at 20%'
+);
+
+select is(
+  (
+    select discount_basis_points from public.coupons
+    where code = 'UAT2026' and discount_type = 'percentage' and active
+  ),
+  4000,
+  'UAT2026 is an active percentage coupon at 40%'
+);
+
+-- 20260915025906 re-issues the Atlántico convenio as UDA2026 at 30% and
+-- deactivates the old code. The retired row stays: coupon_uses references it.
+select is(
+  (
+    select discount_basis_points from public.coupons
+    where code = 'UDA2026' and discount_type = 'percentage' and active
+  ),
+  3000,
+  'UDA2026 is an active percentage coupon at 30%'
+);
+
+select is(
+  (select active from public.coupons where code = 'ATLANTICO2026'),
+  false,
+  'ATLANTICO2026 is retired but kept, not deleted'
 );
 
 -- The coupon constraints are exercised as the owning role: service_role can
