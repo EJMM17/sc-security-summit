@@ -14,19 +14,21 @@ import { validateDiscountCodeUseCase } from "@/server/use-cases/validate-discoun
  *
  * The rate belongs to the coupon, not to "being a convenio": 20260827120000
  * seeded four codes at 20%, 20260904185529 added AAARAC at 25%,
- * 20260910120000 added five more at 20% and 20260919120000 re-priced UAT2026
- * alone at 40%.
+ * 20260910120000 added five more at 20%, 20260911140721 fixed the IIES code,
+ * 20260915025906 retired ATLANTICO2026 in favour of UDA2026 at 30% and
+ * 20260919012452 re-priced UAT2026 alone at 40%. Only the active codes are
+ * listed here: a retired coupon never reaches the use case.
  */
 const SEEDED_CODES = {
   UVB2026: 2_000,
-  IIIES2026: 2_000,
+  IIES2026: 2_000,
   PVILLAFLORIDA2026: 2_000,
   CANACAR2026: 2_000,
   AAARAC2026: 2_500,
   UT2026: 2_000,
   ITCC2026: 2_000,
   UAT2026: 4_000,
-  ATLANTICO2026: 2_000,
+  UDA2026: 3_000,
   UMAN2026: 2_000,
 } as const;
 
