@@ -171,6 +171,8 @@ test.describe("Homepage comercial", () => {
     ).toHaveValue("essential");
 
     await page.getByRole("button", { name: "Aceptar todas" }).click();
+    // The notice closes completely: no dialog and no floating control left.
+    await expect(page.getByRole("dialog", { name: "Privacidad y cookies" })).toHaveCount(0);
     await expect.poll(storedAttribution).toEqual({
       local: expect.any(String),
       cookie: true,
@@ -196,5 +198,24 @@ test.describe("Homepage comercial", () => {
     await expect(
       page.locator('input[name="marketingConsent"]').first(),
     ).toHaveValue("essential");
+  });
+
+  test("el aviso de cookies no reaparece tras elegir y se reabre desde el pie", async ({
+    page,
+  }) => {
+    await page.goto("/?lang=es");
+    const notice = page.getByRole("dialog", { name: "Privacidad y cookies" });
+    await expect(notice).toBeVisible();
+    await expect(notice.locator('img[src*="logo-symbol-blue"]')).toHaveCount(1);
+
+    await page.getByRole("button", { name: "Solo esenciales" }).click();
+    await expect(notice).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.locator(".consent-dock")).toBeHidden();
+    await expect(notice).toHaveCount(0);
+
+    await page.getByRole("button", { name: "Configurar cookies" }).click();
+    await expect(notice).toBeVisible();
   });
 });

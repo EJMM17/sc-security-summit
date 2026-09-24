@@ -112,7 +112,8 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang={language} className="scroll-smooth">
+    // ConsentMode flags a stored cookie choice on <html> before hydration.
+    <html lang={language} className="scroll-smooth" suppressHydrationWarning>
       <body
         className={`${inter.variable} ${oswald.variable} font-sans bg-white text-[#0F172A] antialiased`}
       >

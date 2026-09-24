@@ -11,15 +11,20 @@
  * The cookie banner (components/CookieConsent.tsx) calls
  * gtag('consent','update', …) to flip storage to granted/denied.
  *
+ * It also flags <html> when any choice is stored, so the server-rendered cookie
+ * notice stays hidden for a returning visitor instead of flashing until
+ * hydration.
+ *
  * Nonce-based: compatible with the per-request CSP in middleware.ts.
  */
 export default function ConsentMode({ nonce }: { nonce?: string }) {
   const storageKey = JSON.stringify(COOKIE_CONSENT_STORAGE_KEY);
+  const decidedAttribute = JSON.stringify(COOKIE_CONSENT_DECIDED_ATTRIBUTE);
   const script = `window.dataLayer=window.dataLayer||[];
 function gtag(){dataLayer.push(arguments);}
 window.gtag=window.gtag||gtag;
 var s='denied';
-try{var r=window.localStorage.getItem(${storageKey});if(r){var d=JSON.parse(r);if(d&&d.decision==='all')s='granted';}}catch(e){}
+try{var r=window.localStorage.getItem(${storageKey});if(r){var d=JSON.parse(r);if(d&&d.decision==='all')s='granted';if(d&&(d.decision==='all'||d.decision==='essential'))document.documentElement.setAttribute(${decidedAttribute},'');}}catch(e){}
 gtag('consent','default',{ad_storage:s,ad_user_data:s,ad_personalization:s,analytics_storage:s,functionality_storage:'granted',security_storage:'granted',wait_for_update:500});
 gtag('set','url_passthrough',true);
 gtag('set','ads_data_redaction',s!=='granted');`;
@@ -32,4 +37,7 @@ gtag('set','ads_data_redaction',s!=='granted');`;
     />
   );
 }
-import { COOKIE_CONSENT_STORAGE_KEY } from "@/lib/consent";
+import {
+  COOKIE_CONSENT_DECIDED_ATTRIBUTE,
+  COOKIE_CONSENT_STORAGE_KEY,
+} from "@/lib/consent";

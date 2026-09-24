@@ -7,7 +7,7 @@
 // Versioning: bump CACHE_VERSION to invalidate. Old caches are pruned in
 // `activate`. Cache size is capped via opportunistic eviction.
 
-const CACHE_VERSION = "scss2026-v1";
+const CACHE_VERSION = "scss2026-v2";
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const PAGES_CACHE = `${CACHE_VERSION}-pages`;
 const MAX_PAGES_ENTRIES = 30;
@@ -45,8 +45,9 @@ function isBypass(url, request) {
   if (request.method !== "GET") return true;
   if (url.pathname.startsWith("/api/")) return true;
   if (url.pathname.startsWith("/admin")) return true;
-  if (url.pathname.startsWith("/pago")) return true;
-  if (url.pathname.startsWith("/registro-exitoso")) return true;
+  // Checkout and its return pages render one order's live state: never serve
+  // them from cache.
+  if (url.pathname.startsWith("/checkout")) return true;
   return false;
 }
 

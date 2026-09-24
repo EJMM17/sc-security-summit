@@ -22,7 +22,6 @@ export default async function CheckoutOutcomePage({
 
   return (
     <CheckoutOutcome
-      kind="pending"
       language={language}
       orderId={params?.order}
     />
