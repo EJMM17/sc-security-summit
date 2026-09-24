@@ -4208,97 +4208,74 @@ body {
   text-indent: 0;
 }
 
-.event-countdown-live {
+/* Final stretch. One hairline under the clock carries the whole message: it
+   is the last 48 hours, and it fills as they run out. It opens with the same
+   emphasized rule-draw the section kickers use, then advances one second at a
+   time, like the speaker carousel's progress bar. No glow, no loop. */
+.event-countdown-window {
   position: relative;
-  width: 0.45rem;
-  height: 0.45rem;
+  display: block;
+  width: 100%;
+  max-width: 19rem;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: rgba(147, 197, 253, 0.16);
+  transform-origin: center;
+  animation: labelRuleDraw var(--dur-slow) var(--ease-emphasized) both;
+}
+
+.event-countdown-window > span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, var(--summit-sky));
+  transform: scaleX(var(--window-progress, 0));
+  transform-origin: left center;
+  transition: transform 1s linear;
+  animation: event-countdown-window-fill var(--dur-slow) var(--ease-emphasized)
+    var(--dur-base) backwards;
+}
+
+/* The fill waits for the rule to finish drawing, then grows to where the
+   clock actually is. With no `to` frame it lands on its live value. */
+@keyframes event-countdown-window-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* During the event the label sits beside a steady broadcast dot. It breathes
+   slowly enough to read as "on air", never as an alert. */
+.event-countdown-live {
+  width: 0.4rem;
+  height: 0.4rem;
   flex: none;
   border-radius: 999px;
   background: var(--summit-sky);
 }
 
-.event-countdown-live::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: inherit;
-  opacity: 0;
-}
-
-@keyframes event-countdown-pulse {
-  from {
-    opacity: 0.7;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(2.6);
-  }
-}
-
-/* Final stretch: the separators breathe with the seconds, the seconds carry a
-   soft glow, and the hero CTA catches a light sweep every few seconds. All of
-   it switches on only once the countdown enters the last 48 hours, and none
-   of the motion runs for visitors who ask for reduced motion. */
-.event-countdown[data-phase="imminent"] > div > div:last-child strong {
-  color: var(--summit-sky);
-  text-shadow: 0 0 18px rgba(147, 197, 253, 0.55);
-}
-
-@keyframes event-countdown-colon {
+@keyframes event-countdown-on-air {
   0%,
   100% {
     opacity: 1;
   }
   50% {
-    opacity: 0.25;
-  }
-}
-
-@keyframes primary-cta-sweep {
-  0% {
-    transform: translateX(-120%);
-  }
-  30%,
-  100% {
-    transform: translateX(120%);
+    opacity: 0.4;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .event-countdown-live::after {
-    animation: event-countdown-pulse 1.8s ease-out infinite;
+  .event-countdown-live {
+    animation: event-countdown-on-air 2.4s ease-in-out infinite;
   }
+}
 
-  .event-countdown[data-phase="imminent"] > div > div + div::before {
-    animation: event-countdown-colon 1s ease-in-out infinite;
-  }
-
-  .hero-production-inner:has(.event-countdown[data-phase="imminent"], .event-countdown[data-phase="live"])
-    .hero-actions
-    .primary-cta {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  .hero-production-inner:has(.event-countdown[data-phase="imminent"], .event-countdown[data-phase="live"])
-    .hero-actions
-    .primary-cta::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(
-      105deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.38) 50%,
-      transparent 70%
-    );
-    transform: translateX(-120%);
-    animation: primary-cta-sweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite;
-    pointer-events: none;
+@media (prefers-reduced-motion: reduce) {
+  .event-countdown-window,
+  .event-countdown-window > span {
+    animation: none;
+    transition: none;
   }
 }
 

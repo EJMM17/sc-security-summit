@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type CSSProperties } from "react";
 import { Clock } from "lucide-react";
 import type { Language } from "@/lib/language";
 
@@ -8,8 +8,9 @@ import type { Language } from "@/lib/language";
 const EVENT_START = new Date("2026-09-24T08:00:00-05:00").getTime();
 const EVENT_END = new Date("2026-09-24T19:00:00-05:00").getTime();
 // Inside the last two days the label stops counting "time remaining" and
-// starts announcing the doors, with a live dot: the clock reads as an arrival
-// rather than a deadline, which is urgency without a banner.
+// starts announcing the doors, and a hairline under the clock fills as those
+// hours run out: the clock reads as an arrival rather than a deadline, which
+// is urgency without a banner.
 const IMMINENT_WINDOW_MS = 48 * 3_600_000;
 
 type Phase = "countdown" | "imminent" | "live" | "over";
@@ -20,6 +21,8 @@ type CountdownValue = {
   minutes: number;
   seconds: number;
   phase: Phase;
+  /** Share of the final 48 hours already gone, from 0 to 1. */
+  windowElapsed: number;
 };
 
 function getPhase(now: number): Phase {
@@ -33,6 +36,7 @@ function getCountdown(now: number): CountdownValue {
 
   return {
     phase: getPhase(now),
+    windowElapsed: Math.min(1, Math.max(0, 1 - remaining / IMMINENT_WINDOW_MS)),
     days: Math.floor(remaining / 86_400_000),
     hours: Math.floor((remaining / 3_600_000) % 24),
     minutes: Math.floor((remaining / 60_000) % 60),
@@ -69,7 +73,6 @@ export default function EventCountdown({ language }: { language: Language }) {
   const values = value
     ? [value.days, value.hours, value.minutes, value.seconds]
     : ["--", "--", "--", "--"];
-  const pulsing = phase === "imminent" || phase === "live";
 
   return (
     <div
@@ -78,7 +81,7 @@ export default function EventCountdown({ language }: { language: Language }) {
       aria-label={language === "es" ? "Cuenta regresiva" : "Countdown"}
     >
       <p>
-        {pulsing ? (
+        {phase === "live" ? (
           <span className="event-countdown-live" aria-hidden="true" />
         ) : (
           <Clock aria-hidden="true" />
@@ -109,6 +112,17 @@ export default function EventCountdown({ language }: { language: Language }) {
           })}
         </div>
       )}
+      {phase === "imminent" && value ? (
+        <span className="event-countdown-window" aria-hidden="true">
+          <span
+            style={
+              {
+                "--window-progress": value.windowElapsed,
+              } as CSSProperties
+            }
+          />
+        </span>
+      ) : null}
     </div>
   );
 }
