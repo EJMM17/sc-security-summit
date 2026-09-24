@@ -33,6 +33,10 @@ const nextConfig: NextConfig = {
     // All images served locally from /public — no remote domains needed.
     // If you add a CDN later (Cloudinary, Imgix, etc.), add its hostname here.
     formats: ["image/avif", "image/webp"],
+    // Every source image is local and renamed when it changes (see the
+    // /images headers below), so an optimized variant can live for 31 days
+    // instead of being re-encoded after Next's 4-hour default.
+    minimumCacheTTL: 2_678_400,
     qualities: [70, 75, 82],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],

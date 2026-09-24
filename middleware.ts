@@ -65,7 +65,11 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     {
-      source: "/((?!_next/static|_next/image|favicon.ico|images/).*)",
+      // API routes answer JSON and root-level public files carry no inline
+      // script, so neither needs a nonce: skipping them saves an Edge
+      // invocation on every webhook, cron, health probe and icon request.
+      source:
+        "/((?!api/|_next/static|_next/image|favicon.ico|images/|[^/]+\\.(?:png|ico|txt|js|xml|webmanifest)$).*)",
       missing: [
         { type: "header", key: "next-router-prefetch" },
         { type: "header", key: "purpose", value: "prefetch" },

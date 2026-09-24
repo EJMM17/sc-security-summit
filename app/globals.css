@@ -4208,6 +4208,77 @@ body {
   text-indent: 0;
 }
 
+/* Final stretch. One hairline under the clock carries the whole message: it
+   is the last 48 hours, and it fills as they run out. It opens with the same
+   emphasized rule-draw the section kickers use, then advances one second at a
+   time, like the speaker carousel's progress bar. No glow, no loop. */
+.event-countdown-window {
+  position: relative;
+  display: block;
+  width: 100%;
+  max-width: 19rem;
+  height: 2px;
+  overflow: hidden;
+  border-radius: var(--radius-full);
+  background: rgba(147, 197, 253, 0.16);
+  transform-origin: center;
+  animation: labelRuleDraw var(--dur-slow) var(--ease-emphasized) both;
+}
+
+.event-countdown-window > span {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2563eb, var(--summit-sky));
+  transform: scaleX(var(--window-progress, 0));
+  transform-origin: left center;
+  transition: transform 1s linear;
+  animation: event-countdown-window-fill var(--dur-slow) var(--ease-emphasized)
+    var(--dur-base) backwards;
+}
+
+/* The fill waits for the rule to finish drawing, then grows to where the
+   clock actually is. With no `to` frame it lands on its live value. */
+@keyframes event-countdown-window-fill {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+/* During the event the label sits beside a steady broadcast dot. It breathes
+   slowly enough to read as "on air", never as an alert. */
+.event-countdown-live {
+  width: 0.4rem;
+  height: 0.4rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--summit-sky);
+}
+
+@keyframes event-countdown-on-air {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .event-countdown-live {
+    animation: event-countdown-on-air 2.4s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-countdown-window,
+  .event-countdown-window > span {
+    animation: none;
+    transition: none;
+  }
+}
+
 .event-countdown > div {
   display: flex;
   min-width: 0;
