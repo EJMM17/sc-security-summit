@@ -4208,6 +4208,41 @@ body {
   text-indent: 0;
 }
 
+.event-countdown-live {
+  position: relative;
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: none;
+  border-radius: 999px;
+  background: var(--summit-sky);
+}
+
+.event-countdown-live::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: event-countdown-pulse 1.8s ease-out infinite;
+}
+
+@keyframes event-countdown-pulse {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .event-countdown-live::after {
+    animation: none;
+  }
+}
+
 .event-countdown > div {
   display: flex;
   min-width: 0;

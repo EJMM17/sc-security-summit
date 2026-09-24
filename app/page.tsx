@@ -213,6 +213,18 @@ function buildStructuredData(lang: "es" | "en") {
   };
 }
 
+// The graph depends only on the language and on static content, so it is
+// built and serialized once per language instead of on every request.
+const structuredDataJson = new Map<"es" | "en", string>();
+function getStructuredDataJson(lang: "es" | "en"): string {
+  let json = structuredDataJson.get(lang);
+  if (json === undefined) {
+    json = JSON.stringify(buildStructuredData(lang));
+    structuredDataJson.set(lang, json);
+  }
+  return json;
+}
+
 // ── Page Component ─────────────────────────────────────────────────
 export default async function Home({
   searchParams,
@@ -224,7 +236,6 @@ export default async function Home({
 
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
-  const structuredData = buildStructuredData(language);
 
   return (
     <>
@@ -263,7 +274,7 @@ export default async function Home({
         nonce={nonce}
         suppressHydrationWarning
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: getStructuredDataJson(language) }}
       />
     </>
   );
