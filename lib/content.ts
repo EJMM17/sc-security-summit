@@ -178,7 +178,7 @@ export const UI_TEXT = {
     mapPrivacyNote:
       "El mapa se muestra a través de Google Maps, por lo que al verlo se establece una conexión con ese servicio.",
     mapTitle: "Mapa del Centro de Convenciones de Reynosa",
-    datesLabel: "Fechas",
+    datesLabel: "Fecha y horario",
     datesValue: "24 de septiembre, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contacto",
@@ -333,7 +333,7 @@ export const UI_TEXT = {
     mapPrivacyNote:
       "The map is displayed through Google Maps, so viewing it establishes a connection with that service.",
     mapTitle: "Map of the Reynosa Convention Center",
-    datesLabel: "Dates",
+    datesLabel: "Date and time",
     datesValue: "September 24, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contact",

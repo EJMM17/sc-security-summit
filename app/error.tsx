@@ -2,7 +2,7 @@
 
 import * as Sentry from "@sentry/nextjs";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
 
 export default function GlobalError({
@@ -16,6 +16,12 @@ export default function GlobalError({
     Sentry.captureException(error);
   }, [error]);
 
+  // Follow the language the root layout declared on <html>.
+  const [english, setEnglish] = useState(false);
+  useEffect(() => {
+    setEnglish(document.documentElement.lang === "en");
+  }, []);
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
       <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
@@ -25,10 +31,12 @@ export default function GlobalError({
           strokeWidth={1.5}
         />
         <h1 className="mt-4 font-oswald text-2xl font-bold text-slate-900 sm:text-3xl">
-          Algo salió mal
+          {english ? "Something went wrong" : "Algo salió mal"}
         </h1>
         <p className="mt-3 text-sm text-slate-600">
-          Ocurrió un error inesperado. Intenta de nuevo en unos segundos.
+          {english
+            ? "An unexpected error occurred. Please try again in a few seconds."
+            : "Ocurrió un error inesperado. Intenta de nuevo en unos segundos."}
         </p>
         {error.digest && (
           <p className="mt-3 font-mono text-xs text-slate-400">ref: {error.digest}</p>
@@ -39,13 +47,13 @@ export default function GlobalError({
             onClick={reset}
             className="flex-1 rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-blue-700"
           >
-            Reintentar
+            {english ? "Try again" : "Reintentar"}
           </button>
           <Link
-            href="/"
+            href={english ? "/?lang=en" : "/"}
             className="flex-1 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50"
           >
-            Ir al inicio
+            {english ? "Go to home" : "Ir al inicio"}
           </Link>
         </div>
       </div>

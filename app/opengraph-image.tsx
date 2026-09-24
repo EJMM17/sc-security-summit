@@ -14,6 +14,13 @@ export default async function OgImage() {
     .jpeg({ quality: 85 })
     .toBuffer();
   const base64 = `data:image/jpeg;base64,${jpegBuffer.toString("base64")}`;
+  const logoBuffer = await sharp(
+    path.join(process.cwd(), "public/images/logo-symbol-blue.png")
+  )
+    .resize({ height: 120 })
+    .png()
+    .toBuffer();
+  const logo = `data:image/png;base64,${logoBuffer.toString("base64")}`;
 
   return new ImageResponse(
     <div
@@ -80,6 +87,42 @@ export default async function OgImage() {
           width: "100%",
         }}
       >
+        {/* Brand: the same logo tile the site uses */}
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 18,
+            marginBottom: 30,
+          }}
+        >
+          <div
+            style={{
+              width: 72,
+              height: 72,
+              borderRadius: 14,
+              background: "#ffffff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <img alt="" src={logo} style={{ height: 48 }} />
+          </div>
+          <div
+            style={{
+              fontSize: 22,
+              color: "#ffffff",
+              fontWeight: 800,
+              letterSpacing: "0.14em",
+              textTransform: "uppercase",
+              display: "flex",
+            }}
+          >
+            SC Security Summit
+          </div>
+        </div>
+
         {/* Eyebrow */}
         <div
           style={{
