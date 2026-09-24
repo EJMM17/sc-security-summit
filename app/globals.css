@@ -4223,7 +4223,7 @@ body {
   inset: 0;
   border-radius: inherit;
   background: inherit;
-  animation: event-countdown-pulse 1.8s ease-out infinite;
+  opacity: 0;
 }
 
 @keyframes event-countdown-pulse {
@@ -4237,9 +4237,68 @@ body {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
+/* Final stretch: the separators breathe with the seconds, the seconds carry a
+   soft glow, and the hero CTA catches a light sweep every few seconds. All of
+   it switches on only once the countdown enters the last 48 hours, and none
+   of the motion runs for visitors who ask for reduced motion. */
+.event-countdown[data-phase="imminent"] > div > div:last-child strong {
+  color: var(--summit-sky);
+  text-shadow: 0 0 18px rgba(147, 197, 253, 0.55);
+}
+
+@keyframes event-countdown-colon {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+@keyframes primary-cta-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  30%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
   .event-countdown-live::after {
-    animation: none;
+    animation: event-countdown-pulse 1.8s ease-out infinite;
+  }
+
+  .event-countdown[data-phase="imminent"] > div > div + div::before {
+    animation: event-countdown-colon 1s ease-in-out infinite;
+  }
+
+  .hero-production-inner:has(.event-countdown[data-phase="imminent"], .event-countdown[data-phase="live"])
+    .hero-actions
+    .primary-cta {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hero-production-inner:has(.event-countdown[data-phase="imminent"], .event-countdown[data-phase="live"])
+    .hero-actions
+    .primary-cta::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(
+      105deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.38) 50%,
+      transparent 70%
+    );
+    transform: translateX(-120%);
+    animation: primary-cta-sweep 4.5s cubic-bezier(0.4, 0, 0.2, 1) 1.2s infinite;
+    pointer-events: none;
   }
 }
 
