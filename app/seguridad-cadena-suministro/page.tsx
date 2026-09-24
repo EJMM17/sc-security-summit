@@ -90,7 +90,7 @@ export async function generateMetadata({
   const lang = await getRequestLanguage(params?.lang ?? null);
   const c = COPY[lang];
   return {
-    title: c.title,
+    title: { absolute: c.title },
     description: c.description,
     alternates: {
       canonical: `${BASE_URL}${PATH}`,

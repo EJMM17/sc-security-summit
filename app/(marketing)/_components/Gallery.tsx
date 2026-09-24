@@ -34,7 +34,7 @@ export default function Gallery({ language }: { language: Language }) {
               <div className="gallery-photo-overlay" />
               <div className="gallery-photo-label">
                 <span className="gallery-photo-tag">
-                  <Building2 className="w-3 h-3" /> {ui.galleryTag1}
+                  <Building2 className="w-3 h-3" aria-hidden="true" /> {ui.galleryTag1}
                 </span>
                 <p className="text-white font-oswald text-xl font-bold leading-tight mt-1 drop-shadow-sm">
                   SC Security Summit 2026
@@ -53,9 +53,9 @@ export default function Gallery({ language }: { language: Language }) {
               <div className="gallery-photo-overlay" />
               <div className="gallery-photo-label">
                 <span className="gallery-photo-tag">
-                  <Users className="w-3 h-3" /> {ui.galleryTag2}
+                  <Users className="w-3 h-3" aria-hidden="true" /> {ui.galleryTag2}
                 </span>
-                <p className="text-white/85 text-xs mt-1">Reynosa, Tamaulipas</p>
+                <p className="text-white/90 text-xs font-semibold mt-1 drop-shadow-sm">Reynosa, Tamaulipas</p>
               </div>
             </div>
 
@@ -70,7 +70,7 @@ export default function Gallery({ language }: { language: Language }) {
               <div className="gallery-photo-overlay" />
               <div className="gallery-photo-label">
                 <span className="gallery-photo-tag">
-                  <Mic2 className="w-3 h-3" /> {ui.galleryTag3}
+                  <Mic2 className="w-3 h-3" aria-hidden="true" /> {ui.galleryTag3}
                 </span>
               </div>
             </div>
@@ -86,7 +86,7 @@ export default function Gallery({ language }: { language: Language }) {
               <div className="gallery-photo-overlay" />
               <div className="gallery-photo-label">
                 <span className="gallery-photo-tag">
-                  <Network className="w-3 h-3" /> {ui.galleryTag4}
+                  <Network className="w-3 h-3" aria-hidden="true" /> {ui.galleryTag4}
                 </span>
               </div>
             </div>

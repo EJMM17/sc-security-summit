@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Shield, ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
 
 export const revalidate = 86400; // 24 hours — static content, revalidate daily
 
 export const metadata: Metadata = {
-  title: "Términos y Condiciones | SC Security Summit 2026",
+  title: { absolute: "Términos y Condiciones | SC Security Summit 2026" },
   description:
     "Términos y condiciones de participación para el 1er Summit de Seguridad en la Cadena de Suministros 2026.",
   robots: { index: false, follow: false },
@@ -18,9 +19,14 @@ export default function TerminosCondiciones() {
       <header className="bg-slate-900 py-6">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <Image
+              src="/images/logo-symbol-blue.png"
+              alt="SC Security Summit"
+              width={36}
+              height={36}
+              className="summit-footer-logo w-9 h-9 object-contain"
+              priority
+            />
             <div>
               <span className="font-bold text-white text-sm tracking-tight" style={{ fontFamily: "var(--font-oswald)" }}>SC SUMMIT</span>
               <span className="block text-[10px] font-bold tracking-[0.2em] text-blue-400">REYNOSA 2026</span>

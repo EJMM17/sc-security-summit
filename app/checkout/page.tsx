@@ -37,7 +37,7 @@ export async function generateMetadata({
   const seo = SEO[language];
 
   return {
-    title: seo.title,
+    title: { absolute: seo.title },
     description: seo.description,
     alternates: {
       canonical: `${BASE_URL}${PATH}`,

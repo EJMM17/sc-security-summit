@@ -178,7 +178,7 @@ export const UI_TEXT = {
     mapPrivacyNote:
       "El mapa se muestra a través de Google Maps, por lo que al verlo se establece una conexión con ese servicio.",
     mapTitle: "Mapa del Centro de Convenciones de Reynosa",
-    datesLabel: "Fechas",
+    datesLabel: "Fecha y horario",
     datesValue: "24 de septiembre, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contacto",
@@ -188,7 +188,7 @@ export const UI_TEXT = {
     faqLabel: "PREGUNTAS FRECUENTES",
     faqTitle: "Preguntas frecuentes",
     regLabel: "PASES CORPORATIVOS",
-    regTitle: "Capacita a Tu Equipo Completo",
+    regTitle: "Capacita a tu equipo completo",
     regDesc:
       "Un solo pase, cobertura completa. Acceso para tu equipo a cualquier hora del día: cada departamento asiste al bloque que le corresponde.",
     corporateAccessTitle: "Accesos Plus con descuento por volumen",
@@ -219,6 +219,7 @@ export const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. Todos los derechos reservados.",
     footerPrivacy: "Aviso de Privacidad",
     footerTerms: "Términos y Condiciones",
+    footerCookies: "Configurar cookies",
     galleryLabel: "LA EXPERIENCIA",
     galleryTitle: "Diseñada para aprender, no solo para escuchar",
     galleryDesc:
@@ -332,7 +333,7 @@ export const UI_TEXT = {
     mapPrivacyNote:
       "The map is displayed through Google Maps, so viewing it establishes a connection with that service.",
     mapTitle: "Map of the Reynosa Convention Center",
-    datesLabel: "Dates",
+    datesLabel: "Date and time",
     datesValue: "September 24, 2026",
     datesHours: "8:00 AM — 7:00 PM",
     contactLabel: "Contact",
@@ -373,6 +374,7 @@ export const UI_TEXT = {
     footerCopyright: "© 2026 SC Security Summit. All rights reserved.",
     footerPrivacy: "Privacy Notice",
     footerTerms: "Terms and Conditions",
+    footerCookies: "Cookie settings",
     galleryLabel: "THE EXPERIENCE",
     galleryTitle: "Designed to learn, not just to listen",
     galleryDesc:
@@ -1407,13 +1409,14 @@ export const CHECKOUT = {
       "Solicitaste CFDI: lo emitimos dentro de las 72 horas siguientes a la confirmación del pago.",
     pendingTitle: "Pago pendiente",
     pendingDesc:
-      "Tu pago está en proceso. Si pagaste con SPEI o en efectivo puede tardar hasta 48 horas en acreditarse. Te avisamos por correo en cuanto se confirme.",
+      "Tu pago está en proceso. Si pagaste con transferencia SPEI puede tardar un poco más en acreditarse. Te avisamos por correo en cuanto se acredite.",
     failureTitle: "No se completó el pago",
     failureDesc:
       "El pago no se realizó y no se te hizo ningún cargo. Puedes intentarlo de nuevo o escribirnos a hola@scsecuritysummit.com.",
     backToCheckout: "VOLVER A INTENTAR",
     backToHome: "IR AL INICIO",
     orderReference: "Referencia de tu orden",
+    unknownTitle: "Estado de tu orden",
     statusUnknown:
       "No encontramos esa orden. Si ya pagaste, escríbenos a hola@scsecuritysummit.com con tu comprobante.",
   },
@@ -1554,13 +1557,14 @@ export const CHECKOUT = {
       "You requested a CFDI: we issue it within 72 hours of payment confirmation.",
     pendingTitle: "Payment pending",
     pendingDesc:
-      "Your payment is being processed. SPEI transfers and cash payments can take up to 48 hours to clear. We will email you as soon as it is confirmed.",
+      "Your payment is being processed. SPEI transfers can take a little longer to clear. We will email you as soon as it clears.",
     failureTitle: "Payment not completed",
     failureDesc:
       "The payment did not go through and you were not charged. You can try again or email us at hola@scsecuritysummit.com.",
     backToCheckout: "TRY AGAIN",
     backToHome: "GO TO HOME",
     orderReference: "Your order reference",
+    unknownTitle: "Your order status",
     statusUnknown:
       "We could not find that order. If you already paid, email hola@scsecuritysummit.com with your receipt.",
   },

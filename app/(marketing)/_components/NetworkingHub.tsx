@@ -24,8 +24,8 @@ export default function NetworkingHub({ language }: { language: Language }) {
       <div className="networking-overlay absolute inset-0 z-[1]" aria-hidden="true" />
 
       <div className="mock-container relative z-10">
-        <div className="flex flex-col md:flex-row items-center gap-12">
-          <div className="md:w-3/5">
+        <div className="flex flex-col lg:flex-row items-center gap-12">
+          <div className="w-full lg:w-3/5">
             <ScrollReveal>
               <span className="networking-label mb-6">
                 {ui.networkingLabel}
@@ -54,7 +54,7 @@ export default function NetworkingHub({ language }: { language: Language }) {
             </ScrollReveal>
           </div>
 
-          <div className="md:w-2/5">
+          <div className="w-full lg:w-2/5">
             <ScrollReveal delay={150}>
               <span className="networking-label networking-label--sub mb-2">
                 {ui.providersLabel}

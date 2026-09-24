@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
-import { Shield, ArrowLeft } from "lucide-react";
+import Image from "next/image";
+import { ArrowLeft } from "lucide-react";
 import Breadcrumbs from "@/components/Breadcrumbs";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 import { INQUIRY_CONSENT_VERSION } from "@/lib/inquiries/constants";
 
 export const revalidate = 86400; // 24 hours — static content, revalidate daily
 
 export const metadata: Metadata = {
-  title: "Aviso de Privacidad | SC Security Summit 2026",
+  title: { absolute: "Aviso de Privacidad | SC Security Summit 2026" },
   description:
     "Aviso de privacidad de Lanz Logistics para el 1er Summit de Seguridad en la Cadena de Suministros 2026.",
   robots: { index: false, follow: false },
@@ -19,9 +21,14 @@ export default function AvisoPrivacidad() {
       <header className="bg-slate-900 py-6">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-blue-800 flex items-center justify-center">
-              <Shield className="w-4 h-4 text-white" />
-            </div>
+            <Image
+              src="/images/logo-symbol-blue.png"
+              alt="SC Security Summit"
+              width={36}
+              height={36}
+              className="summit-footer-logo w-9 h-9 object-contain"
+              priority
+            />
             <div>
               <span className="font-bold text-white text-sm tracking-tight" style={{ fontFamily: "var(--font-oswald)" }}>SC SUMMIT</span>
               <span className="block text-[10px] font-bold tracking-[0.2em] text-blue-400">REYNOSA 2026</span>
@@ -262,10 +269,14 @@ export default function AvisoPrivacidad() {
               Consent Mode de Google se inicializa denegado y las etiquetas se
               montan solo después de elegir “Aceptar todas”. El titular puede
               otorgar, rechazar o cambiar su elección en cualquier momento
-              desde el control permanente de configuración de cookies del
-              sitio, o escribiendo a{" "}
+              desde el enlace «Configurar cookies» al pie de cada página del
+              sitio o con el botón de esta sección, o escribiendo a{" "}
               <a href="mailto:hola@scsecuritysummit.com" className="text-blue-600 hover:underline">hola@scsecuritysummit.com</a>.
             </p>
+            <CookieSettingsButton
+              label="Configurar cookies"
+              className="mt-4 inline-flex min-h-11 items-center rounded-lg border border-slate-300 px-4 text-sm font-semibold text-slate-800 transition-colors hover:border-blue-500 hover:text-blue-700"
+            />
             <p className="mt-3">
               La atribución propia de campañas también permanece deshabilitada
               sin consentimiento. Al elegir solo cookies esenciales se borran

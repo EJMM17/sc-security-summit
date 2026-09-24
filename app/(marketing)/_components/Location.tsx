@@ -71,14 +71,16 @@ export default function Location({ language }: { language: Language }) {
                   <span className="mock-icon-box" aria-hidden="true">
                     <SummitIcon name="phone" />
                   </span>
-                  <div>
+                  <div className="min-w-0">
                     <h3 className="font-bold text-slate-800 text-sm">{ui.contactLabel}</h3>
                     <p className="text-sm text-slate-500 mt-1">+52 899 112 8755</p>
                     <a
                       href="mailto:hola@scsecuritysummit.com"
-                      className="inline-flex min-h-11 items-center text-sm text-blue-600 hover:underline"
+                      className="inline-block min-h-11 py-3 text-sm text-blue-600 [overflow-wrap:anywhere] hover:underline"
                     >
-                      hola@scsecuritysummit.com
+                      {/* On a narrow card the address breaks after the @, not
+                          in the middle of the domain. */}
+                      hola@<wbr />scsecuritysummit.com
                     </a>
                   </div>
                 </div>

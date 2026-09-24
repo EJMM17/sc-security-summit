@@ -1,5 +1,12 @@
 export const COOKIE_CONSENT_STORAGE_KEY = "scss2026:cookie-consent";
 export const COOKIE_CONSENT_EVENT = "scss2026:consent";
+/** Reopens the cookie notice from a "Cookie settings" control. */
+export const COOKIE_SETTINGS_EVENT = "scss2026:consent-settings";
+/**
+ * Set on <html> by ConsentMode before first paint when a choice is stored, so
+ * a returning visitor never sees the server-rendered notice flash in.
+ */
+export const COOKIE_CONSENT_DECIDED_ATTRIBUTE = "data-consent-decided";
 export const MARKETING_CONSENT_FORM_FIELD = "marketingConsent";
 
 export type CookieConsentDecision = "all" | "essential";
@@ -34,4 +41,10 @@ export function readCookieConsentDecision(): CookieConsentDecision | null {
 
 export function hasMarketingConsent(): boolean {
   return readCookieConsentDecision() === "all";
+}
+
+export function openCookieSettings(): void {
+  try {
+    window.dispatchEvent(new Event(COOKIE_SETTINGS_EVENT));
+  } catch {}
 }

@@ -1,7 +1,27 @@
 import Link from "next/link";
 import { Compass } from "lucide-react";
+import { getRequestLanguage } from "@/lib/language";
 
-export default function NotFound() {
+const COPY = {
+  es: {
+    title: "Página no encontrada",
+    body: "La página que buscas no existe o fue movida.",
+    home: "Ir al inicio",
+    href: "/",
+  },
+  en: {
+    title: "Page not found",
+    body: "The page you are looking for does not exist or has moved.",
+    home: "Go to home",
+    href: "/?lang=en",
+  },
+} as const;
+
+export default async function NotFound() {
+  // Same language the root layout declared, so the page and the cookie notice
+  // above it never disagree.
+  const t = COPY[await getRequestLanguage()];
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
       <div className="max-w-md rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
@@ -14,17 +34,15 @@ export default function NotFound() {
           404
         </p>
         <h1 className="mt-2 font-oswald text-2xl font-bold text-slate-900 sm:text-3xl">
-          Página no encontrada
+          {t.title}
         </h1>
-        <p className="mt-3 text-sm text-slate-600">
-          La página que buscas no existe o fue movida.
-        </p>
+        <p className="mt-3 text-sm text-slate-600">{t.body}</p>
         <div className="mt-6">
           <Link
-            href="/"
+            href={t.href}
             className="inline-block rounded-lg bg-blue-600 px-5 py-3 text-sm font-bold uppercase tracking-wider text-white transition-colors hover:bg-blue-700"
           >
-            Ir al inicio
+            {t.home}
           </Link>
         </div>
       </div>

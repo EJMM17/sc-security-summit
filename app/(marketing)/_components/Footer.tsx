@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ExternalLink, Mail, Phone } from "lucide-react";
+import CookieSettingsButton from "@/components/CookieSettingsButton";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
 
@@ -77,6 +78,7 @@ export default function Footer({
           <div>
             <a href="/aviso-de-privacidad">{ui.footerPrivacy}</a>
             <a href="/terminos-y-condiciones">{ui.footerTerms}</a>
+            <CookieSettingsButton label={ui.footerCookies} />
           </div>
         </div>
       </div>

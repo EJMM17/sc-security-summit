@@ -1,12 +1,34 @@
 import Link from "next/link";
-import { CheckCircle2, Clock, XCircle } from "lucide-react";
+import { CheckCircle2, Clock, HelpCircle, XCircle } from "lucide-react";
 import PageShell from "@/components/PageShell";
 import { CONTENT } from "@/lib/content";
 import type { Language } from "@/lib/language";
+import type { TicketOrderStatus } from "@/lib/payments/result";
 import { formatMxn } from "@/lib/payments/tax";
 import { reconcileTicketOrder } from "@/server/use-cases/reconcile-ticket-order";
 
 export type CheckoutOutcomeKind = "success" | "pending" | "failure";
+
+/**
+ * The presentation follows the stored status. The route MercadoPago returned
+ * to only says what the buyer saw in its checkout; `/checkout/gracias` for an
+ * order the webhook has not settled yet is still a pending payment.
+ */
+function presentationFor(status: TicketOrderStatus): CheckoutOutcomeKind | "unknown" {
+  switch (status) {
+    case "paid":
+      return "success";
+    case "pending":
+    case "in_process":
+      return "pending";
+    case "rejected":
+    case "cancelled":
+      return "failure";
+    default:
+      // Refunded or charged back: neither "confirmed" nor "not charged" is true.
+      return "unknown";
+  }
+}
 
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -26,11 +48,9 @@ const UUID_PATTERN =
  * whose webhook never arrived is not shown a stale status forever.
  */
 export default async function CheckoutOutcome({
-  kind,
   language,
   orderId,
 }: {
-  kind: CheckoutOutcomeKind;
   language: Language;
   orderId: string | undefined;
 }) {
@@ -40,6 +60,10 @@ export default async function CheckoutOutcome({
     orderId && UUID_PATTERN.test(orderId)
       ? await reconcileTicketOrder(orderId).catch(() => null)
       : null;
+
+  // Without a stored order there is nothing to confirm: never tell a buyer a
+  // payment went through because of the URL they landed on.
+  const kind = summary ? presentationFor(summary.status) : "unknown";
 
   const presentation = {
     success: {
@@ -56,6 +80,11 @@ export default async function CheckoutOutcome({
       icon: <XCircle className="h-12 w-12 text-red-600" aria-hidden="true" />,
       title: copy.failureTitle,
       desc: copy.failureDesc,
+    },
+    unknown: {
+      icon: <HelpCircle className="h-12 w-12 text-slate-400" aria-hidden="true" />,
+      title: copy.unknownTitle,
+      desc: copy.statusUnknown,
     },
   }[kind];
 
@@ -93,9 +122,7 @@ export default async function CheckoutOutcome({
                 <span className="font-mono">{summary.id}</span>
               </p>
             </div>
-          ) : (
-            <p className="mt-6 text-sm text-slate-500">{copy.statusUnknown}</p>
-          )}
+          ) : null}
 
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             {kind === "success" ? (

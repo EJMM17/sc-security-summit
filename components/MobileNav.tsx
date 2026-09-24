@@ -29,6 +29,15 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
     };
   }, [open]);
 
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   return (
     <div className="lg:hidden">
       <button
@@ -58,8 +67,10 @@ export default function MobileNav({ language = "es" }: { language?: Language }) 
         aria-label={language === "en" ? "Navigation menu" : "Menú de navegación"}
         className={`fixed top-[70px] left-3 right-3 z-40 bg-white rounded-[20px] shadow-lg border border-[var(--border-light)] transition-all duration-200 max-h-[calc(100dvh-84px)] overflow-y-auto safe-pad-bottom ${
           open
-            ? "opacity-100 translate-y-0 scale-100"
-            : "opacity-0 -translate-y-4 scale-95 pointer-events-none"
+            ? "visible opacity-100 translate-y-0 scale-100"
+            : // `invisible` keeps the closed menu out of the tab order and the
+              // accessibility tree; visibility flips only after the fade-out.
+              "invisible opacity-0 -translate-y-4 scale-95 pointer-events-none"
         }`}
       >
         <nav
