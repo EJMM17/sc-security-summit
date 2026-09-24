@@ -5216,7 +5216,7 @@ body {
 .summit-footer-bottom > div {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1.6rem;
+  gap: 0.5rem 1.6rem;
 }
 
 .summit-footer-bottom a:hover,

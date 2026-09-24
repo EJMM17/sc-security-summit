@@ -91,10 +91,16 @@ export default async function RootLayout({
 }>) {
   const headersList = await headers();
   const nonce = headersList.get("x-nonce") ?? "";
-  const language = await getRequestLanguage();
+  const pathname = headersList.get("x-pathname") ?? "";
+  // The legal notices are published only in Spanish: declare the language
+  // they are written in, and show the cookie notice in it too.
+  const isSpanishOnlyRoute =
+    pathname.startsWith("/aviso-de-privacidad") ||
+    pathname.startsWith("/terminos-y-condiciones");
+  const language = isSpanishOnlyRoute ? "es" : await getRequestLanguage();
   // The internal operations panel renders operator-facing data. It never mounts
   // marketing chrome, analytics, pixels or attribution capture.
-  const isAdminRoute = (headersList.get("x-pathname") ?? "").startsWith("/admin");
+  const isAdminRoute = pathname.startsWith("/admin");
   const marketingDataEnabled = !isVisualOnlyVercelDeployment() && !isAdminRoute;
   const productionTelemetryEnabled =
     isVercelProductionDeployment() && !isAdminRoute;

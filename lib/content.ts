@@ -188,7 +188,7 @@ export const UI_TEXT = {
     faqLabel: "PREGUNTAS FRECUENTES",
     faqTitle: "Preguntas frecuentes",
     regLabel: "PASES CORPORATIVOS",
-    regTitle: "Capacita a Tu Equipo Completo",
+    regTitle: "Capacita a tu equipo completo",
     regDesc:
       "Un solo pase, cobertura completa. Acceso para tu equipo a cualquier hora del día: cada departamento asiste al bloque que le corresponde.",
     corporateAccessTitle: "Accesos Plus con descuento por volumen",
